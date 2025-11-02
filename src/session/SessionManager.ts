@@ -14,6 +14,14 @@ import type {
   SessionStatus,
 } from "./types.js";
 
+import {
+  atomicDeleteFile,
+  AtomicOperationError,
+  AtomicReadError,
+  atomicReadFile,
+  AtomicWriteError,
+  atomicWriteFile,
+} from "./atomic-operations.js";
 import { DEFAULT_SESSION_CONFIG, SESSION_FILES } from "./types.js";
 import {
   createSafeFilename,
@@ -21,6 +29,7 @@ import {
   fileExists,
   getCurrentTimestamp,
   isTimestampExpired,
+  resolveSessionDirectory,
   sanitizeSessionId,
   validateSessionDirectory,
 } from "./utils.js";
@@ -36,7 +45,8 @@ export class SessionManager {
       ...config,
     } as SessionConfig;
 
-    this.baseDir = this.config.baseDir;
+    // Resolve the directory path using XDG-compliant resolution
+    this.baseDir = resolveSessionDirectory(this.config.baseDir);
     this.sessionsDir = this.baseDir;
   }
 
@@ -106,11 +116,47 @@ export class SessionManager {
   }
 
   /**
-   * Delete a session directory and all files
+   * Delete a session directory and all files using atomic operations
    */
   async deleteSession(sessionId: string): Promise<void> {
+    if (!this.isValidSessionId(sessionId)) {
+      throw new Error(`Invalid session ID format: ${sessionId}`);
+    }
+
     const sessionDir = this.getSessionDir(sessionId);
-    await fs.rm(sessionDir, { force: true, recursive: true });
+
+    try {
+      // Delete session files atomically
+      const filesToDelete = [
+        SESSION_FILES.REQUEST,
+        SESSION_FILES.STATUS,
+        SESSION_FILES.ANSWERS,
+      ];
+
+      for (const filename of filesToDelete) {
+        const filePath = join(
+          sessionDir,
+          createSafeFilename(sessionId, filename),
+        );
+        try {
+          await atomicDeleteFile(filePath);
+        } catch (error) {
+          // Ignore file not found errors during cleanup
+          if (
+            !(error as AtomicOperationError)?.cause?.message.includes("ENOENT")
+          ) {
+            console.warn(
+              `Warning: Failed to delete session file ${filename}: ${error}`,
+            );
+          }
+        }
+      }
+
+      // Delete session directory
+      await fs.rm(sessionDir, { force: true, recursive: true });
+    } catch (error) {
+      throw new Error(`Failed to delete session ${sessionId}: ${error}`);
+    }
   }
 
   /**
@@ -274,10 +320,21 @@ export class SessionManager {
     // Check required files
     const requiredFiles = [SESSION_FILES.REQUEST, SESSION_FILES.STATUS];
     for (const filename of requiredFiles) {
-      const filePath = join(this.getSessionDir(sessionId), filename);
+      const filePath = join(
+        this.getSessionDir(sessionId),
+        createSafeFilename(sessionId, filename),
+      );
       if (!(await fileExists(filePath))) {
         issues.push(`Required file missing: ${filename}`);
       }
+    }
+
+    // If any required files are missing, don't try to read them
+    if (issues.length > 0) {
+      return {
+        issues,
+        isValid: false,
+      };
     }
 
     // Validate session status consistency
@@ -329,34 +386,54 @@ export class SessionManager {
   }
 
   /**
-   * Read data from a session file
+   * Read data from a session file using atomic operations
    */
   private async readSessionFile<T>(
     sessionId: string,
     filename: string,
     fallback: null | T = null,
   ): Promise<null | T> {
+    // First validate session ID format
+    if (!this.isValidSessionId(sessionId)) {
+      return fallback;
+    }
+
+    const safeFilename = createSafeFilename(sessionId, filename);
+    const filePath = join(this.getSessionDir(sessionId), safeFilename);
+
     try {
-      // First validate session ID format
-      if (!this.isValidSessionId(sessionId)) {
-        return fallback;
+      const content = await atomicReadFile(filePath, {
+        encoding: "utf8",
+        maxRetries: 3,
+        retryDelay: 100,
+      });
+
+      try {
+        return JSON.parse(content) as T;
+      } catch (parseError) {
+        throw new Error(
+          `Failed to parse JSON from session file ${filename} for session ${sessionId}: ${parseError}`,
+        );
       }
-
-      const safeFilename = createSafeFilename(sessionId, filename);
-      const filePath = join(this.getSessionDir(sessionId), safeFilename);
-
-      const content = await fs.readFile(filePath, "utf-8");
-      return JSON.parse(content) as T;
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-        return fallback;
+      if (error instanceof AtomicReadError) {
+        // Check if the error is just that the file doesn't exist
+        if (
+          error.cause?.message.includes("File does not exist") ||
+          error.message.includes("File does not exist")
+        ) {
+          return fallback;
+        }
+        throw new Error(
+          `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`,
+        );
       }
       throw error;
     }
   }
 
   /**
-   * Write data to a session file
+   * Write data to a session file using atomic operations
    */
   private async writeSessionFile<T>(
     sessionId: string,
@@ -365,8 +442,19 @@ export class SessionManager {
   ): Promise<void> {
     const safeFilename = createSafeFilename(sessionId, filename);
     const filePath = join(this.getSessionDir(sessionId), safeFilename);
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), {
-      mode: 0o600,
-    });
+
+    try {
+      await atomicWriteFile(filePath, JSON.stringify(data, null, 2), {
+        encoding: "utf8",
+        mode: 0o600,
+      });
+    } catch (error) {
+      if (error instanceof AtomicWriteError) {
+        throw new Error(
+          `Failed to write session file ${filename} for session ${sessionId}: ${error.message}`,
+        );
+      }
+      throw error;
+    }
   }
 }

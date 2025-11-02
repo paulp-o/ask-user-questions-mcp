@@ -68,7 +68,7 @@ export type SessionStatusValue = SessionStatus["status"];
  * Default session configuration
  */
 export const DEFAULT_SESSION_CONFIG: Partial<SessionConfig> = {
-  baseDir: "/tmp/auq/sessions",
+  baseDir: "~/.local/share/auq/sessions", // Will be resolved to actual path
   maxSessions: 100,
   sessionTimeout: 24 * 60 * 60 * 1000, // 24 hours
 };

@@ -4,6 +4,49 @@
 
 import { constants } from "fs";
 import { promises as fs } from "fs";
+import { homedir } from "os";
+import { join } from "path";
+
+/**
+ * Resolve session directory path using XDG Base Directory specification
+ * Falls back to user home directory if XDG is not available
+ */
+export function resolveSessionDirectory(baseDir?: string): string {
+  if (baseDir) {
+    // If baseDir is provided, expand any ~ to home directory
+    if (baseDir.startsWith("~")) {
+      return join(homedir(), baseDir.slice(1));
+    }
+    return baseDir;
+  }
+
+  // Default XDG-compliant paths
+  const home = homedir();
+  const platform = process.platform;
+
+  if (platform === "darwin") {
+    // macOS: ~/Library/Application Support/
+    return join(home, "Library", "Application Support", "auq", "sessions");
+  } else if (platform === "win32") {
+    // Windows: %APPDATA%/auq/sessions/
+    const appData = process.env.APPDATA;
+    if (appData) {
+      return join(appData, "auq", "sessions");
+    }
+    // Fallback to user profile
+    const userProfile = process.env.USERPROFILE || home;
+    return join(userProfile, "auq", "sessions");
+  } else {
+    // Linux/Unix: ~/.local/share/ (XDG Base Directory)
+    // Check for XDG_DATA_HOME environment variable
+    const xdgDataHome = process.env.XDG_DATA_HOME;
+    if (xdgDataHome) {
+      return join(xdgDataHome, "auq", "sessions");
+    }
+    // Fallback to ~/.local/share/
+    return join(home, ".local", "share", "auq", "sessions");
+  }
+}
 
 /**
  * Create a safe filename from a session ID (basic validation)

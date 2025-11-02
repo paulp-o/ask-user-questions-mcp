@@ -2,6 +2,7 @@ import { FastMCP } from "fastmcp";
 import { z } from "zod";
 
 import type { Question } from "./session/types.js";
+import { resolveSessionDirectory } from "./session/utils.js";
 
 import { SessionManager } from "./session/index.js";
 
@@ -67,22 +68,17 @@ server.addTool({
       // Create new session
       const sessionId = await sessionManager.createSession(questions);
 
-      log.info("Session created", {
-        questionCount: questions.length,
-        sessionDir: `/tmp/auq/sessions/${sessionId}`,
-        sessionId,
-      });
-
       // Return session information for Subtask 1
       // (Future subtasks will handle TUI interaction and response collection)
+      const sessionDir = sessionManager.getConfig().baseDir;
       return {
         content: [
           {
             text:
               `Session created with ID: ${sessionId}\n\n` +
-              `Questions stored in: /tmp/auq/sessions/${sessionId}/\n` +
+              `Questions stored in: ${sessionDir}/${sessionId}/\n` +
               `Total questions: ${questions.length}\n\n` +
-              `[TUI implementation coming in subtask 2 - run 'auq' command when available]`,
+              `[TUI implementation coming in subtask 3 - run 'auq' command when available]`,
             type: "text",
           },
         ],
