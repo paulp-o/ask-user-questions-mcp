@@ -22,6 +22,7 @@ import {
   AtomicWriteError,
   atomicWriteFile,
 } from "./atomic-operations.js";
+import { PromiseFileWatcher } from "./file-watcher.js";
 import { DEFAULT_SESSION_CONFIG, SESSION_FILES } from "./types.js";
 import {
   createSafeFilename,
@@ -37,6 +38,7 @@ import {
 export class SessionManager {
   private baseDir: string;
   private config: SessionConfig;
+  private fileWatcher?: PromiseFileWatcher;
   private sessionsDir: string;
 
   constructor(config: Partial<SessionConfig> = {}) {
@@ -136,7 +138,7 @@ export class SessionManager {
       for (const filename of filesToDelete) {
         const filePath = join(
           sessionDir,
-          createSafeFilename(sessionId, filename),
+          createSafeFilename(sessionId, filename)
         );
         try {
           await atomicDeleteFile(filePath);
@@ -146,7 +148,7 @@ export class SessionManager {
             !(error as AtomicOperationError)?.cause?.message.includes("ENOENT")
           ) {
             console.warn(
-              `Warning: Failed to delete session file ${filename}: ${error}`,
+              `Warning: Failed to delete session file ${filename}: ${error}`
             );
           }
         }
@@ -186,7 +188,7 @@ export class SessionManager {
   async getSessionAnswers(sessionId: string): Promise<null | SessionAnswer> {
     return this.readSessionFile<SessionAnswer>(
       sessionId,
-      SESSION_FILES.ANSWERS,
+      SESSION_FILES.ANSWERS
     );
   }
 
@@ -204,7 +206,7 @@ export class SessionManager {
   async getSessionRequest(sessionId: string): Promise<null | SessionRequest> {
     return this.readSessionFile<SessionRequest>(
       sessionId,
-      SESSION_FILES.REQUEST,
+      SESSION_FILES.REQUEST
     );
   }
 
@@ -226,7 +228,7 @@ export class SessionManager {
       const isValid = await validateSessionDirectory(this.sessionsDir);
       if (!isValid) {
         throw new Error(
-          `Failed to create or access session directory: ${this.sessionsDir}`,
+          `Failed to create or access session directory: ${this.sessionsDir}`
         );
       }
     } catch (error) {
@@ -248,7 +250,7 @@ export class SessionManager {
    */
   async saveSessionAnswers(
     sessionId: string,
-    answers: SessionAnswer,
+    answers: SessionAnswer
   ): Promise<void> {
     const exists = await this.sessionExists(sessionId);
     if (!exists) {
@@ -280,7 +282,7 @@ export class SessionManager {
   async updateSessionStatus(
     sessionId: string,
     status: SessionStatus["status"],
-    additionalData?: Partial<SessionStatus>,
+    additionalData?: Partial<SessionStatus>
   ): Promise<void> {
     // First validate session ID format
     if (!this.isValidSessionId(sessionId)) {
@@ -322,7 +324,7 @@ export class SessionManager {
     for (const filename of requiredFiles) {
       const filePath = join(
         this.getSessionDir(sessionId),
-        createSafeFilename(sessionId, filename),
+        createSafeFilename(sessionId, filename)
       );
       if (!(await fileExists(filePath))) {
         issues.push(`Required file missing: ${filename}`);
@@ -362,6 +364,44 @@ export class SessionManager {
   }
 
   /**
+   * Wait for user answers to be submitted for a specific session
+   * Returns the session ID when answers are detected, or rejects on timeout
+   */
+  async waitForAnswers(sessionId: string, timeoutMs?: number): Promise<string> {
+    if (!this.fileWatcher) {
+      this.fileWatcher = new PromiseFileWatcher({
+        debounceMs: 100,
+        ignoreInitial: true,
+        timeoutMs: timeoutMs ?? 0, // 0 means infinite wait time by default
+      });
+    }
+
+    const sessionDir = this.getSessionDir(sessionId);
+
+    try {
+      const answersPath = await this.fileWatcher.waitForFile(
+        sessionDir,
+        SESSION_FILES.ANSWERS
+      );
+
+      // Clean up the watcher after successful wait
+      this.fileWatcher.cleanup();
+      this.fileWatcher = undefined;
+
+      // Verify the answers file exists and return the session ID
+      console.debug(`Answers file created: ${answersPath}`);
+      return sessionId;
+    } catch (error) {
+      // Clean up on error
+      if (this.fileWatcher) {
+        this.fileWatcher.cleanup();
+        this.fileWatcher = undefined;
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Get session directory path for a given session ID
    */
   private getSessionDir(sessionId: string): string {
@@ -391,7 +431,7 @@ export class SessionManager {
   private async readSessionFile<T>(
     sessionId: string,
     filename: string,
-    fallback: null | T = null,
+    fallback: null | T = null
   ): Promise<null | T> {
     // First validate session ID format
     if (!this.isValidSessionId(sessionId)) {
@@ -412,7 +452,7 @@ export class SessionManager {
         return JSON.parse(content) as T;
       } catch (parseError) {
         throw new Error(
-          `Failed to parse JSON from session file ${filename} for session ${sessionId}: ${parseError}`,
+          `Failed to parse JSON from session file ${filename} for session ${sessionId}: ${parseError}`
         );
       }
     } catch (error) {
@@ -425,7 +465,7 @@ export class SessionManager {
           return fallback;
         }
         throw new Error(
-          `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`,
+          `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`
         );
       }
       throw error;
@@ -438,7 +478,7 @@ export class SessionManager {
   private async writeSessionFile<T>(
     sessionId: string,
     filename: string,
-    data: T,
+    data: T
   ): Promise<void> {
     const safeFilename = createSafeFilename(sessionId, filename);
     const filePath = join(this.getSessionDir(sessionId), safeFilename);
@@ -451,7 +491,7 @@ export class SessionManager {
     } catch (error) {
       if (error instanceof AtomicWriteError) {
         throw new Error(
-          `Failed to write session file ${filename} for session ${sessionId}: ${error.message}`,
+          `Failed to write session file ${filename} for session ${sessionId}: ${error.message}`
         );
       }
       throw error;

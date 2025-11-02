@@ -8,52 +8,11 @@ import { homedir } from "os";
 import { join } from "path";
 
 /**
- * Resolve session directory path using XDG Base Directory specification
- * Falls back to user home directory if XDG is not available
- */
-export function resolveSessionDirectory(baseDir?: string): string {
-  if (baseDir) {
-    // If baseDir is provided, expand any ~ to home directory
-    if (baseDir.startsWith("~")) {
-      return join(homedir(), baseDir.slice(1));
-    }
-    return baseDir;
-  }
-
-  // Default XDG-compliant paths
-  const home = homedir();
-  const platform = process.platform;
-
-  if (platform === "darwin") {
-    // macOS: ~/Library/Application Support/
-    return join(home, "Library", "Application Support", "auq", "sessions");
-  } else if (platform === "win32") {
-    // Windows: %APPDATA%/auq/sessions/
-    const appData = process.env.APPDATA;
-    if (appData) {
-      return join(appData, "auq", "sessions");
-    }
-    // Fallback to user profile
-    const userProfile = process.env.USERPROFILE || home;
-    return join(userProfile, "auq", "sessions");
-  } else {
-    // Linux/Unix: ~/.local/share/ (XDG Base Directory)
-    // Check for XDG_DATA_HOME environment variable
-    const xdgDataHome = process.env.XDG_DATA_HOME;
-    if (xdgDataHome) {
-      return join(xdgDataHome, "auq", "sessions");
-    }
-    // Fallback to ~/.local/share/
-    return join(home, ".local", "share", "auq", "sessions");
-  }
-}
-
-/**
  * Create a safe filename from a session ID (basic validation)
  */
 export function createSafeFilename(
   sessionId: string,
-  filename: string,
+  filename: string
 ): string {
   if (!sanitizeSessionId(sessionId)) {
     throw new Error(`Invalid session ID format: ${sessionId}`);
@@ -96,11 +55,52 @@ export function getCurrentTimestamp(): string {
  */
 export function isTimestampExpired(
   timestamp: string,
-  timeoutMs: number,
+  timeoutMs: number
 ): boolean {
   const now = new Date().getTime();
   const timestampTime = new Date(timestamp).getTime();
   return now - timestampTime > timeoutMs;
+}
+
+/**
+ * Resolve session directory path using XDG Base Directory specification
+ * Falls back to user home directory if XDG is not available
+ */
+export function resolveSessionDirectory(baseDir?: string): string {
+  if (baseDir) {
+    // If baseDir is provided, expand any ~ to home directory
+    if (baseDir.startsWith("~")) {
+      return join(homedir(), baseDir.slice(1));
+    }
+    return baseDir;
+  }
+
+  // Default XDG-compliant paths
+  const home = homedir();
+  const platform = process.platform;
+
+  if (platform === "darwin") {
+    // macOS: ~/Library/Application Support/
+    return join(home, "Library", "Application Support", "auq", "sessions");
+  } else if (platform === "win32") {
+    // Windows: %APPDATA%/auq/sessions/
+    const appData = process.env.APPDATA;
+    if (appData) {
+      return join(appData, "auq", "sessions");
+    }
+    // Fallback to user profile
+    const userProfile = process.env.USERPROFILE || home;
+    return join(userProfile, "auq", "sessions");
+  } else {
+    // Linux/Unix: ~/.local/share/ (XDG Base Directory)
+    // Check for XDG_DATA_HOME environment variable
+    const xdgDataHome = process.env.XDG_DATA_HOME;
+    if (xdgDataHome) {
+      return join(xdgDataHome, "auq", "sessions");
+    }
+    // Fallback to ~/.local/share/
+    return join(home, ".local", "share", "auq", "sessions");
+  }
 }
 
 /**
@@ -128,7 +128,7 @@ export function sanitizeSessionId(sessionId: string): boolean {
  * Validate that a session directory exists and is accessible
  */
 export async function validateSessionDirectory(
-  baseDir: string,
+  baseDir: string
 ): Promise<boolean> {
   try {
     await fs.access(baseDir, constants.R_OK | constants.W_OK);

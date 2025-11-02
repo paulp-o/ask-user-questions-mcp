@@ -2,9 +2,9 @@ import { FastMCP } from "fastmcp";
 import { z } from "zod";
 
 import type { Question } from "./session/types.js";
-import { resolveSessionDirectory } from "./session/utils.js";
 
 import { SessionManager } from "./session/index.js";
+// import { resolveSessionDirectory } from "./session/utils.js";
 
 // Initialize session manager
 const sessionManager = new SessionManager();
