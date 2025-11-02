@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
       paddingX={1}
     >
       <Text bold color={theme.colors.primary}>
-        | AUQ | - Ask User Questions MCP TUI
+        ⋆˙⟡ AUQ | Ask User Questions MCP TUI
       </Text>
       <Box>
         <Text dimColor>│</Text>
