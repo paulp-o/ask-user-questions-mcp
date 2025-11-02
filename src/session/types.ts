@@ -13,7 +13,7 @@ export interface Option {
 export interface Question {
   options: Option[];
   prompt: string;
-  title?: string; // Optional - defaults to "Q1", "Q2", etc. if not provided
+  title?: string; // Strongly recommended - provide a descriptive title like 'Language' or 'Framework'. Falls back to 'Q1', 'Q2' only if omitted.
 }
 
 export interface SessionAnswer {

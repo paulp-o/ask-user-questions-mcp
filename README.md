@@ -301,6 +301,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
   "questions": [
     {
       "prompt": "Which programming language do you want to use?",
+      "title": "Language",
       "options": [
         {
           "label": "JavaScript",

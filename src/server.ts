@@ -38,7 +38,9 @@ const QuestionSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Optional short 1-2 word summary for UI display. If omitted, defaults to 'Q1', 'Q2', etc."
+      "REQUIRED: Short 1-2 word summary for UI display (e.g., 'Language', 'Framework', 'Theme'). " +
+        "This title appears as a chip/tag in the interface and helps users quickly identify questions. " +
+        "Provide a meaningful title for better UX - do not rely on auto-generated 'Q1', 'Q2' fallbacks."
     ),
 });
 
@@ -54,7 +56,8 @@ server.addTool({
   description:
     "Ask the user one or more structured questions via an interactive terminal interface. " +
     "Each question includes multiple-choice options and allows custom free-text responses. " +
-    "Returns a formatted summary of all questions and answers.",
+    "Returns a formatted summary of all questions and answers. " +
+    "IMPORTANT: Always provide a descriptive 'title' field (1-2 words) for each question to improve UI clarity.",
   execute: async (args, { log }) => {
     try {
       // Initialize session manager if not already done
