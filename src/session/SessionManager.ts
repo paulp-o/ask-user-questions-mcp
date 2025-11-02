@@ -39,7 +39,6 @@ import {
 export class SessionManager {
   private baseDir: string;
   private config: SessionConfig;
-  private fileWatcher?: PromiseFileWatcher;
   private sessionsDir: string;
 
   constructor(config: Partial<SessionConfig> = {}) {
@@ -141,7 +140,7 @@ export class SessionManager {
       for (const filename of filesToDelete) {
         const filePath = join(
           sessionDir,
-          createSafeFilename(sessionId, filename),
+          createSafeFilename(sessionId, filename)
         );
         try {
           await atomicDeleteFile(filePath);
@@ -151,7 +150,7 @@ export class SessionManager {
             !(error as AtomicOperationError)?.cause?.message.includes("ENOENT")
           ) {
             console.warn(
-              `Warning: Failed to delete session file ${filename}: ${error}`,
+              `Warning: Failed to delete session file ${filename}: ${error}`
             );
           }
         }
@@ -191,7 +190,7 @@ export class SessionManager {
   async getSessionAnswers(sessionId: string): Promise<null | SessionAnswer> {
     return this.readSessionFile<SessionAnswer>(
       sessionId,
-      SESSION_FILES.ANSWERS,
+      SESSION_FILES.ANSWERS
     );
   }
 
@@ -209,7 +208,7 @@ export class SessionManager {
   async getSessionRequest(sessionId: string): Promise<null | SessionRequest> {
     return this.readSessionFile<SessionRequest>(
       sessionId,
-      SESSION_FILES.REQUEST,
+      SESSION_FILES.REQUEST
     );
   }
 
@@ -231,7 +230,7 @@ export class SessionManager {
       const isValid = await validateSessionDirectory(this.sessionsDir);
       if (!isValid) {
         throw new Error(
-          `Failed to create or access session directory: ${this.sessionsDir}`,
+          `Failed to create or access session directory: ${this.sessionsDir}`
         );
       }
     } catch (error) {
@@ -253,7 +252,7 @@ export class SessionManager {
    */
   async saveSessionAnswers(
     sessionId: string,
-    answers: SessionAnswer,
+    answers: SessionAnswer
   ): Promise<void> {
     const exists = await this.sessionExists(sessionId);
     if (!exists) {
@@ -308,12 +307,38 @@ export class SessionManager {
    * @returns Object containing sessionId and formatted response text
    * @throws Error if timeout occurs, validation fails, or file operations fail
    */
-  async startSession(questions: Question[]): Promise<{
+  async startSession(
+    questions: Question[],
+    callId?: string
+  ): Promise<{
     formattedResponse: string;
     sessionId: string;
   }> {
     // Step 1: Create the session
     const sessionId = await this.createSession(questions);
+
+    // Optionally attach callId metadata to request and status
+    if (callId) {
+      try {
+        const req = await this.getSessionRequest(sessionId);
+        if (req) {
+          await this.writeSessionFile(sessionId, SESSION_FILES.REQUEST, {
+            ...req,
+            callId,
+          } as SessionRequest);
+        }
+
+        const stat = await this.getSessionStatus(sessionId);
+        if (stat) {
+          await this.writeSessionFile(sessionId, SESSION_FILES.STATUS, {
+            ...stat,
+            callId,
+          } as SessionStatus);
+        }
+      } catch (e) {
+        console.warn("Failed to write callId metadata:", e);
+      }
+    }
 
     try {
       // Step 2: Calculate timeouts
@@ -325,13 +350,10 @@ export class SessionManager {
 
       // Step 3: Wait for answers with timeout
       try {
-        await this.waitForAnswers(sessionId, watcherTimeout);
+        await this.waitForAnswers(sessionId, watcherTimeout, callId);
       } catch (error) {
         // Check if session was rejected by user
-        if (
-          error instanceof Error &&
-          error.message === "SESSION_REJECTED"
-        ) {
+        if (error instanceof Error && error.message === "SESSION_REJECTED") {
           // Return rejection message to MCP caller
           return {
             formattedResponse:
@@ -343,7 +365,7 @@ export class SessionManager {
         // Watcher timeout occurred
         await this.updateSessionStatus(sessionId, "timed_out");
         throw new Error(
-          `Session ${sessionId} timed out waiting for user response: ${error instanceof Error ? error.message : String(error)}`,
+          `Session ${sessionId} timed out waiting for user response: ${error instanceof Error ? error.message : String(error)}`
         );
       }
 
@@ -360,7 +382,7 @@ export class SessionManager {
       if (!answers) {
         await this.updateSessionStatus(sessionId, "abandoned");
         throw new Error(
-          `Answers file was created but is invalid for session ${sessionId}`,
+          `Answers file was created but is invalid for session ${sessionId}`
         );
       }
 
@@ -376,14 +398,14 @@ export class SessionManager {
       } catch (error) {
         await this.updateSessionStatus(sessionId, "abandoned");
         throw new Error(
-          `Answer validation failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
+          `Answer validation failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`
         );
       }
 
       // Step 6: Format the response according to PRD specification
       const formattedResponse = ResponseFormatter.formatUserResponse(
         answers,
-        request.questions,
+        request.questions
       );
 
       // Step 7: Update final status
@@ -409,7 +431,7 @@ export class SessionManager {
   async updateSessionStatus(
     sessionId: string,
     status: SessionStatus["status"],
-    additionalData?: Partial<SessionStatus>,
+    additionalData?: Partial<SessionStatus>
   ): Promise<void> {
     // First validate session ID format
     if (!this.isValidSessionId(sessionId)) {
@@ -451,7 +473,7 @@ export class SessionManager {
     for (const filename of requiredFiles) {
       const filePath = join(
         this.getSessionDir(sessionId),
-        createSafeFilename(sessionId, filename),
+        createSafeFilename(sessionId, filename)
       );
       if (!(await fileExists(filePath))) {
         issues.push(`Required file missing: ${filename}`);
@@ -494,38 +516,51 @@ export class SessionManager {
    * Wait for user answers to be submitted for a specific session
    * Returns the session ID when answers are detected, or rejects on timeout
    */
-  async waitForAnswers(sessionId: string, timeoutMs?: number): Promise<string> {
-    if (!this.fileWatcher) {
-      this.fileWatcher = new PromiseFileWatcher({
-        debounceMs: 100,
-        ignoreInitial: true,
-        timeoutMs: timeoutMs ?? 0, // 0 means infinite wait time by default
-      });
-    }
-
+  async waitForAnswers(
+    sessionId: string,
+    timeoutMs?: number,
+    expectedCallId?: string
+  ): Promise<string> {
     const sessionDir = this.getSessionDir(sessionId);
+    const answersPath = join(sessionDir, SESSION_FILES.ANSWERS);
+    const startTime = Date.now();
+    const pollInterval = 200; // ms
 
-    try {
-      // Race between waiting for answers and polling for rejection
-      const result = await Promise.race([
-        this.fileWatcher.waitForFile(sessionDir, SESSION_FILES.ANSWERS),
-        this.pollForRejection(sessionId, timeoutMs ?? 0),
-      ]);
-
-      // Clean up the watcher after successful wait
-      this.fileWatcher.cleanup();
-      this.fileWatcher = undefined;
-
-      // Verify the answers file exists and return the session ID
-      console.debug(`Answers file created: ${result}`);
-      return sessionId;
-    } catch (error) {
-      // Clean up on error
-      if (this.fileWatcher) {
-        this.fileWatcher.cleanup();
-        this.fileWatcher = undefined;
+    // Poll for answers.json existence, guard against rejection and timeout
+    // This avoids race conditions inherent in fs.watch when files are created before watch attaches
+    // and isolates each MCP call purely by sessionId
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      // Check for answers
+      if (await fileExists(answersPath)) {
+        if (expectedCallId) {
+          // Verify callId matches before resolving (defensive)
+          try {
+            const ans = await this.getSessionAnswers(sessionId);
+            if (ans && (!ans.callId || ans.callId === expectedCallId)) {
+              return sessionId;
+            }
+          } catch {
+            // If read fails transiently, continue polling
+          }
+        } else {
+          return sessionId;
+        }
       }
-      throw error;
+
+      // Check for rejection
+      const status = await this.getSessionStatus(sessionId);
+      if (status && status.status === "rejected") {
+        throw new Error("SESSION_REJECTED");
+      }
+
+      // Check for timeout
+      if (timeoutMs && timeoutMs > 0 && Date.now() - startTime > timeoutMs) {
+        throw new Error("Timeout waiting for user response");
+      }
+
+      // Sleep before next poll
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
   }
 
@@ -535,7 +570,7 @@ export class SessionManager {
    */
   private async pollForRejection(
     sessionId: string,
-    timeoutMs: number,
+    timeoutMs: number
   ): Promise<never> {
     const startTime = Date.now();
     const pollInterval = 500; // Poll every 500ms
@@ -553,10 +588,7 @@ export class SessionManager {
         }
       } catch (error) {
         // If we can't read status, ignore and continue polling
-        if (
-          error instanceof Error &&
-          error.message === "SESSION_REJECTED"
-        ) {
+        if (error instanceof Error && error.message === "SESSION_REJECTED") {
           throw error; // Re-throw rejection
         }
       }
@@ -613,7 +645,7 @@ export class SessionManager {
   private async readSessionFile<T>(
     sessionId: string,
     filename: string,
-    fallback: null | T = null,
+    fallback: null | T = null
   ): Promise<null | T> {
     // First validate session ID format
     if (!this.isValidSessionId(sessionId)) {
@@ -634,7 +666,7 @@ export class SessionManager {
         return JSON.parse(content) as T;
       } catch (parseError) {
         throw new Error(
-          `Failed to parse JSON from session file ${filename} for session ${sessionId}: ${parseError}`,
+          `Failed to parse JSON from session file ${filename} for session ${sessionId}: ${parseError}`
         );
       }
     } catch (error) {
@@ -647,7 +679,7 @@ export class SessionManager {
           return fallback;
         }
         throw new Error(
-          `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`,
+          `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`
         );
       }
       throw error;
@@ -660,7 +692,7 @@ export class SessionManager {
   private async writeSessionFile<T>(
     sessionId: string,
     filename: string,
-    data: T,
+    data: T
   ): Promise<void> {
     const safeFilename = createSafeFilename(sessionId, filename);
     const filePath = join(this.getSessionDir(sessionId), safeFilename);
@@ -673,7 +705,7 @@ export class SessionManager {
     } catch (error) {
       if (error instanceof AtomicWriteError) {
         throw new Error(
-          `Failed to write session file ${filename} for session ${sessionId}: ${error.message}`,
+          `Failed to write session file ${filename} for session ${sessionId}: ${error.message}`
         );
       }
       throw error;

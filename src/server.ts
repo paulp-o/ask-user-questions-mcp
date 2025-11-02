@@ -1,4 +1,5 @@
 import { FastMCP } from "fastmcp";
+import { randomUUID } from "crypto";
 import { z } from "zod";
 
 import type { Question } from "./session/types.js";
@@ -92,10 +93,12 @@ server.addTool({
       });
 
       // Start complete session lifecycle - this will wait for user answers
+      // Generate a per-tool-call ID and persist it with the session
+      const callId = randomUUID();
       const { formattedResponse, sessionId } =
-        await sessionManager.startSession(questions);
+        await sessionManager.startSession(questions, callId);
 
-      log.info("Session completed successfully", { sessionId });
+      log.info("Session completed successfully", { sessionId, callId });
 
       // Return formatted response to AI model
       return {

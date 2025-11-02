@@ -91,6 +91,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
         answers: userAnswers,
         sessionId,
         timestamp: new Date().toISOString(),
+        callId: sessionRequest.callId,
       });
       // Signal completion (successful submission)
       onComplete?.(false);

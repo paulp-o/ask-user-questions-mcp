@@ -20,6 +20,7 @@ export interface SessionAnswer {
   answers: UserAnswer[];
   sessionId: string;
   timestamp: string;
+  callId?: string;
 }
 
 export interface SessionConfig {
@@ -34,6 +35,7 @@ export interface SessionRequest {
   sessionId: string;
   status: "completed" | "in-progress" | "pending" | "rejected" | "timed_out";
   timestamp: string;
+  callId?: string;
 }
 
 export interface SessionStatus {
@@ -43,6 +45,7 @@ export interface SessionStatus {
   sessionId: string;
   status: "abandoned" | "completed" | "in-progress" | "pending" | "rejected" | "timed_out";
   totalQuestions: number;
+  callId?: string;
 }
 
 export interface UserAnswer {
