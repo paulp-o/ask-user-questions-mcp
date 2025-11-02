@@ -15,6 +15,7 @@ import { StepperView } from "../src/tui/components/StepperView.js";
 import { Toast } from "../src/tui/components/Toast.js";
 import { WaitingScreen } from "../src/tui/components/WaitingScreen.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
+import { goodbyeText } from "../src/tui/utils/gradientText.js";
 
 // Handle command-line arguments
 const args = process.argv.slice(2);
@@ -200,9 +201,11 @@ const App: React.FC = () => {
             console.error("Failed to reject session on quit:", error);
           })
           .finally(() => {
+            console.log(goodbyeText("👋 Goodbye! See you next time."));
             exit();
           });
       } else {
+        console.log(goodbyeText("👋 Goodbye! See you next time."));
         exit();
       }
     }
