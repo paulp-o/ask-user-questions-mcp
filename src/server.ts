@@ -1,6 +1,13 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
 
+import type { Question } from "./session/types.js";
+
+import { SessionManager } from "./session/index.js";
+
+// Initialize session manager
+const sessionManager = new SessionManager();
+
 const server = new FastMCP({
   instructions:
     "This MCP server provides a tool to ask users structured questions via the terminal. " +
@@ -38,23 +45,59 @@ server.addTool({
     "Ask the user one or more structured questions via an interactive terminal interface. " +
     "Each question includes multiple-choice options and allows custom free-text responses. " +
     "Returns a formatted summary of all questions and answers.",
-  execute: async (args) => {
-    // TODO: Implement session creation and TUI coordination
-    // For now, return a placeholder response
-    const placeholderResponse = args.questions
-      .map((q, i) => {
-        return `${i + 1}. ${q.prompt}\n→ [User response will be collected via TUI]`;
-      })
-      .join("\n\n");
+  execute: async (args, { log }) => {
+    try {
+      // Initialize session manager if not already done
+      await sessionManager.initialize();
 
-    return {
-      content: [
-        {
-          text: `[PLACEHOLDER] Questions queued for user:\n\n${placeholderResponse}\n\n(Session management and TUI not yet implemented)`,
-          type: "text",
-        },
-      ],
-    };
+      // Validate questions (using existing Zod schema validation)
+      if (!args.questions || args.questions.length === 0) {
+        throw new Error("At least one question is required");
+      }
+
+      // Convert Zod-validated questions to our internal Question type
+      const questions: Question[] = args.questions.map((q) => ({
+        options: q.options.map((opt) => ({
+          description: opt.description,
+          label: opt.label,
+        })),
+        prompt: q.prompt,
+      }));
+
+      // Create new session
+      const sessionId = await sessionManager.createSession(questions);
+
+      log.info("Session created", {
+        questionCount: questions.length,
+        sessionDir: `/tmp/auq/sessions/${sessionId}`,
+        sessionId,
+      });
+
+      // Return session information for Subtask 1
+      // (Future subtasks will handle TUI interaction and response collection)
+      return {
+        content: [
+          {
+            text:
+              `Session created with ID: ${sessionId}\n\n` +
+              `Questions stored in: /tmp/auq/sessions/${sessionId}/\n` +
+              `Total questions: ${questions.length}\n\n` +
+              `[TUI implementation coming in subtask 2 - run 'auq' command when available]`,
+            type: "text",
+          },
+        ],
+      };
+    } catch (error) {
+      log.error("Failed to create session", { error: String(error) });
+      return {
+        content: [
+          {
+            text: `Error creating session: ${error}`,
+            type: "text",
+          },
+        ],
+      };
+    }
   },
   name: "ask_user_questions",
   parameters: z.object({

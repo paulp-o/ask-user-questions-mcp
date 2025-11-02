@@ -26,7 +26,9 @@
   "license": "MIT",
   "description": "An MCP server that provides a tool to ask a user questions via the terminal",
   "dependencies": {
+    "@types/uuid": "^10.0.0",
     "fastmcp": "^1.27.3",
+    "uuid": "^13.0.0",
     "zod": "^3.24.4"
   },
   "release": {
