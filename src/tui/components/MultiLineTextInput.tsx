@@ -43,9 +43,9 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         return;
       }
 
-      // Enter: Submit
+      // Enter: Submit (only if content is non-empty)
       if (key.return) {
-        if (onSubmit) {
+        if (onSubmit && value.trim().length > 0) {
           onSubmit();
         }
         return;

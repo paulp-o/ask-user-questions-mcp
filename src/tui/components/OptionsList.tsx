@@ -124,6 +124,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 <MultiLineTextInput
                   isFocused={true}
                   onChange={onCustomChange}
+                  onSubmit={onAdvance}
                   placeholder="Type your answer... (Shift+Enter for newline)"
                   value={customValue}
                 />

@@ -210,6 +210,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onSelectOption={handleSelectOption}
       questions={sessionRequest.questions}
       selectedOption={currentAnswer?.selectedOption}
+      answers={answers}
     />
   );
 };

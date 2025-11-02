@@ -16,6 +16,7 @@ interface QuestionDisplayProps {
   questions: Question[];
   selectedOption?: string;
   onAdvanceToNext?: () => void;
+  answers: Map<number, { customText?: string; selectedOption?: string }>;
 }
 
 /**
@@ -31,6 +32,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   questions,
   selectedOption,
   onAdvanceToNext,
+  answers,
 }) => {
   // Handle option selection - clears custom answer (mutual exclusion)
   const handleSelectOption = (label: string) => {
@@ -51,7 +53,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   return (
     <Box flexDirection="column">
       {/* TabBar showing all question titles */}
-      <TabBar currentIndex={currentQuestionIndex} questions={questions} />
+      <TabBar currentIndex={currentQuestionIndex} questions={questions} answers={answers} />
 
       {/* Question prompt */}
       <Box marginBottom={1} marginTop={1}>

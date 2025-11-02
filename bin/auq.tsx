@@ -201,11 +201,9 @@ const App: React.FC = () => {
             console.error("Failed to reject session on quit:", error);
           })
           .finally(() => {
-            console.log(goodbyeText("👋 Goodbye! See you next time."));
             exit();
           });
       } else {
-        console.log(goodbyeText("👋 Goodbye! See you next time."));
         exit();
       }
     }
@@ -275,4 +273,15 @@ const App: React.FC = () => {
   );
 };
 
-render(<App />);
+const { waitUntilExit } = render(<App />);
+
+// Handle Ctrl+C gracefully
+process.on('SIGINT', () => {
+  process.exit(0);
+});
+
+// Show goodbye after Ink unmounts
+waitUntilExit().then(() => {
+  process.stdout.write('\n');
+  console.log(goodbyeText("👋 Goodbye! See you next time."));
+});
