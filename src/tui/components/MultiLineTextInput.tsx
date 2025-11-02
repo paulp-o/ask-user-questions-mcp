@@ -26,6 +26,17 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
     (input, key) => {
       if (!isFocused) return;
 
+      // Normalize Enter key sequences that may arrive as raw input ("\r"/"\n").
+      // Prevent accidental carriage return insertion which causes line overwrite in terminals.
+      if (input === "\r" || input === "\n") {
+        if (key.shift) {
+          onChange(value + "\n");
+        } else if (onSubmit) {
+          onSubmit();
+        }
+        return;
+      }
+
       // Shift+Enter: Add newline
       if (key.return && key.shift) {
         onChange(value + "\n");
@@ -47,15 +58,24 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
       }
 
       // Regular character input (append)
-      if (input && !key.ctrl && !key.meta && !key.escape) {
+      if (
+        input &&
+        !key.ctrl &&
+        !key.meta &&
+        !key.escape &&
+        input !== "\r" &&
+        input !== "\n"
+      ) {
         onChange(value + input);
       }
     },
     { isActive: isFocused },
   );
 
-  const hasContent = value.length > 0;
-  const lines = hasContent ? value.split("\n") : [placeholder];
+  // Normalize any carriage returns that might already be present in value
+  const normalizedValue = value.replace(/\r\n?/g, "\n");
+  const hasContent = normalizedValue.length > 0;
+  const lines = hasContent ? normalizedValue.split("\n") : [placeholder];
 
   return (
     <Box flexDirection="column">

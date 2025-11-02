@@ -38,7 +38,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   // Calculate max index: include custom input option if enabled
   const maxIndex = showCustomInput ? options.length : options.length - 1;
   const isCustomInputFocused = showCustomInput && focusedIndex === options.length;
-  const customLines = customValue.split("\n");
+  const customLines = customValue.replace(/\r\n?/g, "\n").split("\n");
 
   useInput(
     (input, key) => {
