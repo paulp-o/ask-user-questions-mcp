@@ -1,6 +1,7 @@
 import { Box, Text } from "ink";
 import React from "react";
 import { welcomeText } from "../utils/gradientText.js";
+import { theme } from "../theme.js";
 
 interface WaitingScreenProps {
   queueCount: number;
@@ -14,7 +15,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
   if (queueCount === 0) {
     return (
       <Box flexDirection="column">
-        <Text color="yellow">No pending question sets found.</Text>
+        {/* <Text color={theme.colors.warning}>No pending question sets found.</Text> */}
         <Text>{welcomeText("🤖 Waiting for AI to ask questions...")}</Text>
         <Text dimColor>Press q to quit</Text>
       </Box>
@@ -23,7 +24,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
 
   return (
     <Box flexDirection="column">
-      <Text color="cyan">
+      <Text color={theme.colors.info}>
         Processing question set... ({queueCount} remaining in queue)
       </Text>
       <Text dimColor>Press q to quit</Text>

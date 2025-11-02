@@ -327,6 +327,19 @@ export class SessionManager {
       try {
         await this.waitForAnswers(sessionId, watcherTimeout);
       } catch (error) {
+        // Check if session was rejected by user
+        if (
+          error instanceof Error &&
+          error.message === "SESSION_REJECTED"
+        ) {
+          // Return rejection message to MCP caller
+          return {
+            formattedResponse:
+              "User rejected this question set and chose not to provide answers.",
+            sessionId,
+          };
+        }
+
         // Watcher timeout occurred
         await this.updateSessionStatus(sessionId, "timed_out");
         throw new Error(
@@ -493,17 +506,18 @@ export class SessionManager {
     const sessionDir = this.getSessionDir(sessionId);
 
     try {
-      const answersPath = await this.fileWatcher.waitForFile(
-        sessionDir,
-        SESSION_FILES.ANSWERS,
-      );
+      // Race between waiting for answers and polling for rejection
+      const result = await Promise.race([
+        this.fileWatcher.waitForFile(sessionDir, SESSION_FILES.ANSWERS),
+        this.pollForRejection(sessionId, timeoutMs ?? 0),
+      ]);
 
       // Clean up the watcher after successful wait
       this.fileWatcher.cleanup();
       this.fileWatcher = undefined;
 
       // Verify the answers file exists and return the session ID
-      console.debug(`Answers file created: ${answersPath}`);
+      console.debug(`Answers file created: ${result}`);
       return sessionId;
     } catch (error) {
       // Clean up on error
@@ -512,6 +526,43 @@ export class SessionManager {
         this.fileWatcher = undefined;
       }
       throw error;
+    }
+  }
+
+  /**
+   * Poll status.json to detect if session was rejected
+   * Throws error if status becomes "rejected"
+   */
+  private async pollForRejection(
+    sessionId: string,
+    timeoutMs: number,
+  ): Promise<never> {
+    const startTime = Date.now();
+    const pollInterval = 500; // Poll every 500ms
+
+    while (true) {
+      // Check for timeout
+      if (timeoutMs > 0 && Date.now() - startTime > timeoutMs) {
+        throw new Error("Timeout waiting for user response");
+      }
+
+      try {
+        const status = await this.getSessionStatus(sessionId);
+        if (status && status.status === "rejected") {
+          throw new Error("SESSION_REJECTED");
+        }
+      } catch (error) {
+        // If we can't read status, ignore and continue polling
+        if (
+          error instanceof Error &&
+          error.message === "SESSION_REJECTED"
+        ) {
+          throw error; // Re-throw rejection
+        }
+      }
+
+      // Wait before next poll
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
   }
 

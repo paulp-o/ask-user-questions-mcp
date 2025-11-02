@@ -1,5 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import React from "react";
+import { theme } from "../theme.js";
 
 interface MultiLineTextInputProps {
   isFocused?: boolean;
@@ -69,7 +70,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
           <Text key={index} dimColor={isPlaceholder}>
             {displayText}
             {showCursor && (
-              <Text color="cyan" dimColor>
+              <Text color={theme.colors.focused} dimColor>
                 ▌
               </Text>
             )}

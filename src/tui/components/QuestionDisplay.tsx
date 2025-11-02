@@ -3,6 +3,7 @@ import React from "react";
 
 import type { Question } from "../../session/types.js";
 
+import { theme } from "../theme.js";
 import { OptionsList } from "./OptionsList.js";
 import { TabBar } from "./TabBar.js";
 
@@ -70,9 +71,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       />
 
       {/* Footer with keybindings */}
-      <Box borderColor="gray" borderStyle="single" marginTop={1} padding={0.5}>
+      <Box borderColor={theme.borders.neutral} borderStyle="single" marginTop={1} padding={0.5}>
         <Text dimColor>
-          ↑↓ Options | ←→ Questions | Enter Select/Submit | Shift+Enter Newline | Esc Reject | q Quit
+          ↑↓ Options | ←→ Questions | Enter Select | Shift+Enter Newline | Esc Reject | q Quit
         </Text>
       </Box>
     </Box>

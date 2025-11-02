@@ -1,5 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import React, { useState } from "react";
+import { theme } from "../theme.js";
 
 interface ConfirmationDialogProps {
   message: string;
@@ -59,13 +60,13 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   return (
     <Box
-      borderColor="yellow"
+      borderColor={theme.borders.warning}
       borderStyle="single"
       flexDirection="column"
       padding={1}
     >
       <Box marginBottom={1}>
-        <Text bold color="yellow">
+        <Text bold color={theme.colors.warning}>
           {message}
         </Text>
       </Box>
@@ -75,7 +76,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <Box key={index} marginTop={index > 0 ? 0.5 : 0}>
             <Text
               bold={isFocused}
-              color={isFocused ? "cyan" : "white"}
+              color={isFocused ? theme.colors.focused : theme.colors.text}
             >
               {isFocused ? "→ " : "  "}
               {index + 1}. {option.label} ({option.key})

@@ -1,33 +1,57 @@
 import { Box, Text } from "ink";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { welcomeText } from "../utils/gradientText.js";
+import { theme } from "../theme.js";
 
 interface HeaderProps {
-	pendingCount: number;
+  pendingCount: number;
 }
 
 /**
  * Header component - displays app logo and status
- * Shows at the top of the TUI with gradient branding and pending queue count
+ * Shows at the top of the TUI with gradient branding and live-updating pending queue count
  */
 export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
-	return (
-		<Box
-			borderColor="cyan"
-			borderStyle="single"
-			flexDirection="row"
-			justifyContent="space-between"
-			paddingX={1}
-		>
-			<Text>{welcomeText("🤖 AUQ - Ask User Questions MCP")}</Text>
-			<Box>
-				<Text dimColor>│</Text>
-				<Text color={pendingCount > 0 ? "yellow" : "green"}>
-					{" "}
-					{pendingCount} more on queue
-				</Text>
-			</Box>
-		</Box>
-	);
+  const [flash, setFlash] = useState(false);
+  const [prevCount, setPrevCount] = useState(pendingCount);
+
+  // Flash effect when count changes
+  useEffect(() => {
+    if (pendingCount !== prevCount) {
+      setFlash(true);
+      setPrevCount(pendingCount);
+      const timer = setTimeout(() => setFlash(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingCount, prevCount]);
+
+  return (
+    <Box
+      borderColor={theme.components.header.border}
+      borderStyle="single"
+      flexDirection="row"
+      justifyContent="space-between"
+      paddingX={1}
+    >
+      <Text bold color={theme.colors.primary}>
+        🤖 AUQ - Ask User Questions MCP TUI
+      </Text>
+      <Box>
+        <Text dimColor>│</Text>
+        <Text
+          bold={flash}
+          color={
+            flash
+              ? theme.components.header.queueFlash
+              : pendingCount > 0
+                ? theme.components.header.queueActive
+                : theme.components.header.queueEmpty
+          }
+        >
+          {" "}
+          {pendingCount} more on queue
+        </Text>
+      </Box>
+    </Box>
+  );
 };

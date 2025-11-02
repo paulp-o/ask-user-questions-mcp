@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 import type { Option } from "../../session/types.js";
 
+import { theme } from "../theme.js";
 import { MultiLineTextInput } from "./MultiLineTextInput.js";
 
 interface OptionsListProps {
@@ -79,14 +80,20 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           <Box key={index} flexDirection="column" marginTop={0}>
             <Text
               bold={isFocusedOption || isSelected}
-              color={isFocusedOption ? "cyan" : isSelected ? "green" : "white"}
+              color={
+                isFocusedOption
+                  ? theme.components.options.focused
+                  : isSelected
+                    ? theme.components.options.selected
+                    : theme.components.options.default
+              }
             >
               {indicator} {selectionMark} {option.label}
             </Text>
             {option.description && (
               <Box marginLeft={4}>
                 <Text
-                  color={isFocusedOption ? "cyan" : undefined}
+                  color={isFocusedOption ? theme.components.options.focused : undefined}
                   dimColor={!isFocusedOption}
                 >
                   {option.description}
@@ -103,7 +110,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           <Box flexDirection="column">
             <Text
               bold={isCustomInputFocused}
-              color={isCustomInputFocused ? "cyan" : "white"}
+              color={
+                isCustomInputFocused
+                  ? theme.components.options.focused
+                  : theme.components.options.default
+              }
             >
               {isCustomInputFocused ? "→" : " "} {customValue ? "●" : "○"} Other
               (custom answer)
@@ -113,8 +124,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 <MultiLineTextInput
                   isFocused={true}
                   onChange={onCustomChange}
-                  onSubmit={onAdvance}
-                  placeholder="Type your answer... (Shift+Enter for newline, Enter to submit)"
+                  placeholder="Type your answer... (Shift+Enter for newline)"
                   value={customValue}
                 />
               </Box>

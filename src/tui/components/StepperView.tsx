@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
 
 import { SessionManager } from "../../session/SessionManager.js";
+import { theme } from "../theme.js";
 import { ConfirmationDialog } from "./ConfirmationDialog.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
 import { ReviewScreen } from "./ReviewScreen.js";
@@ -158,8 +159,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
   if (submitting) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Box borderColor="yellow" borderStyle="single" padding={1}>
-          <Text color="yellow">Submitting answers...</Text>
+        <Box borderColor={theme.colors.pending} borderStyle="single" padding={1}>
+          <Text color={theme.colors.pending}>Submitting answers...</Text>
         </Box>
       </Box>
     );
