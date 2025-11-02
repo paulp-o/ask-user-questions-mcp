@@ -76,7 +76,7 @@ describe("Atomic File Operations", () => {
         .readdir("/tmp")
         .then((files) => files.filter((file) => file.includes(".tmp")));
       const testTempFiles = tempFiles.filter((file) =>
-        file.includes("test.txt"),
+        file.includes("test.txt")
       );
       expect(testTempFiles).toHaveLength(0);
     });
@@ -354,7 +354,7 @@ describe("Atomic File Operations", () => {
   describe("Concurrent Access", () => {
     it("should handle concurrent writes correctly", async () => {
       const promises = Array.from({ length: 10 }, (_, i) =>
-        atomicWriteFile(testFile, `Content ${i}`),
+        atomicWriteFile(testFile, `Content ${i}`)
       );
 
       // All writes should complete without errors
@@ -369,7 +369,7 @@ describe("Atomic File Operations", () => {
       await fs.writeFile(testFile, testContent);
 
       const promises = Array.from({ length: 10 }, () =>
-        atomicReadFile(testFile),
+        atomicReadFile(testFile)
       );
 
       const results = await Promise.all(promises);
@@ -384,10 +384,10 @@ describe("Atomic File Operations", () => {
       await atomicWriteFile(testFile, "Initial");
 
       const readPromises = Array.from({ length: 5 }, () =>
-        atomicReadFile(testFile),
+        atomicReadFile(testFile)
       );
       const writePromises = Array.from({ length: 5 }, (_, i) =>
-        atomicWriteFile(testFile, `Updated ${i}`),
+        atomicWriteFile(testFile, `Updated ${i}`)
       );
 
       // All operations should complete
@@ -431,6 +431,7 @@ describe("Atomic File Operations", () => {
               { description: "Description 2", label: "Option 2" },
             ],
             prompt: "Test question",
+            title: "Question",
           },
         ],
         sessionId: "test-session",

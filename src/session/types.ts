@@ -11,6 +11,7 @@ export interface Option {
  * Question interface - matches the FastMCP tool schema
  */
 export interface Question {
+  title?: string; // Optional - defaults to "Q1", "Q2", etc. if not provided
   options: Option[];
   prompt: string;
 }

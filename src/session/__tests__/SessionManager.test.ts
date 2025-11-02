@@ -54,6 +54,7 @@ describe("SessionManager", () => {
   describe("createSession", () => {
     const sampleQuestions: Question[] = [
       {
+        title: "Language",
         options: [
           { description: "Dynamic scripting language", label: "JavaScript" },
           { description: "Typed superset of JavaScript", label: "TypeScript" },
@@ -128,7 +129,7 @@ describe("SessionManager", () => {
 
   describe("sessionExists", () => {
     it("should return true for existing session", async () => {
-      const questions = [{ options: [{ label: "Option" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Option" }], prompt: "Test" }];
       const sessionId = await sessionManager.createSession(questions);
 
       const exists = await sessionManager.sessionExists(sessionId);
@@ -143,7 +144,7 @@ describe("SessionManager", () => {
 
   describe("getSessionStatus", () => {
     it("should return session status for existing session", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await sessionManager.createSession(questions);
 
       const status = await sessionManager.getSessionStatus(sessionId);
@@ -186,7 +187,7 @@ describe("SessionManager", () => {
 
   describe("updateSessionStatus", () => {
     it("should update session status successfully", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await sessionManager.createSession(questions);
 
       // Add small delay to ensure different timestamps
@@ -216,7 +217,7 @@ describe("SessionManager", () => {
     });
 
     it("should return correct count for multiple sessions", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
 
       await sessionManager.createSession(questions);
       await sessionManager.createSession(questions);
@@ -234,7 +235,7 @@ describe("SessionManager", () => {
     });
 
     it("should return all session IDs", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
 
       const id1 = await sessionManager.createSession(questions);
       const id2 = await sessionManager.createSession(questions);
@@ -248,7 +249,7 @@ describe("SessionManager", () => {
 
   describe("isSessionLimitReached", () => {
     it("should return false when under limit", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       await sessionManager.createSession(questions);
 
       const isLimitReached = await sessionManager.isSessionLimitReached();
@@ -256,7 +257,7 @@ describe("SessionManager", () => {
     });
 
     it("should return true when at limit", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
 
       // Create sessions up to the limit (10)
       for (let i = 0; i < 10; i++) {
@@ -270,7 +271,7 @@ describe("SessionManager", () => {
 
   describe("deleteSession", () => {
     it("should delete session and all files", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await sessionManager.createSession(questions);
 
       // Verify session exists
@@ -294,7 +295,7 @@ describe("SessionManager", () => {
 
       await shortRetentionManager.initialize();
 
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await shortRetentionManager.createSession(questions);
 
       // Wait for retention period to expire
@@ -306,7 +307,7 @@ describe("SessionManager", () => {
     });
 
     it("should not clean up active sessions", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await sessionManager.createSession(questions);
 
       // Clean up immediately (session should not be expired yet)
@@ -325,7 +326,7 @@ describe("SessionManager", () => {
 
       await retentionManager.initialize();
 
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await retentionManager.createSession(questions);
 
       // Wait for retention period to expire
@@ -345,7 +346,7 @@ describe("SessionManager", () => {
 
       await retentionManager.initialize();
 
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await retentionManager.createSession(questions);
 
       // Clean up immediately - session should be preserved
@@ -363,7 +364,7 @@ describe("SessionManager", () => {
 
       await noRetentionManager.initialize();
 
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await noRetentionManager.createSession(questions);
 
       // Wait a bit
@@ -383,7 +384,7 @@ describe("SessionManager", () => {
 
       await defaultManager.initialize();
 
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await defaultManager.createSession(questions);
 
       // Clean up immediately - should preserve with default 7-day retention
@@ -395,7 +396,7 @@ describe("SessionManager", () => {
 
   describe("validateSession", () => {
     it("should validate a correct session", async () => {
-      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
       const sessionId = await sessionManager.createSession(questions);
 
       const validation = await sessionManager.validateSession(sessionId);
@@ -423,6 +424,7 @@ describe("SessionManager", () => {
     it("should complete full lifecycle successfully", async () => {
       const questions: Question[] = [
         {
+          title: "Language",
           options: [
             { description: "Dynamic web language", label: "JavaScript" },
             { description: "Type-safe JavaScript", label: "TypeScript" },
@@ -430,6 +432,7 @@ describe("SessionManager", () => {
           prompt: "What is your favorite programming language?",
         },
         {
+          title: "App Type",
           options: [
             { description: "Web application", label: "Web" },
             { description: "Command-line tool", label: "CLI" },
@@ -494,6 +497,7 @@ describe("SessionManager", () => {
 
       const questions: Question[] = [
         {
+          title: "Test",
           options: [{ label: "Option 1" }],
           prompt: "Test question",
         },
@@ -518,6 +522,7 @@ describe("SessionManager", () => {
     it("should handle invalid answers file", async () => {
       const questions: Question[] = [
         {
+          title: "Test",
           options: [{ label: "Option 1" }],
           prompt: "Test question",
         },
@@ -548,6 +553,7 @@ describe("SessionManager", () => {
     it("should handle answer validation errors", async () => {
       const questions: Question[] = [
         {
+          title: "Test",
           options: [{ label: "Option 1" }, { label: "Option 2" }],
           prompt: "Test question",
         },

@@ -24,6 +24,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "What is your favorite programming language?",
+          title: "Language",
         },
       ];
 
@@ -62,6 +63,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "What is your favorite programming language?",
+          title: "Language",
         },
         {
           options: [
@@ -75,6 +77,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "What type of application are you building?",
+          title: "Application Type",
         },
       ];
 
@@ -120,6 +123,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "What type of application are you building?",
+          title: "Application Type",
         },
       ];
 
@@ -158,6 +162,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "What is your favorite programming language?",
+          title: "Language",
         },
         {
           options: [
@@ -171,6 +176,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "What type of application are you building?",
+          title: "Application Type",
         },
       ];
 
@@ -214,6 +220,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "Choose a color",
+          title: "Color",
         },
       ];
 
@@ -245,6 +252,7 @@ describe("ResponseFormatter", () => {
             },
           ],
           prompt: "What is your feedback?",
+          title: "Feedback",
         },
       ];
 
@@ -270,6 +278,7 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }],
           prompt: "Test question",
+          title: "Test Question",
         },
       ];
 
@@ -309,10 +318,12 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }],
           prompt: "Question 1",
+          title: "Question 1",
         },
         {
           options: [{ label: "Option 2" }],
           prompt: "Question 2",
+          title: "Question 2",
         },
       ];
 
@@ -344,6 +355,7 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }, { label: "Option 2" }],
           prompt: "Test question",
+          title: "Test Question",
         },
       ];
 
@@ -369,6 +381,7 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }],
           prompt: "Test question",
+          title: "Test Question",
         },
       ];
 
@@ -394,6 +407,7 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }],
           prompt: "Test question",
+          title: "Test Question",
         },
       ];
 
@@ -419,6 +433,7 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }, { label: "Option 2" }],
           prompt: "Test question",
+          title: "Test Question",
         },
       ];
 
@@ -444,6 +459,7 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }],
           prompt: "Test question",
+          title: "Test Question",
         },
       ];
 
@@ -469,6 +485,7 @@ describe("ResponseFormatter", () => {
         {
           options: [{ label: "Option 1" }],
           prompt: "Test question",
+          title: "Test Question",
         },
       ];
 

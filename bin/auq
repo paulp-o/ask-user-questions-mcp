@@ -1,0 +1,3 @@
+#!/bin/sh
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+exec npx tsx "$SCRIPT_DIR/auq.tsx" "$@"

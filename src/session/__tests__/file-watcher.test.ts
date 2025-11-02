@@ -147,6 +147,7 @@ describe("File System Watching", () => {
           JSON.stringify({
             questions: [
               {
+                title: "Test",
                 options: [{ label: "Option 1" }],
                 prompt: "Test question",
               },

@@ -35,6 +35,7 @@ describe("Server Integration", () => {
     it("should create session when ask_user_questions tool is called", async () => {
       const questions: Question[] = [
         {
+          title: "Language",
           options: [
             { description: "Dynamic language", label: "JavaScript" },
             { description: "Static typing", label: "TypeScript" },
@@ -64,6 +65,7 @@ describe("Server Integration", () => {
     it("should handle multiple questions correctly", async () => {
       const questions: Question[] = [
         {
+          title: "Language",
           options: [
             { description: "Dynamic language", label: "JavaScript" },
             { description: "Static typing", label: "TypeScript" },
@@ -71,6 +73,7 @@ describe("Server Integration", () => {
           prompt: "Which programming language?",
         },
         {
+          title: "App Type",
           options: [
             { description: "Web application", label: "Web" },
             { description: "Command-line tool", label: "CLI" },
@@ -94,6 +97,7 @@ describe("Server Integration", () => {
     it("should create unique sessions for multiple calls", async () => {
       const questions = [
         {
+          title: "Test",
           options: [{ label: "Test option" }],
           prompt: "Test question",
         },
@@ -120,6 +124,7 @@ describe("Server Integration", () => {
     it("should persist session data across manager instances", async () => {
       const questions: Question[] = [
         {
+          title: "Persistence",
           options: [{ description: "Test description", label: "Test option" }],
           prompt: "Test question for persistence",
         },
@@ -145,6 +150,7 @@ describe("Server Integration", () => {
     it("should store session files with correct structure", async () => {
       const questions: Question[] = [
         {
+          title: "Structure",
           options: [{ description: "Description", label: "Option" }],
           prompt: "File structure test",
         },
@@ -193,6 +199,7 @@ describe("Server Integration", () => {
     it("should handle concurrent session creation", async () => {
       const questions = [
         {
+          title: "Concurrent",
           options: [{ label: "Option" }],
           prompt: "Concurrent test",
         },
@@ -222,6 +229,7 @@ describe("Server Integration", () => {
     it("should support complete session lifecycle", async () => {
       const questions: Question[] = [
         {
+          title: "Lifecycle",
           options: [{ label: "Option" }],
           prompt: "Lifecycle test",
         },
@@ -271,6 +279,7 @@ describe("Server Integration", () => {
     it("should handle session validation correctly", async () => {
       const questions: Question[] = [
         {
+          title: "Validation",
           options: [{ label: "Option" }],
           prompt: "Validation test",
         },
@@ -298,6 +307,7 @@ describe("Server Integration", () => {
     it("should handle session creation under time limits", async () => {
       const questions = [
         {
+          title: "Performance",
           options: [{ label: "Option" }],
           prompt: "Performance test",
         },
@@ -315,6 +325,7 @@ describe("Server Integration", () => {
     it("should handle multiple sessions efficiently", async () => {
       const questions = [
         {
+          title: "Efficiency",
           options: [{ label: "Option" }],
           prompt: "Efficiency test",
         },

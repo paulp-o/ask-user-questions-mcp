@@ -22,6 +22,7 @@ describe("TUI Session Watcher", () => {
   const mockSessionRequest = {
     questions: [
       {
+        title: "Language",
         options: [
           { description: "Dynamic web language", label: "JavaScript" },
           { description: "Typed JavaScript", label: "TypeScript" },
