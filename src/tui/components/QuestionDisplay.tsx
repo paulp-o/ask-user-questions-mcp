@@ -1,9 +1,8 @@
-import { Box, Text, useInput } from "ink";
-import React, { useState } from "react";
+import { Box, Text } from "ink";
+import React from "react";
 
 import type { Question } from "../../session/types.js";
 
-import { CustomInput } from "./CustomInput.js";
 import { OptionsList } from "./OptionsList.js";
 import { TabBar } from "./TabBar.js";
 
@@ -15,6 +14,7 @@ interface QuestionDisplayProps {
   onSelectOption: (label: string) => void;
   questions: Question[];
   selectedOption?: string;
+  onAdvanceToNext?: () => void;
 }
 
 /**
@@ -29,17 +29,8 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   onSelectOption,
   questions,
   selectedOption,
+  onAdvanceToNext,
 }) => {
-  // Track which input mode is focused: options or custom
-  const [focusMode, setFocusMode] = useState<"custom" | "options">("options");
-
-  // Tab key toggles between options and custom input
-  useInput((input, key) => {
-    if (key.tab) {
-      setFocusMode((prev) => (prev === "options" ? "custom" : "options"));
-    }
-  });
-
   // Handle option selection - clears custom answer (mutual exclusion)
   const handleSelectOption = (label: string) => {
     onSelectOption(label);
@@ -66,26 +57,22 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         <Text bold>{currentQuestion.prompt}</Text>
       </Box>
 
-      {/* Options list */}
+      {/* Options list with integrated custom input */}
       <OptionsList
-        isFocused={focusMode === "options"}
+        customValue={customAnswer}
+        isFocused={true}
+        onAdvance={onAdvanceToNext}
+        onCustomChange={handleCustomAnswerChange}
         onSelect={handleSelectOption}
         options={currentQuestion.options}
         selectedOption={selectedOption}
-      />
-
-      {/* Custom input field */}
-      <CustomInput
-        isFocused={focusMode === "custom"}
-        onChange={handleCustomAnswerChange}
-        value={customAnswer}
+        showCustomInput={true}
       />
 
       {/* Footer with keybindings */}
       <Box borderColor="gray" borderStyle="single" marginTop={1} padding={0.5}>
         <Text dimColor>
-          ↑↓ Options | ←→ Questions | Tab Switch | Enter Select | r Review | q
-          Quit
+          ↑↓ Options | ←→ Questions | Enter Select & Next | q Quit
         </Text>
       </Box>
     </Box>

@@ -33,7 +33,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
   const [showReview, setShowReview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   const currentQuestion = sessionRequest.questions[currentQuestionIndex];
 
@@ -73,13 +72,10 @@ export const StepperView: React.FC<StepperViewProps> = ({
         sessionId,
         timestamp: new Date().toISOString(),
       });
-      setSubmitted(true);
-      // Call onComplete callback after a brief delay to show success message
-      setTimeout(() => {
-        if (onComplete) {
-          onComplete();
-        }
-      }, 1500);
+      // Call onComplete callback immediately (toast will show in parent)
+      if (onComplete) {
+        onComplete();
+      }
     } catch (error) {
       console.error("Failed to save answers:", error);
       setSubmitting(false);
@@ -91,10 +87,21 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setShowReview(false);
   };
 
+  // Handle advance to next question or review
+  const handleAdvanceToNext = () => {
+    if (currentQuestionIndex < sessionRequest.questions.length - 1) {
+      // Move to next question
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      // Last question - show review
+      setShowReview(true);
+    }
+  };
+
   // Global keyboard shortcuts and navigation
   useInput((input, key) => {
     // Don't handle navigation when showing review or submitting
-    if (showReview || submitting || submitted) return;
+    if (showReview || submitting) return;
 
     // Question navigation with arrow keys
     if (key.leftArrow && currentQuestionIndex > 0) {
@@ -106,27 +113,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
     ) {
       setCurrentQuestionIndex((prev) => prev + 1);
     }
-
-    // Global shortcuts
-    if (input === "r") {
-      setShowReview(true);
-    }
   });
 
   const currentAnswer = answers.get(currentQuestionIndex);
-
-  // Show success message after submission
-  if (submitted) {
-    return (
-      <Box flexDirection="column" padding={1}>
-        <Box borderColor="green" borderStyle="single" padding={1}>
-          <Text bold color="green">
-            ✓ Answers submitted successfully!
-          </Text>
-        </Box>
-      </Box>
-    );
-  }
 
   // Show submitting message
   if (submitting) {
@@ -158,6 +147,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       currentQuestion={currentQuestion}
       currentQuestionIndex={currentQuestionIndex}
       customAnswer={currentAnswer?.customText}
+      onAdvanceToNext={handleAdvanceToNext}
       onChangeCustomAnswer={handleChangeCustomAnswer}
       onSelectOption={handleSelectOption}
       questions={sessionRequest.questions}

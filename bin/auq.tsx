@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-import { render, Text, useApp, useInput } from "ink";
+import { Box, render, Text, useApp, useInput } from "ink";
 import React, { useEffect, useState } from "react";
 
 import type { SessionRequest } from "../src/session/types.js";
 
 import { StepperView } from "../src/tui/components/StepperView.js";
+import { Toast } from "../src/tui/components/Toast.js";
 import { WaitingScreen } from "../src/tui/components/WaitingScreen.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
 
@@ -18,11 +19,17 @@ interface SessionData {
   timestamp: Date;
 }
 
+interface ToastData {
+  message: string;
+  type: "success" | "error" | "info";
+}
+
 const App: React.FC = () => {
   const { exit } = useApp();
   const [state, setState] = useState<AppState>({ mode: "WAITING" });
   const [sessionQueue, setSessionQueue] = useState<SessionData[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [toast, setToast] = useState<ToastData | null>(null);
 
   // Initialize: Load existing sessions + start persistent watcher
   useEffect(() => {
@@ -110,8 +117,16 @@ const App: React.FC = () => {
     }
   });
 
+  // Show toast notification
+  const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
+    setToast({ message, type });
+  };
+
   // Handle session completion
   const handleSessionComplete = () => {
+    // Show success toast
+    showToast("✓ Answers submitted successfully!", "success");
+
     if (sessionQueue.length > 0) {
       // Auto-load next session
       const [nextSession, ...rest] = sessionQueue;
@@ -128,18 +143,35 @@ const App: React.FC = () => {
     return <Text>Loading...</Text>;
   }
 
+  let mainContent;
   if (state.mode === "WAITING") {
-    return <WaitingScreen queueCount={sessionQueue.length} />;
+    mainContent = <WaitingScreen queueCount={sessionQueue.length} />;
+  } else {
+    // PROCESSING mode
+    const { session } = state;
+    mainContent = (
+      <StepperView
+        onComplete={handleSessionComplete}
+        sessionId={session.sessionId}
+        sessionRequest={session.sessionRequest}
+      />
+    );
   }
 
-  // PROCESSING mode
-  const { session } = state;
+  // Render with toast overlay if present
   return (
-    <StepperView
-      onComplete={handleSessionComplete}
-      sessionId={session.sessionId}
-      sessionRequest={session.sessionRequest}
-    />
+    <Box flexDirection="column">
+      {toast && (
+        <Box marginBottom={1}>
+          <Toast
+            message={toast.message}
+            onDismiss={() => setToast(null)}
+            type={toast.type}
+          />
+        </Box>
+      )}
+      {mainContent}
+    </Box>
   );
 };
 
