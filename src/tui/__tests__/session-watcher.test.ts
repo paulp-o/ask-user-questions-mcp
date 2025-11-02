@@ -51,6 +51,7 @@ describe("TUI Session Watcher", () => {
       it("should detect new sessions with loaded data", async () => {
         const watcher = new EnhancedTUISessionWatcher({
           autoLoadData: true,
+          debounceMs: 100,
           sessionDir,
         });
 
@@ -85,8 +86,8 @@ describe("TUI Session Watcher", () => {
           ),
         ]);
 
-        // Wait for event processing
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // Wait for debounce (100ms) + processing time
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         expect(events).toHaveLength(1);
         expect(events[0].type).toBe("session-created");
@@ -99,6 +100,7 @@ describe("TUI Session Watcher", () => {
       it("should handle autoLoadData disabled", async () => {
         const watcher = new EnhancedTUISessionWatcher({
           autoLoadData: false,
+          debounceMs: 100,
           sessionDir,
         });
 
@@ -118,8 +120,8 @@ describe("TUI Session Watcher", () => {
           JSON.stringify(mockSessionRequest, null, 2)
         );
 
-        // Wait for event processing
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // Wait for debounce + processing
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         expect(events).toHaveLength(1);
         expect(events[0].type).toBe("session-created");
@@ -132,6 +134,7 @@ describe("TUI Session Watcher", () => {
       it("should handle corrupted session files gracefully", async () => {
         const watcher = new EnhancedTUISessionWatcher({
           autoLoadData: true,
+          debounceMs: 100,
           sessionDir,
         });
 
@@ -149,10 +152,25 @@ describe("TUI Session Watcher", () => {
         await fs.mkdir(newSessionDir);
 
         const requestFile = join(newSessionDir, SESSION_FILES.REQUEST);
-        await fs.writeFile(requestFile, "invalid json content");
+        const statusFile = join(newSessionDir, SESSION_FILES.STATUS);
 
-        // Wait for event processing
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // Write corrupted request.json and valid status.json
+        await Promise.all([
+          fs.writeFile(requestFile, "invalid json content"),
+          fs.writeFile(
+            statusFile,
+            JSON.stringify({
+              createdAt: new Date().toISOString(),
+              lastModified: new Date().toISOString(),
+              sessionId: testSessionId,
+              status: "pending",
+              totalQuestions: 1,
+            })
+          ),
+        ]);
+
+        // Wait for debounce + processing
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         expect(events).toHaveLength(1);
         expect(events[0].type).toBe("session-created");
@@ -172,7 +190,10 @@ describe("TUI Session Watcher", () => {
 
     describe("event handlers", () => {
       it("should support multiple event handlers", async () => {
-        const watcher = new EnhancedTUISessionWatcher({ sessionDir });
+        const watcher = new EnhancedTUISessionWatcher({
+          debounceMs: 100,
+          sessionDir,
+        });
 
         const mainEvents: TUISessionEvent[] = [];
         const customEvents: TUISessionEvent[] = [];
@@ -195,8 +216,8 @@ describe("TUI Session Watcher", () => {
           JSON.stringify(mockSessionRequest, null, 2)
         );
 
-        // Wait for processing
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // Wait for debounce + processing
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         expect(mainEvents).toHaveLength(1);
         expect(customEvents).toHaveLength(1);

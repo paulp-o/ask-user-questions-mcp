@@ -30,7 +30,7 @@ export interface SessionConfig {
 export interface SessionRequest {
   questions: Question[];
   sessionId: string;
-  status: "completed" | "in-progress" | "pending";
+  status: "completed" | "in-progress" | "pending" | "timed_out";
   timestamp: string;
 }
 
@@ -39,7 +39,7 @@ export interface SessionStatus {
   currentQuestionIndex?: number;
   lastModified: string;
   sessionId: string;
-  status: "abandoned" | "completed" | "in-progress" | "pending";
+  status: "abandoned" | "completed" | "in-progress" | "pending" | "timed_out";
   totalQuestions: number;
 }
 
@@ -70,5 +70,5 @@ export type SessionStatusValue = SessionStatus["status"];
 export const DEFAULT_SESSION_CONFIG: Partial<SessionConfig> = {
   baseDir: "~/.local/share/auq/sessions", // Will be resolved to actual path
   maxSessions: 100,
-  sessionTimeout: 24 * 60 * 60 * 1000, // 24 hours
+  sessionTimeout: 0, // 0 = infinite timeout (wait indefinitely for user)
 };

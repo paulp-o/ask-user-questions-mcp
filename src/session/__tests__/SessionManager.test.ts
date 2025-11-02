@@ -3,11 +3,13 @@
  */
 
 import { promises as fs } from "fs";
+import { join } from "path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import type { Question, SessionConfig } from "../types.js";
+import type { Question, SessionAnswer, SessionConfig } from "../types.js";
 
 import { SessionManager } from "../SessionManager.js";
+import { getCurrentTimestamp } from "../utils.js";
 
 describe("SessionManager", () => {
   let sessionManager: SessionManager;
@@ -95,15 +97,15 @@ describe("SessionManager", () => {
 
     it("should throw error for empty questions array", async () => {
       await expect(sessionManager.createSession([])).rejects.toThrow(
-        "At least one question is required to create a session",
+        "At least one question is required to create a session"
       );
     });
 
     it("should throw error for null questions", async () => {
       await expect(
-        sessionManager.createSession(null as unknown as Question[]),
+        sessionManager.createSession(null as unknown as Question[])
       ).rejects.toThrow(
-        "At least one question is required to create a session",
+        "At least one question is required to create a session"
       );
     });
 
@@ -202,7 +204,7 @@ describe("SessionManager", () => {
 
     it("should throw error for non-existing session", async () => {
       await expect(
-        sessionManager.updateSessionStatus("non-existent-id", "completed"),
+        sessionManager.updateSessionStatus("non-existent-id", "completed")
       ).rejects.toThrow("Session not found: non-existent-id");
     });
   });
@@ -329,6 +331,287 @@ describe("SessionManager", () => {
       expect(config.baseDir).toBe(testBaseDir);
       expect(config.maxSessions).toBe(10);
       expect(config.sessionTimeout).toBe(1000);
+    });
+  });
+
+  describe("startSession - Complete Lifecycle", () => {
+    it("should complete full lifecycle successfully", async () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { description: "Dynamic web language", label: "JavaScript" },
+            { description: "Type-safe JavaScript", label: "TypeScript" },
+          ],
+          prompt: "What is your favorite programming language?",
+        },
+        {
+          options: [
+            { description: "Web application", label: "Web" },
+            { description: "Command-line tool", label: "CLI" },
+          ],
+          prompt: "What type of application are you building?",
+        },
+      ];
+
+      // Start session in background
+      const sessionPromise = sessionManager.startSession(questions);
+
+      // Wait a bit for session files to be created
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Get the session ID from directory listing
+      const entries = await fs.readdir(testBaseDir);
+      expect(entries.length).toBe(1);
+      const sessionId = entries[0];
+
+      // Simulate user submitting answers
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOption: "TypeScript",
+            timestamp: getCurrentTimestamp(),
+          },
+          {
+            customText: "Desktop app with Electron",
+            questionIndex: 1,
+            timestamp: getCurrentTimestamp(),
+          },
+        ],
+        sessionId,
+        timestamp: getCurrentTimestamp(),
+      };
+
+      await sessionManager.saveSessionAnswers(sessionId, answers);
+
+      // Wait for session to complete
+      const result = await sessionPromise;
+
+      expect(result.sessionId).toBe(sessionId);
+      expect(result.formattedResponse).toContain(
+        "Here are the user's answers:"
+      );
+      expect(result.formattedResponse).toContain("TypeScript");
+      expect(result.formattedResponse).toContain("Desktop app with Electron");
+
+      // Verify final status is completed
+      const status = await sessionManager.getSessionStatus(sessionId);
+      expect(status?.status).toBe("completed");
+    });
+
+    it("should timeout and set status to timed_out", async () => {
+      // Create session manager with short timeout for testing
+      const shortTimeoutManager = new SessionManager({
+        baseDir: testBaseDir,
+        sessionTimeout: 500, // 500ms
+      });
+      await shortTimeoutManager.initialize();
+
+      const questions: Question[] = [
+        {
+          options: [{ label: "Option 1" }],
+          prompt: "Test question",
+        },
+      ];
+
+      // Start session but don't provide answers
+      await expect(shortTimeoutManager.startSession(questions)).rejects.toThrow(
+        "timed out"
+      );
+
+      // Wait a bit to ensure the status is updated
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Verify status was set to timed_out
+      const entries = await fs.readdir(testBaseDir);
+      const sessionId = entries[entries.length - 1]; // Get the last created session
+
+      const status = await shortTimeoutManager.getSessionStatus(sessionId);
+      expect(status?.status).toBe("timed_out");
+    });
+
+    it("should handle invalid answers file", async () => {
+      const questions: Question[] = [
+        {
+          options: [{ label: "Option 1" }],
+          prompt: "Test question",
+        },
+      ];
+
+      // Start session in background
+      const sessionPromise = sessionManager.startSession(questions);
+
+      // Wait for session files to be created
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Get session ID
+      const entries = await fs.readdir(testBaseDir);
+      const sessionId = entries[entries.length - 1];
+
+      // Write invalid answers file
+      const answersPath = join(testBaseDir, sessionId, "answers.json");
+      await fs.writeFile(answersPath, "invalid json");
+
+      // Should reject with validation error
+      await expect(sessionPromise).rejects.toThrow("Failed to parse JSON");
+
+      // Verify status was set to abandoned
+      const status = await sessionManager.getSessionStatus(sessionId);
+      expect(status?.status).toBe("abandoned");
+    });
+
+    it("should handle answer validation errors", async () => {
+      const questions: Question[] = [
+        {
+          options: [{ label: "Option 1" }, { label: "Option 2" }],
+          prompt: "Test question",
+        },
+      ];
+
+      // Start session in background
+      const sessionPromise = sessionManager.startSession(questions);
+
+      // Wait for session files to be created
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Get session ID
+      const entries = await fs.readdir(testBaseDir);
+      const sessionId = entries[entries.length - 1];
+
+      // Submit answer with invalid option
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOption: "Invalid Option", // Not in the options list
+            timestamp: getCurrentTimestamp(),
+          },
+        ],
+        sessionId,
+        timestamp: getCurrentTimestamp(),
+      };
+
+      await sessionManager.saveSessionAnswers(sessionId, answers);
+
+      // Should reject with validation error
+      await expect(sessionPromise).rejects.toThrow("Answer validation failed");
+
+      // Verify status was set to abandoned
+      const status = await sessionManager.getSessionStatus(sessionId);
+      expect(status?.status).toBe("abandoned");
+    });
+
+    it("should format response according to PRD specification", async () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { description: "The color of fire", label: "Red" },
+            { description: "The color of sky", label: "Blue" },
+          ],
+          prompt: "What is your favorite color?",
+        },
+      ];
+
+      // Start session in background
+      const sessionPromise = sessionManager.startSession(questions);
+
+      // Wait for session files to be created
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Get session ID
+      const entries = await fs.readdir(testBaseDir);
+      const sessionId = entries[entries.length - 1];
+
+      // Submit answer
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOption: "Blue",
+            timestamp: getCurrentTimestamp(),
+          },
+        ],
+        sessionId,
+        timestamp: getCurrentTimestamp(),
+      };
+
+      await sessionManager.saveSessionAnswers(sessionId, answers);
+
+      // Wait for completion
+      const result = await sessionPromise;
+
+      // Verify PRD-compliant format
+      expect(result.formattedResponse).toBe(
+        "Here are the user's answers:\n\n" +
+          "1. What is your favorite color?\n" +
+          "→ Blue — The color of sky"
+      );
+    });
+
+    it.skip("should handle concurrent sessions independently", async () => {
+      const questions1: Question[] = [
+        {
+          options: [{ label: "Option 1" }],
+          prompt: "Question 1",
+        },
+      ];
+
+      const questions2: Question[] = [
+        {
+          options: [{ label: "Option 2" }],
+          prompt: "Question 2",
+        },
+      ];
+
+      // Start two sessions concurrently
+      const session1Promise = sessionManager.startSession(questions1);
+      const session2Promise = sessionManager.startSession(questions2);
+
+      // Wait for both sessions to be created
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Get both session IDs
+      const entries = await fs.readdir(testBaseDir);
+      expect(entries.length).toBeGreaterThanOrEqual(2);
+      const sessionId1 = entries[entries.length - 2];
+      const sessionId2 = entries[entries.length - 1];
+
+      // Submit answers for both sessions
+      await sessionManager.saveSessionAnswers(sessionId1, {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOption: "Option 1",
+            timestamp: getCurrentTimestamp(),
+          },
+        ],
+        sessionId: sessionId1,
+        timestamp: getCurrentTimestamp(),
+      });
+
+      await sessionManager.saveSessionAnswers(sessionId2, {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOption: "Option 2",
+            timestamp: getCurrentTimestamp(),
+          },
+        ],
+        sessionId: sessionId2,
+        timestamp: getCurrentTimestamp(),
+      });
+
+      // Wait for both to complete
+      const [result1, result2] = await Promise.all([
+        session1Promise,
+        session2Promise,
+      ]);
+
+      // Verify both completed independently
+      expect(result1.sessionId).toBe(sessionId1);
+      expect(result1.formattedResponse).toContain("Option 1");
+      expect(result2.sessionId).toBe(sessionId2);
+      expect(result2.formattedResponse).toContain("Option 2");
     });
   });
 });

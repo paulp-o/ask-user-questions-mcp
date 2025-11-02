@@ -48,7 +48,11 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
     new Map();
 
   constructor(config?: TUIWatcherConfig) {
-    super(config);
+    // Map sessionDir to baseDir for parent class
+    super({
+      baseDir: config?.sessionDir,
+      debounceMs: config?.debounceMs,
+    });
     this.autoLoadData = config?.autoLoadData ?? true;
   }
 
@@ -233,13 +237,16 @@ export async function getNextPendingSession(
     return null;
   }
 
-  // Get the newest session (first in sorted list)
-  const sessionId = pendingSessions[0];
-  const sessionRequest = await watcher.getSessionRequest(sessionId);
+  // Try each pending session until we find one with valid data
+  for (const sessionId of pendingSessions) {
+    const sessionRequest = await watcher.getSessionRequest(sessionId);
 
-  if (!sessionRequest) {
-    return null;
+    if (sessionRequest) {
+      return { sessionId, sessionRequest };
+    }
+    // Skip corrupted sessions and continue to next one
   }
 
-  return { sessionId, sessionRequest };
+  // No valid sessions found
+  return null;
 }

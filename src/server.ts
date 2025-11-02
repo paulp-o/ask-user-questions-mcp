@@ -65,30 +65,31 @@ server.addTool({
         prompt: q.prompt,
       }));
 
-      // Create new session
-      const sessionId = await sessionManager.createSession(questions);
+      log.info("Starting session and waiting for user answers...", {
+        questionCount: questions.length,
+      });
 
-      // Return session information for Subtask 1
-      // (Future subtasks will handle TUI interaction and response collection)
-      const sessionDir = sessionManager.getConfig().baseDir;
+      // Start complete session lifecycle - this will wait for user answers
+      const { formattedResponse, sessionId } =
+        await sessionManager.startSession(questions);
+
+      log.info("Session completed successfully", { sessionId });
+
+      // Return formatted response to AI model
       return {
         content: [
           {
-            text:
-              `Session created with ID: ${sessionId}\n\n` +
-              `Questions stored in: ${sessionDir}/${sessionId}/\n` +
-              `Total questions: ${questions.length}\n\n` +
-              `[TUI implementation coming in subtask 3 - run 'auq' command when available]`,
+            text: formattedResponse,
             type: "text",
           },
         ],
       };
     } catch (error) {
-      log.error("Failed to create session", { error: String(error) });
+      log.error("Session failed", { error: String(error) });
       return {
         content: [
           {
-            text: `Error creating session: ${error}`,
+            text: `Error in session: ${error}`,
             type: "text",
           },
         ],

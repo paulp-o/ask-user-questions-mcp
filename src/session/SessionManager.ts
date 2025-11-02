@@ -23,6 +23,7 @@ import {
   atomicWriteFile,
 } from "./atomic-operations.js";
 import { PromiseFileWatcher } from "./file-watcher.js";
+import { ResponseFormatter } from "./ResponseFormatter.js";
 import { DEFAULT_SESSION_CONFIG, SESSION_FILES } from "./types.js";
 import {
   createSafeFilename,
@@ -274,6 +275,103 @@ export class SessionManager {
 
     const sessionDir = this.getSessionDir(sessionId);
     return await fileExists(sessionDir);
+  }
+
+  /**
+   * Start a complete session lifecycle from creation to formatted response
+   *
+   * This is the main orchestration method that:
+   * 1. Creates a new session with the provided questions
+   * 2. Waits for user to submit answers (with optional timeout)
+   * 3. Reads and validates the answers
+   * 4. Formats the response according to PRD specification
+   * 5. Updates session status to completed
+   * 6. Returns the formatted response for the AI model
+   *
+   * @param questions - Array of questions to ask the user
+   * @returns Object containing sessionId and formatted response text
+   * @throws Error if timeout occurs, validation fails, or file operations fail
+   */
+  async startSession(questions: Question[]): Promise<{
+    formattedResponse: string;
+    sessionId: string;
+  }> {
+    // Step 1: Create the session
+    const sessionId = await this.createSession(questions);
+
+    try {
+      // Step 2: Calculate timeouts
+      const sessionTimeout = this.config.sessionTimeout ?? 0; // 0 = infinite
+      const watcherTimeout =
+        sessionTimeout > 0
+          ? Math.floor(sessionTimeout * 0.9) // 90% of session timeout
+          : 0; // Also infinite if session is infinite
+
+      // Step 3: Wait for answers with timeout
+      try {
+        await this.waitForAnswers(sessionId, watcherTimeout);
+      } catch (error) {
+        // Watcher timeout occurred
+        await this.updateSessionStatus(sessionId, "timed_out");
+        throw new Error(
+          `Session ${sessionId} timed out waiting for user response: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+
+      // Step 4: Read and validate answers
+      let answers;
+      try {
+        answers = await this.getSessionAnswers(sessionId);
+      } catch (error) {
+        // Handle JSON parse errors or other read failures
+        await this.updateSessionStatus(sessionId, "abandoned");
+        throw error;
+      }
+
+      if (!answers) {
+        await this.updateSessionStatus(sessionId, "abandoned");
+        throw new Error(
+          `Answers file was created but is invalid for session ${sessionId}`
+        );
+      }
+
+      const request = await this.getSessionRequest(sessionId);
+      if (!request) {
+        await this.updateSessionStatus(sessionId, "abandoned");
+        throw new Error(`Session request not found: ${sessionId}`);
+      }
+
+      // Step 5: Validate answers match questions
+      try {
+        ResponseFormatter.validateAnswers(answers, request.questions);
+      } catch (error) {
+        await this.updateSessionStatus(sessionId, "abandoned");
+        throw new Error(
+          `Answer validation failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+
+      // Step 6: Format the response according to PRD specification
+      const formattedResponse = ResponseFormatter.formatUserResponse(
+        answers,
+        request.questions
+      );
+
+      // Step 7: Update final status
+      await this.updateSessionStatus(sessionId, "completed");
+
+      // Step 8: Return results
+      return {
+        formattedResponse,
+        sessionId,
+      };
+    } catch (error) {
+      // Ensure any errors are properly propagated with session context
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(`Session ${sessionId} failed: ${String(error)}`);
+    }
   }
 
   /**

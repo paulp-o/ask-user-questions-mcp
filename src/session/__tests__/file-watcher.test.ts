@@ -247,6 +247,7 @@ describe("File System Watching", () => {
       it("should detect new sessions when watching", async () => {
         const tuiWatcher = new TUISessionWatcher({
           baseDir: testDir, // This should be the base directory, not sessions
+          debounceMs: 100, // Shorter debounce for testing
         });
 
         const detectedSessions: Array<{
@@ -266,6 +267,7 @@ describe("File System Watching", () => {
         const requestFile = join(newSessionDir, SESSION_FILES.REQUEST);
         const statusFile = join(newSessionDir, SESSION_FILES.STATUS);
 
+        // Write files atomically
         await Promise.all([
           fs.writeFile(
             requestFile,
@@ -288,8 +290,8 @@ describe("File System Watching", () => {
           ),
         ]);
 
-        // Wait for detection
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        // Wait for debounce (100ms) + processing time
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         expect(detectedSessions).toHaveLength(1);
         expect(detectedSessions[0].sessionId).toBe(testSessionId);
