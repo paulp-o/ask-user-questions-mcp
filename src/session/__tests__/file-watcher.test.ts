@@ -133,6 +133,9 @@ describe("File System Watching", () => {
           sessionEvents.push({ sessionId, sessionPath });
         });
 
+        // Give watcher time to initialize
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
         // Create a new session directory
         const newSessionDir = join(sessionDir, testSessionId);
         await fs.mkdir(newSessionDir);
@@ -154,8 +157,8 @@ describe("File System Watching", () => {
           })
         );
 
-        // Wait a bit for the event to be processed
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // Wait for debounce (50ms) + processing time
+        await new Promise((resolve) => setTimeout(resolve, 150));
 
         expect(sessionEvents).toHaveLength(1);
         expect(sessionEvents[0].sessionId).toBe(testSessionId);
