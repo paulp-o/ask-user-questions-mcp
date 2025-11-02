@@ -16,7 +16,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
     return (
       <Box flexDirection="column">
         {/* <Text color={theme.colors.warning}>No pending question sets found.</Text> */}
-        <Text>{welcomeText("🤖 Waiting for AI to ask questions...")}</Text>
+        <Text>{welcomeText("Waiting for AI to ask questions...")}</Text>
         <Text dimColor>Press q to quit</Text>
       </Box>
     );
