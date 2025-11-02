@@ -28,8 +28,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   sessionId,
   sessionRequest,
 }) => {
-  // const { exit } =
-  useApp();
+  const { exit } = useApp();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
   const [showReview, setShowReview] = useState(false);
@@ -148,7 +147,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
         <ConfirmationDialog
           message="Are you sure you want to reject this question set?"
           onCancel={() => setShowRejectionConfirm(false)}
-          onConfirm={handleRejectSession}
+          onQuit={() => exit()}
+          onReject={handleRejectSession}
         />
       </Box>
     );

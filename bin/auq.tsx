@@ -9,6 +9,8 @@ import React, { useEffect, useState } from "react";
 
 import type { SessionRequest } from "../src/session/types.js";
 
+import { SessionManager } from "../src/session/SessionManager.js";
+import { Header } from "../src/tui/components/Header.js";
 import { StepperView } from "../src/tui/components/StepperView.js";
 import { Toast } from "../src/tui/components/Toast.js";
 import { WaitingScreen } from "../src/tui/components/WaitingScreen.js";
@@ -189,7 +191,20 @@ const App: React.FC = () => {
   // Global 'q' to quit anytime
   useInput((input) => {
     if (input === "q") {
-      exit();
+      // If processing a session, reject it before exiting
+      if (state.mode === "PROCESSING") {
+        const sessionManager = new SessionManager();
+        sessionManager
+          .rejectSession(state.session.sessionId)
+          .catch((error) => {
+            console.error("Failed to reject session on quit:", error);
+          })
+          .finally(() => {
+            exit();
+          });
+      } else {
+        exit();
+      }
     }
   });
 
@@ -238,11 +253,12 @@ const App: React.FC = () => {
     );
   }
 
-  // Render with toast overlay if present
+  // Render with header, toast overlay, and main content
   return (
     <Box flexDirection="column">
+      <Header pendingCount={sessionQueue.length} />
       {toast && (
-        <Box marginBottom={1}>
+        <Box marginBottom={1} marginTop={1}>
           <Toast
             message={toast.message}
             onDismiss={() => setToast(null)}
@@ -250,7 +266,7 @@ const App: React.FC = () => {
           />
         </Box>
       )}
-      {mainContent}
+      <Box marginTop={toast ? 0 : 1}>{mainContent}</Box>
     </Box>
   );
 };

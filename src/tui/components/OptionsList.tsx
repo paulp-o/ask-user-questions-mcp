@@ -1,4 +1,4 @@
-import { Box, Text, useInput } from "ink";
+import { Box, Newline, Text, useInput } from "ink";
 import React, { useState } from "react";
 
 import type { Option } from "../../session/types.js";
@@ -37,6 +37,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   // Calculate max index: include custom input option if enabled
   const maxIndex = showCustomInput ? options.length : options.length - 1;
   const isCustomInputFocused = showCustomInput && focusedIndex === options.length;
+  const customLines = customValue.split("\n");
 
   useInput(
     (input, key) => {
@@ -49,17 +50,15 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         setFocusedIndex((prev) => Math.min(maxIndex, prev + 1));
       }
       if (key.return) {
+        // Don't handle Return when custom input is focused - MultiLineTextInput handles it
         if (isCustomInputFocused) {
-          // On custom input: submit text and advance
-          if (customValue && onAdvance) {
-            onAdvance();
-          }
-        } else {
-          // On regular option: select and advance
-          onSelect(options[focusedIndex].label);
-          if (onAdvance) {
-            onAdvance();
-          }
+          return;
+        }
+
+        // On regular option: select and advance
+        onSelect(options[focusedIndex].label);
+        if (onAdvance) {
+          onAdvance();
         }
       }
     },
@@ -77,7 +76,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         const selectionMark = isSelected ? "●" : "○";
 
         return (
-          <Box key={index} marginTop={0}>
+          <Box key={index} flexDirection="column" marginTop={0}>
             <Text
               bold={isFocusedOption || isSelected}
               color={isFocusedOption ? "cyan" : isSelected ? "green" : "white"}
@@ -85,13 +84,14 @@ export const OptionsList: React.FC<OptionsListProps> = ({
               {indicator} {selectionMark} {option.label}
             </Text>
             {option.description && (
-              <Text
-                color={isFocusedOption ? "cyan" : undefined}
-                dimColor={!isFocusedOption}
-              >
-                {" "}
-                — {option.description}
-              </Text>
+              <Box marginLeft={4}>
+                <Text
+                  color={isFocusedOption ? "cyan" : undefined}
+                  dimColor={!isFocusedOption}
+                >
+                  {option.description}
+                </Text>
+              </Box>
             )}
           </Box>
         );
@@ -99,7 +99,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
 
       {/* Custom input option */}
       {showCustomInput && (
-        <Box marginTop={1}>
+        <Box marginTop={0}>
           <Box flexDirection="column">
             <Text
               bold={isCustomInputFocused}
@@ -109,12 +109,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
               (custom answer)
             </Text>
             {isCustomInputFocused && onCustomChange && (
-              <Box
-                borderColor="cyan"
-                borderStyle="single"
-                marginTop={0.5}
-                padding={0.5}
-              >
+              <Box marginLeft={2} marginTop={0.5}>
                 <MultiLineTextInput
                   isFocused={true}
                   onChange={onCustomChange}
@@ -126,7 +121,15 @@ export const OptionsList: React.FC<OptionsListProps> = ({
             )}
             {!isCustomInputFocused && customValue && (
               <Box marginLeft={2} marginTop={0.5}>
-                <Text dimColor>→ {customValue}</Text>
+                <Text dimColor>
+                  {customLines.map((line, idx) => (
+                    <React.Fragment key={idx}>
+                      {idx === 0 ? "→ " : "  "}
+                      {line || " "}
+                      {idx < customLines.length - 1 && <Newline />}
+                    </React.Fragment>
+                  ))}
+                </Text>
               </Box>
             )}
           </Box>
