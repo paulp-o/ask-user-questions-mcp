@@ -13,6 +13,7 @@ interface Answer {
 }
 
 interface StepperViewProps {
+  onComplete?: () => void;
   sessionId: string;
   sessionRequest: SessionRequest;
 }
@@ -22,10 +23,12 @@ interface StepperViewProps {
  * Manages state for current question, answers, and navigation
  */
 export const StepperView: React.FC<StepperViewProps> = ({
+  onComplete,
   sessionId,
   sessionRequest,
 }) => {
-  const { exit } = useApp();
+  // const { exit } =
+  useApp();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
   const [showReview, setShowReview] = useState(false);
@@ -71,8 +74,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
         timestamp: new Date().toISOString(),
       });
       setSubmitted(true);
-      // Exit after a brief delay to show success message
-      setTimeout(() => exit(), 1500);
+      // Call onComplete callback after a brief delay to show success message
+      setTimeout(() => {
+        if (onComplete) {
+          onComplete();
+        }
+      }, 1500);
     } catch (error) {
       console.error("Failed to save answers:", error);
       setSubmitting(false);
@@ -101,9 +108,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
 
     // Global shortcuts
-    if (input === "q") {
-      exit();
-    }
     if (input === "r") {
       setShowReview(true);
     }

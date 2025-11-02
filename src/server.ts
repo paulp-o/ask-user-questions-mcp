@@ -37,16 +37,18 @@ const QuestionSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Optional short 1-2 word summary for UI display. If omitted, defaults to 'Q1', 'Q2', etc.",
+      "Optional short 1-2 word summary for UI display. If omitted, defaults to 'Q1', 'Q2', etc."
     ),
 });
 
 // Add the ask_user_questions tool
 server.addTool({
+  name: "ask_user_questions",
   annotations: {
+    title: "Ask User Questions",
     openWorldHint: true, // This tool interacts with the user's terminal
     readOnlyHint: false, // This tool waits for user input
-    title: "Ask User Questions",
+    idempotentHint: true,
   },
   description:
     "Ask the user one or more structured questions via an interactive terminal interface. " +
@@ -116,7 +118,6 @@ server.addTool({
       };
     }
   },
-  name: "ask_user_questions",
   parameters: z.object({
     questions: z
       .array(QuestionSchema)

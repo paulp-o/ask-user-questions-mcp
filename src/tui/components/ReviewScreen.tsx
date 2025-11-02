@@ -4,7 +4,7 @@ import React from "react";
 import type { Question, UserAnswer } from "../../session/types.js";
 
 interface ReviewScreenProps {
-  answers: Map<number, { customText?: string; selectedOption?: string; }>;
+  answers: Map<number, { customText?: string; selectedOption?: string }>;
   onConfirm: (userAnswers: UserAnswer[]) => void;
   onGoBack: () => void;
   questions: Question[];
@@ -20,7 +20,6 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   onConfirm,
   onGoBack,
   questions,
-  sessionId,
 }) => {
   const { exit } = useApp();
 
