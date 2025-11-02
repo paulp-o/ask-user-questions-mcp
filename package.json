@@ -3,10 +3,19 @@
   "version": "0.1.0",
   "main": "dist/index.js",
   "bin": {
-    "auq": "./bin/auq"
+    "auq": "dist/bin/auq.js"
   },
+  "files": [
+    "dist",
+    "scripts/postinstall.cjs",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
+    "postinstall": "node scripts/postinstall.cjs",
+    "server": "node dist/src/server.js",
     "start": "tsx src/server.ts",
     "dev": "fastmcp dev src/server.ts",
     "lint": "prettier --check . && eslint . && tsc --noEmit",

@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+import { exec } from "child_process";
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+
 import { Box, render, Text, useApp, useInput } from "ink";
 import React, { useEffect, useState } from "react";
 
@@ -9,6 +14,77 @@ import { Toast } from "../src/tui/components/Toast.js";
 import { WaitingScreen } from "../src/tui/components/WaitingScreen.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
 
+// Handle command-line arguments
+const args = process.argv.slice(2);
+const command = args[0];
+
+// Display help
+if (command === "--help" || command === "-h") {
+  console.log(`
+AUQ MCP Server - Ask User Questions
+
+Usage:
+  auq [command] [options]
+
+Commands:
+  (default)     Start the TUI (Terminal User Interface)
+  server        Start the MCP server (for use with MCP clients)
+
+Options:
+  --help, -h    Show this help message
+  --version, -v Show version information
+
+Examples:
+  auq                    # Start TUI (wait for questions from AI)
+  auq server             # Start MCP server (for Claude Desktop, etc.)
+  auq --help             # Show this help message
+
+For more information, visit:
+  https://github.com/paulp-o/ask-user-question-mcp
+`);
+  process.exit(0);
+}
+
+// Display version
+if (command === "--version" || command === "-v") {
+  // Read version from package.json
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const packageJsonPath = join(__dirname, "..", "package.json");
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+  console.log(`auq-mcp-server v${packageJson.version}`);
+  process.exit(0);
+}
+
+// Handle 'server' command
+if (command === "server") {
+  console.log("Starting MCP server...");
+  const serverProcess = exec("node dist/src/server.js", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error starting server: ${error.message}`);
+      process.exit(1);
+    }
+    if (stderr) {
+      console.error(stderr);
+    }
+    console.log(stdout);
+  });
+
+  // Forward signals
+  process.on("SIGINT", () => {
+    serverProcess.kill("SIGINT");
+    process.exit(0);
+  });
+  process.on("SIGTERM", () => {
+    serverProcess.kill("SIGTERM");
+    process.exit(0);
+  });
+
+  // Keep process alive
+  await new Promise(() => {});
+}
+
+// Default: Start TUI
 type AppState =
   | { mode: "PROCESSING"; session: SessionData }
   | { mode: "WAITING" };
