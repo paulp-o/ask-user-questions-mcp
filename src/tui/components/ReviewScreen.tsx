@@ -48,7 +48,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   });
 
   return (
-    <Box flexDirection="column" padding={1}>
+    <Box flexDirection="column">
       {/* Header */}
       <Box
         borderColor="cyan"

@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
 				<Text dimColor>│</Text>
 				<Text color={pendingCount > 0 ? "yellow" : "green"}>
 					{" "}
-					{pendingCount} pending Q-set{pendingCount !== 1 ? "s" : ""}
+					{pendingCount} more on queue
 				</Text>
 			</Box>
 		</Box>

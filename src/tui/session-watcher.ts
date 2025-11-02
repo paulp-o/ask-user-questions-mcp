@@ -5,7 +5,7 @@
  * and coordinate with the MCP server through file system events.
  */
 
-import type { SessionRequest } from "../session/types.js";
+import type { SessionRequest, SessionStatus } from "../session/types.js";
 
 import { atomicReadFile } from "../session/atomic-operations.js";
 import { TUISessionWatcher } from "../session/file-watcher.js";
@@ -67,7 +67,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
   }
 
   /**
-   * Get list of pending sessions (sessions without answers)
+   * Get list of pending sessions (sessions without answers and status is pending/in-progress)
    */
   async getPendingSessions(): Promise<string[]> {
     const fs = await import("fs/promises");
@@ -90,12 +90,18 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
           // Check if answers file doesn't exist (pending session)
           await fs.access(answersPath);
         } catch {
-          // Answers file doesn't exist - check if this is a valid session
+          // Answers file doesn't exist - check status
           try {
-            await fs.access(statusPath);
-            pendingSessions.push(entry.name);
+            const statusContent = await fs.readFile(statusPath, "utf-8");
+            const status = JSON.parse(statusContent) as SessionStatus;
+
+            // Only include sessions that are actually pending or in-progress
+            // Exclude: rejected, completed, timed_out, abandoned
+            if (status.status === "pending" || status.status === "in-progress") {
+              pendingSessions.push(entry.name);
+            }
           } catch {
-            // No status file - not a valid session
+            // No valid status file - not a valid session
           }
         }
       }

@@ -266,7 +266,7 @@ const App: React.FC = () => {
           />
         </Box>
       )}
-      <Box marginTop={toast ? 0 : 1}>{mainContent}</Box>
+      {mainContent}
     </Box>
   );
 };

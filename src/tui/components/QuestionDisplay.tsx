@@ -48,7 +48,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   };
 
   return (
-    <Box flexDirection="column" padding={1}>
+    <Box flexDirection="column">
       {/* TabBar showing all question titles */}
       <TabBar currentIndex={currentQuestionIndex} questions={questions} />
 

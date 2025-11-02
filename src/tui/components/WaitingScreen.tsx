@@ -13,7 +13,7 @@ interface WaitingScreenProps {
 export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
   if (queueCount === 0) {
     return (
-      <Box flexDirection="column" padding={1}>
+      <Box flexDirection="column">
         <Text color="yellow">No pending question sets found.</Text>
         <Text>{welcomeText("🤖 Waiting for AI to ask questions...")}</Text>
         <Text dimColor>Press q to quit</Text>
@@ -22,7 +22,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
   }
 
   return (
-    <Box flexDirection="column" padding={1}>
+    <Box flexDirection="column">
       <Text color="cyan">
         Processing question set... ({queueCount} remaining in queue)
       </Text>

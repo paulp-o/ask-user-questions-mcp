@@ -1,4 +1,4 @@
-import { Box, Newline, Text, useInput } from "ink";
+import { Box, Text, useInput } from "ink";
 import React from "react";
 
 interface MultiLineTextInputProps {
@@ -53,25 +53,29 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
     { isActive: isFocused },
   );
 
-  const lines = value.split("\n");
   const hasContent = value.length > 0;
-  const displayLines = hasContent ? lines : [placeholder];
+  const lines = hasContent ? value.split("\n") : [placeholder];
 
   return (
     <Box flexDirection="column">
-      <Text dimColor={!hasContent}>
-        {displayLines.map((line, index) => (
-          <React.Fragment key={index}>
-            {line || " "}
-            {index < displayLines.length - 1 && <Newline />}
-          </React.Fragment>
-        ))}
-      </Text>
-      {isFocused && (
-        <Text color="cyan" dimColor>
-          ▌
-        </Text>
-      )}
+      {lines.map((line, index) => {
+        const isLastLine = index === lines.length - 1;
+        const showCursor = isFocused && isLastLine;
+        const isPlaceholder = !hasContent;
+        const lineHasContent = line.length > 0;
+        const displayText = lineHasContent ? line : showCursor ? "" : " ";
+
+        return (
+          <Text key={index} dimColor={isPlaceholder}>
+            {displayText}
+            {showCursor && (
+              <Text color="cyan" dimColor>
+                ▌
+              </Text>
+            )}
+          </Text>
+        );
+      })}
     </Box>
   );
 };
