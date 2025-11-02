@@ -1,0 +1,161 @@
+import React, { useState } from "react";
+import { Box, Text, useApp, useInput } from "ink";
+import { QuestionDisplay } from "./QuestionDisplay.js";
+import { ReviewScreen } from "./ReviewScreen.js";
+import { SessionManager } from "../../session/SessionManager.js";
+import type { SessionRequest, UserAnswer } from "../../session/types.js";
+
+interface StepperViewProps {
+  sessionId: string;
+  sessionRequest: SessionRequest;
+}
+
+interface Answer {
+  selectedOption?: string;
+  customText?: string;
+}
+
+/**
+ * StepperView orchestrates the question-answering flow
+ * Manages state for current question, answers, and navigation
+ */
+export const StepperView: React.FC<StepperViewProps> = ({
+  sessionId,
+  sessionRequest,
+}) => {
+  const { exit } = useApp();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
+  const [showReview, setShowReview] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const currentQuestion = sessionRequest.questions[currentQuestionIndex];
+
+  // Handle option selection
+  const handleSelectOption = (label: string) => {
+    setAnswers((prev) => {
+      const newAnswers = new Map(prev);
+      const existing = newAnswers.get(currentQuestionIndex) || {};
+      newAnswers.set(currentQuestionIndex, {
+        ...existing,
+        selectedOption: label,
+      });
+      return newAnswers;
+    });
+  };
+
+  // Handle custom answer text
+  const handleChangeCustomAnswer = (text: string) => {
+    setAnswers((prev) => {
+      const newAnswers = new Map(prev);
+      const existing = newAnswers.get(currentQuestionIndex) || {};
+      newAnswers.set(currentQuestionIndex, {
+        ...existing,
+        customText: text,
+      });
+      return newAnswers;
+    });
+  };
+
+  // Handle answer confirmation
+  const handleConfirm = async (userAnswers: UserAnswer[]) => {
+    setSubmitting(true);
+    try {
+      const sessionManager = new SessionManager();
+      await sessionManager.saveSessionAnswers(sessionId, {
+        sessionId,
+        answers: userAnswers,
+        timestamp: new Date().toISOString(),
+      });
+      setSubmitted(true);
+      // Exit after a brief delay to show success message
+      setTimeout(() => exit(), 1500);
+    } catch (error) {
+      console.error("Failed to save answers:", error);
+      setSubmitting(false);
+    }
+  };
+
+  // Handle going back from review
+  const handleGoBack = () => {
+    setShowReview(false);
+  };
+
+  // Global keyboard shortcuts and navigation
+  useInput((input, key) => {
+    // Don't handle navigation when showing review or submitting
+    if (showReview || submitting || submitted) return;
+
+    // Question navigation with arrow keys
+    if (key.leftArrow && currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
+    if (
+      key.rightArrow &&
+      currentQuestionIndex < sessionRequest.questions.length - 1
+    ) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    }
+
+    // Global shortcuts
+    if (input === "q") {
+      exit();
+    }
+    if (input === "r") {
+      setShowReview(true);
+    }
+  });
+
+  const currentAnswer = answers.get(currentQuestionIndex);
+
+  // Show success message after submission
+  if (submitted) {
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Box borderStyle="single" borderColor="green" padding={1}>
+          <Text bold color="green">
+            ✓ Answers submitted successfully!
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  // Show submitting message
+  if (submitting) {
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Box borderStyle="single" borderColor="yellow" padding={1}>
+          <Text color="yellow">Submitting answers...</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  // Show review screen
+  if (showReview) {
+    return (
+      <ReviewScreen
+        questions={sessionRequest.questions}
+        answers={answers}
+        sessionId={sessionId}
+        onConfirm={handleConfirm}
+        onGoBack={handleGoBack}
+      />
+    );
+  }
+
+  // Show question display (default)
+  return (
+    <QuestionDisplay
+      questions={sessionRequest.questions}
+      currentQuestionIndex={currentQuestionIndex}
+      currentQuestion={currentQuestion}
+      selectedOption={currentAnswer?.selectedOption}
+      onSelectOption={handleSelectOption}
+      customAnswer={currentAnswer?.customText}
+      onChangeCustomAnswer={handleChangeCustomAnswer}
+    />
+  );
+};
