@@ -61,6 +61,9 @@ describe("TUI Session Watcher", () => {
           events.push(event);
         });
 
+        // Give watcher time to initialize
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
         // Create a new session directory
         const newSessionDir = join(sessionDir, testSessionId);
         await fs.mkdir(newSessionDir);
@@ -208,6 +211,9 @@ describe("TUI Session Watcher", () => {
         watcher.startEnhancedWatching((event) => {
           mainEvents.push(event);
         });
+
+        // Give watcher time to initialize
+        await new Promise((resolve) => setTimeout(resolve, 50));
 
         // Create session
         const newSessionDir = join(sessionDir, testSessionId);
