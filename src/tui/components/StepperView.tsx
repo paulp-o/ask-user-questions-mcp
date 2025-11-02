@@ -1,5 +1,5 @@
 import { Box, Text, useApp, useInput } from "ink";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
 
@@ -64,6 +64,24 @@ export const StepperView: React.FC<StepperViewProps> = ({
     });
   };
 
+  // Track mount status to avoid state updates after unmount
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Reset internal stepper state when the session changes (safety in case component isn't remounted)
+  useEffect(() => {
+    setCurrentQuestionIndex(0);
+    setAnswers(new Map());
+    setShowReview(false);
+    setSubmitting(false);
+    setShowRejectionConfirm(false);
+  }, [sessionId]);
+
   // Handle answer confirmation
   const handleConfirm = async (userAnswers: UserAnswer[]) => {
     setSubmitting(true);
@@ -74,13 +92,14 @@ export const StepperView: React.FC<StepperViewProps> = ({
         sessionId,
         timestamp: new Date().toISOString(),
       });
-      // Call onComplete callback immediately (toast will show in parent)
-      if (onComplete) {
-        onComplete();
-      }
+      // Signal completion (successful submission)
+      onComplete?.(false);
     } catch (error) {
       console.error("Failed to save answers:", error);
-      setSubmitting(false);
+    } finally {
+      if (isMountedRef.current) {
+        setSubmitting(false);
+      }
     }
   };
 

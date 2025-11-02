@@ -249,6 +249,7 @@ const App: React.FC = () => {
     const { session } = state;
     mainContent = (
       <StepperView
+        key={session.sessionId}
         onComplete={handleSessionComplete}
         sessionId={session.sessionId}
         sessionRequest={session.sessionRequest}
