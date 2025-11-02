@@ -285,16 +285,24 @@ describe("SessionManager", () => {
   });
 
   describe("cleanupExpiredSessions", () => {
-    it("should clean up expired sessions", async () => {
+    it("should clean up expired sessions based on retention period", async () => {
+      // Create a manager with short retention period for testing
+      const shortRetentionManager = new SessionManager({
+        baseDir: testBaseDir,
+        retentionPeriod: 500, // 500ms retention
+      } as SessionConfig);
+
+      await shortRetentionManager.initialize();
+
       const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
-      const sessionId = await sessionManager.createSession(questions);
+      const sessionId = await shortRetentionManager.createSession(questions);
 
-      // Wait for session to expire (timeout is 1 second)
-      await new Promise((resolve) => setTimeout(resolve, 1100));
+      // Wait for retention period to expire
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      const cleanedCount = await sessionManager.cleanupExpiredSessions();
+      const cleanedCount = await shortRetentionManager.cleanupExpiredSessions();
       expect(cleanedCount).toBe(1);
-      expect(await sessionManager.sessionExists(sessionId)).toBe(false);
+      expect(await shortRetentionManager.sessionExists(sessionId)).toBe(false);
     });
 
     it("should not clean up active sessions", async () => {
@@ -305,6 +313,83 @@ describe("SessionManager", () => {
       const cleanedCount = await sessionManager.cleanupExpiredSessions();
       expect(cleanedCount).toBe(0);
       expect(await sessionManager.sessionExists(sessionId)).toBe(true);
+    });
+
+    it("should respect retention period independently from session timeout", async () => {
+      // Create a new manager with short retention period (500ms) but no session timeout
+      const retentionManager = new SessionManager({
+        baseDir: testBaseDir,
+        retentionPeriod: 500, // 500ms retention
+        sessionTimeout: 0, // No timeout (infinite wait)
+      } as SessionConfig);
+
+      await retentionManager.initialize();
+
+      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const sessionId = await retentionManager.createSession(questions);
+
+      // Wait for retention period to expire
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      const cleanedCount = await retentionManager.cleanupExpiredSessions();
+      expect(cleanedCount).toBe(1);
+      expect(await retentionManager.sessionExists(sessionId)).toBe(false);
+    });
+
+    it("should preserve sessions within retention period", async () => {
+      // Create manager with 7-day retention period (default)
+      const retentionManager = new SessionManager({
+        baseDir: testBaseDir,
+        retentionPeriod: 604800000, // 7 days
+      } as SessionConfig);
+
+      await retentionManager.initialize();
+
+      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const sessionId = await retentionManager.createSession(questions);
+
+      // Clean up immediately - session should be preserved
+      const cleanedCount = await retentionManager.cleanupExpiredSessions();
+      expect(cleanedCount).toBe(0);
+      expect(await retentionManager.sessionExists(sessionId)).toBe(true);
+    });
+
+    it("should not cleanup when retentionPeriod is 0", async () => {
+      // Create manager with retention disabled
+      const noRetentionManager = new SessionManager({
+        baseDir: testBaseDir,
+        retentionPeriod: 0, // Disabled
+      } as SessionConfig);
+
+      await noRetentionManager.initialize();
+
+      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const sessionId = await noRetentionManager.createSession(questions);
+
+      // Wait a bit
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Should not clean up even old sessions
+      const cleanedCount = await noRetentionManager.cleanupExpiredSessions();
+      expect(cleanedCount).toBe(0);
+      expect(await noRetentionManager.sessionExists(sessionId)).toBe(true);
+    });
+
+    it("should use default 7-day retention period when not specified", async () => {
+      // Create manager without specifying retention period
+      const defaultManager = new SessionManager({
+        baseDir: testBaseDir,
+      } as SessionConfig);
+
+      await defaultManager.initialize();
+
+      const questions = [{ options: [{ label: "Opt" }], prompt: "Test" }];
+      const sessionId = await defaultManager.createSession(questions);
+
+      // Clean up immediately - should preserve with default 7-day retention
+      const cleanedCount = await defaultManager.cleanupExpiredSessions();
+      expect(cleanedCount).toBe(0);
+      expect(await defaultManager.sessionExists(sessionId)).toBe(true);
     });
   });
 

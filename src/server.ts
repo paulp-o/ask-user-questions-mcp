@@ -51,6 +51,18 @@ server.addTool({
       // Initialize session manager if not already done
       await sessionManager.initialize();
 
+      // Clean up old sessions on startup (non-blocking)
+      sessionManager
+        .cleanupExpiredSessions()
+        .then((count) => {
+          if (count > 0) {
+            log.info(`Cleaned up ${count} expired session(s)`);
+          }
+        })
+        .catch((error) => {
+          log.warn("Cleanup failed:", { error: String(error) });
+        });
+
       // Validate questions (using existing Zod schema validation)
       if (!args.questions || args.questions.length === 0) {
         throw new Error("At least one question is required");

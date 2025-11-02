@@ -24,6 +24,7 @@ export interface SessionAnswer {
 export interface SessionConfig {
   baseDir: string;
   maxSessions?: number;
+  retentionPeriod?: number; // in milliseconds, how long to keep old sessions before cleanup
   sessionTimeout?: number; // in milliseconds
 }
 
@@ -70,5 +71,6 @@ export type SessionStatusValue = SessionStatus["status"];
 export const DEFAULT_SESSION_CONFIG: Partial<SessionConfig> = {
   baseDir: "~/.local/share/auq/sessions", // Will be resolved to actual path
   maxSessions: 100,
+  retentionPeriod: 604800000, // 7 days in milliseconds
   sessionTimeout: 0, // 0 = infinite timeout (wait indefinitely for user)
 };

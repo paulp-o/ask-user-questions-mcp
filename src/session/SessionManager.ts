@@ -54,7 +54,9 @@ export class SessionManager {
   }
 
   /**
-   * Clean up expired sessions (basic implementation for Subtask 1)
+   * Clean up old sessions that have exceeded the retention period (garbage collection)
+   * This is different from session timeout - retention period determines when old
+   * sessions are permanently deleted, regardless of their completion status.
    */
   async cleanupExpiredSessions(): Promise<number> {
     try {
@@ -63,7 +65,7 @@ export class SessionManager {
 
       for (const sessionId of sessionIds) {
         const status = await this.getSessionStatus(sessionId);
-        if (status && this.isSessionExpired(status)) {
+        if (status && this.isSessionRetentionExpired(status)) {
           await this.deleteSession(sessionId);
           cleanedCount++;
         }
@@ -514,6 +516,23 @@ export class SessionManager {
     if (timeout <= 0) return false;
 
     return isTimestampExpired(status.lastModified, timeout);
+  }
+
+  /**
+   * Check if a session has exceeded the retention period and should be garbage collected
+   */
+  private isSessionRetentionExpired(status: SessionStatus): boolean {
+    const retentionPeriod = this.config.retentionPeriod ?? 604800000; // Default 7 days
+    if (retentionPeriod <= 0) return false;
+
+    // Check the more recent timestamp (lastModified or createdAt)
+    // to determine if session is old enough for cleanup
+    const recentTimestamp =
+      status.lastModified > status.createdAt
+        ? status.lastModified
+        : status.createdAt;
+
+    return isTimestampExpired(recentTimestamp, retentionPeriod);
   }
 
   /**
