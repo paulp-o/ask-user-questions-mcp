@@ -80,7 +80,16 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                   <Text color="green">→ {answer.selectedOption}</Text>
                 )}
                 {answer?.customText && (
-                  <Text color="yellow">→ Custom: "{answer.customText}"</Text>
+                  <Box flexDirection="column">
+                    {answer.customText.split("\n").map((line, lineIndex) => (
+                      <Text key={lineIndex} color="yellow">
+                        {lineIndex === 0
+                          ? `→ Custom: "${line}`
+                          : `  ${line}`}
+                      </Text>
+                    ))}
+                    <Text color="yellow">"</Text>
+                  </Box>
                 )}
                 {!answer?.selectedOption && !answer?.customText && (
                   <Text dimColor>→ (No answer provided)</Text>

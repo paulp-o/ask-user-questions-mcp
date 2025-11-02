@@ -72,7 +72,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       {/* Footer with keybindings */}
       <Box borderColor="gray" borderStyle="single" marginTop={1} padding={0.5}>
         <Text dimColor>
-          ↑↓ Options | ←→ Questions | Enter Select & Next | q Quit
+          ↑↓ Options | ←→ Questions | Enter Select/Submit | Shift+Enter Newline | Esc Reject | q Quit
         </Text>
       </Box>
     </Box>

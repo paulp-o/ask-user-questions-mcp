@@ -1,8 +1,9 @@
 import { Box, Text, useInput } from "ink";
-import TextInput from "ink-text-input";
 import React, { useState } from "react";
 
 import type { Option } from "../../session/types.js";
+
+import { MultiLineTextInput } from "./MultiLineTextInput.js";
 
 interface OptionsListProps {
   isFocused: boolean;
@@ -114,9 +115,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 marginTop={0.5}
                 padding={0.5}
               >
-                <TextInput
+                <MultiLineTextInput
+                  isFocused={true}
                   onChange={onCustomChange}
-                  placeholder="Type your answer..."
+                  onSubmit={onAdvance}
+                  placeholder="Type your answer... (Shift+Enter for newline, Enter to submit)"
                   value={customValue}
                 />
               </Box>

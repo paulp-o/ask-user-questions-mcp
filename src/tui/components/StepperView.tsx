@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
 
 import { SessionManager } from "../../session/SessionManager.js";
+import { ConfirmationDialog } from "./ConfirmationDialog.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
 import { ReviewScreen } from "./ReviewScreen.js";
 
@@ -13,7 +14,7 @@ interface Answer {
 }
 
 interface StepperViewProps {
-  onComplete?: () => void;
+  onComplete?: (wasRejected?: boolean) => void;
   sessionId: string;
   sessionRequest: SessionRequest;
 }
@@ -33,6 +34,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
   const [showReview, setShowReview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showRejectionConfirm, setShowRejectionConfirm] = useState(false);
 
   const currentQuestion = sessionRequest.questions[currentQuestionIndex];
 
@@ -98,10 +100,32 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
   };
 
+  // Handle session rejection
+  const handleRejectSession = async () => {
+    try {
+      const sessionManager = new SessionManager();
+      await sessionManager.rejectSession(sessionId);
+
+      // Call onComplete with rejection flag
+      if (onComplete) {
+        onComplete(true);
+      }
+    } catch (error) {
+      console.error("Failed to reject session:", error);
+      setShowRejectionConfirm(false);
+    }
+  };
+
   // Global keyboard shortcuts and navigation
   useInput((input, key) => {
-    // Don't handle navigation when showing review or submitting
-    if (showReview || submitting) return;
+    // Don't handle navigation when showing review, submitting, or confirming rejection
+    if (showReview || submitting || showRejectionConfirm) return;
+
+    // Esc key - show rejection confirmation
+    if (key.escape) {
+      setShowRejectionConfirm(true);
+      return;
+    }
 
     // Question navigation with arrow keys
     if (key.leftArrow && currentQuestionIndex > 0) {
@@ -116,6 +140,19 @@ export const StepperView: React.FC<StepperViewProps> = ({
   });
 
   const currentAnswer = answers.get(currentQuestionIndex);
+
+  // Show rejection confirmation
+  if (showRejectionConfirm) {
+    return (
+      <Box flexDirection="column" padding={1}>
+        <ConfirmationDialog
+          message="Are you sure you want to reject this question set?"
+          onCancel={() => setShowRejectionConfirm(false)}
+          onConfirm={handleRejectSession}
+        />
+      </Box>
+    );
+  }
 
   // Show submitting message
   if (submitting) {

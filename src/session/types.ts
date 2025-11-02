@@ -32,7 +32,7 @@ export interface SessionConfig {
 export interface SessionRequest {
   questions: Question[];
   sessionId: string;
-  status: "completed" | "in-progress" | "pending" | "timed_out";
+  status: "completed" | "in-progress" | "pending" | "rejected" | "timed_out";
   timestamp: string;
 }
 
@@ -41,7 +41,7 @@ export interface SessionStatus {
   currentQuestionIndex?: number;
   lastModified: string;
   sessionId: string;
-  status: "abandoned" | "completed" | "in-progress" | "pending" | "timed_out";
+  status: "abandoned" | "completed" | "in-progress" | "pending" | "rejected" | "timed_out";
   totalQuestions: number;
 }
 

@@ -267,6 +267,20 @@ export class SessionManager {
   }
 
   /**
+   * Reject a session - mark as rejected by user
+   * This allows users to skip unwanted question sets
+   */
+  async rejectSession(sessionId: string): Promise<void> {
+    const exists = await this.sessionExists(sessionId);
+    if (!exists) {
+      throw new Error(`Session not found: ${sessionId}`);
+    }
+
+    // Update status to rejected
+    await this.updateSessionStatus(sessionId, "rejected");
+  }
+
+  /**
    * Check if session exists
    */
   async sessionExists(sessionId: string): Promise<boolean> {

@@ -38,6 +38,7 @@
   "license": "MIT",
   "description": "An MCP server that provides a tool to ask a user questions via the terminal",
   "dependencies": {
+    "@inkjs/ui": "^2.0.0",
     "@types/uuid": "^10.0.0",
     "fastmcp": "^1.27.3",
     "ink": "^6.4.0",

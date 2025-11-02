@@ -199,9 +199,13 @@ const App: React.FC = () => {
   };
 
   // Handle session completion
-  const handleSessionComplete = () => {
-    // Show success toast
-    showToast("✓ Answers submitted successfully!", "success");
+  const handleSessionComplete = (wasRejected = false) => {
+    // Show appropriate toast
+    if (wasRejected) {
+      showToast("Question set rejected", "info");
+    } else {
+      showToast("✓ Answers submitted successfully!", "success");
+    }
 
     if (sessionQueue.length > 0) {
       // Auto-load next session

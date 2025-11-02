@@ -18,4 +18,14 @@
   }
 }
 ```
+
 Add a guide in readme about how to set up this MCP server, AND how to use the auq command.
+--- add v2 ---
+# TUI style redesign
+- make the color theme more vibrant and modern - use cyan-purple gradient theme for important texts.
+- more aggressive usage of bold text for headers and important texts.
+- for the multiple choices, remove the vertical blank spacing between the options.
+- put the question/MCQ view in a rectangular box with a border.
+- put most of the viewers in a rectangular box with a border. (e.g. the question/MCQ view, the options list, the custom input view, the review screen, the waiting screen, the toast messages, etc.)
+- use more emojis for the UI.
+- when showng MCQs and their description, show description in the newline. so that the multiple choice's title would show in bold text and the description would show in normal text, in the next line.
