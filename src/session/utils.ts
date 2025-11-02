@@ -12,7 +12,7 @@ import { join } from "path";
  */
 export function createSafeFilename(
   sessionId: string,
-  filename: string
+  filename: string,
 ): string {
   if (!sanitizeSessionId(sessionId)) {
     throw new Error(`Invalid session ID format: ${sessionId}`);
@@ -55,7 +55,7 @@ export function getCurrentTimestamp(): string {
  */
 export function isTimestampExpired(
   timestamp: string,
-  timeoutMs: number
+  timeoutMs: number,
 ): boolean {
   const now = new Date().getTime();
   const timestampTime = new Date(timestamp).getTime();
@@ -128,7 +128,7 @@ export function sanitizeSessionId(sessionId: string): boolean {
  * Validate that a session directory exists and is accessible
  */
 export async function validateSessionDirectory(
-  baseDir: string
+  baseDir: string,
 ): Promise<boolean> {
   try {
     await fs.access(baseDir, constants.R_OK | constants.W_OK);

@@ -45,7 +45,7 @@ describe("ResponseFormatter", () => {
       expect(result).toBe(
         "Here are the user's answers:\n\n" +
           "1. What is your favorite programming language?\n" +
-          "→ TypeScript — Type-safe JavaScript"
+          "→ TypeScript — Type-safe JavaScript",
       );
     });
 
@@ -105,7 +105,7 @@ describe("ResponseFormatter", () => {
           "1. What is your favorite programming language?\n" +
           "→ TypeScript — Type-safe JavaScript\n\n" +
           "2. What type of application are you building?\n" +
-          "→ Web — Frontend or backend web application"
+          "→ Web — Frontend or backend web application",
       );
     });
 
@@ -144,7 +144,7 @@ describe("ResponseFormatter", () => {
       expect(result).toBe(
         "Here are the user's answers:\n\n" +
           "1. What type of application are you building?\n" +
-          "→ Other: 'Desktop app with Electron'"
+          "→ Other: 'Desktop app with Electron'",
       );
     });
 
@@ -204,7 +204,7 @@ describe("ResponseFormatter", () => {
           "1. What is your favorite programming language?\n" +
           "→ TypeScript — Type-safe JavaScript\n\n" +
           "2. What type of application are you building?\n" +
-          "→ Other: 'Desktop app with Electron'"
+          "→ Other: 'Desktop app with Electron'",
       );
     });
 
@@ -239,7 +239,7 @@ describe("ResponseFormatter", () => {
       const result = ResponseFormatter.formatUserResponse(answers, questions);
 
       expect(result).toBe(
-        "Here are the user's answers:\n\n" + "1. Choose a color\n" + "→ Red"
+        "Here are the user's answers:\n\n" + "1. Choose a color\n" + "→ Red",
       );
     });
 
@@ -289,7 +289,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.formatUserResponse(answers, questions)
+        ResponseFormatter.formatUserResponse(answers, questions),
       ).toThrow("No answers provided in session");
     });
 
@@ -309,7 +309,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.formatUserResponse(answers, questions)
+        ResponseFormatter.formatUserResponse(answers, questions),
       ).toThrow("No questions provided");
     });
 
@@ -344,7 +344,7 @@ describe("ResponseFormatter", () => {
 
       // Should only include the answered question
       expect(result).toBe(
-        "Here are the user's answers:\n\n" + "1. Question 1\n" + "→ Option 1"
+        "Here are the user's answers:\n\n" + "1. Question 1\n" + "→ Option 1",
       );
     });
   });
@@ -372,7 +372,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.validateAnswers(answers, questions)
+        ResponseFormatter.validateAnswers(answers, questions),
       ).not.toThrow();
     });
 
@@ -398,7 +398,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.validateAnswers(answers, questions)
+        ResponseFormatter.validateAnswers(answers, questions),
       ).toThrow("Answer references invalid question index: 99");
     });
 
@@ -424,7 +424,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.validateAnswers(answers, questions)
+        ResponseFormatter.validateAnswers(answers, questions),
       ).toThrow("has neither selectedOption nor customText");
     });
 
@@ -450,7 +450,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.validateAnswers(answers, questions)
+        ResponseFormatter.validateAnswers(answers, questions),
       ).toThrow("references non-existent option: Option 3");
     });
 
@@ -476,7 +476,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.validateAnswers(answers, questions)
+        ResponseFormatter.validateAnswers(answers, questions),
       ).not.toThrow();
     });
 
@@ -496,7 +496,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.validateAnswers(answers, questions)
+        ResponseFormatter.validateAnswers(answers, questions),
       ).toThrow("No answers provided");
     });
 
@@ -516,7 +516,7 @@ describe("ResponseFormatter", () => {
       };
 
       expect(() =>
-        ResponseFormatter.validateAnswers(answers, questions)
+        ResponseFormatter.validateAnswers(answers, questions),
       ).toThrow("No questions provided");
     });
   });

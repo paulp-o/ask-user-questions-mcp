@@ -1,18 +1,20 @@
-import React, { useState } from "react";
 import { Box, Text, useApp, useInput } from "ink";
+import React, { useState } from "react";
+
+import type { SessionRequest, UserAnswer } from "../../session/types.js";
+
+import { SessionManager } from "../../session/SessionManager.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
 import { ReviewScreen } from "./ReviewScreen.js";
-import { SessionManager } from "../../session/SessionManager.js";
-import type { SessionRequest, UserAnswer } from "../../session/types.js";
+
+interface Answer {
+  customText?: string;
+  selectedOption?: string;
+}
 
 interface StepperViewProps {
   sessionId: string;
   sessionRequest: SessionRequest;
-}
-
-interface Answer {
-  selectedOption?: string;
-  customText?: string;
 }
 
 /**
@@ -64,8 +66,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
     try {
       const sessionManager = new SessionManager();
       await sessionManager.saveSessionAnswers(sessionId, {
-        sessionId,
         answers: userAnswers,
+        sessionId,
         timestamp: new Date().toISOString(),
       });
       setSubmitted(true);
@@ -113,7 +115,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   if (submitted) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Box borderStyle="single" borderColor="green" padding={1}>
+        <Box borderColor="green" borderStyle="single" padding={1}>
           <Text bold color="green">
             ✓ Answers submitted successfully!
           </Text>
@@ -126,7 +128,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   if (submitting) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Box borderStyle="single" borderColor="yellow" padding={1}>
+        <Box borderColor="yellow" borderStyle="single" padding={1}>
           <Text color="yellow">Submitting answers...</Text>
         </Box>
       </Box>
@@ -137,11 +139,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
   if (showReview) {
     return (
       <ReviewScreen
-        questions={sessionRequest.questions}
         answers={answers}
-        sessionId={sessionId}
         onConfirm={handleConfirm}
         onGoBack={handleGoBack}
+        questions={sessionRequest.questions}
+        sessionId={sessionId}
       />
     );
   }
@@ -149,13 +151,13 @@ export const StepperView: React.FC<StepperViewProps> = ({
   // Show question display (default)
   return (
     <QuestionDisplay
-      questions={sessionRequest.questions}
-      currentQuestionIndex={currentQuestionIndex}
       currentQuestion={currentQuestion}
-      selectedOption={currentAnswer?.selectedOption}
-      onSelectOption={handleSelectOption}
+      currentQuestionIndex={currentQuestionIndex}
       customAnswer={currentAnswer?.customText}
       onChangeCustomAnswer={handleChangeCustomAnswer}
+      onSelectOption={handleSelectOption}
+      questions={sessionRequest.questions}
+      selectedOption={currentAnswer?.selectedOption}
     />
   );
 };

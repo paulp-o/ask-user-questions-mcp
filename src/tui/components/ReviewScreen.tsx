@@ -1,13 +1,14 @@
+import { Box, Text, useApp, useInput } from "ink";
 import React from "react";
-import { Box, Text, useInput, useApp } from "ink";
+
 import type { Question, UserAnswer } from "../../session/types.js";
 
 interface ReviewScreenProps {
-  questions: Question[];
-  answers: Map<number, { selectedOption?: string; customText?: string }>;
-  sessionId: string;
+  answers: Map<number, { customText?: string; selectedOption?: string; }>;
   onConfirm: (userAnswers: UserAnswer[]) => void;
   onGoBack: () => void;
+  questions: Question[];
+  sessionId: string;
 }
 
 /**
@@ -15,11 +16,11 @@ interface ReviewScreenProps {
  * User can press 'y' to confirm and submit, or 'n' to go back and edit
  */
 export const ReviewScreen: React.FC<ReviewScreenProps> = ({
-  questions,
   answers,
-  sessionId,
   onConfirm,
   onGoBack,
+  questions,
+  sessionId,
 }) => {
   const { exit } = useApp();
 
@@ -30,9 +31,9 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
       answers.forEach((answer, questionIndex) => {
         if (answer.selectedOption || answer.customText) {
           userAnswers.push({
+            customText: answer.customText,
             questionIndex,
             selectedOption: answer.selectedOption,
-            customText: answer.customText,
             timestamp: new Date().toISOString(),
           });
         }
@@ -50,7 +51,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   return (
     <Box flexDirection="column" padding={1}>
       {/* Header */}
-      <Box marginBottom={1} borderStyle="single" borderColor="cyan" padding={0.5}>
+      <Box
+        borderColor="cyan"
+        borderStyle="single"
+        marginBottom={1}
+        padding={0.5}
+      >
         <Text bold color="cyan">
           Review Your Answers
         </Text>
@@ -63,7 +69,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
           const questionTitle = question.title || `Q${index + 1}`;
 
           return (
-            <Box key={index} flexDirection="column" marginBottom={1}>
+            <Box flexDirection="column" key={index} marginBottom={1}>
               {/* Question title and prompt */}
               <Text bold>
                 {questionTitle}. {question.prompt}
@@ -88,9 +94,9 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
 
       {/* Confirmation prompt */}
       <Box
-        marginTop={1}
-        borderStyle="single"
         borderColor="yellow"
+        borderStyle="single"
+        marginTop={1}
         padding={0.5}
       >
         <Text bold color="yellow">

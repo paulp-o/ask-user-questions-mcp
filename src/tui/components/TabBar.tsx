@@ -1,10 +1,11 @@
-import React from "react";
 import { Box, Text } from "ink";
+import React from "react";
+
 import type { Question } from "../../session/types.js";
 
 interface TabBarProps {
-  questions: Question[];
   currentIndex: number;
+  questions: Question[];
 }
 
 /**
@@ -12,7 +13,7 @@ interface TabBarProps {
  * Visual: [Language*] [App Type] [Framework] (2/3)
  * where * indicates the active/highlighted question
  */
-export const TabBar: React.FC<TabBarProps> = ({ questions, currentIndex }) => {
+export const TabBar: React.FC<TabBarProps> = ({ currentIndex, questions }) => {
   return (
     <Box>
       {questions.map((question, index) => {
@@ -25,8 +26,8 @@ export const TabBar: React.FC<TabBarProps> = ({ questions, currentIndex }) => {
             {index > 0 && " "}
             {"["}
             <Text
-              color={isActive ? "cyan" : "white"}
               bold={isActive}
+              color={isActive ? "cyan" : "white"}
               underline={isActive}
             >
               {title}

@@ -13,9 +13,9 @@ const OptionSchema = z.object({
 });
 
 const QuestionSchema = z.object({
-  title: z.string(),
   options: z.array(OptionSchema).min(1),
   prompt: z.string(),
+  title: z.string(),
 });
 
 const QuestionsArraySchema = z.array(QuestionSchema).min(1);
@@ -34,9 +34,9 @@ describe("Schema Validation - Edge Cases", () => {
 
     it("should reject empty options array", () => {
       const invalidQuestion = {
-        title: "Test",
         options: [], // Empty array
         prompt: "Test question?",
+        title: "Test",
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -44,8 +44,8 @@ describe("Schema Validation - Edge Cases", () => {
 
     it("should reject missing prompt", () => {
       const invalidQuestion = {
-        title: "Test",
         options: [{ label: "Option 1" }],
+        title: "Test",
         // prompt missing
       };
 
@@ -54,9 +54,9 @@ describe("Schema Validation - Edge Cases", () => {
 
     it("should reject missing options field", () => {
       const invalidQuestion = {
-        title: "Test",
         // options missing
         prompt: "Test question?",
+        title: "Test",
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -64,7 +64,6 @@ describe("Schema Validation - Edge Cases", () => {
 
     it("should reject option with missing label", () => {
       const invalidQuestion = {
-        title: "Test",
         options: [
           {
             description: "A description",
@@ -72,6 +71,7 @@ describe("Schema Validation - Edge Cases", () => {
           },
         ],
         prompt: "Test question?",
+        title: "Test",
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -87,7 +87,6 @@ describe("Schema Validation - Edge Cases", () => {
   describe("Valid Input (should accept)", () => {
     it("should accept valid question with title", () => {
       const validQuestion = {
-        title: "Language",
         options: [
           {
             description: "A helpful description",
@@ -95,6 +94,7 @@ describe("Schema Validation - Edge Cases", () => {
           },
         ],
         prompt: "What is your choice?",
+        title: "Language",
       };
 
       expect(() => QuestionSchema.parse(validQuestion)).not.toThrow();
@@ -106,7 +106,6 @@ describe("Schema Validation - Edge Cases", () => {
 
     it("should accept valid question with all fields", () => {
       const validQuestion = {
-        title: "Framework",
         options: [
           {
             description: "A helpful description",
@@ -114,6 +113,7 @@ describe("Schema Validation - Edge Cases", () => {
           },
         ],
         prompt: "What is your choice?",
+        title: "Framework",
       };
 
       expect(() => QuestionSchema.parse(validQuestion)).not.toThrow();
@@ -124,7 +124,6 @@ describe("Schema Validation - Edge Cases", () => {
 
     it("should accept valid question with description omitted", () => {
       const validQuestion = {
-        title: "Choice",
         options: [
           {
             label: "Option 1",
@@ -132,6 +131,7 @@ describe("Schema Validation - Edge Cases", () => {
           },
         ],
         prompt: "What is your choice?",
+        title: "Choice",
       };
 
       expect(() => QuestionSchema.parse(validQuestion)).not.toThrow();
@@ -142,14 +142,14 @@ describe("Schema Validation - Edge Cases", () => {
     it("should accept multiple valid questions", () => {
       const validQuestions = [
         {
-          title: "First",
           options: [{ label: "A" }],
           prompt: "Question 1?",
+          title: "First",
         },
         {
-          title: "Second",
           options: [{ label: "B" }, { label: "C" }],
           prompt: "Question 2?",
+          title: "Second",
         },
       ];
 

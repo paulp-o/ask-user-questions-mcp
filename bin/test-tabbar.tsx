@@ -1,24 +1,26 @@
+import { render, Box, Text } from "ink";
 #!/usr/bin/env node
 import React, { useState, useEffect } from "react";
-import { render, Box, Text } from "ink";
-import { TabBar } from "../src/tui/components/TabBar.js";
+
 import type { Question } from "../src/session/types.js";
+
+import { TabBar } from "../src/tui/components/TabBar.js";
 
 const mockQuestions: Question[] = [
   {
-    title: "Language",
-    prompt: "Which programming language?",
     options: [{ label: "JavaScript" }, { label: "TypeScript" }],
+    prompt: "Which programming language?",
+    title: "Language",
   },
   {
-    title: "App Type",
-    prompt: "What type of application?",
     options: [{ label: "Web" }, { label: "CLI" }],
+    prompt: "What type of application?",
+    title: "App Type",
   },
   {
-    title: "Framework",
-    prompt: "Which framework?",
     options: [{ label: "React" }, { label: "Vue" }],
+    prompt: "Which framework?",
+    title: "Framework",
   },
 ];
 
@@ -43,7 +45,7 @@ const TestTabBar: React.FC = () => {
         (Cycles through questions every 2 seconds to show highlighting)
       </Text>
       <Box marginTop={1}>
-        <TabBar questions={mockQuestions} currentIndex={currentIndex} />
+        <TabBar currentIndex={currentIndex} questions={mockQuestions} />
       </Box>
       <Box marginTop={1}>
         <Text dimColor>Current question: {currentIndex + 1}</Text>

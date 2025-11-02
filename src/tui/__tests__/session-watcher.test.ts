@@ -22,13 +22,13 @@ describe("TUI Session Watcher", () => {
   const mockSessionRequest = {
     questions: [
       {
-        title: "Language",
         options: [
           { description: "Dynamic web language", label: "JavaScript" },
           { description: "Typed JavaScript", label: "TypeScript" },
           { description: "Versatile and readable", label: "Python" },
         ],
         prompt: "What is your favorite programming language?",
+        title: "Language",
       },
     ],
     sessionId: testSessionId,
@@ -76,7 +76,7 @@ describe("TUI Session Watcher", () => {
         await Promise.all([
           fs.writeFile(
             requestFile,
-            JSON.stringify(mockSessionRequest, null, 2)
+            JSON.stringify(mockSessionRequest, null, 2),
           ),
           fs.writeFile(
             statusFile,
@@ -86,7 +86,7 @@ describe("TUI Session Watcher", () => {
               sessionId: testSessionId,
               status: "pending",
               totalQuestions: 1,
-            })
+            }),
           ),
         ]);
 
@@ -124,7 +124,7 @@ describe("TUI Session Watcher", () => {
         const requestFile = join(newSessionDir, SESSION_FILES.REQUEST);
         await fs.writeFile(
           requestFile,
-          JSON.stringify(mockSessionRequest, null, 2)
+          JSON.stringify(mockSessionRequest, null, 2),
         );
 
         // Wait for debounce + processing
@@ -172,7 +172,7 @@ describe("TUI Session Watcher", () => {
               sessionId: testSessionId,
               status: "pending",
               totalQuestions: 1,
-            })
+            }),
           ),
         ]);
 
@@ -187,7 +187,7 @@ describe("TUI Session Watcher", () => {
         // Should have logged a warning about corrupted data
         expect(consoleSpy).toHaveBeenCalledWith(
           expect.stringContaining("Failed to load session request"),
-          expect.any(Error)
+          expect.any(Error),
         );
 
         consoleSpy.mockRestore();
@@ -223,7 +223,7 @@ describe("TUI Session Watcher", () => {
         const requestFile = join(newSessionDir, SESSION_FILES.REQUEST);
         await fs.writeFile(
           requestFile,
-          JSON.stringify(mockSessionRequest, null, 2)
+          JSON.stringify(mockSessionRequest, null, 2),
         );
 
         // Wait for debounce + processing
@@ -257,7 +257,7 @@ describe("TUI Session Watcher", () => {
         const requestFile = join(newSessionDir, SESSION_FILES.REQUEST);
         await fs.writeFile(
           requestFile,
-          JSON.stringify(mockSessionRequest, null, 2)
+          JSON.stringify(mockSessionRequest, null, 2),
         );
 
         // Wait for processing
@@ -289,7 +289,7 @@ describe("TUI Session Watcher", () => {
             JSON.stringify({
               ...mockSessionRequest,
               sessionId: session.id,
-            })
+            }),
           );
 
           // Create status.json
@@ -302,7 +302,7 @@ describe("TUI Session Watcher", () => {
               sessionId: session.id,
               status: session.completed ? "completed" : "pending",
               totalQuestions: 1,
-            })
+            }),
           );
 
           // Create answers.json for completed sessions
@@ -320,7 +320,7 @@ describe("TUI Session Watcher", () => {
                 ],
                 sessionId: session.id,
                 timestamp: new Date().toISOString(),
-              })
+              }),
             );
           }
         }
@@ -367,7 +367,7 @@ describe("TUI Session Watcher", () => {
         expect(sessionRequest).toBeNull();
         expect(consoleSpy).toHaveBeenCalledWith(
           expect.stringContaining("Failed to load session request"),
-          expect.any(Error)
+          expect.any(Error),
         );
 
         consoleSpy.mockRestore();
@@ -421,7 +421,7 @@ describe("TUI Session Watcher", () => {
               JSON.stringify({
                 ...mockSessionRequest,
                 sessionId: session.id,
-              })
+              }),
             ),
             fs.writeFile(
               statusFile,
@@ -431,7 +431,7 @@ describe("TUI Session Watcher", () => {
                 sessionId: session.id,
                 status: "pending",
                 totalQuestions: 1,
-              })
+              }),
             ),
           ]);
         }
@@ -470,7 +470,7 @@ describe("TUI Session Watcher", () => {
             sessionId: "corrupted-session",
             status: "pending",
             totalQuestions: 1,
-          })
+          }),
         );
 
         // Create corrupted request.json
@@ -499,7 +499,7 @@ describe("TUI Session Watcher", () => {
       expect(pendingSessions).toEqual([]);
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("Failed to scan for pending sessions"),
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();

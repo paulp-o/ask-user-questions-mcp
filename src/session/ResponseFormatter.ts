@@ -27,7 +27,7 @@ export class ResponseFormatter {
    */
   static formatUserResponse(
     answers: SessionAnswer,
-    questions: Question[]
+    questions: Question[],
   ): string {
     // Validate that we have matching questions and answers
     if (answers.answers.length === 0) {
@@ -90,14 +90,14 @@ export class ResponseFormatter {
         answer.questionIndex >= questions.length
       ) {
         throw new Error(
-          `Answer references invalid question index: ${answer.questionIndex}`
+          `Answer references invalid question index: ${answer.questionIndex}`,
         );
       }
 
       // Check that answer has either selectedOption or customText
       if (!answer.selectedOption && !answer.customText) {
         throw new Error(
-          `Answer for question ${answer.questionIndex} has neither selectedOption nor customText`
+          `Answer for question ${answer.questionIndex} has neither selectedOption nor customText`,
         );
       }
 
@@ -105,12 +105,12 @@ export class ResponseFormatter {
       if (answer.selectedOption) {
         const question = questions[answer.questionIndex];
         const optionExists = question.options.some(
-          (opt) => opt.label === answer.selectedOption
+          (opt) => opt.label === answer.selectedOption,
         );
 
         if (!optionExists) {
           throw new Error(
-            `Answer for question ${answer.questionIndex} references non-existent option: ${answer.selectedOption}`
+            `Answer for question ${answer.questionIndex} references non-existent option: ${answer.selectedOption}`,
           );
         }
       }
@@ -128,7 +128,7 @@ export class ResponseFormatter {
   private static formatQuestion(
     question: Question,
     answer: UserAnswer,
-    index: number
+    index: number,
   ): string {
     const lines: string[] = [];
 
@@ -143,7 +143,7 @@ export class ResponseFormatter {
     } else if (answer.selectedOption) {
       // Selected option - find the option details
       const option = question.options.find(
-        (opt) => opt.label === answer.selectedOption
+        (opt) => opt.label === answer.selectedOption,
       );
 
       if (option) {

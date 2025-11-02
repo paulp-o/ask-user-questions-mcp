@@ -1,12 +1,13 @@
-import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
+import React, { useState } from "react";
+
 import type { Option } from "../../session/types.js";
 
 interface OptionsListProps {
-  options: Option[];
-  onSelect: (label: string) => void;
-  selectedOption?: string;
   isFocused: boolean;
+  onSelect: (label: string) => void;
+  options: Option[];
+  selectedOption?: string;
 }
 
 /**
@@ -14,10 +15,10 @@ interface OptionsListProps {
  * Uses ↑↓ to navigate, Enter to select
  */
 export const OptionsList: React.FC<OptionsListProps> = ({
-  options,
-  onSelect,
-  selectedOption,
   isFocused,
+  onSelect,
+  options,
+  selectedOption,
 }) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
 
@@ -35,7 +36,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         onSelect(options[focusedIndex].label);
       }
     },
-    { isActive: isFocused }
+    { isActive: isFocused },
   );
 
   return (
@@ -51,15 +52,15 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         return (
           <Box key={index} marginTop={index > 0 ? 0.5 : 0}>
             <Text
-              color={isFocusedOption ? "cyan" : isSelected ? "green" : "white"}
               bold={isFocusedOption || isSelected}
+              color={isFocusedOption ? "cyan" : isSelected ? "green" : "white"}
             >
               {indicator} {selectionMark} {option.label}
             </Text>
             {option.description && (
               <Text
-                dimColor={!isFocusedOption}
                 color={isFocusedOption ? "cyan" : undefined}
+                dimColor={!isFocusedOption}
               >
                 {" "}
                 — {option.description}

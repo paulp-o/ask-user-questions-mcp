@@ -1,11 +1,11 @@
-import React from "react";
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
+import React from "react";
 
 interface CustomInputProps {
-  value: string;
-  onChange: (value: string) => void;
   isFocused: boolean;
+  onChange: (value: string) => void;
+  value: string;
 }
 
 /**
@@ -13,27 +13,25 @@ interface CustomInputProps {
  * Uses Ink's TextInput component with visual focus indicator
  */
 export const CustomInput: React.FC<CustomInputProps> = ({
-  value,
-  onChange,
   isFocused,
+  onChange,
+  value,
 }) => {
   return (
     <Box
-      flexDirection="column"
-      borderStyle="single"
       borderColor={isFocused ? "cyan" : "gray"}
-      padding={0.5}
+      borderStyle="single"
+      flexDirection="column"
       marginTop={1}
+      padding={0.5}
     >
-      <Text dimColor={!isFocused}>
-        {isFocused ? "→" : " "} Custom answer:{" "}
-      </Text>
+      <Text dimColor={!isFocused}>{isFocused ? "→" : " "} Custom answer: </Text>
       <Box marginTop={0.5}>
         {isFocused ? (
           <TextInput
-            value={value}
             onChange={onChange}
             placeholder="Type your answer here..."
+            value={value}
           />
         ) : (
           <Text color={value ? "white" : "gray"}>

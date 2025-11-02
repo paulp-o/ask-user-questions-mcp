@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Box, Text, useInput, useApp } from "ink";
-import { createTUIWatcher } from "../session-watcher.js";
+import { Box, Text, useApp, useInput } from "ink";
+import React, { useEffect, useState } from "react";
+
 import type { SessionRequest } from "../../session/types.js";
 
-interface SessionSelectionMenuProps {
-  onSessionSelect: (sessionId: string, sessionRequest: SessionRequest) => void;
-}
+import { createTUIWatcher } from "../session-watcher.js";
 
 interface SessionData {
   sessionId: string;
@@ -13,8 +11,12 @@ interface SessionData {
   timestamp: Date;
 }
 
+interface SessionSelectionMenuProps {
+  onSessionSelect: (sessionId: string, sessionRequest: SessionRequest) => void;
+}
+
 /**
- * SessionSelectionMenu displays a list of pending sessions and allows user to select one
+ * SessionSelectionMenu displays a list of pending question sets and allows user to select one
  * Uses ↑↓ for navigation, Enter to select, q to quit
  */
 export const SessionSelectionMenu: React.FC<SessionSelectionMenuProps> = ({
@@ -24,44 +26,79 @@ export const SessionSelectionMenu: React.FC<SessionSelectionMenuProps> = ({
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<null | string>(null);
 
-  // Load pending sessions on mount
+  // Load pending sessions on mount and start persistent watcher
   useEffect(() => {
-    loadPendingSessions();
+    let watcherInstance: null | ReturnType<typeof createTUIWatcher> = null;
+
+    const initialize = async () => {
+      try {
+        setIsLoading(true);
+
+        // Step 1: Load existing pending sessions
+        const watcher = createTUIWatcher();
+        const sessionIds = await watcher.getPendingSessions();
+
+        const sessionData = await Promise.all(
+          sessionIds.map(async (sessionId) => {
+            const sessionRequest = await watcher.getSessionRequest(sessionId);
+            if (!sessionRequest) return null;
+
+            return {
+              sessionId,
+              sessionRequest,
+              timestamp: new Date(sessionRequest.timestamp),
+            };
+          }),
+        );
+
+        // Filter out null entries and sort by timestamp (newest first)
+        const validSessions = sessionData
+          .filter((s): s is NonNullable<typeof s> => s !== null)
+          .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+        setSessions(validSessions);
+        setIsLoading(false);
+
+        // Step 2: Start persistent watcher for new sessions
+        watcherInstance = createTUIWatcher({ autoLoadData: true });
+        watcherInstance.startEnhancedWatching((event) => {
+          // Add new session to queue (FIFO - append to end)
+          setSessions((prev) => {
+            // Check for duplicates
+            if (prev.some((s) => s.sessionId === event.sessionId)) {
+              return prev;
+            }
+
+            // Add to end of queue
+            return [
+              ...prev,
+              {
+                sessionId: event.sessionId,
+                sessionRequest: event.sessionRequest!,
+                timestamp: new Date(event.timestamp),
+              },
+            ];
+          });
+        });
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load question sets",
+        );
+        setIsLoading(false);
+      }
+    };
+
+    initialize();
+
+    // Cleanup: stop watcher on unmount
+    return () => {
+      if (watcherInstance) {
+        watcherInstance.stop();
+      }
+    };
   }, []);
-
-  const loadPendingSessions = async () => {
-    try {
-      setIsLoading(true);
-      const watcher = createTUIWatcher();
-      const sessionIds = await watcher.getPendingSessions();
-
-      const sessionData = await Promise.all(
-        sessionIds.map(async (sessionId) => {
-          const sessionRequest = await watcher.getSessionRequest(sessionId);
-          if (!sessionRequest) return null;
-
-          return {
-            sessionId,
-            sessionRequest,
-            timestamp: new Date(sessionRequest.timestamp),
-          };
-        })
-      );
-
-      // Filter out null entries and sort by timestamp (newest first)
-      const validSessions = sessionData
-        .filter((s): s is NonNullable<typeof s> => s !== null)
-        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
-      setSessions(validSessions);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load sessions");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // Handle keyboard input
   useInput((input, key) => {
@@ -86,7 +123,7 @@ export const SessionSelectionMenu: React.FC<SessionSelectionMenuProps> = ({
   if (isLoading) {
     return (
       <Box padding={1}>
-        <Text>Loading sessions...</Text>
+        <Text>Loading question sets...</Text>
       </Box>
     );
   }
@@ -105,7 +142,7 @@ export const SessionSelectionMenu: React.FC<SessionSelectionMenuProps> = ({
   if (sessions.length === 0) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Text color="yellow">No pending sessions found.</Text>
+        <Text color="yellow">No pending question sets found.</Text>
         <Text dimColor>Waiting for AI to ask questions...</Text>
         <Text dimColor>Press q to quit</Text>
       </Box>
@@ -115,23 +152,25 @@ export const SessionSelectionMenu: React.FC<SessionSelectionMenuProps> = ({
   // Session selection menu
   return (
     <Box
+      borderColor="cyan"
+      borderStyle="round"
       flexDirection="column"
       padding={1}
-      borderStyle="round"
-      borderColor="cyan"
     >
-      <Text bold>Select a pending session:</Text>
+      <Text bold>Select a pending question set:</Text>
       <Box marginTop={1} />
 
       {sessions.map((session, idx) => {
         const isSelected = idx === selectedIndex;
         const indicator = isSelected ? "→" : " ";
         const questionCount = session.sessionRequest.questions.length;
-        const relativeTime = formatRelativeTime(session.sessionRequest.timestamp);
+        const relativeTime = formatRelativeTime(
+          session.sessionRequest.timestamp,
+        );
 
         return (
-          <Text key={session.sessionId} color={isSelected ? "cyan" : "white"}>
-            {indicator} Session {idx + 1} ({questionCount}{" "}
+          <Text color={isSelected ? "cyan" : "white"} key={session.sessionId}>
+            {indicator} Question Set {idx + 1} ({questionCount}{" "}
             {questionCount === 1 ? "question" : "questions"}) - {relativeTime}
           </Text>
         );

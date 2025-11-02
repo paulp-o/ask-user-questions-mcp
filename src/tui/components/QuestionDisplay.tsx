@@ -1,18 +1,20 @@
-import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
-import { TabBar } from "./TabBar.js";
-import { OptionsList } from "./OptionsList.js";
-import { CustomInput } from "./CustomInput.js";
+import React, { useState } from "react";
+
 import type { Question } from "../../session/types.js";
 
+import { CustomInput } from "./CustomInput.js";
+import { OptionsList } from "./OptionsList.js";
+import { TabBar } from "./TabBar.js";
+
 interface QuestionDisplayProps {
-  questions: Question[];
-  currentQuestionIndex: number;
   currentQuestion: Question;
-  selectedOption?: string;
-  onSelectOption: (label: string) => void;
+  currentQuestionIndex: number;
   customAnswer?: string;
   onChangeCustomAnswer: (text: string) => void;
+  onSelectOption: (label: string) => void;
+  questions: Question[];
+  selectedOption?: string;
 }
 
 /**
@@ -20,16 +22,16 @@ interface QuestionDisplayProps {
  * Includes TabBar, question prompt, options list, and footer
  */
 export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
-  questions,
-  currentQuestionIndex,
   currentQuestion,
-  selectedOption,
-  onSelectOption,
+  currentQuestionIndex,
   customAnswer = "",
   onChangeCustomAnswer,
+  onSelectOption,
+  questions,
+  selectedOption,
 }) => {
   // Track which input mode is focused: options or custom
-  const [focusMode, setFocusMode] = useState<"options" | "custom">("options");
+  const [focusMode, setFocusMode] = useState<"custom" | "options">("options");
 
   // Tab key toggles between options and custom input
   useInput((input, key) => {
@@ -57,30 +59,30 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   return (
     <Box flexDirection="column" padding={1}>
       {/* TabBar showing all question titles */}
-      <TabBar questions={questions} currentIndex={currentQuestionIndex} />
+      <TabBar currentIndex={currentQuestionIndex} questions={questions} />
 
       {/* Question prompt */}
-      <Box marginTop={1} marginBottom={1}>
+      <Box marginBottom={1} marginTop={1}>
         <Text bold>{currentQuestion.prompt}</Text>
       </Box>
 
       {/* Options list */}
       <OptionsList
-        options={currentQuestion.options}
-        onSelect={handleSelectOption}
-        selectedOption={selectedOption}
         isFocused={focusMode === "options"}
+        onSelect={handleSelectOption}
+        options={currentQuestion.options}
+        selectedOption={selectedOption}
       />
 
       {/* Custom input field */}
       <CustomInput
-        value={customAnswer}
-        onChange={handleCustomAnswerChange}
         isFocused={focusMode === "custom"}
+        onChange={handleCustomAnswerChange}
+        value={customAnswer}
       />
 
       {/* Footer with keybindings */}
-      <Box marginTop={1} borderStyle="single" borderColor="gray" padding={0.5}>
+      <Box borderColor="gray" borderStyle="single" marginTop={1} padding={0.5}>
         <Text dimColor>
           ↑↓ Options | ←→ Questions | Tab Switch | Enter Select | r Review | q
           Quit

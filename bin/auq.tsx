@@ -1,9 +1,11 @@
+import { render } from "ink";
 #!/usr/bin/env node
 import React, { useState } from "react";
-import { render } from "ink";
+
+import type { SessionRequest } from "../src/session/types.js";
+
 import { SessionSelectionMenu } from "../src/tui/components/SessionSelectionMenu.js";
 import { StepperView } from "../src/tui/components/StepperView.js";
-import type { SessionRequest } from "../src/session/types.js";
 
 const App: React.FC = () => {
   const [selectedSession, setSelectedSession] = useState<{
@@ -11,7 +13,7 @@ const App: React.FC = () => {
     sessionRequest: SessionRequest;
   } | null>(null);
 
-  // Phase 1: Session selection
+  // Phase 1: Question set selection
   if (!selectedSession) {
     return (
       <SessionSelectionMenu
@@ -25,9 +27,7 @@ const App: React.FC = () => {
   // Phase 2: Question answering with StepperView
   const { sessionId, sessionRequest } = selectedSession;
 
-  return (
-    <StepperView sessionId={sessionId} sessionRequest={sessionRequest} />
-  );
+  return <StepperView sessionId={sessionId} sessionRequest={sessionRequest} />;
 };
 
 render(<App />);

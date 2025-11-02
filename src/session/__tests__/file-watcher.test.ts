@@ -65,7 +65,7 @@ describe("File System Watching", () => {
         } catch (error) {
           expect(error).toBeInstanceOf(Error);
           expect((error as Error).message).toContain(
-            "Timeout waiting for file"
+            "Timeout waiting for file",
           );
         }
 
@@ -85,7 +85,7 @@ describe("File System Watching", () => {
         } catch (error) {
           expect(error).toBeInstanceOf(Error);
           expect((error as Error).message).toContain(
-            "File watcher setup error"
+            "File watcher setup error",
           );
         }
 
@@ -147,15 +147,15 @@ describe("File System Watching", () => {
           JSON.stringify({
             questions: [
               {
-                title: "Test",
                 options: [{ label: "Option 1" }],
                 prompt: "Test question",
+                title: "Test",
               },
             ],
             sessionId: testSessionId,
             status: "pending",
             timestamp: new Date().toISOString(),
-          })
+          }),
         );
 
         // Wait for debounce (50ms) + processing time
@@ -280,7 +280,7 @@ describe("File System Watching", () => {
               sessionId: testSessionId,
               status: "pending",
               timestamp: new Date().toISOString(),
-            })
+            }),
           ),
           fs.writeFile(
             statusFile,
@@ -290,7 +290,7 @@ describe("File System Watching", () => {
               sessionId: testSessionId,
               status: "pending",
               totalQuestions: 0,
-            })
+            }),
           ),
         ]);
 
@@ -405,7 +405,7 @@ describe("File System Watching", () => {
       // Create multiple files concurrently
       setTimeout(async () => {
         const promises = Array.from({ length: 5 }, (_, i) =>
-          fs.writeFile(join(sessionDir, `file-${i}.txt`), `content ${i}`)
+          fs.writeFile(join(sessionDir, `file-${i}.txt`), `content ${i}`),
         );
 
         // Create the target file last

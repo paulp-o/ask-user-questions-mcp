@@ -28,12 +28,17 @@ const OptionSchema = z.object({
 });
 
 const QuestionSchema = z.object({
-  title: z.string().optional().describe("Optional short 1-2 word summary for UI display. If omitted, defaults to 'Q1', 'Q2', etc."),
   options: z
     .array(OptionSchema)
     .min(1)
     .describe("Non-empty list of predefined answer choices"),
   prompt: z.string().describe("The full question text"),
+  title: z
+    .string()
+    .optional()
+    .describe(
+      "Optional short 1-2 word summary for UI display. If omitted, defaults to 'Q1', 'Q2', etc.",
+    ),
 });
 
 // Add the ask_user_questions tool
@@ -72,12 +77,12 @@ server.addTool({
       // Convert Zod-validated questions to our internal Question type
       // Auto-generate titles like "Q1", "Q2" if not provided
       const questions: Question[] = args.questions.map((q, index) => ({
-        title: q.title || `Q${index + 1}`,
         options: q.options.map((opt) => ({
           description: opt.description,
           label: opt.label,
         })),
         prompt: q.prompt,
+        title: q.title || `Q${index + 1}`,
       }));
 
       log.info("Starting session and waiting for user answers...", {

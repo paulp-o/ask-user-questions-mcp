@@ -3,62 +3,63 @@
  * Usage: npx tsx scripts/create-mock-session.ts [count]
  */
 
-import { SessionManager } from "../src/session/SessionManager.js";
 import type { Question } from "../src/session/types.js";
+
+import { SessionManager } from "../src/session/SessionManager.js";
 
 const mockQuestionSets: Question[][] = [
   [
     {
-      title: "Language",
+      options: [
+        { description: "Dynamic scripting language", label: "JavaScript" },
+        { description: "Type-safe JavaScript", label: "TypeScript" },
+        { description: "High-level interpreted language", label: "Python" },
+      ],
       prompt: "Which programming language do you prefer?",
-      options: [
-        { label: "JavaScript", description: "Dynamic scripting language" },
-        { label: "TypeScript", description: "Type-safe JavaScript" },
-        { label: "Python", description: "High-level interpreted language" },
-      ],
+      title: "Language",
     },
     {
-      title: "Framework",
+      options: [
+        { description: "UI library from Facebook", label: "React" },
+        { description: "Progressive framework", label: "Vue" },
+      ],
       prompt: "Which framework do you want to use?",
-      options: [
-        { label: "React", description: "UI library from Facebook" },
-        { label: "Vue", description: "Progressive framework" },
-      ],
+      title: "Framework",
     },
   ],
   [
     {
-      title: "Database",
+      options: [
+        { description: "Relational database", label: "PostgreSQL" },
+        { description: "NoSQL database", label: "MongoDB" },
+      ],
       prompt: "Which database system?",
-      options: [
-        { label: "PostgreSQL", description: "Relational database" },
-        { label: "MongoDB", description: "NoSQL database" },
-      ],
+      title: "Database",
     },
   ],
   [
     {
-      title: "Hosting",
-      prompt: "Where will you deploy?",
       options: [
-        { label: "Vercel", description: "Serverless platform" },
-        { label: "AWS", description: "Amazon Web Services" },
-        { label: "Self-hosted", description: "Your own servers" },
+        { description: "Serverless platform", label: "Vercel" },
+        { description: "Amazon Web Services", label: "AWS" },
+        { description: "Your own servers", label: "Self-hosted" },
       ],
+      prompt: "Where will you deploy?",
+      title: "Hosting",
     },
     {
-      title: "CI/CD",
-      prompt: "Which CI/CD tool?",
       options: [
         { label: "GitHub Actions" },
         { label: "GitLab CI" },
         { label: "CircleCI" },
       ],
+      prompt: "Which CI/CD tool?",
+      title: "CI/CD",
     },
     {
-      title: "Testing",
-      prompt: "Testing framework?",
       options: [{ label: "Vitest" }, { label: "Jest" }, { label: "Mocha" }],
+      prompt: "Testing framework?",
+      title: "Testing",
     },
   ],
 ];
@@ -74,7 +75,7 @@ async function createMockSessions(count: number) {
     const sessionId = await manager.createSession(questions);
 
     console.log(
-      `✓ Created session ${i + 1}/${count}: ${sessionId} (${questions.length} questions)`
+      `✓ Created session ${i + 1}/${count}: ${sessionId} (${questions.length} questions)`,
     );
 
     // Add delay between sessions to show different timestamps
@@ -85,7 +86,7 @@ async function createMockSessions(count: number) {
 
   console.log(`\n✅ Successfully created ${count} mock session(s)`);
   console.log(
-    `\nRun 'npx tsx bin/test-session-menu.tsx' to test the SessionSelectionMenu`
+    `\nRun 'npx tsx bin/test-session-menu.tsx' to test the SessionSelectionMenu`,
   );
 }
 

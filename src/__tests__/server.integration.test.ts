@@ -35,12 +35,12 @@ describe("Server Integration", () => {
     it("should create session when ask_user_questions tool is called", async () => {
       const questions: Question[] = [
         {
-          title: "Language",
           options: [
             { description: "Dynamic language", label: "JavaScript" },
             { description: "Static typing", label: "TypeScript" },
           ],
           prompt: "Which programming language do you prefer?",
+          title: "Language",
         },
       ];
 
@@ -65,21 +65,21 @@ describe("Server Integration", () => {
     it("should handle multiple questions correctly", async () => {
       const questions: Question[] = [
         {
-          title: "Language",
           options: [
             { description: "Dynamic language", label: "JavaScript" },
             { description: "Static typing", label: "TypeScript" },
           ],
           prompt: "Which programming language?",
+          title: "Language",
         },
         {
-          title: "App Type",
           options: [
             { description: "Web application", label: "Web" },
             { description: "Command-line tool", label: "CLI" },
             { description: "Desktop application", label: "Desktop" },
           ],
           prompt: "What type of application?",
+          title: "App Type",
         },
       ];
 
@@ -97,9 +97,9 @@ describe("Server Integration", () => {
     it("should create unique sessions for multiple calls", async () => {
       const questions = [
         {
-          title: "Test",
           options: [{ label: "Test option" }],
           prompt: "Test question",
+          title: "Test",
         },
       ];
 
@@ -124,9 +124,9 @@ describe("Server Integration", () => {
     it("should persist session data across manager instances", async () => {
       const questions: Question[] = [
         {
-          title: "Persistence",
           options: [{ description: "Test description", label: "Test option" }],
           prompt: "Test question for persistence",
+          title: "Persistence",
         },
       ];
 
@@ -150,9 +150,9 @@ describe("Server Integration", () => {
     it("should store session files with correct structure", async () => {
       const questions: Question[] = [
         {
-          title: "Structure",
           options: [{ description: "Description", label: "Option" }],
           prompt: "File structure test",
+          title: "Structure",
         },
       ];
 
@@ -199,9 +199,9 @@ describe("Server Integration", () => {
     it("should handle concurrent session creation", async () => {
       const questions = [
         {
-          title: "Concurrent",
           options: [{ label: "Option" }],
           prompt: "Concurrent test",
+          title: "Concurrent",
         },
       ];
 
@@ -229,9 +229,9 @@ describe("Server Integration", () => {
     it("should support complete session lifecycle", async () => {
       const questions: Question[] = [
         {
-          title: "Lifecycle",
           options: [{ label: "Option" }],
           prompt: "Lifecycle test",
+          title: "Lifecycle",
         },
       ];
 
@@ -279,9 +279,9 @@ describe("Server Integration", () => {
     it("should handle session validation correctly", async () => {
       const questions: Question[] = [
         {
-          title: "Validation",
           options: [{ label: "Option" }],
           prompt: "Validation test",
+          title: "Validation",
         },
       ];
 
@@ -307,9 +307,9 @@ describe("Server Integration", () => {
     it("should handle session creation under time limits", async () => {
       const questions = [
         {
-          title: "Performance",
           options: [{ label: "Option" }],
           prompt: "Performance test",
+          title: "Performance",
         },
       ];
 
@@ -325,9 +325,9 @@ describe("Server Integration", () => {
     it("should handle multiple sessions efficiently", async () => {
       const questions = [
         {
-          title: "Efficiency",
           options: [{ label: "Option" }],
           prompt: "Efficiency test",
+          title: "Efficiency",
         },
       ];
 

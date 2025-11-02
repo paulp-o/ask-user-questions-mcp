@@ -54,13 +54,13 @@ describe("SessionManager", () => {
   describe("createSession", () => {
     const sampleQuestions: Question[] = [
       {
-        title: "Language",
         options: [
           { description: "Dynamic scripting language", label: "JavaScript" },
           { description: "Typed superset of JavaScript", label: "TypeScript" },
           { description: "High-level interpreted language", label: "Python" },
         ],
         prompt: "Which programming language do you prefer?",
+        title: "Language",
       },
     ];
 
@@ -98,15 +98,15 @@ describe("SessionManager", () => {
 
     it("should throw error for empty questions array", async () => {
       await expect(sessionManager.createSession([])).rejects.toThrow(
-        "At least one question is required to create a session"
+        "At least one question is required to create a session",
       );
     });
 
     it("should throw error for null questions", async () => {
       await expect(
-        sessionManager.createSession(null as unknown as Question[])
+        sessionManager.createSession(null as unknown as Question[]),
       ).rejects.toThrow(
-        "At least one question is required to create a session"
+        "At least one question is required to create a session",
       );
     });
 
@@ -129,7 +129,9 @@ describe("SessionManager", () => {
 
   describe("sessionExists", () => {
     it("should return true for existing session", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Option" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Option" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await sessionManager.createSession(questions);
 
       const exists = await sessionManager.sessionExists(sessionId);
@@ -144,7 +146,9 @@ describe("SessionManager", () => {
 
   describe("getSessionStatus", () => {
     it("should return session status for existing session", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await sessionManager.createSession(questions);
 
       const status = await sessionManager.getSessionStatus(sessionId);
@@ -187,7 +191,9 @@ describe("SessionManager", () => {
 
   describe("updateSessionStatus", () => {
     it("should update session status successfully", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await sessionManager.createSession(questions);
 
       // Add small delay to ensure different timestamps
@@ -205,7 +211,7 @@ describe("SessionManager", () => {
 
     it("should throw error for non-existing session", async () => {
       await expect(
-        sessionManager.updateSessionStatus("non-existent-id", "completed")
+        sessionManager.updateSessionStatus("non-existent-id", "completed"),
       ).rejects.toThrow("Session not found: non-existent-id");
     });
   });
@@ -217,7 +223,9 @@ describe("SessionManager", () => {
     });
 
     it("should return correct count for multiple sessions", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
 
       await sessionManager.createSession(questions);
       await sessionManager.createSession(questions);
@@ -235,7 +243,9 @@ describe("SessionManager", () => {
     });
 
     it("should return all session IDs", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
 
       const id1 = await sessionManager.createSession(questions);
       const id2 = await sessionManager.createSession(questions);
@@ -249,7 +259,9 @@ describe("SessionManager", () => {
 
   describe("isSessionLimitReached", () => {
     it("should return false when under limit", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       await sessionManager.createSession(questions);
 
       const isLimitReached = await sessionManager.isSessionLimitReached();
@@ -257,7 +269,9 @@ describe("SessionManager", () => {
     });
 
     it("should return true when at limit", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
 
       // Create sessions up to the limit (10)
       for (let i = 0; i < 10; i++) {
@@ -271,7 +285,9 @@ describe("SessionManager", () => {
 
   describe("deleteSession", () => {
     it("should delete session and all files", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await sessionManager.createSession(questions);
 
       // Verify session exists
@@ -295,7 +311,9 @@ describe("SessionManager", () => {
 
       await shortRetentionManager.initialize();
 
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await shortRetentionManager.createSession(questions);
 
       // Wait for retention period to expire
@@ -307,7 +325,9 @@ describe("SessionManager", () => {
     });
 
     it("should not clean up active sessions", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await sessionManager.createSession(questions);
 
       // Clean up immediately (session should not be expired yet)
@@ -326,7 +346,9 @@ describe("SessionManager", () => {
 
       await retentionManager.initialize();
 
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await retentionManager.createSession(questions);
 
       // Wait for retention period to expire
@@ -346,7 +368,9 @@ describe("SessionManager", () => {
 
       await retentionManager.initialize();
 
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await retentionManager.createSession(questions);
 
       // Clean up immediately - session should be preserved
@@ -364,7 +388,9 @@ describe("SessionManager", () => {
 
       await noRetentionManager.initialize();
 
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await noRetentionManager.createSession(questions);
 
       // Wait a bit
@@ -384,7 +410,9 @@ describe("SessionManager", () => {
 
       await defaultManager.initialize();
 
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await defaultManager.createSession(questions);
 
       // Clean up immediately - should preserve with default 7-day retention
@@ -396,7 +424,9 @@ describe("SessionManager", () => {
 
   describe("validateSession", () => {
     it("should validate a correct session", async () => {
-      const questions = [{ title: "Test", options: [{ label: "Opt" }], prompt: "Test" }];
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
       const sessionId = await sessionManager.createSession(questions);
 
       const validation = await sessionManager.validateSession(sessionId);
@@ -424,20 +454,20 @@ describe("SessionManager", () => {
     it("should complete full lifecycle successfully", async () => {
       const questions: Question[] = [
         {
-          title: "Language",
           options: [
             { description: "Dynamic web language", label: "JavaScript" },
             { description: "Type-safe JavaScript", label: "TypeScript" },
           ],
           prompt: "What is your favorite programming language?",
+          title: "Language",
         },
         {
-          title: "App Type",
           options: [
             { description: "Web application", label: "Web" },
             { description: "Command-line tool", label: "CLI" },
           ],
           prompt: "What type of application are you building?",
+          title: "App Type",
         },
       ];
 
@@ -477,7 +507,7 @@ describe("SessionManager", () => {
 
       expect(result.sessionId).toBe(sessionId);
       expect(result.formattedResponse).toContain(
-        "Here are the user's answers:"
+        "Here are the user's answers:",
       );
       expect(result.formattedResponse).toContain("TypeScript");
       expect(result.formattedResponse).toContain("Desktop app with Electron");
@@ -497,15 +527,15 @@ describe("SessionManager", () => {
 
       const questions: Question[] = [
         {
-          title: "Test",
           options: [{ label: "Option 1" }],
           prompt: "Test question",
+          title: "Test",
         },
       ];
 
       // Start session but don't provide answers
       await expect(shortTimeoutManager.startSession(questions)).rejects.toThrow(
-        "timed out"
+        "timed out",
       );
 
       // Wait a bit to ensure the status is updated
@@ -522,9 +552,9 @@ describe("SessionManager", () => {
     it("should handle invalid answers file", async () => {
       const questions: Question[] = [
         {
-          title: "Test",
           options: [{ label: "Option 1" }],
           prompt: "Test question",
+          title: "Test",
         },
       ];
 
@@ -553,9 +583,9 @@ describe("SessionManager", () => {
     it("should handle answer validation errors", async () => {
       const questions: Question[] = [
         {
-          title: "Test",
           options: [{ label: "Option 1" }, { label: "Option 2" }],
           prompt: "Test question",
+          title: "Test",
         },
       ];
 
@@ -635,7 +665,7 @@ describe("SessionManager", () => {
       expect(result.formattedResponse).toBe(
         "Here are the user's answers:\n\n" +
           "1. What is your favorite color?\n" +
-          "→ Blue — The color of sky"
+          "→ Blue — The color of sky",
       );
     });
 

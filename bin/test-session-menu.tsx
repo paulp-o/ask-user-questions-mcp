@@ -1,8 +1,10 @@
+import { render, Box, Text } from "ink";
 #!/usr/bin/env node
 import React from "react";
-import { render, Box, Text } from "ink";
-import { SessionSelectionMenu } from "../src/tui/components/SessionSelectionMenu.js";
+
 import type { SessionRequest } from "../src/session/types.js";
+
+import { SessionSelectionMenu } from "../src/tui/components/SessionSelectionMenu.js";
 
 const TestSessionMenu: React.FC = () => {
   const [selectedSession, setSelectedSession] = React.useState<{

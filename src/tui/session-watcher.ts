@@ -61,7 +61,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
    */
   addEventHandler(
     name: string,
-    handler: (event: TUISessionEvent) => void
+    handler: (event: TUISessionEvent) => void,
   ): void {
     this.eventHandlers.set(name, handler);
   }
@@ -160,7 +160,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
    * Start watching with enhanced event handling
    */
   startEnhancedWatching(
-    onSessionEvent: (event: TUISessionEvent) => void
+    onSessionEvent: (event: TUISessionEvent) => void,
   ): void {
     this.startWatching(async (sessionId, sessionPath) => {
       const event: TUISessionEvent = {
@@ -178,7 +178,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
         } catch (error) {
           console.warn(
             `Failed to load session request for ${sessionId}:`,
-            error
+            error,
           );
         }
       }
@@ -195,7 +195,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
    * Load session request data from file
    */
   private async loadSessionRequest(
-    sessionPath: string
+    sessionPath: string,
   ): Promise<SessionRequest> {
     const requestPath = `${sessionPath}/${SESSION_FILES.REQUEST}`;
 
@@ -209,7 +209,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
       return JSON.parse(content) as SessionRequest;
     } catch (error) {
       throw new Error(
-        `Failed to load session request from ${requestPath}: ${error}`
+        `Failed to load session request from ${requestPath}: ${error}`,
       );
     }
   }
@@ -219,7 +219,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
  * Create a simple TUI session watcher instance
  */
 export function createTUIWatcher(
-  config?: TUIWatcherConfig
+  config?: TUIWatcherConfig,
 ): EnhancedTUISessionWatcher {
   return new EnhancedTUISessionWatcher(config);
 }
@@ -228,7 +228,7 @@ export function createTUIWatcher(
  * Convenience function to get the next pending session
  */
 export async function getNextPendingSession(
-  config?: TUIWatcherConfig
+  config?: TUIWatcherConfig,
 ): Promise<{ sessionId: string; sessionRequest: SessionRequest } | null> {
   const watcher = createTUIWatcher(config);
   const pendingSessions = await watcher.getPendingSessions();
