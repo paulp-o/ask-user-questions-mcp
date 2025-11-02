@@ -1,5 +1,6 @@
 import { Box, Text } from "ink";
 import React from "react";
+import { welcomeText } from "../utils/gradientText.js";
 
 interface WaitingScreenProps {
   queueCount: number;
@@ -14,7 +15,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
     return (
       <Box flexDirection="column" padding={1}>
         <Text color="yellow">No pending question sets found.</Text>
-        <Text dimColor>Waiting for AI to ask questions...</Text>
+        <Text>{welcomeText("🤖 Waiting for AI to ask questions...")}</Text>
         <Text dimColor>Press q to quit</Text>
       </Box>
     );

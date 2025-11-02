@@ -77,7 +77,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         const selectionMark = isSelected ? "●" : "○";
 
         return (
-          <Box key={index} marginTop={index > 0 ? 0.5 : 0}>
+          <Box key={index} marginTop={0}>
             <Text
               bold={isFocusedOption || isSelected}
               color={isFocusedOption ? "cyan" : isSelected ? "green" : "white"}
