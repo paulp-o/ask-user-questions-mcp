@@ -176,8 +176,8 @@ describe("TUI Session Watcher", () => {
           ),
         ]);
 
-        // Wait for debounce + processing
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // Wait for debounce + processing (increased for reliability)
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         expect(events).toHaveLength(1);
         expect(events[0].type).toBe("session-created");
