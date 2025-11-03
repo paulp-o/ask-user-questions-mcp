@@ -63,8 +63,8 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       <TabBar currentIndex={currentQuestionIndex} questions={questions} answers={answers} />
 
       {/* Question prompt with type indicator */}
-      <Box marginTop={1} justifyContent="space-between">
-        <Text bold>{currentQuestion.prompt}</Text>
+      <Box marginTop={1}>
+        <Text bold>{currentQuestion.prompt} </Text>
         <Text dimColor>
           {multiSelect ? "[Multiple Choice]" : "[Single Choice]"}
         </Text>

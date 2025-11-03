@@ -13,7 +13,7 @@ export const themeGradient = gradient(gradientColors as unknown as string[]);
  * Returns ANSI-colored string compatible with Ink <Text> components.
  */
 export function welcomeText(text: string): string {
-	return themeGradient(text);
+  return themeGradient(text);
 }
 
 /**
@@ -21,5 +21,9 @@ export function welcomeText(text: string): string {
  * Returns ANSI-colored string compatible with Ink <Text> components.
  */
 export function goodbyeText(text: string): string {
-	return themeGradient(text);
+  return themeGradient(text);
+}
+
+export function gradientText(text: string): string {
+  return themeGradient(text);
 }

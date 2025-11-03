@@ -141,10 +141,10 @@ export const StepperView: React.FC<StepperViewProps> = ({
   };
 
   // Handle session rejection
-  const handleRejectSession = async () => {
+  const handleRejectSession = async (reason: string | null) => {
     try {
       const sessionManager = new SessionManager();
-      await sessionManager.rejectSession(sessionId);
+      await sessionManager.rejectSession(sessionId, reason);
 
       // Call onComplete with rejection flag
       if (onComplete) {

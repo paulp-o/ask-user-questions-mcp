@@ -80,7 +80,7 @@ export const theme = {
     },
     tabBar: {
       selected: "cyan" as const,
-      selectedBg: "blue" as const,
+      selectedBg: "black" as const,
       default: "white" as const,
       answered: "green" as const,
       unanswered: "gray" as const,

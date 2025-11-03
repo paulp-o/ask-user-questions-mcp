@@ -268,15 +268,20 @@ export class SessionManager {
   /**
    * Reject a session - mark as rejected by user
    * This allows users to skip unwanted question sets
+   * @param sessionId - The session ID to reject
+   * @param reason - Optional reason for rejection (null if user skipped providing reason)
    */
-  async rejectSession(sessionId: string): Promise<void> {
+  async rejectSession(sessionId: string, reason?: string | null): Promise<void> {
     const exists = await this.sessionExists(sessionId);
     if (!exists) {
       throw new Error(`Session not found: ${sessionId}`);
     }
 
-    // Update status to rejected
-    await this.updateSessionStatus(sessionId, "rejected");
+    // Update status to rejected with reason
+    const statusUpdate: Partial<SessionStatus> = {
+      rejectionReason: reason || null,
+    };
+    await this.updateSessionStatus(sessionId, "rejected", statusUpdate);
   }
 
   /**
@@ -354,10 +359,21 @@ export class SessionManager {
       } catch (error) {
         // Check if session was rejected by user
         if (error instanceof Error && error.message === "SESSION_REJECTED") {
-          // Return rejection message to MCP caller
+          // Get session status to retrieve rejection reason
+          const status = await this.getSessionStatus(sessionId);
+          const reason = status?.rejectionReason;
+
+          // Format rejection message with reason for MCP caller
+          let formattedResponse = "User rejected this question set.\n\n";
+          if (reason) {
+            formattedResponse += `Rejection reason: "${reason}"\n\n`;
+          } else {
+            formattedResponse += "No reason provided.\n\n";
+          }
+          formattedResponse += "The user chose not to answer these questions at this time.";
+
           return {
-            formattedResponse:
-              "User rejected this question set and chose not to provide answers.",
+            formattedResponse,
             sessionId,
           };
         }

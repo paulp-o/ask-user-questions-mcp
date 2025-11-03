@@ -53,6 +53,7 @@ export interface SessionStatus {
     | "timed_out";
   totalQuestions: number;
   callId?: string;
+  rejectionReason?: string | null; // User's feedback when rejecting a question set
 }
 
 export interface UserAnswer {

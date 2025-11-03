@@ -10,6 +10,8 @@ interface FooterProps {
   customInputValue?: string;
 }
 
+type Keybinding = { key: string; action: string };
+
 /**
  * Footer component - displays context-aware keybindings
  * Shows different shortcuts based on current focus context and question type
@@ -20,52 +22,63 @@ export const Footer: React.FC<FooterProps> = ({
   isReviewScreen = false,
   customInputValue = "",
 }) => {
-  const renderKeybindings = () => {
+  const getKeybindings = (): Keybinding[] => {
     // Review screen mode
     if (isReviewScreen) {
-      return "Enter Submit | n Back";
+      return [
+        { key: "Enter", action: "Submit" },
+        { key: "n", action: "Back" },
+      ];
     }
 
     // Custom input focused
     if (focusContext === "custom-input") {
       const hasContent = customInputValue.trim().length > 0;
-      const parts: string[] = [];
-
-      parts.push("↑↓ Options");
-      parts.push("Tab Next");
+      const bindings: Keybinding[] = [
+        { key: "↑↓", action: "Options" },
+        { key: "Tab", action: "Next" },
+      ];
 
       if (hasContent) {
-        parts.push("Enter Submit");
+        bindings.push({ key: "Enter", action: "Submit" });
       }
 
-      parts.push("Shift+Enter Newline");
-      parts.push("Esc Reject");
+      bindings.push(
+        { key: "Shift+Enter", action: "Newline" },
+        { key: "Esc", action: "Reject" }
+      );
 
-      return parts.join(" | ");
+      return bindings;
     }
 
     // Option focused
     if (focusContext === "option") {
-      const parts: string[] = [];
-
-      parts.push("↑↓ Options");
-      parts.push("←→ Questions");
+      const bindings: Keybinding[] = [
+        { key: "↑↓", action: "Options" },
+        { key: "←→", action: "Questions" },
+      ];
 
       if (multiSelect) {
-        parts.push("Space Toggle");
-        parts.push("Tab Submit");
+        bindings.push(
+          { key: "Space", action: "Toggle" },
+          { key: "Tab", action: "Submit" }
+        );
       } else {
-        parts.push("Enter Select");
+        bindings.push({ key: "Enter", action: "Select" });
       }
 
-      parts.push("Esc Reject");
-      parts.push("q Quit");
+      bindings.push(
+        { key: "Esc", action: "Reject" },
+        { key: "q", action: "Quit" }
+      );
 
-      return parts.join(" | ");
+      return bindings;
     }
 
-    return "";
+    return [];
   };
+
+  const keybindings = getKeybindings();
 
   return (
     <Box
@@ -73,7 +86,15 @@ export const Footer: React.FC<FooterProps> = ({
       borderStyle="single"
       paddingX={1}
     >
-      <Text dimColor>{renderKeybindings()}</Text>
+      <Text dimColor>
+        {keybindings.map((binding, idx) => (
+          <React.Fragment key={idx}>
+            {idx > 0 && <Text dimColor> | </Text>}
+            <Text bold color="cyan">{binding.key}</Text>
+            <Text dimColor> {binding.action}</Text>
+          </React.Fragment>
+        ))}
+      </Text>
     </Box>
   );
 };
