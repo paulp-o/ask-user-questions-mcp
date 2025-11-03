@@ -1,9 +1,9 @@
 import { Box, Text } from "ink";
-import React from "react";
+import React, { useState } from "react";
 
 import type { Question } from "../../session/types.js";
 
-import { theme } from "../theme.js";
+import { Footer } from "./Footer.js";
 import { OptionsList } from "./OptionsList.js";
 import { TabBar } from "./TabBar.js";
 
@@ -38,6 +38,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   onToggleOption,
   multiSelect,
 }) => {
+  // Track focus context for Footer component
+  const [focusContext, setFocusContext] = useState<"option" | "custom-input">("option");
+
   // Handle option selection - clears custom answer only in single-select mode
   const handleSelectOption = (label: string) => {
     onSelectOption(label);
@@ -80,28 +83,15 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         onToggle={onToggleOption}
         multiSelect={multiSelect}
         selectedOptions={answers.get(currentQuestionIndex)?.selectedOptions}
+        onFocusContextChange={setFocusContext}
       />
 
-      {/* Footer with keybindings */}
-      <Box borderColor={theme.borders.neutral} borderStyle="single" marginTop={1} padding={0.5}>
-        <Text dimColor>
-          <Text bold>↑↓</Text> Options |{" "}
-          <Text bold>←→</Text> Questions |{" "}
-          {multiSelect ? (
-            <>
-              <Text bold>Space</Text> Toggle |{" "}
-              <Text bold>Tab</Text> Submit |{" "}
-            </>
-          ) : (
-            <>
-              <Text bold>Enter</Text> Select |{" "}
-            </>
-          )}
-          <Text bold>Shift+Enter</Text> Newline |{" "}
-          <Text bold>Esc</Text> Reject |{" "}
-          <Text bold>q</Text> Quit
-        </Text>
-      </Box>
+      {/* Footer with context-aware keybindings */}
+      <Footer
+        focusContext={focusContext}
+        multiSelect={multiSelect ?? false}
+        customInputValue={customAnswer}
+      />
     </Box>
   );
 };

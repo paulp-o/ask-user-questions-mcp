@@ -1,5 +1,5 @@
 /**
- * SessionManager - Core session management for AskUserQuery MCP server
+ * SessionManager - Core session management for AskUserQuestions MCP server
  */
 
 import { promises as fs } from "fs";
@@ -22,7 +22,7 @@ import {
   AtomicWriteError,
   atomicWriteFile,
 } from "./atomic-operations.js";
-import { PromiseFileWatcher } from "./file-watcher.js";
+// import { PromiseFileWatcher } from "./file-watcher.js";
 import { ResponseFormatter } from "./ResponseFormatter.js";
 import { DEFAULT_SESSION_CONFIG, SESSION_FILES } from "./types.js";
 import {
@@ -529,7 +529,6 @@ export class SessionManager {
     // Poll for answers.json existence, guard against rejection and timeout
     // This avoids race conditions inherent in fs.watch when files are created before watch attaches
     // and isolates each MCP call purely by sessionId
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       // Check for answers
       if (await fileExists(answersPath)) {

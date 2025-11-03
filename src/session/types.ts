@@ -1,5 +1,5 @@
 /**
- * Session-related TypeScript interfaces and types for AskUserQuery MCP server
+ * Session-related TypeScript interfaces and types for AskUserQuestions MCP server
  */
 
 export interface Option {
@@ -44,7 +44,13 @@ export interface SessionStatus {
   currentQuestionIndex?: number;
   lastModified: string;
   sessionId: string;
-  status: "abandoned" | "completed" | "in-progress" | "pending" | "rejected" | "timed_out";
+  status:
+    | "abandoned"
+    | "completed"
+    | "in-progress"
+    | "pending"
+    | "rejected"
+    | "timed_out";
   totalQuestions: number;
   callId?: string;
 }

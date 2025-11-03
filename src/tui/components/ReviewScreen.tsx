@@ -1,8 +1,9 @@
-import { Box, Text, useApp, useInput } from "ink";
+import { Box, Text, useInput } from "ink";
 import React from "react";
 
 import type { Question, UserAnswer } from "../../session/types.js";
 import { theme } from "../theme.js";
+import { Footer } from "./Footer.js";
 
 interface ReviewScreenProps {
   answers: Map<number, { customText?: string; selectedOption?: string; selectedOptions?: string[] }>;
@@ -22,8 +23,6 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   onGoBack,
   questions,
 }) => {
-  const { exit } = useApp();
-
   useInput((input, key) => {
     if (key.return) {
       // Convert answers to UserAnswer format
@@ -43,9 +42,6 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
     }
     if (input === "n") {
       onGoBack();
-    }
-    if (input === "q") {
-      exit();
     }
   });
 
@@ -114,18 +110,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
         })}
       </Box>
 
-      {/* Confirmation prompt */}
-      <Box
-        borderColor={theme.components.review.confirmBorder}
-        borderStyle="single"
-        marginTop={1}
-        padding={0.5}
-      >
-        <Text bold color={theme.components.review.confirmBorder}>
-          Submit these answers? Press Enter to confirm, 'n' to go back, 'q' to
-          quit
-        </Text>
-      </Box>
+      {/* Footer with keybindings */}
+      <Footer
+        focusContext="option"
+        multiSelect={false}
+        isReviewScreen={true}
+      />
     </Box>
   );
 };

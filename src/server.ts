@@ -15,7 +15,7 @@ const server = new FastMCP({
     "This MCP server provides a tool to ask users structured questions via the terminal. " +
     "The ask_user_questions tool allows AI models to pause and gather direct user input through " +
     "an interactive TUI, returning formatted responses for continued reasoning.",
-  name: "AskUserQuery",
+  name: "AskUserQuestions",
   version: "0.1.0",
 });
 

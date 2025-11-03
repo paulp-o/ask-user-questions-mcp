@@ -78,6 +78,13 @@ export const theme = {
       queueEmpty: "green" as const,
       queueFlash: "cyan" as const,
     },
+    tabBar: {
+      selected: "cyan" as const,
+      selectedBg: "blue" as const,
+      default: "white" as const,
+      answered: "green" as const,
+      unanswered: "gray" as const,
+    },
     options: {
       focused: "cyan" as const,
       selected: "green" as const,

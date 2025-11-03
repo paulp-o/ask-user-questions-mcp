@@ -2,6 +2,7 @@ import { Box, Text } from "ink";
 import React from "react";
 
 import type { Question } from "../../session/types.js";
+import { theme } from "../theme.js";
 
 interface TabBarProps {
   currentIndex: number;
@@ -11,8 +12,9 @@ interface TabBarProps {
 
 /**
  * TabBar component displays question titles horizontally with progress indicator
- * Visual: ● [Language*] ○ [App Type] ○ [Framework] (2/3)
- * where ● indicates answered questions, ○ indicates unanswered, and * indicates the active/highlighted question
+ * Visual: ☑ Language ☐ App Type ☐ Framework (2/3)
+ * where ☑ indicates answered questions, ☐ indicates unanswered
+ * Active tab has underline, cyan text, and blue background
  */
 export const TabBar: React.FC<TabBarProps> = ({
   currentIndex,
@@ -20,7 +22,7 @@ export const TabBar: React.FC<TabBarProps> = ({
   answers,
 }) => {
   return (
-    <Box>
+    <Box flexWrap="wrap">
       {questions.map((question, index) => {
         const isActive = index === currentIndex;
         // Use provided title or fallback to "Q1", "Q2", etc.
@@ -29,30 +31,29 @@ export const TabBar: React.FC<TabBarProps> = ({
         // Check if question is answered
         const answer = answers.get(index);
         const isAnswered = answer && (answer.selectedOption || answer.customText);
-        const icon = isAnswered ? "●" : "○";
-        const iconColor = isAnswered ? "green" : "gray";
+        const icon = isAnswered ? "☑" : "☐";
+        const iconColor = isAnswered ? theme.components.tabBar.answered : theme.components.tabBar.unanswered;
 
         return (
-          <Text key={index}>
-            {index > 0 && " "}
+          <Box key={index} minWidth={15} paddingRight={1}>
             <Text color={iconColor}>{icon}</Text>
             {" "}
-            {"["}
             <Text
               bold={isActive}
-              color={isActive ? "cyan" : "white"}
+              color={isActive ? theme.components.tabBar.selected : theme.components.tabBar.default}
+              backgroundColor={isActive ? theme.components.tabBar.selectedBg : undefined}
               underline={isActive}
             >
               {title}
             </Text>
-            {"]"}
-          </Text>
+          </Box>
         );
       })}
-      <Text>
-        {" "}
-        ({currentIndex + 1}/{questions.length})
-      </Text>
+      <Box minWidth={10}>
+        <Text>
+          ({currentIndex + 1}/{questions.length})
+        </Text>
+      </Box>
     </Box>
   );
 };

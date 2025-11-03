@@ -4,7 +4,7 @@ An [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server that 
 
 ## 🎯 What is AUQ?
 
-AUQ (Ask User Query) is a human clarification bridge for AI models. When an AI needs missing context or user preferences during reasoning, it can call the `ask_user_questions` tool to present multiple-choice and free-text questions. The user answers through a keyboard-navigable TUI, and the AI receives a formatted response to continue its work.
+AUQ (Ask User Questions) is a human clarification bridge for AI models. When an AI needs missing context or user preferences during reasoning, it can call the `ask_user_questions` tool to present multiple-choice and free-text questions. The user answers through a keyboard-navigable TUI, and the AI receives a formatted response to continue its work.
 
 **Key Features:**
 - 📝 Multiple-choice questions with descriptions

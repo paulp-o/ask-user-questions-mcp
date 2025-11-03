@@ -1,5 +1,5 @@
 import { Box, Newline, Text, useInput } from "ink";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import type { Option } from "../../session/types.js";
 
@@ -21,6 +21,8 @@ interface OptionsListProps {
   multiSelect?: boolean;
   onToggle?: (label: string) => void;
   selectedOptions?: string[];
+  // Focus context tracking
+  onFocusContextChange?: (context: "option" | "custom-input") => void;
 }
 
 /**
@@ -39,6 +41,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   multiSelect = false,
   onToggle,
   selectedOptions = [],
+  onFocusContextChange,
 }) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
 
@@ -46,6 +49,12 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   const maxIndex = showCustomInput ? options.length : options.length - 1;
   const isCustomInputFocused = showCustomInput && focusedIndex === options.length;
   const customLines = customValue.replace(/\r\n?/g, "\n").split("\n");
+
+  // Track and emit focus context changes
+  useEffect(() => {
+    const newContext: "option" | "custom-input" = isCustomInputFocused ? "custom-input" : "option";
+    onFocusContextChange?.(newContext);
+  }, [focusedIndex, isCustomInputFocused, onFocusContextChange]);
 
   useInput(
     (input, key) => {

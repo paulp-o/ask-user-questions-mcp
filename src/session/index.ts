@@ -1,5 +1,5 @@
 /**
- * Session module exports for AskUserQuery MCP server
+ * Session module exports for AskUserQuestions MCP server
  */
 
 export * from "./atomic-operations.js";
