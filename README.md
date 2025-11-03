@@ -1,4 +1,4 @@
-# AUQ - Ask User Questions MCP
+# AUQ - ask-user-questions MCP
 
 [![npm version](https://img.shields.io/npm/v/auq-mcp-server.svg)](https://www.npmjs.com/package/auq-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
