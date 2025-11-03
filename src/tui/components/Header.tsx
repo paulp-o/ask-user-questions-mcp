@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
   }, [pendingCount, prevCount]);
 
   const headerGradient = gradient(gradientColors as unknown as string[]);
-  const headerText = headerGradient("⋆˙⟡ AUQ :: Ask User Questions MCP TUI");
+  const headerText = headerGradient("⟡ AUQ ⋆˙ Ask User Questions MCP ⋆˙ ");
 
   return (
     <Box

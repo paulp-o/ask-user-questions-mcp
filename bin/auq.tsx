@@ -15,7 +15,7 @@ import { StepperView } from "../src/tui/components/StepperView.js";
 import { Toast } from "../src/tui/components/Toast.js";
 import { WaitingScreen } from "../src/tui/components/WaitingScreen.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
-import { goodbyeText } from "../src/tui/utils/gradientText.js";
+// import { goodbyeText } from "../src/tui/utils/gradientText.js";
 
 // Handle command-line arguments
 const args = process.argv.slice(2);
@@ -62,16 +62,19 @@ if (command === "--version" || command === "-v") {
 // Handle 'server' command
 if (command === "server") {
   console.log("Starting MCP server...");
-  const serverProcess = exec("node dist/src/server.js", (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error starting server: ${error.message}`);
-      process.exit(1);
+  const serverProcess = exec(
+    "node dist/src/server.js",
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error starting server: ${error.message}`);
+        process.exit(1);
+      }
+      if (stderr) {
+        console.error(stderr);
+      }
+      console.log(stdout);
     }
-    if (stderr) {
-      console.error(stderr);
-    }
-    console.log(stdout);
-  });
+  );
 
   // Forward signals
   process.on("SIGINT", () => {
@@ -130,7 +133,7 @@ const App: React.FC = () => {
               sessionRequest,
               timestamp: new Date(sessionRequest.timestamp),
             };
-          }),
+          })
         );
 
         // Filter out null entries and sort by timestamp (FIFO - oldest first)
@@ -210,7 +213,10 @@ const App: React.FC = () => {
   });
 
   // Show toast notification
-  const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
+  const showToast = (
+    message: string,
+    type: "success" | "error" | "info" = "success"
+  ) => {
     setToast({ message, type });
   };
 
@@ -257,7 +263,7 @@ const App: React.FC = () => {
 
   // Render with header, toast overlay, and main content
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" paddingX={1}>
       <Header pendingCount={sessionQueue.length} />
       {toast && (
         <Box marginBottom={1} marginTop={1}>
@@ -276,12 +282,12 @@ const App: React.FC = () => {
 const { waitUntilExit } = render(<App />);
 
 // Handle Ctrl+C gracefully
-process.on('SIGINT', () => {
+process.on("SIGINT", () => {
   process.exit(0);
 });
 
 // Show goodbye after Ink unmounts
 waitUntilExit().then(() => {
-  process.stdout.write('\n');
-  console.log(goodbyeText("👋 Goodbye! See you next time."));
+  process.stdout.write("\n");
+  console.log("👋 Goodbye! See you next time.");
 });
