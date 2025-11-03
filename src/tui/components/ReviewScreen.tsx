@@ -73,35 +73,43 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
               </Text>
 
               {/* Answer */}
-              <Box marginLeft={2} marginTop={0.5}>
+              <Box flexDirection="column" marginLeft={2} marginTop={0.5}>
                 {/* Multi-select answers */}
                 {answer?.selectedOptions && answer.selectedOptions.length > 0 && (
-                  <Box flexDirection="column">
+                  <>
                     {answer.selectedOptions.map((option, idx) => (
                       <Text key={idx} color={theme.components.review.selectedOption}>
                         → {option}
                       </Text>
                     ))}
-                  </Box>
+                  </>
                 )}
 
                 {/* Single-select answer */}
                 {answer?.selectedOption && (
                   <Text color={theme.components.review.selectedOption}>→ {answer.selectedOption}</Text>
                 )}
+
+                {/* Custom text (can coexist with multi-select) */}
                 {answer?.customText && (
-                  <Box flexDirection="column">
-                    {answer.customText.split("\n").map((line, lineIndex) => (
-                      <Text key={lineIndex} color={theme.components.review.customAnswer}>
-                        {lineIndex === 0
-                          ? `→ Custom: "${line}`
-                          : `  ${line}`}
-                      </Text>
-                    ))}
-                    <Text color={theme.components.review.customAnswer}>"</Text>
-                  </Box>
+                  <>
+                    {answer.customText.split("\n").map((line, lineIndex, lines) => {
+                      const isFirstLine = lineIndex === 0;
+                      const isLastLine = lineIndex === lines.length - 1;
+
+                      return (
+                        <Text key={lineIndex} color={theme.components.review.customAnswer}>
+                          {isFirstLine ? "→ Custom: \"" : "  "}
+                          {line}
+                          {isLastLine ? "\"" : ""}
+                        </Text>
+                      );
+                    })}
+                  </>
                 )}
-                {!answer?.selectedOption && !answer?.customText && (
+
+                {/* No answer provided */}
+                {!answer?.selectedOption && !answer?.selectedOptions && !answer?.customText && (
                   <Text dimColor>→ (No answer provided)</Text>
                 )}
               </Box>
