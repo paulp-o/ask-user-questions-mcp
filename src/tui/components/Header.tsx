@@ -27,7 +27,9 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
   }, [pendingCount, prevCount]);
 
   // Use the selected gradient theme from theme.ts
-  const headerText = (gradient as any)[theme.headerGradient]("⟡ AUQ ⋆˙ Ask User Questions MCP ⋆˙ ");
+  const headerText = (
+    gradient as unknown as Record<string, (text: string) => string>
+  )[theme.headerGradient](".𖥔 AUQ ⋆ Ask User Questions MCP ⋆ ");
 
   return (
     <Box

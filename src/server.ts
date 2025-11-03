@@ -12,28 +12,45 @@ const sessionManager = new SessionManager();
 
 const server = new FastMCP({
   instructions:
-    "This MCP server provides a tool to ask users structured questions via the terminal. " +
-    "The ask_user_questions tool allows AI models to pause and gather direct user input through " +
-    "an interactive TUI, returning formatted responses for continued reasoning.",
+    "This MCP server provides a tool to ask structured questions to the user. " +
+    "Use the ask_user_questions tool when you need to:\n" +
+    "- Gather user preferences or requirements during execution\n" +
+    "- Clarify ambiguous instructions or implementation choices\n" +
+    "- Get decisions on what direction to take\n" +
+    "- Offer choices to the user about multiple valid approaches\n\n" +
+    "The tool allows AI models to pause execution and gather direct user input through an interactive TUI, " +
+    "returning formatted responses for continued reasoning. " +
+    "Each question supports 2-4 multiple-choice options with descriptions, and users can always provide custom text input. " +
+    "Both single-select and multi-select modes are supported.",
   name: "AskUserQuestions",
   version: "0.1.0",
 });
 
 // Define the question and option schemas
 const OptionSchema = z.object({
+  label: z
+    .string()
+    .describe(
+      "The display text for this option that the user will see and select. " +
+        "Should be concise (1-5 words) and clearly describe the choice."
+    ),
   description: z
     .string()
     .optional()
-    .describe("Optional explanatory note for this option"),
-  label: z.string().describe("The visible text of the choice"),
+    .describe(
+      "Explanation of what this option means or what will happen if chosen. " +
+        "Useful for providing context about trade-offs or implications."
+    ),
 });
 
 const QuestionSchema = z.object({
-  options: z
-    .array(OptionSchema)
-    .min(1)
-    .describe("Non-empty list of predefined answer choices"),
-  prompt: z.string().describe("The full question text"),
+  prompt: z
+    .string()
+    .describe(
+      "The complete question to ask the user. Should be clear, specific, and end with a question mark. " +
+        "Example: 'Which programming language do you want to use?' " +
+        "If multiSelect is true, phrase it accordingly, e.g. 'Which features do you want to enable?'"
+    ),
   title: z
     .string()
     .min(
@@ -41,13 +58,24 @@ const QuestionSchema = z.object({
       "Question title is required. Provide a short summary like 'Language' or 'Framework'."
     )
     .describe(
-      "Short 1-2 word summary for UI display (e.g., 'Language', 'Framework', 'Theme'). " +
-        "This title appears as a chip/tag in the interface and helps users quickly identify questions."
+      "Very short label displayed as a chip/tag (max 12 chars). " +
+        "Examples: 'Auth method', 'Library', 'Approach'. " +
+        "This title appears in the interface to help users quickly identify questions."
+    ),
+  options: z
+    .array(OptionSchema)
+    .min(2)
+    .max(4)
+    .describe(
+      "The available choices for this question. Must have 2-4 options. " +
+        "Each option should be a distinct, mutually exclusive choice (unless multiSelect is enabled). " +
+        "There should be no 'Other' option, that will be provided automatically."
     ),
   multiSelect: z
     .boolean()
     .describe(
-      "Enable multi-select mode allowing multiple option selections. Default: false (single-select)"
+      "Set to true to allow the user to select multiple options instead of just one. " +
+        "Use when choices are not mutually exclusive. Default: false (single-select)"
     ),
 });
 
@@ -61,14 +89,26 @@ server.addTool({
     idempotentHint: true,
   },
   description:
-    "Ask the user one or more structured questions via an interactive terminal interface. " +
-    "Each question includes multiple-choice options and allows custom free-text responses. " +
-    "\n\nSUPPORTS TWO MODES:\n" +
-    "1. Single-select (default): User picks ONE option or provides custom text\n" +
-    "2. Multi-select (set multiSelect: true): User can select MULTIPLE options using spacebar\n" +
-    "\nExample multi-select: {prompt: 'Which features?', options: [...], multiSelect: true}\n" +
-    "\nReturns a formatted summary of all questions and answers. " +
-    "IMPORTANT: Always provide a descriptive 'title' field (1-2 words) for each question to improve UI clarity.",
+    "Use this tool when you need to ask the user questions during execution. " +
+    "This allows you to:\n" +
+    "1. Gather user preferences or requirements\n" +
+    "2. Clarify ambiguous instructions\n" +
+    "3. Get decisions on implementation choices as you work\n" +
+    "4. Offer choices to the user about what direction to take\n\n" +
+    "FEATURES:\n" +
+    "- Ask 1-4 structured questions via an interactive terminal interface\n" +
+    "- Each question includes 2-4 multiple-choice options with explanatory descriptions\n" +
+    "- Users can always provide custom free-text input as an alternative to predefined options\n" +
+    "- Single-select mode (default): User picks ONE option or provides custom text\n" +
+    "- Multi-select mode (multiSelect: true): User can select MULTIPLE options\n\n" +
+    "USAGE NOTES:\n" +
+    "- Always provide a descriptive 'title' field (max 12 chars) for each question\n" +
+    "- Use multiSelect: true when choices are not mutually exclusive\n" +
+    "- Option labels should be concise (1-5 words)\n" +
+    "- Questions should end with a question mark\n" +
+    "- Don't include an 'Other' option - it's provided automatically\n\n" +
+    "- If user seems not aware how to answer the question, inform them that they need to install the 'auq' cli tool.\n\n" +
+    "Returns a formatted summary of all questions and answers.",
   execute: async (args, { log }) => {
     try {
       // Initialize session manager if not already done
@@ -139,7 +179,12 @@ server.addTool({
     questions: z
       .array(QuestionSchema)
       .min(1)
-      .describe("Array of questions to ask the user"),
+      .max(4)
+      .describe(
+        "Questions to ask the user (1-4 questions). " +
+          "Each question must include: prompt (full question text), title (short label, max 12 chars), " +
+          "options (2-4 choices with labels and descriptions), and multiSelect (boolean)."
+      ),
   }),
 });
 

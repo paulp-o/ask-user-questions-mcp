@@ -271,7 +271,10 @@ export class SessionManager {
    * @param sessionId - The session ID to reject
    * @param reason - Optional reason for rejection (null if user skipped providing reason)
    */
-  async rejectSession(sessionId: string, reason?: string | null): Promise<void> {
+  async rejectSession(
+    sessionId: string,
+    reason?: string | null
+  ): Promise<void> {
     const exists = await this.sessionExists(sessionId);
     if (!exists) {
       throw new Error(`Session not found: ${sessionId}`);
@@ -370,7 +373,7 @@ export class SessionManager {
           } else {
             formattedResponse += "No reason provided.\n\n";
           }
-          formattedResponse += "The user chose not to answer these questions at this time.";
+          // formattedResponse += "The user chose not to answer these questions at this time.";
 
           return {
             formattedResponse,
