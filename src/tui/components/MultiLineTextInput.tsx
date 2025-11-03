@@ -31,7 +31,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
       if (input === "\r" || input === "\n") {
         if (key.shift) {
           onChange(value + "\n");
-        } else if (onSubmit) {
+        } else if (onSubmit && value.trim().length > 0) {
           onSubmit();
         }
         return;
