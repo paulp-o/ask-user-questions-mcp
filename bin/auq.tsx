@@ -10,6 +10,10 @@ import React, { useEffect, useState } from "react";
 import type { SessionRequest } from "../src/session/types.js";
 
 import { SessionManager } from "../src/session/SessionManager.js";
+import {
+  ensureDirectoryExists,
+  getSessionDirectory,
+} from "../src/session/utils.js";
 import { Header } from "../src/tui/components/Header.js";
 import { StepperView } from "../src/tui/components/StepperView.js";
 import { Toast } from "../src/tui/components/Toast.js";
@@ -112,6 +116,18 @@ const App: React.FC = () => {
   const [sessionQueue, setSessionQueue] = useState<SessionData[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [toast, setToast] = useState<ToastData | null>(null);
+  const [showSessionLog, setShowSessionLog] = useState(true);
+
+  // Get session directory for logging
+  const sessionDir = getSessionDirectory();
+
+  // Auto-hide session log after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSessionLog(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Initialize: Load existing sessions + start persistent watcher
   useEffect(() => {
@@ -119,6 +135,9 @@ const App: React.FC = () => {
 
     const initialize = async () => {
       try {
+        // Step 0: Ensure session directory exists
+        await ensureDirectoryExists(sessionDir);
+
         // Step 1: Load existing pending sessions
         const watcher = createTUIWatcher();
         const sessionIds = await watcher.getPendingSessions();
@@ -275,9 +294,17 @@ const App: React.FC = () => {
         </Box>
       )}
       {mainContent}
+      {showSessionLog && (
+        <Box marginTop={1}>
+          <Text dimColor>[AUQ] Session directory: {sessionDir}</Text>
+        </Box>
+      )}
     </Box>
   );
 };
+
+// Clear terminal before showing app
+console.clear();
 
 const { waitUntilExit } = render(<App />);
 

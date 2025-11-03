@@ -10,6 +10,7 @@ import type { SessionRequest, SessionStatus } from "../session/types.js";
 import { atomicReadFile } from "../session/atomic-operations.js";
 import { TUISessionWatcher } from "../session/file-watcher.js";
 import { SESSION_FILES } from "../session/types.js";
+import { getSessionDirectory } from "../session/utils.js";
 
 /**
  * Interface for TUI session events
@@ -223,11 +224,18 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
 
 /**
  * Create a simple TUI session watcher instance
+ * Auto-detects session directory based on global vs local install
  */
 export function createTUIWatcher(
   config?: TUIWatcherConfig,
 ): EnhancedTUISessionWatcher {
-  return new EnhancedTUISessionWatcher(config);
+  // Auto-detect session directory if not provided in config
+  const sessionDir = config?.sessionDir ?? getSessionDirectory();
+
+  return new EnhancedTUISessionWatcher({
+    ...config,
+    sessionDir,
+  });
 }
 
 /**

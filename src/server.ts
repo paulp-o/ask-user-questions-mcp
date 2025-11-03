@@ -5,12 +5,19 @@ import { z } from "zod";
 import type { Question } from "./session/types.js";
 
 import { SessionManager } from "./session/index.js";
-// import { resolveSessionDirectory } from "./session/utils.js";
+import { getSessionDirectory } from "./session/utils.js";
 
-// Initialize session manager
-const sessionManager = new SessionManager();
+// Get session directory (auto-detects global vs local install)
+const sessionDir = getSessionDirectory();
+
+// Log session directory for debugging
+console.error(`[AUQ] Session directory: ${sessionDir}`);
+
+// Initialize session manager with detected session directory
+const sessionManager = new SessionManager({ baseDir: sessionDir });
 
 const server = new FastMCP({
+  name: "AskUserQuestions",
   instructions:
     "This MCP server provides a tool to ask structured questions to the user. " +
     "Use the ask_user_questions tool when you need to:\n" +
@@ -22,7 +29,6 @@ const server = new FastMCP({
     "returning formatted responses for continued reasoning. " +
     "Each question supports 2-4 multiple-choice options with descriptions, and users can always provide custom text input. " +
     "Both single-select and multi-select modes are supported.",
-  name: "AskUserQuestions",
   version: "0.1.0",
 });
 

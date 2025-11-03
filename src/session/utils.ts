@@ -2,10 +2,11 @@
  * Utility functions for session management
  */
 
-import { constants } from "fs";
+import { constants, existsSync } from "fs";
 import { promises as fs } from "fs";
 import { homedir } from "os";
-import { join } from "path";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
 /**
  * Create a safe filename from a session ID (basic validation)
@@ -137,4 +138,70 @@ export async function validateSessionDirectory(
   } catch {
     return false;
   }
+}
+
+/**
+ * Detect whether AUQ is installed globally or locally
+ * by inspecting the module's location
+ */
+export function detectInstallMode(): {
+  mode: "global" | "local";
+  projectRoot?: string;
+} {
+  try {
+    // Get current module's file path
+    const __filename = fileURLToPath(import.meta.url);
+    const parts = __filename.split(/[/\\]/); // Handle both Unix and Windows separators
+
+    // Find the last occurrence of 'node_modules' in the path
+    const nodeModulesIndex = parts.lastIndexOf("node_modules");
+
+    if (nodeModulesIndex === -1) {
+      // Not in node_modules (development or global install without node_modules in path)
+      return { mode: "global" };
+    }
+
+    // We're inside node_modules - check if there's a project package.json above
+    const potentialProjectRoot = parts.slice(0, nodeModulesIndex).join("/");
+    const packageJsonPath = join(potentialProjectRoot, "package.json");
+
+    if (existsSync(packageJsonPath)) {
+      // Found a package.json above node_modules → local install
+      return { mode: "local", projectRoot: potentialProjectRoot };
+    }
+
+    // In node_modules but no project context → global install
+    return { mode: "global" };
+  } catch (error) {
+    // Fallback to global mode if detection fails
+    console.error("[AUQ] Failed to detect install mode:", error);
+    return { mode: "global" };
+  }
+}
+
+/**
+ * Get the appropriate session directory based on installation mode
+ * Supports environment variable override via AUQ_SESSION_DIR
+ */
+export function getSessionDirectory(): string {
+  // Check for environment variable override first
+  if (process.env.AUQ_SESSION_DIR) {
+    const envDir = process.env.AUQ_SESSION_DIR;
+    // Expand ~ to home directory if needed
+    if (envDir.startsWith("~")) {
+      return join(homedir(), envDir.slice(1));
+    }
+    return envDir;
+  }
+
+  // Auto-detect installation mode
+  const { mode, projectRoot } = detectInstallMode();
+
+  if (mode === "local" && projectRoot) {
+    // Local install: use project-relative .auq/sessions directory
+    return join(projectRoot, ".auq", "sessions");
+  }
+
+  // Global install: use XDG-compliant system paths
+  return resolveSessionDirectory();
 }

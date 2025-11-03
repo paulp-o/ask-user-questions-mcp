@@ -47,12 +47,15 @@ export const OptionsList: React.FC<OptionsListProps> = ({
 
   // Calculate max index: include custom input option if enabled
   const maxIndex = showCustomInput ? options.length : options.length - 1;
-  const isCustomInputFocused = showCustomInput && focusedIndex === options.length;
+  const isCustomInputFocused =
+    showCustomInput && focusedIndex === options.length;
   const customLines = customValue.replace(/\r\n?/g, "\n").split("\n");
 
   // Track and emit focus context changes
   useEffect(() => {
-    const newContext: "option" | "custom-input" = isCustomInputFocused ? "custom-input" : "option";
+    const newContext: "option" | "custom-input" = isCustomInputFocused
+      ? "custom-input"
+      : "option";
     onFocusContextChange?.(newContext);
   }, [focusedIndex, isCustomInputFocused, onFocusContextChange]);
 
@@ -106,7 +109,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         }
       }
     },
-    { isActive: isFocused },
+    { isActive: isFocused }
   );
 
   return (
@@ -119,12 +122,16 @@ export const OptionsList: React.FC<OptionsListProps> = ({
 
         // Different icons for single vs multi-select
         const isSelected = multiSelect
-          ? (selectedOptions?.includes(option.label) || false)
+          ? selectedOptions?.includes(option.label) || false
           : selectedOption === option.label;
 
         const selectionMark = multiSelect
-          ? (isSelected ? "[✔]" : "[ ]")  // Checkbox for multi-select
-          : (isSelected ? "●" : "○");      // Radio for single-select
+          ? isSelected
+            ? "[✔]"
+            : "[ ]" // Checkbox for multi-select
+          : isSelected
+            ? "●"
+            : "○"; // Radio for single-select
 
         return (
           <Box key={index} flexDirection="column" marginTop={0}>
@@ -143,7 +150,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
             {option.description && (
               <Box marginLeft={4}>
                 <Text
-                  color={isFocusedOption ? theme.components.options.focused : undefined}
+                  color={
+                    isFocusedOption
+                      ? theme.components.options.focused
+                      : undefined
+                  }
                   dimColor={!isFocusedOption}
                 >
                   {option.description}
@@ -185,7 +196,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 <Text dimColor>
                   {customLines.map((line, idx) => (
                     <React.Fragment key={idx}>
-                      {idx === 0 ? "→ " : "  "}
+                      {idx === 0 ? "❯ " : "  "}
                       {line || " "}
                       {idx < customLines.length - 1 && <Newline />}
                     </React.Fragment>
