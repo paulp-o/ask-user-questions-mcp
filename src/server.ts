@@ -44,6 +44,11 @@ const QuestionSchema = z.object({
       "Short 1-2 word summary for UI display (e.g., 'Language', 'Framework', 'Theme'). " +
         "This title appears as a chip/tag in the interface and helps users quickly identify questions."
     ),
+  multiSelect: z
+    .boolean()
+    .describe(
+      "Enable multi-select mode allowing multiple option selections. Default: false (single-select)"
+    ),
 });
 
 // Add the ask_user_questions tool
@@ -58,7 +63,11 @@ server.addTool({
   description:
     "Ask the user one or more structured questions via an interactive terminal interface. " +
     "Each question includes multiple-choice options and allows custom free-text responses. " +
-    "Returns a formatted summary of all questions and answers. " +
+    "\n\nSUPPORTS TWO MODES:\n" +
+    "1. Single-select (default): User picks ONE option or provides custom text\n" +
+    "2. Multi-select (set multiSelect: true): User can select MULTIPLE options using spacebar\n" +
+    "\nExample multi-select: {prompt: 'Which features?', options: [...], multiSelect: true}\n" +
+    "\nReturns a formatted summary of all questions and answers. " +
     "IMPORTANT: Always provide a descriptive 'title' field (1-2 words) for each question to improve UI clarity.",
   execute: async (args, { log }) => {
     try {
@@ -90,6 +99,7 @@ server.addTool({
         })),
         prompt: q.prompt,
         title: q.title,
+        multiSelect: q.multiSelect,
       }));
 
       log.info("Starting session and waiting for user answers...", {

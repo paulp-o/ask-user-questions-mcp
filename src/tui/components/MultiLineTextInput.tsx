@@ -69,7 +69,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         onChange(value + input);
       }
     },
-    { isActive: isFocused },
+    { isActive: isFocused }
   );
 
   // Normalize any carriage returns that might already be present in value

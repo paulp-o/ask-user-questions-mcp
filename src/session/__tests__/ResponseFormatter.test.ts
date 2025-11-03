@@ -425,7 +425,7 @@ describe("ResponseFormatter", () => {
 
       expect(() =>
         ResponseFormatter.validateAnswers(answers, questions),
-      ).toThrow("has neither selectedOption nor customText");
+      ).toThrow("has neither selectedOption, selectedOptions, nor customText");
     });
 
     it("should throw error for non-existent option", () => {
@@ -518,6 +518,364 @@ describe("ResponseFormatter", () => {
       expect(() =>
         ResponseFormatter.validateAnswers(answers, questions),
       ).toThrow("No questions provided");
+    });
+
+    it("should validate multi-select answers with selectedOptions array", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { label: "Feature A" },
+            { label: "Feature B" },
+            { label: "Feature C" },
+          ],
+          prompt: "Which features do you want?",
+          title: "Features",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: ["Feature A", "Feature C"],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      expect(() =>
+        ResponseFormatter.validateAnswers(answers, questions),
+      ).not.toThrow();
+    });
+
+    it("should throw error for invalid option in selectedOptions array", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { label: "Feature A" },
+            { label: "Feature B" },
+            { label: "Feature C" },
+          ],
+          prompt: "Which features do you want?",
+          title: "Features",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: ["Feature A", "Invalid Feature"],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      expect(() =>
+        ResponseFormatter.validateAnswers(answers, questions),
+      ).toThrow("references non-existent option: Invalid Feature");
+    });
+
+    it("should validate empty selectedOptions array (no selections)", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { label: "Feature A" },
+            { label: "Feature B" },
+          ],
+          prompt: "Which features do you want?",
+          title: "Features",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: [],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      expect(() =>
+        ResponseFormatter.validateAnswers(answers, questions),
+      ).not.toThrow();
+    });
+  });
+
+  describe("formatUserResponse - Multi-Select", () => {
+    it("should format multi-select question with multiple selections (with descriptions)", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            {
+              description: "Authentication support",
+              label: "Auth",
+            },
+            {
+              description: "Database integration",
+              label: "Database",
+            },
+            {
+              description: "API endpoints",
+              label: "API",
+            },
+          ],
+          prompt: "Which features do you want to enable?",
+          title: "Features",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: ["Auth", "API"],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      expect(result).toBe(
+        "Here are the user's answers:\n\n" +
+          "1. Which features do you want to enable?\n" +
+          "→ Auth — Authentication support\n" +
+          "→ API — API endpoints",
+      );
+    });
+
+    it("should format multi-select question with multiple selections (without descriptions)", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { label: "Red" },
+            { label: "Green" },
+            { label: "Blue" },
+          ],
+          prompt: "Select your favorite colors",
+          title: "Colors",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: ["Red", "Blue"],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      expect(result).toBe(
+        "Here are the user's answers:\n\n" +
+          "1. Select your favorite colors\n" +
+          "→ Red\n" +
+          "→ Blue",
+      );
+    });
+
+    it("should format multi-select question with empty selections", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { label: "Feature A" },
+            { label: "Feature B" },
+          ],
+          prompt: "Which optional features do you want?",
+          title: "Optional Features",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: [],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      expect(result).toBe(
+        "Here are the user's answers:\n\n" +
+          "1. Which optional features do you want?\n" +
+          "→ (No selection)",
+      );
+    });
+
+    it("should format mixed single-select and multi-select questions", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            {
+              description: "Type-safe JavaScript",
+              label: "TypeScript",
+            },
+            {
+              description: "Dynamic web language",
+              label: "JavaScript",
+            },
+          ],
+          prompt: "What is your primary language?",
+          title: "Language",
+          multiSelect: false,
+        },
+        {
+          options: [
+            {
+              description: "Authentication support",
+              label: "Auth",
+            },
+            {
+              description: "Database integration",
+              label: "Database",
+            },
+            {
+              description: "API endpoints",
+              label: "API",
+            },
+          ],
+          prompt: "Which features do you want?",
+          title: "Features",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOption: "TypeScript",
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+          {
+            questionIndex: 1,
+            selectedOptions: ["Auth", "Database"],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      expect(result).toBe(
+        "Here are the user's answers:\n\n" +
+          "1. What is your primary language?\n" +
+          "→ TypeScript — Type-safe JavaScript\n\n" +
+          "2. Which features do you want?\n" +
+          "→ Auth — Authentication support\n" +
+          "→ Database — Database integration",
+      );
+    });
+
+    it("should format multi-select with single selection (edge case)", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { label: "Option A" },
+            { label: "Option B" },
+            { label: "Option C" },
+          ],
+          prompt: "Select any options you like",
+          title: "Options",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: ["Option B"],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      expect(result).toBe(
+        "Here are the user's answers:\n\n" +
+          "1. Select any options you like\n" +
+          "→ Option B",
+      );
+    });
+
+    it("should format multi-select with both selected options AND custom text", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            {
+              description: "Authentication support",
+              label: "Auth",
+            },
+            {
+              description: "Database integration",
+              label: "Database",
+            },
+            {
+              description: "API endpoints",
+              label: "API",
+            },
+          ],
+          prompt: "Which features do you want?",
+          title: "Features",
+          multiSelect: true,
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: ["Auth", "Database"],
+            customText: "Also need caching system",
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      expect(result).toBe(
+        "Here are the user's answers:\n\n" +
+          "1. Which features do you want?\n" +
+          "→ Auth — Authentication support\n" +
+          "→ Database — Database integration\n" +
+          "→ Other: 'Also need caching system'",
+      );
     });
   });
 });

@@ -14,6 +14,7 @@ export interface Question {
   options: Option[];
   prompt: string;
   title: string; // Short 1-2 word summary for UI display (e.g., 'Language', 'Framework')
+  multiSelect?: boolean; // Enable multi-select mode allowing multiple option selections. Default: false (single-select)
 }
 
 export interface SessionAnswer {
@@ -51,7 +52,8 @@ export interface SessionStatus {
 export interface UserAnswer {
   customText?: string;
   questionIndex: number;
-  selectedOption?: string;
+  selectedOption?: string; // For single-select questions
+  selectedOptions?: string[]; // For multi-select questions
   timestamp: string;
 }
 

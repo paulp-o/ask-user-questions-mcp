@@ -16,7 +16,9 @@ interface QuestionDisplayProps {
   questions: Question[];
   selectedOption?: string;
   onAdvanceToNext?: () => void;
-  answers: Map<number, { customText?: string; selectedOption?: string }>;
+  answers: Map<number, { customText?: string; selectedOption?: string; selectedOptions?: string[] }>;
+  onToggleOption?: (label: string) => void;
+  multiSelect?: boolean;
 }
 
 /**
@@ -33,20 +35,22 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   selectedOption,
   onAdvanceToNext,
   answers,
+  onToggleOption,
+  multiSelect,
 }) => {
-  // Handle option selection - clears custom answer (mutual exclusion)
+  // Handle option selection - clears custom answer only in single-select mode
   const handleSelectOption = (label: string) => {
     onSelectOption(label);
-    if (customAnswer) {
-      onChangeCustomAnswer(""); // Clear custom answer when option selected
+    if (customAnswer && !multiSelect) {
+      onChangeCustomAnswer(""); // Clear custom answer when option selected (single-select only)
     }
   };
 
-  // Handle custom answer change - clears option selection (mutual exclusion)
+  // Handle custom answer change - clears option selection only in single-select mode
   const handleCustomAnswerChange = (text: string) => {
     onChangeCustomAnswer(text);
-    if (selectedOption && text) {
-      onSelectOption(""); // Clear option when custom text entered
+    if (selectedOption && text && !multiSelect) {
+      onSelectOption(""); // Clear option when custom text entered (single-select only)
     }
   };
 
@@ -55,9 +59,12 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       {/* TabBar showing all question titles */}
       <TabBar currentIndex={currentQuestionIndex} questions={questions} answers={answers} />
 
-      {/* Question prompt */}
-      <Box marginBottom={1} marginTop={1}>
+      {/* Question prompt with type indicator */}
+      <Box marginTop={1} justifyContent="space-between">
         <Text bold>{currentQuestion.prompt}</Text>
+        <Text dimColor>
+          {multiSelect ? "[Multiple Choice]" : "[Single Choice]"}
+        </Text>
       </Box>
 
       {/* Options list with integrated custom input */}
@@ -70,13 +77,28 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         options={currentQuestion.options}
         selectedOption={selectedOption}
         showCustomInput={true}
+        onToggle={onToggleOption}
+        multiSelect={multiSelect}
+        selectedOptions={answers.get(currentQuestionIndex)?.selectedOptions}
       />
 
       {/* Footer with keybindings */}
       <Box borderColor={theme.borders.neutral} borderStyle="single" marginTop={1} padding={0.5}>
         <Text dimColor>
-          <Text bold>↑↓</Text> Options | <Text bold>←→</Text> Questions | <Text bold>Enter</Text>{" "}
-          Select | <Text bold>Shift+Enter</Text> Newline | <Text bold>Esc</Text> Reject |{" "}
+          <Text bold>↑↓</Text> Options |{" "}
+          <Text bold>←→</Text> Questions |{" "}
+          {multiSelect ? (
+            <>
+              <Text bold>Space</Text> Toggle |{" "}
+              <Text bold>Tab</Text> Submit |{" "}
+            </>
+          ) : (
+            <>
+              <Text bold>Enter</Text> Select |{" "}
+            </>
+          )}
+          <Text bold>Shift+Enter</Text> Newline |{" "}
+          <Text bold>Esc</Text> Reject |{" "}
           <Text bold>q</Text> Quit
         </Text>
       </Box>

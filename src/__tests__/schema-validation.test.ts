@@ -16,6 +16,7 @@ const QuestionSchema = z.object({
   options: z.array(OptionSchema).min(1),
   prompt: z.string(),
   title: z.string().min(1),
+  multiSelect: z.boolean().optional(),
 });
 
 const QuestionsArraySchema = z.array(QuestionSchema).min(1);
@@ -156,6 +157,44 @@ describe("Schema Validation - Edge Cases", () => {
       expect(() => QuestionsArraySchema.parse(validQuestions)).not.toThrow();
       const parsed = QuestionsArraySchema.parse(validQuestions);
       expect(parsed).toHaveLength(2);
+    });
+
+    it("should accept question with multiSelect: true", () => {
+      const multiSelectQuestion = {
+        options: [{ label: "A" }, { label: "B" }, { label: "C" }],
+        prompt: "Select multiple options",
+        title: "Features",
+        multiSelect: true,
+      };
+
+      expect(() => QuestionSchema.parse(multiSelectQuestion)).not.toThrow();
+      const parsed = QuestionSchema.parse(multiSelectQuestion);
+      expect(parsed.multiSelect).toBe(true);
+    });
+
+    it("should accept question with multiSelect: false", () => {
+      const singleSelectQuestion = {
+        options: [{ label: "A" }, { label: "B" }],
+        prompt: "Select one option",
+        title: "Choice",
+        multiSelect: false,
+      };
+
+      expect(() => QuestionSchema.parse(singleSelectQuestion)).not.toThrow();
+      const parsed = QuestionSchema.parse(singleSelectQuestion);
+      expect(parsed.multiSelect).toBe(false);
+    });
+
+    it("should accept question with multiSelect omitted (defaults to undefined)", () => {
+      const defaultQuestion = {
+        options: [{ label: "A" }],
+        prompt: "Default single-select",
+        title: "Default",
+      };
+
+      expect(() => QuestionSchema.parse(defaultQuestion)).not.toThrow();
+      const parsed = QuestionSchema.parse(defaultQuestion);
+      expect(parsed.multiSelect).toBeUndefined();
     });
   });
 });

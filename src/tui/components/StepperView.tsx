@@ -11,7 +11,8 @@ import { ReviewScreen } from "./ReviewScreen.js";
 
 interface Answer {
   customText?: string;
-  selectedOption?: string;
+  selectedOption?: string;     // For single-select
+  selectedOptions?: string[];  // For multi-select
 }
 
 interface StepperViewProps {
@@ -46,6 +47,25 @@ export const StepperView: React.FC<StepperViewProps> = ({
       newAnswers.set(currentQuestionIndex, {
         ...existing,
         selectedOption: label,
+      });
+      return newAnswers;
+    });
+  };
+
+  const handleToggleOption = (label: string) => {
+    setAnswers((prev) => {
+      const newAnswers = new Map(prev);
+      const existing = newAnswers.get(currentQuestionIndex) || {};
+      const currentSelections = existing.selectedOptions || [];
+
+      const newSelections = currentSelections.includes(label)
+        ? currentSelections.filter((l) => l !== label)  // Remove if already selected
+        : [...currentSelections, label];                 // Add if not selected
+
+      newAnswers.set(currentQuestionIndex, {
+        selectedOptions: newSelections,
+        // Keep customText in multi-select mode (allow both)
+        customText: existing.customText,
       });
       return newAnswers;
     });
@@ -208,6 +228,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onAdvanceToNext={handleAdvanceToNext}
       onChangeCustomAnswer={handleChangeCustomAnswer}
       onSelectOption={handleSelectOption}
+      onToggleOption={handleToggleOption}
+      multiSelect={currentQuestion.multiSelect}
       questions={sessionRequest.questions}
       selectedOption={currentAnswer?.selectedOption}
       answers={answers}

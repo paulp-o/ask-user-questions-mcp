@@ -94,10 +94,10 @@ export class ResponseFormatter {
         );
       }
 
-      // Check that answer has either selectedOption or customText
-      if (!answer.selectedOption && !answer.customText) {
+      // Check that answer has either selectedOption, selectedOptions, or customText
+      if (!answer.selectedOption && !answer.customText && !answer.selectedOptions) {
         throw new Error(
-          `Answer for question ${answer.questionIndex} has neither selectedOption nor customText`,
+          `Answer for question ${answer.questionIndex} has neither selectedOption, selectedOptions, nor customText`,
         );
       }
 
@@ -112,6 +112,21 @@ export class ResponseFormatter {
           throw new Error(
             `Answer for question ${answer.questionIndex} references non-existent option: ${answer.selectedOption}`,
           );
+        }
+      }
+
+      // Validate multi-select options
+      if (answer.selectedOptions) {
+        const question = questions[answer.questionIndex];
+        for (const selectedOpt of answer.selectedOptions) {
+          const optionExists = question.options.some(
+            (opt) => opt.label === selectedOpt,
+          );
+          if (!optionExists) {
+            throw new Error(
+              `Answer for question ${answer.questionIndex} references non-existent option: ${selectedOpt}`,
+            );
+          }
         }
       }
     }
@@ -135,13 +150,33 @@ export class ResponseFormatter {
     // Add question with number
     lines.push(`${index}. ${question.prompt}`);
 
-    // Format the answer
-    if (answer.customText) {
-      // Custom text answer - escape single quotes for display
-      const escapedText = answer.customText.replace(/'/g, "\\'");
-      lines.push(`→ Other: '${escapedText}'`);
-    } else if (answer.selectedOption) {
-      // Selected option - find the option details
+    // Track if any answer was provided
+    let hasAnswer = false;
+
+    // Format multi-select options (if present)
+    if (answer.selectedOptions && answer.selectedOptions.length > 0) {
+      hasAnswer = true;
+      for (const selectedLabel of answer.selectedOptions) {
+        const option = question.options.find(
+          (opt) => opt.label === selectedLabel,
+        );
+        if (option) {
+          if (option.description) {
+            lines.push(`→ ${option.label} — ${option.description}`);
+          } else {
+            lines.push(`→ ${option.label}`);
+          }
+        }
+      }
+    } else if (answer.selectedOptions && answer.selectedOptions.length === 0 && !answer.customText) {
+      // Multi-select with no selections and no custom text
+      hasAnswer = true;
+      lines.push("→ (No selection)");
+    }
+
+    // Format single-select option (if present and no multi-select)
+    if (answer.selectedOption && !answer.selectedOptions) {
+      hasAnswer = true;
       const option = question.options.find(
         (opt) => opt.label === answer.selectedOption,
       );
@@ -157,8 +192,17 @@ export class ResponseFormatter {
         // Option not found - shouldn't happen, but handle gracefully
         lines.push(`→ ${answer.selectedOption}`);
       }
-    } else {
-      // No answer provided - this shouldn't happen
+    }
+
+    // Format custom text (if present) - can coexist with selectedOptions in multi-select
+    if (answer.customText) {
+      hasAnswer = true;
+      const escapedText = answer.customText.replace(/'/g, "\\'");
+      lines.push(`→ Other: '${escapedText}'`);
+    }
+
+    // If no answer at all
+    if (!hasAnswer) {
       lines.push("→ No answer provided");
     }
 

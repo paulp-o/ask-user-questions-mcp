@@ -17,6 +17,10 @@ interface OptionsListProps {
   onCustomChange?: (value: string) => void;
   // Auto-advance support
   onAdvance?: () => void;
+  // Multi-select support
+  multiSelect?: boolean;
+  onToggle?: (label: string) => void;
+  selectedOptions?: string[];
 }
 
 /**
@@ -32,6 +36,9 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   customValue = "",
   onCustomChange,
   onAdvance,
+  multiSelect = false,
+  onToggle,
+  selectedOptions = [],
 }) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
 
@@ -47,19 +54,46 @@ export const OptionsList: React.FC<OptionsListProps> = ({
       if (key.upArrow) {
         setFocusedIndex((prev) => Math.max(0, prev - 1));
       }
+
       if (key.downArrow) {
         setFocusedIndex((prev) => Math.min(maxIndex, prev + 1));
       }
-      if (key.return) {
-        // Don't handle Return when custom input is focused - MultiLineTextInput handles it
-        if (isCustomInputFocused) {
-          return;
+
+      if (multiSelect) {
+        // Multi-select mode
+        if (input === " ") {
+          // Spacebar: Toggle selection WITHOUT advancing
+          if (!isCustomInputFocused) {
+            onToggle?.(options[focusedIndex].label);
+          }
         }
 
-        // On regular option: select and advance
-        onSelect(options[focusedIndex].label);
-        if (onAdvance) {
-          onAdvance();
+        if (key.return || key.tab) {
+          // Enter OR Tab: Advance to next question (don't toggle)
+          if (!isCustomInputFocused && onAdvance) {
+            onAdvance();
+          }
+        }
+      } else {
+        // Single-select mode
+        if (key.return) {
+          // Don't handle Return when custom input is focused - MultiLineTextInput handles it
+          if (isCustomInputFocused) {
+            return;
+          }
+
+          // On regular option: select and advance
+          onSelect(options[focusedIndex].label);
+          if (onAdvance) {
+            onAdvance();
+          }
+        }
+
+        if (key.tab) {
+          // Tab: Just advance (don't select)
+          if (onAdvance) {
+            onAdvance();
+          }
         }
       }
     },
@@ -70,11 +104,18 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     <Box flexDirection="column">
       {options.map((option, index) => {
         const isFocusedOption = isFocused && index === focusedIndex;
-        const isSelected = option.label === selectedOption;
 
         // Visual indicators
         const indicator = isFocusedOption ? "→" : " ";
-        const selectionMark = isSelected ? "●" : "○";
+
+        // Different icons for single vs multi-select
+        const isSelected = multiSelect
+          ? (selectedOptions?.includes(option.label) || false)
+          : selectedOption === option.label;
+
+        const selectionMark = multiSelect
+          ? (isSelected ? "[✔]" : "[ ]")  // Checkbox for multi-select
+          : (isSelected ? "●" : "○");      // Radio for single-select
 
         return (
           <Box key={index} flexDirection="column" marginTop={0}>

@@ -5,7 +5,7 @@ import type { Question, UserAnswer } from "../../session/types.js";
 import { theme } from "../theme.js";
 
 interface ReviewScreenProps {
-  answers: Map<number, { customText?: string; selectedOption?: string }>;
+  answers: Map<number, { customText?: string; selectedOption?: string; selectedOptions?: string[] }>;
   onConfirm: (userAnswers: UserAnswer[]) => void;
   onGoBack: () => void;
   questions: Question[];
@@ -29,11 +29,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
       // Convert answers to UserAnswer format
       const userAnswers: UserAnswer[] = [];
       answers.forEach((answer, questionIndex) => {
-        if (answer.selectedOption || answer.customText) {
+        if (answer.selectedOption || answer.selectedOptions || answer.customText) {
           userAnswers.push({
             customText: answer.customText,
             questionIndex,
             selectedOption: answer.selectedOption,
+            selectedOptions: answer.selectedOptions,
             timestamp: new Date().toISOString(),
           });
         }
@@ -77,6 +78,18 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
 
               {/* Answer */}
               <Box marginLeft={2} marginTop={0.5}>
+                {/* Multi-select answers */}
+                {answer?.selectedOptions && answer.selectedOptions.length > 0 && (
+                  <Box flexDirection="column">
+                    {answer.selectedOptions.map((option, idx) => (
+                      <Text key={idx} color={theme.components.review.selectedOption}>
+                        → {option}
+                      </Text>
+                    ))}
+                  </Box>
+                )}
+
+                {/* Single-select answer */}
                 {answer?.selectedOption && (
                   <Text color={theme.components.review.selectedOption}>→ {answer.selectedOption}</Text>
                 )}
