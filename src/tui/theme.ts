@@ -10,24 +10,32 @@
  * - Bright: "gray", "grey", "brightRed", "brightGreen", etc.
  * - Or use hex colors: "#FF5733"
  *
- * EXAMPLE THEME VARIATIONS:
- *
- * Ocean Theme:
- *   gradient: { start: "cyan", middle: "blue", end: "blueBright" }
- *
- * Sunset Theme:
- *   gradient: { start: "yellow", middle: "red", end: "magenta" }
- *
- * Forest Theme:
- *   gradient: { start: "green", middle: "cyan", end: "blue" }
- *
- * Monochrome Theme:
- *   gradient: { start: "white", middle: "gray", end: "white" }
+ * HEADER GRADIENT THEMES (from gradient-string):
+ * Change 'headerGradient' below to any of these beautiful premade gradients:
+ * - "cristal"    - Crystal clear blues
+ * - "teen"       - Vibrant teen energy
+ * - "mind"       - Psychedelic colors
+ * - "morning"    - Sunrise colors
+ * - "vice"       - Neon vice city
+ * - "passion"    - Passionate reds
+ * - "fruit"      - Fruity colors
+ * - "instagram"  - Instagram gradient
+ * - "atlas"      - Atlas blue
+ * - "retro"      - Retro gaming
+ * - "summer"     - Summer vibes
+ * - "pastel"     - Soft pastels
+ * - "rainbow"    - Full rainbow
  */
 
 export const theme = {
   /**
-   * Gradient Colors
+   * Header Gradient Theme
+   * To change: Replace "pastel" with any gradient name from the list above
+   */
+  headerGradient: "vice" as const,
+
+  /**
+   * Gradient Colors (deprecated - use headerGradient instead)
    * Used for logo, welcome messages, and decorative text
    */
   gradient: {

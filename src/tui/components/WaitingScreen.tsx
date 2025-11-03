@@ -16,8 +16,10 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
     return (
       <Box flexDirection="column">
         {/* <Text color={theme.colors.warning}>No pending question sets found.</Text> */}
-        <AnimatedGradient text="Waiting for AI to ask questions…" />
-        <Box marginTop={1}>
+        <Box justifyContent="center" paddingY={1}>
+          <AnimatedGradient text="Waiting for AI to ask questions…" />
+        </Box>
+        <Box justifyContent="center" paddingY={1}>
           <Text dimColor>Press q to quit</Text>
         </Box>
       </Box>
@@ -29,7 +31,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
       <AnimatedGradient
         text={`Processing question set... (${queueCount} remaining in queue)`}
       />
-      <Box marginTop={1}>
+      <Box justifyContent="center" paddingY={1}>
         <Text dimColor>Press q to quit</Text>
       </Box>
     </Box>

@@ -2,7 +2,7 @@ import { Box, Text } from "ink";
 import gradient from "gradient-string";
 import React, { useEffect, useState } from "react";
 
-import { gradientColors, theme } from "../theme.js";
+import { theme } from "../theme.js";
 
 interface HeaderProps {
   pendingCount: number;
@@ -26,8 +26,8 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
     }
   }, [pendingCount, prevCount]);
 
-  const headerGradient = gradient(gradientColors as unknown as string[]);
-  const headerText = headerGradient("⟡ AUQ ⋆˙ Ask User Questions MCP ⋆˙ ");
+  // Use the selected gradient theme from theme.ts
+  const headerText = (gradient as any)[theme.headerGradient]("⟡ AUQ ⋆˙ Ask User Questions MCP ⋆˙ ");
 
   return (
     <Box
