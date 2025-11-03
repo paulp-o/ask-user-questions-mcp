@@ -61,14 +61,27 @@ npx auq
 
 ## 🔌 MCP Server Configuration
 
-### Claude Desktop
+### Cursor
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
+
+### Claude Code (CLI)
+
+**Method 1: Using CLI** (Recommended)
+
+```bash
+claude mcp add --transport stdio ask-user-questions -- npx -y auq-mcp-server server
+```
+
+**Method 2: Manual Configuration**
+
+Add to `.mcp.json` in your project root (for team-wide sharing):
 
 ```json
 {
   "mcpServers": {
     "ask-user-questions": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "auq-mcp-server", "server"]
     }
@@ -76,25 +89,33 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 }
 ```
 
-**Restart Claude Desktop** after saving.
+Or add to `~/.claude.json` for global access across all projects.
 
-### Cursor / Other MCP Clients
-
-Add to `.mcp.json` in your project root:
+**With environment variables:**
 
 ```json
 {
   "mcpServers": {
     "ask-user-questions": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "auq-mcp-server", "server"],
-      "env": {}
+      "env": {
+        "AUQ_SESSION_DIR": "${AUQ_SESSION_DIR}"
+      }
     }
   }
 }
 ```
 
-Restart your client after configuration.
+**Manage servers:**
+```bash
+claude mcp list              # View all servers
+claude mcp get ask-user-questions   # Server details
+claude mcp remove ask-user-questions  # Remove server
+```
+
+**Verify setup:** Type `/mcp` in Claude Code to check server status.
 
 ### Codex CLI
 
@@ -124,6 +145,23 @@ args = ["-y", "auq-mcp-server", "server"]
 ```
 
 Restart Codex CLI after saving the configuration.
+
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+```json
+{
+  "mcpServers": {
+    "ask-user-questions": {
+      "command": "npx",
+      "args": ["-y", "auq-mcp-server", "server"]
+    }
+  }
+}
+```
+
+**Restart Claude Desktop** after saving.
 
 ---
 

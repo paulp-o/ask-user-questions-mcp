@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
 
 import { SessionManager } from "../../session/SessionManager.js";
+import { getSessionDirectory } from "../../session/utils.js";
 import { theme } from "../theme.js";
 import { ConfirmationDialog } from "./ConfirmationDialog.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
@@ -106,7 +107,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const handleConfirm = async (userAnswers: UserAnswer[]) => {
     setSubmitting(true);
     try {
-      const sessionManager = new SessionManager();
+      const sessionManager = new SessionManager({ baseDir: getSessionDirectory() });
       await sessionManager.saveSessionAnswers(sessionId, {
         answers: userAnswers,
         sessionId,
@@ -143,7 +144,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   // Handle session rejection
   const handleRejectSession = async (reason: string | null) => {
     try {
-      const sessionManager = new SessionManager();
+      const sessionManager = new SessionManager({ baseDir: getSessionDirectory() });
       await sessionManager.rejectSession(sessionId, reason);
 
       // Call onComplete with rejection flag
