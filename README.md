@@ -1,10 +1,10 @@
+![AUQ Demo](media/demo.png)
+
 # AUQ - ask-user-questions MCP
 
 [![npm version](https://img.shields.io/npm/v/auq-mcp-server.svg)](https://www.npmjs.com/package/auq-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
-
-![AUQ Demo](media/demo.png)
 
 **A lightweight MCP server & CLI tool that allows your LLMs to ask questions to you in a clean, separate space with great terminal UX.**
 
@@ -12,46 +12,51 @@
 
 ## What does it do?
 
-Through this MCP server, your LLM can generate question sets consisting of multiple-choice, single-choice, and free-text questions (with an "Other" option for custom input) while coding or working, and wait for your answers.
+This MCP server lets your AI assistants generate clarifying questions consisting of multiple-choice/single-choice questions (with an "Other" option for custom input) while coding or working, and wait for your answers through a separate CLI tool without messing up your workflow.
 
-You can keep the `auq` CLI running in advance, or start it when questions are pending. With simple arrow key navigation, you can select answers and send them back to the AI—all within a clean terminal interface.
+You can keep the CLI running in advance, or start it when questions are pending. With simple arrow key navigation, you can select answers and send them back to the AI—all within a clean terminal interface.
 
-## Why?
+## Background
 
-In AI-assisted coding, **clarifying questions** have always been recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code ([research paper](https://arxiv.org/abs/2308.13507)).
+In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been widely recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code [1].
 
-On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` tool, and I loved this feature. Inspired by it, I created this project to overcome what I saw as a few limitations:
+On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` tool, and I loved this feature. Inspired by it, I decided to build a similar tool that is:
 
 - **Tool-agnostic** - Works with any MCP client (Claude Desktop, Cursor, etc.)
 - **Non-invasive** - Doesn't heavily integrate with your coding CLI workflow or occupy UI space
 - **Multi-agent friendly** - Supports receiving questions from multiple agents simultaneously in parallel workflows
 
-This became AUQ—a human-AI question-answer loop tool designed for modern AI coding workflows.
-
 ---
 
 ## ✨ Features
 
+<https://github.com/user-attachments/assets/3a135a13-fcb1-4795-9a6b-f426fa079674>
+
 ### 🖥️ CLI-Based
+
 - **Lightweight**: Adds only ~150 tokens to your context per question
 - **SSH-compatible**: Use over remote connections
 - **Fast**: Instant startup, minimal resource usage
 
 ### 📦 100% Local
+
 All information operates based on your local file system. No data leaves your machine.
 
 ### 🔄 Resumable & Stateless
+
 The CLI app doesn't need to be running in advance. Whether the model calls the MCP first and you start the CLI later, or you keep it running—you can immediately answer pending questions in FIFO order.
 
 ### ❌ Question Set Rejection with Feedback Loop
+
 When the LLM asks about the wrong domain entirely, you can reject the question set, optionally providing the reason to the LLM. The rejection feedback is sent back to the LLM, allowing it to ask more helpful questions or align on what's important for the project.
 
 ### 📋 Question Set Queuing
+
 Recent AI workflows often use parallel sub-agents for concurrent coding. AUQ handles multiple simultaneous LLM calls gracefully—when a new question set arrives while you're answering another, it's queued and processed sequentially. Perfect for multi-agent parallel coding workflows.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (CLI)
 
 ### Global Installation (Recommended)
 
@@ -74,6 +79,7 @@ npx auq
 ```
 
 **Session Storage:**
+
 - **Global install**: `~/Library/Application Support/auq/sessions` (macOS), `~/.local/share/auq/sessions` (Linux)
 - **Local install**: `.auq/sessions/` in your project root
 - **Override**: Set `AUQ_SESSION_DIR` environment variable
@@ -81,10 +87,6 @@ npx auq
 ---
 
 ## 🔌 MCP Server Configuration
-
-### Cursor
-
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
 ### Claude Code (CLI)
 
@@ -130,6 +132,7 @@ Or add to `~/.claude.json` for global access across all projects.
 ```
 
 **Manage servers:**
+
 ```bash
 claude mcp list              # View all servers
 claude mcp get ask-user-questions   # Server details
@@ -137,6 +140,11 @@ claude mcp remove ask-user-questions  # Remove server
 ```
 
 **Verify setup:** Type `/mcp` in Claude Code to check server status.
+
+### Cursor
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
+_Note: This only adds MCP to Cursor and doesn't setup the CLI tool._
 
 ### Codex CLI
 
@@ -234,10 +242,10 @@ rm -rf .auq/sessions/*
 
 ---
 
-
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
+[1] Duan et al. "Asking Clarification Questions to Handle Ambiguity in Code Generation." arXiv:2308.13507 (2023). <https://arxiv.org/abs/2308.13507>
