@@ -157,7 +157,9 @@ export async function atomicReadFile(
     try {
       // Check if file exists
       if (!(await fileExists(filePath))) {
-        throw new AtomicReadError(filePath, new Error("File does not exist"));
+        // File doesn't exist - this is not an error for read operations
+        // Return empty string to indicate file doesn't exist
+        return "";
       }
 
       // Acquire read lock (shared lock)

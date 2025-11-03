@@ -680,6 +680,11 @@ export class SessionManager {
         retryDelay: 100,
       });
 
+      // If content is empty, file doesn't exist
+      if (content === "") {
+        return fallback;
+      }
+
       try {
         return JSON.parse(content) as T;
       } catch (parseError) {
@@ -689,13 +694,6 @@ export class SessionManager {
       }
     } catch (error) {
       if (error instanceof AtomicReadError) {
-        // Check if the error is just that the file doesn't exist
-        if (
-          error.cause?.message.includes("File does not exist") ||
-          error.message.includes("File does not exist")
-        ) {
-          return fallback;
-        }
         throw new Error(
           `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`
         );
