@@ -47,7 +47,7 @@ Examples:
   auq --help             # Show this help message
 
 For more information, visit:
-  https://github.com/paulp-o/ask-user-question-mcp
+  https://github.com/paulp-o/ask-user-questions-mcp
 `);
   process.exit(0);
 }

@@ -48,4 +48,4 @@ if (configFile) {
 }
 
 console.log('For MCP server setup with Claude Desktop or Cursor, see:');
-console.log('  https://github.com/paulp-o/ask-user-question-mcp#setup\n');
+console.log('  https://github.com/paulp-o/ask-user-questions-mcp#setup\n');

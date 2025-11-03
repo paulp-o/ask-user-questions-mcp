@@ -30,10 +30,10 @@
     "terminal"
   ],
   "repository": {
-    "url": "git+https://github.com/paulp-o/ask-user-question-mcp.git"
+    "url": "git+https://github.com/paulp-o/ask-user-questions-mcp.git"
   },
   "author": "Paul Park",
-  "homepage": "https://github.com/paulp-o/ask-user-question-mcp",
+  "homepage": "https://github.com/paulp-o/ask-user-questions-mcp",
   "type": "module",
   "license": "MIT",
   "description": "An MCP server that provides a tool to ask a user questions via the terminal",

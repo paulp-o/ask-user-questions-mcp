@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/auq-mcp-server.svg)](https://www.npmjs.com/package/auq-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/paulp-o/ask-user-question-mcp/test.yml)](https://github.com/paulp-o/ask-user-question-mcp/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/paulp-o/ask-user-questions-mcp/test.yml)](https://github.com/paulp-o/ask-user-questions-mcp/actions)
 
 **A lightweight MCP server & CLI tool that allows your LLMs to ask questions to you in a clean, separate space with great terminal UX.**
 
