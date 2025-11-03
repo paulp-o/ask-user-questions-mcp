@@ -2,11 +2,11 @@
 
 [![npm version](https://img.shields.io/npm/v/auq-mcp-server.svg)](https://www.npmjs.com/package/auq-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/paulp-o/ask-user-questions-mcp/test.yml)](https://github.com/paulp-o/ask-user-questions-mcp/actions)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
+
+![AUQ Demo](media/demo.png)
 
 **A lightweight MCP server & CLI tool that allows your LLMs to ask questions to you in a clean, separate space with great terminal UX.**
-
-![AUQ Demo](docs/screenshot.png)
 
 ---
 
@@ -26,7 +26,28 @@ On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` t
 - **Non-invasive** - Doesn't heavily integrate with your coding CLI workflow or occupy UI space
 - **Multi-agent friendly** - Supports receiving questions from multiple agents simultaneously in parallel workflows
 
-This is AUQ—a human-AI question-answer loop tool designed for modern AI coding workflows.
+This became AUQ—a human-AI question-answer loop tool designed for modern AI coding workflows.
+
+---
+
+## ✨ Features
+
+### 🖥️ CLI-Based
+- **Lightweight**: Adds only ~150 tokens to your context per question
+- **SSH-compatible**: Use over remote connections
+- **Fast**: Instant startup, minimal resource usage
+
+### 📦 100% Local
+All information operates based on your local file system. No data leaves your machine.
+
+### 🔄 Resumable & Stateless
+The CLI app doesn't need to be running in advance. Whether the model calls the MCP first and you start the CLI later, or you keep it running—you can immediately answer pending questions in FIFO order.
+
+### ❌ Question Set Rejection with Feedback Loop
+When the LLM asks about the wrong domain entirely, you can reject the question set, optionally providing the reason to the LLM. The rejection feedback is sent back to the LLM, allowing it to ask more helpful questions or align on what's important for the project.
+
+### 📋 Question Set Queuing
+Recent AI workflows often use parallel sub-agents for concurrent coding. AUQ handles multiple simultaneous LLM calls gracefully—when a new question set arrives while you're answering another, it's queued and processed sequentially. Perfect for multi-agent parallel coding workflows.
 
 ---
 
@@ -162,27 +183,6 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ```
 
 **Restart Claude Desktop** after saving.
-
----
-
-## ✨ Features
-
-### 🖥️ CLI-Based
-- **Lightweight**: Adds only ~150 tokens to your context per question
-- **SSH-compatible**: Use over remote connections
-- **Fast**: Instant startup, minimal resource usage
-
-### 📦 100% Local
-All information operates based on your local file system. No data leaves your machine.
-
-### 🔄 Resumable & Stateless
-The CLI app doesn't need to be running in advance. Whether the model calls the MCP first and you start the CLI later, or you keep it running—you can immediately answer pending questions in FIFO order.
-
-### ❌ Question Set Rejection with Feedback Loop
-When the LLM asks about the wrong domain entirely, you can reject the question set, optionally providing the reason to the LLM. The rejection feedback is sent back to the LLM, allowing it to ask more helpful questions or align on what's important for the project.
-
-### 📋 Question Set Queuing
-Recent AI workflows often use parallel sub-agents for concurrent coding. AUQ handles multiple simultaneous LLM calls gracefully—when a new question set arrives while you're answering another, it's queued and processed sequentially. Perfect for multi-agent parallel coding workflows.
 
 ---
 

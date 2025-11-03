@@ -6,3 +6,4 @@ node_modules
 CLAUDE.md
 .mcp*
 readme_초안.md
+*.DS_Store
