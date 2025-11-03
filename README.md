@@ -68,7 +68,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ```json
 {
   "mcpServers": {
-    "auq": {
+    "ask-user-questions": {
       "command": "npx",
       "args": ["-y", "auq-mcp-server", "server"]
     }
@@ -85,7 +85,7 @@ Add to `.mcp.json` in your project root:
 ```json
 {
   "mcpServers": {
-    "auq": {
+    "ask-user-questions": {
       "command": "npx",
       "args": ["-y", "auq-mcp-server", "server"],
       "env": {}
@@ -95,6 +95,35 @@ Add to `.mcp.json` in your project root:
 ```
 
 Restart your client after configuration.
+
+### Codex CLI
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.ask-user-questions]
+command = "npx"
+args = ["-y", "auq-mcp-server", "server"]
+```
+
+**Full configuration example** (with optional settings):
+
+```toml
+[mcp_servers.ask-user-questions]
+command = "npx"
+args = ["-y", "auq-mcp-server", "server"]
+
+# Optional: Additional environment variables
+# env = { "AUQ_SESSION_DIR" = "/custom/path" }
+
+# Optional: Whitelist additional env vars
+# env_vars = ["AUQ_SESSION_DIR"]
+
+# Optional: Working directory
+# cwd = "/Users/<user>/projects"
+```
+
+Restart Codex CLI after saving the configuration.
 
 ---
 

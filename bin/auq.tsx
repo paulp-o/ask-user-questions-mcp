@@ -65,31 +65,10 @@ if (command === "--version" || command === "-v") {
 
 // Handle 'server' command
 if (command === "server") {
-  console.log("Starting MCP server...");
-  const serverProcess = exec(
-    "node dist/src/server.js",
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error starting server: ${error.message}`);
-        process.exit(1);
-      }
-      if (stderr) {
-        console.error(stderr);
-      }
-      console.log(stdout);
-    }
-  );
-
-  // Forward signals
-  process.on("SIGINT", () => {
-    serverProcess.kill("SIGINT");
-    process.exit(0);
-  });
-  process.on("SIGTERM", () => {
-    serverProcess.kill("SIGTERM");
-    process.exit(0);
-  });
-
+  // Import and start the MCP server directly
+  // This avoids spawning a subprocess and outputting non-JSON to stdout
+  await import("../src/server.js");
+  // The server will start and handle stdio communication
   // Keep process alive
   await new Promise(() => {});
 }
