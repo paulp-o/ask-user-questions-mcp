@@ -30,7 +30,7 @@
     "terminal"
   ],
   "repository": {
-    "url": "https://github.com/paulp-o/ask-user-question-mcp"
+    "url": "git+https://github.com/paulp-o/ask-user-question-mcp.git"
   },
   "author": "Paul Park",
   "homepage": "https://github.com/paulp-o/ask-user-question-mcp",
