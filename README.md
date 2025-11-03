@@ -12,7 +12,7 @@
 
 ## What does it do?
 
-Through the MCP server, your LLM can generate question sets consisting of multiple-choice, single-choice, and free-text questions (with an "Other" option for custom input) while coding or working, and wait for your answers.
+Through this MCP server, your LLM can generate question sets consisting of multiple-choice, single-choice, and free-text questions (with an "Other" option for custom input) while coding or working, and wait for your answers.
 
 You can keep the `auq` CLI running in advance, or start it when questions are pending. With simple arrow key navigation, you can select answers and send them back to the AI—all within a clean terminal interface.
 
