@@ -171,6 +171,7 @@ describe("SessionManager", () => {
         {
           options: [{ description: "Test description", label: "Test option" }],
           prompt: "Test question",
+          title: "Test",
         },
       ];
       const sessionId = await sessionManager.createSession(questions);
@@ -630,6 +631,7 @@ describe("SessionManager", () => {
             { description: "The color of sky", label: "Blue" },
           ],
           prompt: "What is your favorite color?",
+          title: "Color",
         },
       ];
 
@@ -674,6 +676,7 @@ describe("SessionManager", () => {
         {
           options: [{ label: "Option 1" }],
           prompt: "Question 1",
+          title: "Test 1",
         },
       ];
 
@@ -681,6 +684,7 @@ describe("SessionManager", () => {
         {
           options: [{ label: "Option 2" }],
           prompt: "Question 2",
+          title: "Test 2",
         },
       ];
 

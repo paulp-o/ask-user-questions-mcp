@@ -36,11 +36,13 @@ const QuestionSchema = z.object({
   prompt: z.string().describe("The full question text"),
   title: z
     .string()
-    .optional()
+    .min(
+      1,
+      "Question title is required. Provide a short summary like 'Language' or 'Framework'."
+    )
     .describe(
-      "REQUIRED: Short 1-2 word summary for UI display (e.g., 'Language', 'Framework', 'Theme'). " +
-        "This title appears as a chip/tag in the interface and helps users quickly identify questions. " +
-        "Provide a meaningful title for better UX - do not rely on auto-generated 'Q1', 'Q2' fallbacks."
+      "Short 1-2 word summary for UI display (e.g., 'Language', 'Framework', 'Theme'). " +
+        "This title appears as a chip/tag in the interface and helps users quickly identify questions."
     ),
 });
 
@@ -81,14 +83,13 @@ server.addTool({
       }
 
       // Convert Zod-validated questions to our internal Question type
-      // Auto-generate titles like "Q1", "Q2" if not provided
-      const questions: Question[] = args.questions.map((q, index) => ({
+      const questions: Question[] = args.questions.map((q) => ({
         options: q.options.map((opt) => ({
           description: opt.description,
           label: opt.label,
         })),
         prompt: q.prompt,
-        title: q.title || `Q${index + 1}`,
+        title: q.title,
       }));
 
       log.info("Starting session and waiting for user answers...", {

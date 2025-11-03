@@ -15,7 +15,7 @@ const OptionSchema = z.object({
 const QuestionSchema = z.object({
   options: z.array(OptionSchema).min(1),
   prompt: z.string(),
-  title: z.string(),
+  title: z.string().min(1),
 });
 
 const QuestionsArraySchema = z.array(QuestionSchema).min(1);
