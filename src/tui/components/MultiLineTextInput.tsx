@@ -31,7 +31,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
       if (input === "\r" || input === "\n") {
         if (key.shift) {
           onChange(value + "\n");
-        } else if (onSubmit && value.trim().length > 0) {
+        } else if (onSubmit) {
           onSubmit();
         }
         return;
@@ -43,9 +43,9 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         return;
       }
 
-      // Enter: Submit (only if content is non-empty)
+      // Enter: Submit (empty input allowed)
       if (key.return) {
-        if (onSubmit && value.trim().length > 0) {
+        if (onSubmit) {
           onSubmit();
         }
         return;
