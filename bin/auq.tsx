@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { exec } from "child_process";
+// import { exec } from "child_process";
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -219,10 +219,13 @@ const App: React.FC = () => {
   };
 
   // Handle session completion
-  const handleSessionComplete = (wasRejected = false) => {
+  const handleSessionComplete = (wasRejected = false, rejectionReason?: string | null) => {
     // Show appropriate toast
     if (wasRejected) {
-      showToast("Question set rejected", "info");
+      const message = rejectionReason
+        ? `**Question set rejected**\nRejection reason: ${rejectionReason}`
+        : "**Question set rejected**";
+      showToast(message, "info");
     } else {
       showToast("✓ Answers submitted successfully!", "success");
     }

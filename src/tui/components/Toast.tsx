@@ -28,15 +28,11 @@ export const Toast: React.FC<ToastProps> = ({
   }, [duration, onDismiss]);
 
   // Color based on type
-  const color = type === "success" ? "green" : type === "error" ? "red" : "cyan";
+  const color =
+    type === "success" ? "green" : type === "error" ? "red" : "cyan";
 
   return (
-    <Box
-      borderColor={color}
-      borderStyle="round"
-      paddingX={2}
-      paddingY={0.5}
-    >
+    <Box borderColor={color} borderStyle="round" paddingX={2} paddingY={0}>
       <Text bold color={color}>
         {message}
       </Text>

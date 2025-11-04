@@ -20,7 +20,7 @@ You can keep the CLI running in advance, or start it when questions are pending.
 
 In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been widely recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code [1].
 
-On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` tool, and I loved this feature. Inspired by it, I decided to build a similar tool that is:
+On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` tool. Inspired by it, I decided to build a similar tool that is:
 
 - **Tool-agnostic** - Works with any MCP client (Claude Desktop, Cursor, etc.)
 - **Non-invasive** - Doesn't heavily integrate with your coding CLI workflow or occupy UI space
@@ -84,7 +84,6 @@ npx auq
 
 - **Global install**: `~/Library/Application Support/auq/sessions` (macOS), `~/.local/share/auq/sessions` (Linux)
 - **Local install**: `.auq/sessions/` in your project root
-- **Override**: Set `AUQ_SESSION_DIR` environment variable
 
 ---
 
@@ -119,31 +118,6 @@ Add to `.mcp.json` in your project root (for team-wide sharing):
 ```
 
 Or add to `~/.claude.json` for global access across all projects.
-
-**With environment variables:**
-
-```json
-{
-  "mcpServers": {
-    "ask-user-questions": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "auq-mcp-server", "server"],
-      "env": {
-        "AUQ_SESSION_DIR": "${AUQ_SESSION_DIR}"
-      }
-    }
-  }
-}
-```
-
-**Manage servers:**
-
-```bash
-claude mcp list              # View all servers
-claude mcp get ask-user-questions   # Server details
-claude mcp remove ask-user-questions  # Remove server
-```
 
 **Verify setup:** Type `/mcp` in Claude Code to check server status.
 
@@ -200,7 +174,8 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ### Starting the CLI tool
 
 ```bash
-auq
+auq  # if you installed globally
+npx auq  # if you installed locally
 ```
 
 Then just start working with your coding agent or AI assistant. You may prompt to ask questions with the tool the agent got; it will mostly just get what you mean.
@@ -236,10 +211,10 @@ rm -rf .auq/sessions/*
 - [ ] Light & dark mode themes
 - [ ] MCP prompt mode switch (Anthropic style / minimal)
 - [ ] Custom color themes
-- [ ] Question history/recall
 - [ ] Multi-language support
-- [ ] Audio notifications (optional)
-- [ ] Export answers to file
+- [ ] Audio notifications on new question
+- [ ] Simple option to prompt the LLM to/not ask more questions after answering.
+- [ ] Optional 'context' field privided by the LLM, that describes the context of the questions - will be useful for multi-agent coding
 
 ---
 
@@ -249,4 +224,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-[1] Duan et al. "Asking Clarification Questions to Handle Ambiguity in Code Generation." arXiv:2308.13507 (2023). <https://arxiv.org/abs/2308.13507>
+[1] arXiv:2308.13507 <https://arxiv.org/abs/2308.13507>

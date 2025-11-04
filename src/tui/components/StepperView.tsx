@@ -17,7 +17,7 @@ interface Answer {
 }
 
 interface StepperViewProps {
-  onComplete?: (wasRejected?: boolean) => void;
+  onComplete?: (wasRejected?: boolean, rejectionReason?: string | null) => void;
   sessionId: string;
   sessionRequest: SessionRequest;
 }
@@ -147,9 +147,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
       const sessionManager = new SessionManager({ baseDir: getSessionDirectory() });
       await sessionManager.rejectSession(sessionId, reason);
 
-      // Call onComplete with rejection flag
+      // Call onComplete with rejection flag and reason
       if (onComplete) {
-        onComplete(true);
+        onComplete(true, reason);
       }
     } catch (error) {
       console.error("Failed to reject session:", error);
