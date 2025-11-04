@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-**A lightweight MCP server & CLI tool that allows your LLMs to ask questions to you in a clean, separate space with great terminal UX.**
+**A lightweight MCP server & CLI tool that allows your LLMs to ask questions to you in a clean, separate space with great terminal UX. Made for multi-agent parallel coding workflows.**
 
 ---
 
@@ -56,7 +56,9 @@ Recent AI workflows often use parallel sub-agents for concurrent coding. AUQ han
 
 ---
 
-## 🚀 Quick Start (CLI)
+# Setup Instructions
+
+## 🚀 Step 1: Setup CLI
 
 ### Global Installation (Recommended)
 
@@ -86,7 +88,11 @@ npx auq
 
 ---
 
-## 🔌 MCP Server Configuration
+## 🔌 Step 2: Setup MCP Server
+
+### Cursor
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
 ### Claude Code (CLI)
 
@@ -140,11 +146,6 @@ claude mcp remove ask-user-questions  # Remove server
 ```
 
 **Verify setup:** Type `/mcp` in Claude Code to check server status.
-
-### Cursor
-
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
-_Note: This only adds MCP to Cursor and doesn't setup the CLI tool._
 
 ### Codex CLI
 
