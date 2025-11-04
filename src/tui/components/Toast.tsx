@@ -6,6 +6,7 @@ interface ToastProps {
   type?: "success" | "error" | "info";
   onDismiss: () => void;
   duration?: number; // in milliseconds
+  title?: string; // Optional bold title shown before message
 }
 
 /**
@@ -17,6 +18,7 @@ export const Toast: React.FC<ToastProps> = ({
   type = "success",
   onDismiss,
   duration = 2000,
+  title,
 }) => {
   // Auto-dismiss after duration
   useEffect(() => {
@@ -32,10 +34,13 @@ export const Toast: React.FC<ToastProps> = ({
     type === "success" ? "green" : type === "error" ? "red" : "cyan";
 
   return (
-    <Box borderColor={color} borderStyle="round" paddingX={2} paddingY={0}>
-      <Text bold color={color}>
-        {message}
-      </Text>
+    <Box borderColor={color} borderStyle="round" paddingX={2} paddingY={0} flexDirection="column">
+      {title && (
+        <Text bold color={color}>
+          {title}
+        </Text>
+      )}
+      <Text color={color}>{message}</Text>
     </Box>
   );
 };

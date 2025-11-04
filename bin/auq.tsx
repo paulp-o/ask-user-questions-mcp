@@ -87,6 +87,7 @@ interface SessionData {
 interface ToastData {
   message: string;
   type: "success" | "error" | "info";
+  title?: string;
 }
 
 const App: React.FC = () => {
@@ -213,19 +214,21 @@ const App: React.FC = () => {
   // Show toast notification
   const showToast = (
     message: string,
-    type: "success" | "error" | "info" = "success"
+    type: "success" | "error" | "info" = "success",
+    title?: string
   ) => {
-    setToast({ message, type });
+    setToast({ message, type, title });
   };
 
   // Handle session completion
   const handleSessionComplete = (wasRejected = false, rejectionReason?: string | null) => {
     // Show appropriate toast
     if (wasRejected) {
-      const message = rejectionReason
-        ? `**Question set rejected**\nRejection reason: ${rejectionReason}`
-        : "**Question set rejected**";
-      showToast(message, "info");
+      if (rejectionReason) {
+        showToast(`Rejection reason: ${rejectionReason}`, "info", "Question set rejected");
+      } else {
+        showToast("", "info", "Question set rejected");
+      }
     } else {
       showToast("✓ Answers submitted successfully!", "success");
     }
@@ -272,6 +275,7 @@ const App: React.FC = () => {
             message={toast.message}
             onDismiss={() => setToast(null)}
             type={toast.type}
+            title={toast.title}
           />
         </Box>
       )}

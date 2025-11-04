@@ -29,7 +29,7 @@ const server = new FastMCP({
     "returning formatted responses for continued reasoning. " +
     "Each question supports 2-4 multiple-choice options with descriptions, and users can always provide custom text input. " +
     "Both single-select and multi-select modes are supported.",
-  version: "0.1.5",
+  version: "0.1.7",
 });
 
 // Define the question and option schemas
