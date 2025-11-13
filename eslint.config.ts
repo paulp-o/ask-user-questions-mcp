@@ -7,6 +7,11 @@ export default tseslint.config(
   tseslint.configs.recommended,
   eslintConfigPrettier,
   {
-    ignores: ["**/*.js"],
-  }
+    ignores: ["**/*.js", "**/*.cjs"],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": "warn",
+    },
+  },
 );

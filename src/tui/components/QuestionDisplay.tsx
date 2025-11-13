@@ -16,7 +16,10 @@ interface QuestionDisplayProps {
   questions: Question[];
   selectedOption?: string;
   onAdvanceToNext?: () => void;
-  answers: Map<number, { customText?: string; selectedOption?: string; selectedOptions?: string[] }>;
+  answers: Map<
+    number,
+    { customText?: string; selectedOption?: string; selectedOptions?: string[] }
+  >;
   onToggleOption?: (label: string) => void;
   multiSelect?: boolean;
 }
@@ -39,7 +42,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   multiSelect,
 }) => {
   // Track focus context for Footer component
-  const [focusContext, setFocusContext] = useState<"option" | "custom-input">("option");
+  const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
+    "option",
+  );
 
   // Handle option selection - clears custom answer only in single-select mode
   const handleSelectOption = (label: string) => {
@@ -60,7 +65,11 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   return (
     <Box flexDirection="column">
       {/* TabBar showing all question titles */}
-      <TabBar currentIndex={currentQuestionIndex} questions={questions} answers={answers} />
+      <TabBar
+        currentIndex={currentQuestionIndex}
+        questions={questions}
+        answers={answers}
+      />
 
       {/* Question prompt with type indicator */}
       <Box marginTop={1}>

@@ -34,9 +34,12 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   };
 
   const options = [
-    { key: "y", label: "Yes, inform the AI that I rejected this question set", action: () => setShowReasonInput(true) },
+    {
+      key: "y",
+      label: "Yes, inform the AI that I rejected this question set",
+      action: () => setShowReasonInput(true),
+    },
     { key: "n", label: "No, go back to answering questions", action: onCancel },
-    { key: "q", label: "I'm just trying to quit the CLI, I'll answer later", action: onQuit },
   ];
 
   useInput((input, key) => {
@@ -67,9 +70,6 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     }
     if (input === "n" || input === "N") {
       onCancel();
-    }
-    if (input === "q" || input === "Q") {
-      onQuit();
     }
 
     // Esc key - same as quit
@@ -139,7 +139,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         );
       })}
       <Box marginTop={1}>
-        <Text dimColor>↑↓ Navigate | Enter Select | y/n/q Shortcuts</Text>
+        <Text dimColor>
+          ↑↓ Navigate | Enter Select | y/n Shortcuts | Esc Quit
+        </Text>
       </Box>
     </Box>
   );

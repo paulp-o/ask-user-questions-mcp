@@ -91,10 +91,16 @@ export class PromiseFileWatcher extends EventEmitter {
    */
   async waitForFile(watchPath: string, fileName: string): Promise<string> {
     const fullPath = join(watchPath, fileName);
+
+    // Set isWatching early so active() returns true immediately
+    this.isWatching = true;
+
     // Fast-path: if file already exists, resolve immediately
     if (await fileExists(fullPath)) {
+      this.isWatching = false; // Not actually watching since file exists
       return fullPath;
     }
+
     return new Promise((resolve, reject) => {
       const timeoutId =
         this.config.timeoutMs > 0
@@ -129,7 +135,7 @@ export class PromiseFileWatcher extends EventEmitter {
                 });
               }
             }
-          }
+          },
         );
 
         this.watchers.set(watchPath, watcher);
@@ -140,10 +146,9 @@ export class PromiseFileWatcher extends EventEmitter {
           this.cleanup();
           reject(new Error(`File watcher error: ${error.message}`));
         });
-
-        this.isWatching = true;
       } catch (error) {
         if (timeoutId) clearTimeout(timeoutId);
+        this.isWatching = false;
         reject(new Error(`File watcher setup error: ${error}`));
       }
     });
@@ -155,7 +160,7 @@ export class PromiseFileWatcher extends EventEmitter {
    */
   watchForSessions(
     sessionDirPath: string,
-    onSessionCreated: (sessionId: string, sessionPath: string) => void
+    onSessionCreated: (sessionId: string, sessionPath: string) => void,
   ): void {
     try {
       const watcher = watch(
@@ -171,7 +176,7 @@ export class PromiseFileWatcher extends EventEmitter {
             // Check if this is a new directory (potential session)
             this.handleSessionEvent(fullPath, onSessionCreated);
           });
-        }
+        },
       );
 
       this.watchers.set(sessionDirPath, watcher);
@@ -179,7 +184,7 @@ export class PromiseFileWatcher extends EventEmitter {
       watcher.on("error", (error) => {
         this.emit(
           "error",
-          new Error(`Session watcher error: ${error.message}`)
+          new Error(`Session watcher error: ${error.message}`),
         );
       });
 
@@ -226,12 +231,12 @@ export class PromiseFileWatcher extends EventEmitter {
    */
   private async handleSessionEvent(
     sessionPath: string,
-    onSessionCreated: (sessionId: string, sessionPath: string) => void
+    onSessionCreated: (sessionId: string, sessionPath: string) => void,
   ): Promise<void> {
     try {
       // Check if this is actually a directory and has session files
       const stats = await import("fs").then((fs) =>
-        fs.promises.stat(sessionPath)
+        fs.promises.stat(sessionPath),
       );
       if (!stats.isDirectory()) return;
 
@@ -287,7 +292,7 @@ export class TUISessionWatcher {
    * Start watching for new sessions
    */
   startWatching(
-    onNewSession: (sessionId: string, sessionPath: string) => void
+    onNewSession: (sessionId: string, sessionPath: string) => void,
   ): void {
     this.fileWatcher.watchForSessions(this.sessionDirPath, onNewSession);
   }

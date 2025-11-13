@@ -585,10 +585,7 @@ describe("ResponseFormatter", () => {
     it("should validate empty selectedOptions array (no selections)", () => {
       const questions: Question[] = [
         {
-          options: [
-            { label: "Feature A" },
-            { label: "Feature B" },
-          ],
+          options: [{ label: "Feature A" }, { label: "Feature B" }],
           prompt: "Which features do you want?",
           title: "Features",
           multiSelect: true,
@@ -662,11 +659,7 @@ describe("ResponseFormatter", () => {
     it("should format multi-select question with multiple selections (without descriptions)", () => {
       const questions: Question[] = [
         {
-          options: [
-            { label: "Red" },
-            { label: "Green" },
-            { label: "Blue" },
-          ],
+          options: [{ label: "Red" }, { label: "Green" }, { label: "Blue" }],
           prompt: "Select your favorite colors",
           title: "Colors",
           multiSelect: true,
@@ -698,10 +691,7 @@ describe("ResponseFormatter", () => {
     it("should format multi-select question with empty selections", () => {
       const questions: Question[] = [
         {
-          options: [
-            { label: "Feature A" },
-            { label: "Feature B" },
-          ],
+          options: [{ label: "Feature A" }, { label: "Feature B" }],
           prompt: "Which optional features do you want?",
           title: "Optional Features",
           multiSelect: true,

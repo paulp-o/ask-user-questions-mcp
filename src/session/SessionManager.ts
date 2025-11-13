@@ -140,7 +140,7 @@ export class SessionManager {
       for (const filename of filesToDelete) {
         const filePath = join(
           sessionDir,
-          createSafeFilename(sessionId, filename)
+          createSafeFilename(sessionId, filename),
         );
         try {
           await atomicDeleteFile(filePath);
@@ -150,7 +150,7 @@ export class SessionManager {
             !(error as AtomicOperationError)?.cause?.message.includes("ENOENT")
           ) {
             console.warn(
-              `Warning: Failed to delete session file ${filename}: ${error}`
+              `Warning: Failed to delete session file ${filename}: ${error}`,
             );
           }
         }
@@ -190,7 +190,7 @@ export class SessionManager {
   async getSessionAnswers(sessionId: string): Promise<null | SessionAnswer> {
     return this.readSessionFile<SessionAnswer>(
       sessionId,
-      SESSION_FILES.ANSWERS
+      SESSION_FILES.ANSWERS,
     );
   }
 
@@ -208,7 +208,7 @@ export class SessionManager {
   async getSessionRequest(sessionId: string): Promise<null | SessionRequest> {
     return this.readSessionFile<SessionRequest>(
       sessionId,
-      SESSION_FILES.REQUEST
+      SESSION_FILES.REQUEST,
     );
   }
 
@@ -230,7 +230,7 @@ export class SessionManager {
       const isValid = await validateSessionDirectory(this.sessionsDir);
       if (!isValid) {
         throw new Error(
-          `Failed to create or access session directory: ${this.sessionsDir}`
+          `Failed to create or access session directory: ${this.sessionsDir}`,
         );
       }
     } catch (error) {
@@ -252,7 +252,7 @@ export class SessionManager {
    */
   async saveSessionAnswers(
     sessionId: string,
-    answers: SessionAnswer
+    answers: SessionAnswer,
   ): Promise<void> {
     const exists = await this.sessionExists(sessionId);
     if (!exists) {
@@ -273,7 +273,7 @@ export class SessionManager {
    */
   async rejectSession(
     sessionId: string,
-    reason?: string | null
+    reason?: string | null,
   ): Promise<void> {
     const exists = await this.sessionExists(sessionId);
     if (!exists) {
@@ -317,7 +317,7 @@ export class SessionManager {
    */
   async startSession(
     questions: Question[],
-    callId?: string
+    callId?: string,
   ): Promise<{
     formattedResponse: string;
     sessionId: string;
@@ -384,7 +384,7 @@ export class SessionManager {
         // Watcher timeout occurred
         await this.updateSessionStatus(sessionId, "timed_out");
         throw new Error(
-          `Session ${sessionId} timed out waiting for user response: ${error instanceof Error ? error.message : String(error)}`
+          `Session ${sessionId} timed out waiting for user response: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
 
@@ -401,7 +401,7 @@ export class SessionManager {
       if (!answers) {
         await this.updateSessionStatus(sessionId, "abandoned");
         throw new Error(
-          `Answers file was created but is invalid for session ${sessionId}`
+          `Answers file was created but is invalid for session ${sessionId}`,
         );
       }
 
@@ -417,14 +417,14 @@ export class SessionManager {
       } catch (error) {
         await this.updateSessionStatus(sessionId, "abandoned");
         throw new Error(
-          `Answer validation failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`
+          `Answer validation failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
 
       // Step 6: Format the response according to PRD specification
       const formattedResponse = ResponseFormatter.formatUserResponse(
         answers,
-        request.questions
+        request.questions,
       );
 
       // Step 7: Update final status
@@ -450,7 +450,7 @@ export class SessionManager {
   async updateSessionStatus(
     sessionId: string,
     status: SessionStatus["status"],
-    additionalData?: Partial<SessionStatus>
+    additionalData?: Partial<SessionStatus>,
   ): Promise<void> {
     // First validate session ID format
     if (!this.isValidSessionId(sessionId)) {
@@ -492,7 +492,7 @@ export class SessionManager {
     for (const filename of requiredFiles) {
       const filePath = join(
         this.getSessionDir(sessionId),
-        createSafeFilename(sessionId, filename)
+        createSafeFilename(sessionId, filename),
       );
       if (!(await fileExists(filePath))) {
         issues.push(`Required file missing: ${filename}`);
@@ -538,7 +538,7 @@ export class SessionManager {
   async waitForAnswers(
     sessionId: string,
     timeoutMs?: number,
-    expectedCallId?: string
+    expectedCallId?: string,
   ): Promise<string> {
     const sessionDir = this.getSessionDir(sessionId);
     const answersPath = join(sessionDir, SESSION_FILES.ANSWERS);
@@ -588,7 +588,7 @@ export class SessionManager {
    */
   private async pollForRejection(
     sessionId: string,
-    timeoutMs: number
+    timeoutMs: number,
   ): Promise<never> {
     const startTime = Date.now();
     const pollInterval = 500; // Poll every 500ms
@@ -663,7 +663,7 @@ export class SessionManager {
   private async readSessionFile<T>(
     sessionId: string,
     filename: string,
-    fallback: null | T = null
+    fallback: null | T = null,
   ): Promise<null | T> {
     // First validate session ID format
     if (!this.isValidSessionId(sessionId)) {
@@ -684,7 +684,7 @@ export class SessionManager {
         return JSON.parse(content) as T;
       } catch (parseError) {
         throw new Error(
-          `Failed to parse JSON from session file ${filename} for session ${sessionId}: ${parseError}`
+          `Failed to parse JSON from session file ${filename} for session ${sessionId}: ${parseError}`,
         );
       }
     } catch (error) {
@@ -697,7 +697,7 @@ export class SessionManager {
           return fallback;
         }
         throw new Error(
-          `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`
+          `Failed to read session file ${filename} for session ${sessionId}: ${error.message}`,
         );
       }
       throw error;
@@ -710,7 +710,7 @@ export class SessionManager {
   private async writeSessionFile<T>(
     sessionId: string,
     filename: string,
-    data: T
+    data: T,
   ): Promise<void> {
     const safeFilename = createSafeFilename(sessionId, filename);
     const filePath = join(this.getSessionDir(sessionId), safeFilename);
@@ -723,7 +723,7 @@ export class SessionManager {
     } catch (error) {
       if (error instanceof AtomicWriteError) {
         throw new Error(
-          `Failed to write session file ${filename} for session ${sessionId}: ${error.message}`
+          `Failed to write session file ${filename} for session ${sessionId}: ${error.message}`,
         );
       }
       throw error;

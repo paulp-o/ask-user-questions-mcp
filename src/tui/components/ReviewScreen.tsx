@@ -6,7 +6,10 @@ import { theme } from "../theme.js";
 import { Footer } from "./Footer.js";
 
 interface ReviewScreenProps {
-  answers: Map<number, { customText?: string; selectedOption?: string; selectedOptions?: string[] }>;
+  answers: Map<
+    number,
+    { customText?: string; selectedOption?: string; selectedOptions?: string[] }
+  >;
   onConfirm: (userAnswers: UserAnswer[]) => void;
   onGoBack: () => void;
   questions: Question[];
@@ -28,7 +31,11 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
       // Convert answers to UserAnswer format
       const userAnswers: UserAnswer[] = [];
       answers.forEach((answer, questionIndex) => {
-        if (answer.selectedOption || answer.selectedOptions || answer.customText) {
+        if (
+          answer.selectedOption ||
+          answer.selectedOptions ||
+          answer.customText
+        ) {
           userAnswers.push({
             customText: answer.customText,
             questionIndex,
@@ -75,43 +82,56 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
               {/* Answer */}
               <Box flexDirection="column" marginLeft={2} marginTop={0.5}>
                 {/* Multi-select answers */}
-                {answer?.selectedOptions && answer.selectedOptions.length > 0 && (
-                  <>
-                    {answer.selectedOptions.map((option, idx) => (
-                      <Text key={idx} color={theme.components.review.selectedOption}>
-                        → {option}
-                      </Text>
-                    ))}
-                  </>
-                )}
+                {answer?.selectedOptions &&
+                  answer.selectedOptions.length > 0 && (
+                    <>
+                      {answer.selectedOptions.map((option, idx) => (
+                        <Text
+                          key={idx}
+                          color={theme.components.review.selectedOption}
+                        >
+                          → {option}
+                        </Text>
+                      ))}
+                    </>
+                  )}
 
                 {/* Single-select answer */}
                 {answer?.selectedOption && (
-                  <Text color={theme.components.review.selectedOption}>→ {answer.selectedOption}</Text>
+                  <Text color={theme.components.review.selectedOption}>
+                    → {answer.selectedOption}
+                  </Text>
                 )}
 
                 {/* Custom text (can coexist with multi-select) */}
                 {answer?.customText && (
                   <>
-                    {answer.customText.split("\n").map((line, lineIndex, lines) => {
-                      const isFirstLine = lineIndex === 0;
-                      const isLastLine = lineIndex === lines.length - 1;
+                    {answer.customText
+                      .split("\n")
+                      .map((line, lineIndex, lines) => {
+                        const isFirstLine = lineIndex === 0;
+                        const isLastLine = lineIndex === lines.length - 1;
 
-                      return (
-                        <Text key={lineIndex} color={theme.components.review.customAnswer}>
-                          {isFirstLine ? "→ Custom: \"" : "  "}
-                          {line}
-                          {isLastLine ? "\"" : ""}
-                        </Text>
-                      );
-                    })}
+                        return (
+                          <Text
+                            key={lineIndex}
+                            color={theme.components.review.customAnswer}
+                          >
+                            {isFirstLine ? '→ Custom: "' : "  "}
+                            {line}
+                            {isLastLine ? '"' : ""}
+                          </Text>
+                        );
+                      })}
                   </>
                 )}
 
                 {/* No answer provided */}
-                {!answer?.selectedOption && !answer?.selectedOptions && !answer?.customText && (
-                  <Text dimColor>→ (No answer provided)</Text>
-                )}
+                {!answer?.selectedOption &&
+                  !answer?.selectedOptions &&
+                  !answer?.customText && (
+                    <Text dimColor>→ (No answer provided)</Text>
+                  )}
               </Box>
             </Box>
           );
@@ -119,11 +139,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
       </Box>
 
       {/* Footer with keybindings */}
-      <Footer
-        focusContext="option"
-        multiSelect={false}
-        isReviewScreen={true}
-      />
+      <Footer focusContext="option" multiSelect={false} isReviewScreen={true} />
     </Box>
   );
 };

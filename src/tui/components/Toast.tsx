@@ -34,7 +34,13 @@ export const Toast: React.FC<ToastProps> = ({
     type === "success" ? "green" : type === "error" ? "red" : "cyan";
 
   return (
-    <Box borderColor={color} borderStyle="round" paddingX={2} paddingY={0} flexDirection="column">
+    <Box
+      borderColor={color}
+      borderStyle="round"
+      paddingX={2}
+      paddingY={0}
+      flexDirection="column"
+    >
       {title && (
         <Text bold color={color}>
           {title}

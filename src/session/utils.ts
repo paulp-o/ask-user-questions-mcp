@@ -5,7 +5,7 @@
 import { constants, existsSync } from "fs";
 import { promises as fs } from "fs";
 import { homedir } from "os";
-import { dirname, join } from "path";
+import { join } from "path";
 import { fileURLToPath } from "url";
 
 /**

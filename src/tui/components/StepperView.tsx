@@ -12,8 +12,8 @@ import { ReviewScreen } from "./ReviewScreen.js";
 
 interface Answer {
   customText?: string;
-  selectedOption?: string;     // For single-select
-  selectedOptions?: string[];  // For multi-select
+  selectedOption?: string; // For single-select
+  selectedOptions?: string[]; // For multi-select
 }
 
 interface StepperViewProps {
@@ -60,8 +60,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
       const currentSelections = existing.selectedOptions || [];
 
       const newSelections = currentSelections.includes(label)
-        ? currentSelections.filter((l) => l !== label)  // Remove if already selected
-        : [...currentSelections, label];                 // Add if not selected
+        ? currentSelections.filter((l) => l !== label) // Remove if already selected
+        : [...currentSelections, label]; // Add if not selected
 
       newAnswers.set(currentQuestionIndex, {
         selectedOptions: newSelections,
@@ -107,7 +107,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const handleConfirm = async (userAnswers: UserAnswer[]) => {
     setSubmitting(true);
     try {
-      const sessionManager = new SessionManager({ baseDir: getSessionDirectory() });
+      const sessionManager = new SessionManager({
+        baseDir: getSessionDirectory(),
+      });
       await sessionManager.saveSessionAnswers(sessionId, {
         answers: userAnswers,
         sessionId,
@@ -144,7 +146,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
   // Handle session rejection
   const handleRejectSession = async (reason: string | null) => {
     try {
-      const sessionManager = new SessionManager({ baseDir: getSessionDirectory() });
+      const sessionManager = new SessionManager({
+        baseDir: getSessionDirectory(),
+      });
       await sessionManager.rejectSession(sessionId, reason);
 
       // Call onComplete with rejection flag and reason
@@ -200,7 +204,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
   if (submitting) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Box borderColor={theme.colors.pending} borderStyle="single" padding={1}>
+        <Box
+          borderColor={theme.colors.pending}
+          borderStyle="single"
+          padding={1}
+        >
           <Text color={theme.colors.pending}>Submitting answers...</Text>
         </Box>
       </Box>

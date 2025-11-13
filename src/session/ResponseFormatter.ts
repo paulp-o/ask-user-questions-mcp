@@ -95,7 +95,11 @@ export class ResponseFormatter {
       }
 
       // Check that answer has either selectedOption, selectedOptions, or customText
-      if (!answer.selectedOption && !answer.customText && !answer.selectedOptions) {
+      if (
+        !answer.selectedOption &&
+        !answer.customText &&
+        !answer.selectedOptions
+      ) {
         throw new Error(
           `Answer for question ${answer.questionIndex} has neither selectedOption, selectedOptions, nor customText`,
         );
@@ -168,7 +172,11 @@ export class ResponseFormatter {
           }
         }
       }
-    } else if (answer.selectedOptions && answer.selectedOptions.length === 0 && !answer.customText) {
+    } else if (
+      answer.selectedOptions &&
+      answer.selectedOptions.length === 0 &&
+      !answer.customText
+    ) {
       // Multi-select with no selections and no custom text
       hasAnswer = true;
       lines.push("→ (No selection)");

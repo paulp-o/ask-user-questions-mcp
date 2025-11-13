@@ -4,12 +4,11 @@ import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
-import { Box, render, Text, useApp, useInput } from "ink";
+import { Box, render, Text } from "ink";
 import React, { useEffect, useState } from "react";
 
 import type { SessionRequest } from "../src/session/types.js";
 
-import { SessionManager } from "../src/session/SessionManager.js";
 import {
   ensureDirectoryExists,
   getSessionDirectory,
@@ -91,7 +90,6 @@ interface ToastData {
 }
 
 const App: React.FC = () => {
-  const { exit } = useApp();
   const [state, setState] = useState<AppState>({ mode: "WAITING" });
   const [sessionQueue, setSessionQueue] = useState<SessionData[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -132,7 +130,7 @@ const App: React.FC = () => {
               sessionRequest,
               timestamp: new Date(sessionRequest.timestamp),
             };
-          })
+          }),
         );
 
         // Filter out null entries and sort by timestamp (FIFO - oldest first)
@@ -191,41 +189,28 @@ const App: React.FC = () => {
     }
   }, [state, sessionQueue, isInitialized]);
 
-  // Global 'q' to quit anytime
-  useInput((input) => {
-    if (input === "q") {
-      // If processing a session, reject it before exiting
-      if (state.mode === "PROCESSING") {
-        const sessionManager = new SessionManager();
-        sessionManager
-          .rejectSession(state.session.sessionId)
-          .catch((error) => {
-            console.error("Failed to reject session on quit:", error);
-          })
-          .finally(() => {
-            exit();
-          });
-      } else {
-        exit();
-      }
-    }
-  });
-
   // Show toast notification
   const showToast = (
     message: string,
     type: "success" | "error" | "info" = "success",
-    title?: string
+    title?: string,
   ) => {
     setToast({ message, type, title });
   };
 
   // Handle session completion
-  const handleSessionComplete = (wasRejected = false, rejectionReason?: string | null) => {
+  const handleSessionComplete = (
+    wasRejected = false,
+    rejectionReason?: string | null,
+  ) => {
     // Show appropriate toast
     if (wasRejected) {
       if (rejectionReason) {
-        showToast(`Rejection reason: ${rejectionReason}`, "info", "Question set rejected");
+        showToast(
+          `Rejection reason: ${rejectionReason}`,
+          "info",
+          "Question set rejected",
+        );
       } else {
         showToast("", "info", "Question set rejected");
       }

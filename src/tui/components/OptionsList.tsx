@@ -109,7 +109,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         }
       }
     },
-    { isActive: isFocused }
+    { isActive: isFocused },
   );
 
   return (

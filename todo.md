@@ -8,6 +8,7 @@
 - [x] For custom input, newline isn't supported yet. It should be supported.
 - [x] there should be a npx based installer which set up proper aliases so that users can just run 'auq' to start the tool. (npm install -g @paulp-o/auq)
 - [x] add proper way to setup this MCP server connectable to a MCP client like Claude Desktop or Cursor; make it so that it can be added through Claude Code. for example:
+
 ```json
 {
   "mcpServers": {
@@ -19,6 +20,7 @@
   }
 }
 ```
+
 - [x] Add a guide in readme about how to set up this MCP server, AND how to use the auq command.
 
 ---

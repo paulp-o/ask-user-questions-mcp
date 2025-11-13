@@ -98,7 +98,10 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
 
             // Only include sessions that are actually pending or in-progress
             // Exclude: rejected, completed, timed_out, abandoned
-            if (status.status === "pending" || status.status === "in-progress") {
+            if (
+              status.status === "pending" ||
+              status.status === "in-progress"
+            ) {
               pendingSessions.push(entry.name);
             }
           } catch {

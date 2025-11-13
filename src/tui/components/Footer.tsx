@@ -45,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({
 
       bindings.push(
         { key: "Shift+Enter", action: "Newline" },
-        { key: "Esc", action: "Reject" }
+        { key: "Esc", action: "Reject" },
       );
 
       return bindings;
@@ -61,16 +61,13 @@ export const Footer: React.FC<FooterProps> = ({
       if (multiSelect) {
         bindings.push(
           { key: "Space", action: "Toggle" },
-          { key: "Tab", action: "Submit" }
+          { key: "Tab", action: "Submit" },
         );
       } else {
         bindings.push({ key: "Enter", action: "Select" });
       }
 
-      bindings.push(
-        { key: "Esc", action: "Reject" },
-        { key: "q", action: "Quit" }
-      );
+      bindings.push({ key: "Esc", action: "Reject" });
 
       return bindings;
     }
@@ -81,16 +78,14 @@ export const Footer: React.FC<FooterProps> = ({
   const keybindings = getKeybindings();
 
   return (
-    <Box
-      borderColor={theme.borders.neutral}
-      borderStyle="single"
-      paddingX={1}
-    >
+    <Box borderColor={theme.borders.neutral} borderStyle="single" paddingX={1}>
       <Text dimColor>
         {keybindings.map((binding, idx) => (
           <React.Fragment key={idx}>
             {idx > 0 && <Text dimColor> | </Text>}
-            <Text bold color="cyan">{binding.key}</Text>
+            <Text bold color="cyan">
+              {binding.key}
+            </Text>
             <Text dimColor> {binding.action}</Text>
           </React.Fragment>
         ))}
