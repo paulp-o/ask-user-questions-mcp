@@ -4,30 +4,19 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
-
-// Import schemas from server (in real implementation, might extract to validation module)
-const OptionSchema = z.object({
-  description: z.string().optional(),
-  label: z.string(),
-});
-
-const QuestionSchema = z.object({
-  options: z.array(OptionSchema).min(1),
-  prompt: z.string(),
-  title: z.string().min(1),
-  multiSelect: z.boolean().optional(),
-});
-
-const QuestionsArraySchema = z.array(QuestionSchema).min(1);
+import {
+  QuestionSchema,
+  QuestionsSchema,
+} from "../core/ask-user-questions.js";
 
 describe("Schema Validation - Edge Cases", () => {
   describe("Invalid Input (should reject)", () => {
     it("should reject missing title field", () => {
       const invalidQuestion = {
         // title missing
-        options: [{ label: "Option 1" }],
+        options: [{ label: "Option 1" }, { label: "Option 2" }],
         prompt: "Test question?",
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -38,6 +27,7 @@ describe("Schema Validation - Edge Cases", () => {
         options: [], // Empty array
         prompt: "Test question?",
         title: "Test",
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -45,9 +35,10 @@ describe("Schema Validation - Edge Cases", () => {
 
     it("should reject missing prompt", () => {
       const invalidQuestion = {
-        options: [{ label: "Option 1" }],
+        options: [{ label: "Option 1" }, { label: "Option 2" }],
         title: "Test",
         // prompt missing
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -58,6 +49,7 @@ describe("Schema Validation - Edge Cases", () => {
         // options missing
         prompt: "Test question?",
         title: "Test",
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -70,9 +62,11 @@ describe("Schema Validation - Edge Cases", () => {
             description: "A description",
             // label missing
           },
+          { label: "Option 2" },
         ],
         prompt: "Test question?",
         title: "Test",
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(invalidQuestion)).toThrow();
@@ -81,7 +75,7 @@ describe("Schema Validation - Edge Cases", () => {
     it("should reject empty questions array", () => {
       const invalidQuestions: unknown[] = [];
 
-      expect(() => QuestionsArraySchema.parse(invalidQuestions)).toThrow();
+      expect(() => QuestionsSchema.parse(invalidQuestions)).toThrow();
     });
   });
 
@@ -93,9 +87,14 @@ describe("Schema Validation - Edge Cases", () => {
             description: "A helpful description",
             label: "Option 1",
           },
+          {
+            description: "Another helpful description",
+            label: "Option 2",
+          },
         ],
         prompt: "What is your choice?",
         title: "Language",
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(validQuestion)).not.toThrow();
@@ -112,9 +111,14 @@ describe("Schema Validation - Edge Cases", () => {
             description: "A helpful description",
             label: "Option 1",
           },
+          {
+            description: "Another helpful description",
+            label: "Option 2",
+          },
         ],
         prompt: "What is your choice?",
         title: "Framework",
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(validQuestion)).not.toThrow();
@@ -130,9 +134,13 @@ describe("Schema Validation - Edge Cases", () => {
             label: "Option 1",
             // description omitted (optional)
           },
+          {
+            label: "Option 2",
+          },
         ],
         prompt: "What is your choice?",
         title: "Choice",
+        multiSelect: false,
       };
 
       expect(() => QuestionSchema.parse(validQuestion)).not.toThrow();
@@ -143,19 +151,21 @@ describe("Schema Validation - Edge Cases", () => {
     it("should accept multiple valid questions", () => {
       const validQuestions = [
         {
-          options: [{ label: "A" }],
+          options: [{ label: "A" }, { label: "B" }],
           prompt: "Question 1?",
           title: "First",
+          multiSelect: false,
         },
         {
           options: [{ label: "B" }, { label: "C" }],
           prompt: "Question 2?",
           title: "Second",
+          multiSelect: false,
         },
       ];
 
-      expect(() => QuestionsArraySchema.parse(validQuestions)).not.toThrow();
-      const parsed = QuestionsArraySchema.parse(validQuestions);
+      expect(() => QuestionsSchema.parse(validQuestions)).not.toThrow();
+      const parsed = QuestionsSchema.parse(validQuestions);
       expect(parsed).toHaveLength(2);
     });
 
@@ -185,16 +195,14 @@ describe("Schema Validation - Edge Cases", () => {
       expect(parsed.multiSelect).toBe(false);
     });
 
-    it("should accept question with multiSelect omitted (defaults to undefined)", () => {
+    it("should reject question with multiSelect omitted", () => {
       const defaultQuestion = {
-        options: [{ label: "A" }],
+        options: [{ label: "A" }, { label: "B" }],
         prompt: "Default single-select",
         title: "Default",
       };
 
-      expect(() => QuestionSchema.parse(defaultQuestion)).not.toThrow();
-      const parsed = QuestionSchema.parse(defaultQuestion);
-      expect(parsed.multiSelect).toBeUndefined();
+      expect(() => QuestionSchema.parse(defaultQuestion)).toThrow();
     });
   });
 });

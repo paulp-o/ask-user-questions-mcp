@@ -61,7 +61,7 @@ ASK COMMAND:
   - Option labels should be concise (1-5 words)
   - Questions should end with a question mark
   - Don't include an 'Other' option - it's provided automatically
-  - Mark one option as recommended by adding "(recommended)" to its label
+  - Mark one option as recommended.
 
   Returns a formatted summary of all questions and answers.
 
