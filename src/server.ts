@@ -53,8 +53,7 @@ function getPingConfig(): undefined | {
 // Get session directory (auto-detects global vs local install)
 const sessionDir = getSessionDirectory();
 
-// Log session directory for debugging
-console.error(`[AUQ] Session directory: ${sessionDir}`);
+// Session directory logged only for internal debugging (silent)
 
 // Initialize session manager with detected session directory
 const sessionManager = new SessionManager({ baseDir: sessionDir });
@@ -205,9 +204,7 @@ server.addTool({
         multiSelect: q.multiSelect,
       }));
 
-      log.info("Starting session and waiting for user answers...", {
-        questionCount: questions.length,
-      });
+      // Starting session silently
 
       // Start complete session lifecycle - this will wait for user answers
       // Generate a per-tool-call ID and persist it with the session
@@ -219,7 +216,7 @@ server.addTool({
       if (keepAliveIntervalMs > 0) {
         keepAliveTimer = setInterval(() => {
           const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
-          log.info("Still waiting for user answers...", {
+          log.info("waiting..", {
             callId,
             elapsedSec,
           });
@@ -242,7 +239,7 @@ server.addTool({
           if (streamContent && elapsedSec % 30 === 0) { // Every 30 seconds
             streamContent({
               type: "text",
-              text: `⏳ Still waiting for user response... (${Math.floor(elapsedSec / 60)}m ${elapsedSec % 60}s elapsed)\n`,
+              text: `waiting..\n`,
             }).catch(() => {
               // Best-effort only
             });

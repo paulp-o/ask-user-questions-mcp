@@ -40,10 +40,35 @@ Options:
   --help, -h    Show this help message
   --version, -v Show version information
 
+ASK COMMAND:
+  Use 'auq ask' when you need to ask the user questions during execution.
+  This allows you to:
+  1. Gather user preferences or requirements
+  2. Clarify ambiguous instructions
+  3. Get decisions on implementation choices as you work
+  4. Offer choices to the user about what direction to take
+
+  FEATURES:
+  - Ask 1-4 structured questions via an interactive terminal interface
+  - Each question includes 2-4 multiple-choice options with explanatory descriptions
+  - Users can always provide custom free-text input as an alternative to predefined options
+  - Single-select mode (default): User picks ONE option or provides custom text
+  - Multi-select mode (multiSelect: true): User can select MULTIPLE options
+
+  USAGE NOTES:
+  - Always provide a descriptive 'title' field (max 12 chars) for each question
+  - Use multiSelect: true when choices are not mutually exclusive
+  - Option labels should be concise (1-5 words)
+  - Questions should end with a question mark
+  - Don't include an 'Other' option - it's provided automatically
+  - Mark one option as recommended by adding "(recommended)" to its label
+
+  Returns a formatted summary of all questions and answers.
+
 Examples:
   auq                    # Start TUI (wait for questions from AI)
   auq server             # Start MCP server (for Claude Desktop, etc.)
-  auq ask '{"questions": [{"prompt": "Which language?", "title": "Lang", "options": [{"label": "TypeScript"}, {"label": "Python"}], "multiSelect": false}]}'
+  auq ask '{"questions": [{"prompt": "Which language?", "title": "Lang", "options": [{"label": "TypeScript (recommended)"}, {"label": "Python"}], "multiSelect": false}]}'
   echo '{"questions": [...]}' | auq ask   # Pipe JSON to ask command
 
 For more information, visit:
