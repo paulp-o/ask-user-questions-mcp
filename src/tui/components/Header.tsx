@@ -3,6 +3,7 @@ import gradient from "gradient-string";
 import React, { useEffect, useState } from "react";
 
 import { theme } from "../theme.js";
+import packageJson from "../../../package.json" with { type: "json" };
 
 interface HeaderProps {
   pendingCount: number;
@@ -26,9 +27,9 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
     }
   }, [pendingCount, prevCount]);
 
-  // Get version from environment variable set by bin/auq.tsx
+  // Get version from package.json
   const version = React.useMemo(() => {
-    return process.env.AUQ_VERSION || "unknown";
+    return packageJson.version || "unknown";
   }, []);
 
   // Use the selected gradient theme from theme.ts

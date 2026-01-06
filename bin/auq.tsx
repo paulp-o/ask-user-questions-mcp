@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 // import { exec } from "child_process";
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
 
 import { Box, render, Text } from "ink";
 import React, { useEffect, useState } from "react";
@@ -50,13 +47,6 @@ For more information, visit:
 `);
   process.exit(0);
 }
-
-// Read version from package.json and set as environment variable
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const packageJsonPath = join(__dirname, "..", "package.json");
-const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-process.env.AUQ_VERSION = packageJson.version;
 
 // Display version
 if (command === "--version" || command === "-v") {
