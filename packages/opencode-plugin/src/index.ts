@@ -1,7 +1,6 @@
 import { spawn } from "child_process";
 
-import { type Plugin } from "@opencode-ai/plugin";
-import { tool } from "@opencode-ai/plugin/tool";
+import { tool, type Plugin } from "@opencode-ai/plugin";
 
 const z = tool.schema;
 
@@ -81,7 +80,7 @@ const runAuqAsk = async (payload: unknown): Promise<string> =>
     child.on("error", (error) => {
       reject(
         new Error(
-          `Failed to run "auq ask": ${error.message}. Is the auq CLI installed globally?`,
+          `Failed to run \"auq ask\": ${error.message}. Is the auq CLI installed globally?`,
         ),
       );
     });
@@ -124,8 +123,7 @@ export const AskUserQuestionsPlugin: Plugin = async () => ({
         "- Use multiSelect: true when choices are not mutually exclusive\n" +
         "- Option labels should be concise (1-5 words)\n" +
         "- Questions should end with a question mark\n" +
-        "- Don't include an 'Other' option - it's provided automatically\n" +
-        "- Mark one option as recommended.\n\n" +
+        "- Don't include an 'Other' option - it's provided automatically\n\n" +
         "- If user seems not aware how to answer the question, inform them that they need to install the 'auq' cli tool.\n\n" +
         "Returns a formatted summary of all questions and answers.",
       args: {
@@ -141,3 +139,5 @@ export const AskUserQuestionsPlugin: Plugin = async () => ({
     }),
   },
 });
+
+export default AskUserQuestionsPlugin;

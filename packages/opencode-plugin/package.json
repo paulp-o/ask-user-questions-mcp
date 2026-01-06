@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@paulp-o/opencode-auq",
+  "version": "0.1.0",
+  "description": "OpenCode plugin that forwards ask_user_questions to the auq CLI",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "auq",
+    "ask-user-questions"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulp-o/ask-user-questions-mcp.git",
+    "directory": "packages/opencode-plugin"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.1.3",
+    "@tsconfig/node22": "^22.0.1",
+    "@types/node": "^22.13.0",
+    "typescript": "^5.8.3"
+  }
+}
