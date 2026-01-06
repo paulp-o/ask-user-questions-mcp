@@ -32,9 +32,8 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
   // Get version from package.json
   const version = React.useMemo(() => {
     try {
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = dirname(__filename);
-      const packageJsonPath = join(__dirname, "..", "..", "..", "package.json");
+      // Use process.cwd() to get project root reliably
+      const packageJsonPath = join(process.cwd(), "package.json");
       const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
       return packageJson.version;
     } catch {
