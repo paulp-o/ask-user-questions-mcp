@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@paulp-o/opencode-auq",
-  "version": "0.1.0",
+  "version": "0.1.22",
   "description": "OpenCode plugin that forwards ask_user_questions to the auq CLI",
   "type": "module",
   "main": "dist/index.js",
