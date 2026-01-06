@@ -144,6 +144,12 @@ args = ["-y", "auq-mcp-server", "server"]
 # Optional: Whitelist additional env vars
 # env_vars = ["AUQ_SESSION_DIR"]
 
+# Optional: Prevent MCP client timeouts while waiting for user input (milliseconds)
+# - default: 15000 (15s)
+# - set to 0 to disable keep-alive logs
+# env = { "AUQ_MCP_KEEPALIVE_MS" = "15000" }
+# env_vars = ["AUQ_SESSION_DIR", "AUQ_MCP_KEEPALIVE_MS"]
+
 # Optional: Working directory
 # cwd = "/Users/<user>/projects"
 ```

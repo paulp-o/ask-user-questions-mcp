@@ -7,6 +7,17 @@ import type { Question } from "./session/types.js";
 import { SessionManager } from "./session/index.js";
 import { getSessionDirectory } from "./session/utils.js";
 
+function getKeepAliveIntervalMs(): number {
+  const raw = process.env.AUQ_MCP_KEEPALIVE_MS;
+  if (!raw) return 15000; // 15s default
+
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed)) return 15000;
+
+  // 0 (or negative) disables keep-alives
+  return parsed;
+}
+
 // Get session directory (auto-detects global vs local install)
 const sessionDir = getSessionDirectory();
 
@@ -29,7 +40,7 @@ const server = new FastMCP({
     "returning formatted responses for continued reasoning. " +
     "Each question supports 2-4 multiple-choice options with descriptions, and users can always provide custom text input. " +
     "Both single-select and multi-select modes are supported.",
-  version: "0.1.8",
+  version: "0.1.10",
 });
 
 // Define the question and option schemas
@@ -93,6 +104,7 @@ server.addTool({
     openWorldHint: true, // This tool interacts with the user's terminal
     readOnlyHint: false, // This tool waits for user input
     idempotentHint: true,
+    streamingHint: true, // Enable progress/streaming notifications for long-running waits
   },
   description:
     "Use this tool when you need to ask the user questions during execution. " +
@@ -115,7 +127,15 @@ server.addTool({
     "- Don't include an 'Other' option - it's provided automatically\n\n" +
     "- If user seems not aware how to answer the question, inform them that they need to install the 'auq' cli tool.\n\n" +
     "Returns a formatted summary of all questions and answers.",
-  execute: async (args, { log }) => {
+  execute: async (args, ctx) => {
+    const { log } = ctx as { log: { info: Function; warn: Function; error: Function } };
+    const reportProgress: undefined | ((p: { progress: number; total?: number }) => Promise<void>) =
+      (ctx as any).reportProgress;
+
+    const keepAliveIntervalMs = getKeepAliveIntervalMs();
+    let keepAliveTimer: null | ReturnType<typeof setInterval> = null;
+    const startedAt = Date.now();
+
     try {
       // Initialize session manager if not already done
       await sessionManager.initialize();
@@ -155,6 +175,27 @@ server.addTool({
       // Start complete session lifecycle - this will wait for user answers
       // Generate a per-tool-call ID and persist it with the session
       const callId = randomUUID();
+
+      // Some MCP clients enforce a request timeout if there are no server-side
+      // notifications for a few minutes. Emit periodic keep-alives (logs and,
+      // when supported by FastMCP, MCP progress notifications) while waiting.
+      if (keepAliveIntervalMs > 0) {
+        keepAliveTimer = setInterval(() => {
+          const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
+          log.info("Still waiting for user answers...", {
+            callId,
+            elapsedSec,
+          });
+          if (reportProgress) {
+            reportProgress({ progress: elapsedSec, total: elapsedSec + 1 }).catch(
+              () => {
+                // Best-effort only; never fail the tool call because progress reporting failed.
+              },
+            );
+          }
+        }, keepAliveIntervalMs);
+      }
+
       const { formattedResponse, sessionId } =
         await sessionManager.startSession(questions, callId);
 
@@ -179,6 +220,8 @@ server.addTool({
           },
         ],
       };
+    } finally {
+      if (keepAliveTimer) clearInterval(keepAliveTimer);
     }
   },
   parameters: z.object({
