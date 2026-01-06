@@ -1,5 +1,5 @@
 import { Box, Text, useApp, useInput } from "ink";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
 
@@ -37,8 +37,22 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [showReview, setShowReview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showRejectionConfirm, setShowRejectionConfirm] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const currentQuestion = sessionRequest.questions[currentQuestionIndex];
+  const sessionCreatedAt = useMemo(() => {
+    const parsed = Date.parse(sessionRequest.timestamp);
+    return Number.isNaN(parsed) ? Date.now() : parsed;
+  }, [sessionRequest.timestamp]);
+
+  const elapsedLabel = useMemo(() => {
+    const hours = Math.floor(elapsedSeconds / 3600);
+    const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+    const seconds = elapsedSeconds % 60;
+    return [hours, minutes, seconds]
+      .map((value) => value.toString().padStart(2, "0"))
+      .join(":");
+  }, [elapsedSeconds]);
 
   // Handle option selection
   const handleSelectOption = (label: string) => {
@@ -101,7 +115,18 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setShowReview(false);
     setSubmitting(false);
     setShowRejectionConfirm(false);
+    setElapsedSeconds(0);
   }, [sessionId]);
+
+  // Update elapsed time since session creation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - sessionCreatedAt) / 1000);
+      setElapsedSeconds(elapsed >= 0 ? elapsed : 0);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [sessionCreatedAt]);
 
   // Handle answer confirmation
   const handleConfirm = async (userAnswers: UserAnswer[]) => {
@@ -220,6 +245,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     return (
       <ReviewScreen
         answers={answers}
+        elapsedLabel={elapsedLabel}
         onConfirm={handleConfirm}
         onGoBack={handleGoBack}
         questions={sessionRequest.questions}
@@ -234,6 +260,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       currentQuestion={currentQuestion}
       currentQuestionIndex={currentQuestionIndex}
       customAnswer={currentAnswer?.customText}
+      elapsedLabel={elapsedLabel}
       onAdvanceToNext={handleAdvanceToNext}
       onChangeCustomAnswer={handleChangeCustomAnswer}
       onSelectOption={handleSelectOption}

@@ -28,6 +28,9 @@
     "directory": "packages/opencode-plugin"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@opencode-ai/plugin": ">=1.0.0"
   },

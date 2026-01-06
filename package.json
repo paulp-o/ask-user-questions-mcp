@@ -18,6 +18,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "postinstall": "node scripts/postinstall.cjs",
+    "deploy": "node scripts/deploy.mjs",
     "server": "node dist/src/server.js",
     "start": "tsx src/server.ts",
     "dev": "fastmcp dev src/server.ts",

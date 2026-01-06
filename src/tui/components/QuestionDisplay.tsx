@@ -11,6 +11,7 @@ interface QuestionDisplayProps {
   currentQuestion: Question;
   currentQuestionIndex: number;
   customAnswer?: string;
+  elapsedLabel: string;
   onChangeCustomAnswer: (text: string) => void;
   onSelectOption: (label: string) => void;
   questions: Question[];
@@ -32,6 +33,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   currentQuestion,
   currentQuestionIndex,
   customAnswer = "",
+  elapsedLabel,
   onChangeCustomAnswer,
   onSelectOption,
   questions,
@@ -72,11 +74,14 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       />
 
       {/* Question prompt with type indicator */}
-      <Box marginTop={1}>
-        <Text bold>{currentQuestion.prompt} </Text>
-        <Text dimColor>
-          {multiSelect ? "[Multiple Choice]" : "[Single Choice]"}
-        </Text>
+      <Box flexDirection="row" justifyContent="space-between" marginTop={1}>
+        <Box>
+          <Text bold>{currentQuestion.prompt} </Text>
+          <Text dimColor>
+            {multiSelect ? "[Multiple Choice]" : "[Single Choice]"}
+          </Text>
+        </Box>
+        <Text dimColor>Elapsed {elapsedLabel}</Text>
       </Box>
 
       {/* Options list with integrated custom input */}

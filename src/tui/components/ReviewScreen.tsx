@@ -10,6 +10,7 @@ interface ReviewScreenProps {
     number,
     { customText?: string; selectedOption?: string; selectedOptions?: string[] }
   >;
+  elapsedLabel: string;
   onConfirm: (userAnswers: UserAnswer[]) => void;
   onGoBack: () => void;
   questions: Question[];
@@ -22,6 +23,7 @@ interface ReviewScreenProps {
  */
 export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   answers,
+  elapsedLabel,
   onConfirm,
   onGoBack,
   questions,
@@ -61,9 +63,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
         marginBottom={1}
         padding={0.5}
       >
-        <Text bold color={theme.components.review.border}>
-          Review Your Answers
-        </Text>
+        <Box flexDirection="row" justifyContent="space-between" width="100%">
+          <Text bold color={theme.components.review.border}>
+            Review Your Answers
+          </Text>
+          <Text dimColor>Elapsed {elapsedLabel}</Text>
+        </Box>
       </Box>
 
       {/* Questions and Answers */}
