@@ -1,6 +1,3 @@
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
 import { Box, Text } from "ink";
 import gradient from "gradient-string";
 import React, { useEffect, useState } from "react";
@@ -29,16 +26,9 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
     }
   }, [pendingCount, prevCount]);
 
-  // Get version from package.json
+  // Get version from environment variable set by bin/auq.tsx
   const version = React.useMemo(() => {
-    try {
-      // Use process.cwd() to get project root reliably
-      const packageJsonPath = join(process.cwd(), "package.json");
-      const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-      return packageJson.version;
-    } catch {
-      return "unknown";
-    }
+    return process.env.AUQ_VERSION || "unknown";
   }, []);
 
   // Use the selected gradient theme from theme.ts

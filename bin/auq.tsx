@@ -51,14 +51,16 @@ For more information, visit:
   process.exit(0);
 }
 
+// Read version from package.json and set as environment variable
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJsonPath = join(__dirname, "..", "package.json");
+const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+process.env.AUQ_VERSION = packageJson.version;
+
 // Display version
 if (command === "--version" || command === "-v") {
-  // Read version from package.json
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  const packageJsonPath = join(__dirname, "..", "package.json");
-  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-  console.log(`auq-mcp-server v${packageJson.version}`);
+  console.log(`auq-mcp-server v${process.env.AUQ_VERSION}`);
   process.exit(0);
 }
 
