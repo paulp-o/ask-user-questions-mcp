@@ -18,6 +18,38 @@ function getKeepAliveIntervalMs(): number {
   return parsed;
 }
 
+function getPingConfig(): undefined | {
+  enabled?: boolean;
+  intervalMs?: number;
+  logLevel?: "debug" | "info" | "warning" | "error";
+} {
+  const enabledRaw = process.env.AUQ_MCP_PING_ENABLED;
+  if (!enabledRaw) return undefined;
+
+  const enabled =
+    enabledRaw === "1" ||
+    enabledRaw.toLowerCase() === "true" ||
+    enabledRaw.toLowerCase() === "yes";
+
+  const intervalMsRaw = process.env.AUQ_MCP_PING_INTERVAL_MS;
+  const intervalMs = intervalMsRaw ? Number.parseInt(intervalMsRaw, 10) : undefined;
+
+  const logLevelRaw = process.env.AUQ_MCP_PING_LOG_LEVEL?.toLowerCase();
+  const logLevel =
+    logLevelRaw === "debug" ||
+    logLevelRaw === "info" ||
+    logLevelRaw === "warning" ||
+    logLevelRaw === "error"
+      ? (logLevelRaw as "debug" | "info" | "warning" | "error")
+      : undefined;
+
+  return {
+    enabled,
+    intervalMs: Number.isFinite(intervalMs as number) ? intervalMs : undefined,
+    logLevel,
+  };
+}
+
 // Get session directory (auto-detects global vs local install)
 const sessionDir = getSessionDirectory();
 
@@ -40,6 +72,9 @@ const server = new FastMCP({
     "returning formatted responses for continued reasoning. " +
     "Each question supports 2-4 multiple-choice options with descriptions, and users can always provide custom text input. " +
     "Both single-select and multi-select modes are supported.",
+  // Optional: enable ping even on stdio (disabled by default in FastMCP).
+  // Useful for some clients that treat ping as activity/keep-alive.
+  ping: getPingConfig(),
   version: "0.1.17",
 });
 
@@ -129,7 +164,7 @@ server.addTool({
     "Returns a formatted summary of all questions and answers.",
   execute: async (args, ctx) => {
     const { log } = ctx as { log: { info: Function; warn: Function; error: Function } };
-    const reportProgress: undefined | ((p: { progress: number; total?: number; progressToken?: string }) => Promise<void>) =
+    const reportProgress: undefined | ((p: { progress: number; total?: number }) => Promise<void>) =
       (ctx as any).reportProgress;
     const streamContent: undefined | ((content: any) => Promise<void>) =
       (ctx as any).streamContent;
@@ -181,23 +216,21 @@ server.addTool({
       // Some MCP clients enforce a request timeout if there are no server-side
       // notifications for a few minutes. Emit periodic keep-alives (logs and,
       // when supported by FastMCP, MCP progress notifications) while waiting.
-      const progressToken = `auq-${callId}`;
       if (keepAliveIntervalMs > 0) {
         keepAliveTimer = setInterval(() => {
           const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
           log.info("Still waiting for user answers...", {
             callId,
             elapsedSec,
-            progressToken,
           });
 
           // Send both progress and streaming content for maximum compatibility
           if (reportProgress) {
-            // Send progress notification with explicit progressToken
+            // FastMCP wires in the client's progressToken internally (from request.params._meta.progressToken).
+            // We should NOT invent our own token here; just report progress/total.
             reportProgress({
               progress: elapsedSec,
-              total: elapsedSec + 60, // Estimate total as current + 1 minute
-              progressToken
+              total: elapsedSec + 60, // Best-effort "total"; not semantically important for keep-alive
             }).catch(
               () => {
                 // Best-effort only; never fail the tool call because progress reporting failed.

@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 // import { exec } from "child_process";
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
 import { Box, render, Text } from "ink";
 import React, { useEffect, useState } from "react";
@@ -50,7 +53,30 @@ For more information, visit:
 
 // Display version
 if (command === "--version" || command === "-v") {
-  console.log(`auq-mcp-server v${process.env.AUQ_VERSION}`);
+  // Read version from package.json (handle both local dev and global install)
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  // Try different possible paths for package.json
+  const possiblePaths = [
+    join(__dirname, "..", "package.json"),      // dist/../package.json (local dev)
+    join(__dirname, "..", "..", "package.json"), // dist/bin/../../package.json (global install)
+  ];
+
+  let packageJson = null;
+  for (const path of possiblePaths) {
+    try {
+      packageJson = JSON.parse(readFileSync(path, "utf-8"));
+      break;
+    } catch {
+      // Try next path
+    }
+  }
+
+  if (packageJson) {
+    console.log(`auq-mcp-server v${packageJson.version}`);
+  } else {
+    console.log("auq-mcp-server v0.1.17"); // Fallback version
+  }
   process.exit(0);
 }
 

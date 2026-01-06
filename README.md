@@ -150,6 +150,11 @@ args = ["-y", "auq-mcp-server", "server"]
 # env = { "AUQ_MCP_KEEPALIVE_MS" = "15000" }
 # env_vars = ["AUQ_SESSION_DIR", "AUQ_MCP_KEEPALIVE_MS"]
 
+# Optional: Enable FastMCP ping even on stdio transport (some clients treat ping as keep-alive activity)
+# - disabled by default for stdio in FastMCP
+# env = { "AUQ_MCP_PING_ENABLED" = "true", "AUQ_MCP_PING_INTERVAL_MS" = "10000", "AUQ_MCP_PING_LOG_LEVEL" = "debug" }
+# env_vars = ["AUQ_SESSION_DIR", "AUQ_MCP_KEEPALIVE_MS", "AUQ_MCP_PING_ENABLED", "AUQ_MCP_PING_INTERVAL_MS", "AUQ_MCP_PING_LOG_LEVEL"]
+
 # Optional: Working directory
 # cwd = "/Users/<user>/projects"
 ```
