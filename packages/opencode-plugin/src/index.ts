@@ -1,6 +1,7 @@
 import { spawn } from "child_process";
 
-import { tool, type Plugin } from "@opencode-ai/plugin";
+import { type Plugin } from "@opencode-ai/plugin";
+import { tool } from "@opencode-ai/plugin/tool";
 
 const z = tool.schema;
 
