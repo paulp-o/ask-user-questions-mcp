@@ -31,6 +31,31 @@ const ensureCleanGit = () => {
   }
 };
 
+const ensureTagAvailable = (tag) => {
+  const localTags = execSync("git tag", { encoding: "utf8" })
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (localTags.includes(tag)) {
+    console.error(`Git tag ${tag} already exists locally.`);
+    process.exit(1);
+  }
+
+  try {
+    const remoteTags = execSync(`git ls-remote --tags origin ${tag}`, {
+      encoding: "utf8",
+    }).trim();
+
+    if (remoteTags.length > 0) {
+      console.error(`Git tag ${tag} already exists on origin.`);
+      process.exit(1);
+    }
+  } catch {
+    // Best-effort only; remote might be unreachable.
+  }
+};
+
 const updateVersion = (path) => {
   const pkg = readJson(path);
   pkg.version = version;
@@ -44,6 +69,7 @@ const pluginPkgPath = resolve(
 );
 
 ensureCleanGit();
+ensureTagAvailable(`v${version}`);
 
 updateVersion(rootPkgPath);
 updateVersion(pluginPkgPath);
