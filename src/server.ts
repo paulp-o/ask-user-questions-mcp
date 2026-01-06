@@ -129,8 +129,10 @@ server.addTool({
     "Returns a formatted summary of all questions and answers.",
   execute: async (args, ctx) => {
     const { log } = ctx as { log: { info: Function; warn: Function; error: Function } };
-    const reportProgress: undefined | ((p: { progress: number; total?: number }) => Promise<void>) =
+    const reportProgress: undefined | ((p: { progress: number; total?: number; progressToken?: string }) => Promise<void>) =
       (ctx as any).reportProgress;
+    const streamContent: undefined | ((content: any) => Promise<void>) =
+      (ctx as any).streamContent;
 
     const keepAliveIntervalMs = getKeepAliveIntervalMs();
     let keepAliveTimer: null | ReturnType<typeof setInterval> = null;
@@ -179,19 +181,38 @@ server.addTool({
       // Some MCP clients enforce a request timeout if there are no server-side
       // notifications for a few minutes. Emit periodic keep-alives (logs and,
       // when supported by FastMCP, MCP progress notifications) while waiting.
+      const progressToken = `auq-${callId}`;
       if (keepAliveIntervalMs > 0) {
         keepAliveTimer = setInterval(() => {
           const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
           log.info("Still waiting for user answers...", {
             callId,
             elapsedSec,
+            progressToken,
           });
+
+          // Send both progress and streaming content for maximum compatibility
           if (reportProgress) {
-            reportProgress({ progress: elapsedSec, total: elapsedSec + 1 }).catch(
+            // Send progress notification with explicit progressToken
+            reportProgress({
+              progress: elapsedSec,
+              total: elapsedSec + 60, // Estimate total as current + 1 minute
+              progressToken
+            }).catch(
               () => {
                 // Best-effort only; never fail the tool call because progress reporting failed.
               },
             );
+          }
+
+          // Also send streaming content if available (additional keep-alive)
+          if (streamContent && elapsedSec % 30 === 0) { // Every 30 seconds
+            streamContent({
+              type: "text",
+              text: `⏳ Still waiting for user response... (${Math.floor(elapsedSec / 60)}m ${elapsedSec % 60}s elapsed)\n`,
+            }).catch(() => {
+              // Best-effort only
+            });
           }
         }, keepAliveIntervalMs);
       }
