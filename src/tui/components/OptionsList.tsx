@@ -63,6 +63,15 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     (input, key) => {
       if (!isFocused) return;
 
+      // When custom input is focused, only handle escape to exit, let MultiLineTextInput handle other keys
+      if (isCustomInputFocused) {
+        if (key.escape) {
+          // Escape: Exit custom input mode and go back to option navigation
+          setFocusedIndex(options.length - 1); // Focus on last option
+        }
+        return;
+      }
+
       if (key.upArrow) {
         setFocusedIndex((prev) => Math.max(0, prev - 1));
       }

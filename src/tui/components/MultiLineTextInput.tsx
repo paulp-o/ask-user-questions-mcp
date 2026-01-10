@@ -1,5 +1,5 @@
 import { Box, Text, useInput } from "ink";
-import React from "react";
+import React, { useState } from "react";
 import { theme } from "../theme.js";
 
 interface MultiLineTextInputProps {
@@ -11,9 +11,9 @@ interface MultiLineTextInputProps {
 }
 
 /**
- * Multi-line text input component for Ink
- * Append-only mode: Shift+Enter for newlines, Enter to submit
- * Note: No cursor positioning - text is append-only for simplicity
+ * Multi-line text input component for Ink with cursor positioning
+ * Supports left/right arrow keys for cursor movement
+ * Shift+Enter for newlines, Enter to submit
  */
 export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   isFocused = true,
@@ -22,6 +22,15 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   placeholder = "Type your answer...",
   value,
 }) => {
+  const [cursorPosition, setCursorPosition] = useState(value.length);
+
+  // Update cursor position when value changes externally
+  React.useEffect(() => {
+    if (cursorPosition > value.length) {
+      setCursorPosition(value.length);
+    }
+  }, [value.length, cursorPosition]);
+
   useInput(
     (input, key) => {
       if (!isFocused) return;
@@ -30,7 +39,9 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
       // Prevent accidental carriage return insertion which causes line overwrite in terminals.
       if (input === "\r" || input === "\n") {
         if (key.shift) {
-          onChange(value + "\n");
+          const newValue = value.slice(0, cursorPosition) + "\n" + value.slice(cursorPosition);
+          onChange(newValue);
+          setCursorPosition(cursorPosition + 1);
         } else if (onSubmit) {
           onSubmit();
         }
@@ -39,7 +50,9 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
 
       // Shift+Enter: Add newline
       if (key.return && key.shift) {
-        onChange(value + "\n");
+        const newValue = value.slice(0, cursorPosition) + "\n" + value.slice(cursorPosition);
+        onChange(newValue);
+        setCursorPosition(cursorPosition + 1);
         return;
       }
 
@@ -51,13 +64,29 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         return;
       }
 
-      // Backspace: Remove last character
-      if (key.backspace || key.delete) {
-        onChange(value.slice(0, -1));
+      // Left arrow: Move cursor left
+      if (key.leftArrow) {
+        setCursorPosition(Math.max(0, cursorPosition - 1));
         return;
       }
 
-      // Regular character input (append)
+      // Right arrow: Move cursor right
+      if (key.rightArrow) {
+        setCursorPosition(Math.min(value.length, cursorPosition + 1));
+        return;
+      }
+
+      // Backspace: Remove character before cursor
+      if (key.backspace || key.delete) {
+        if (cursorPosition > 0) {
+          const newValue = value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
+          onChange(newValue);
+          setCursorPosition(cursorPosition - 1);
+        }
+        return;
+      }
+
+      // Regular character input (insert at cursor)
       if (
         input &&
         !key.ctrl &&
@@ -66,7 +95,9 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         input !== "\r" &&
         input !== "\n"
       ) {
-        onChange(value + input);
+        const newValue = value.slice(0, cursorPosition) + input + value.slice(cursorPosition);
+        onChange(newValue);
+        setCursorPosition(cursorPosition + 1);
       }
     },
     { isActive: isFocused },
@@ -77,19 +108,39 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   const hasContent = normalizedValue.length > 0;
   const lines = hasContent ? normalizedValue.split("\n") : [placeholder];
 
+  // Calculate which line and position the cursor is on
+  const cursorLineIndex = normalizedValue.slice(0, cursorPosition).split("\n").length - 1;
+  const cursorLineStart = normalizedValue.split("\n").slice(0, cursorLineIndex).join("\n").length + (cursorLineIndex > 0 ? cursorLineIndex : 0);
+  const cursorPositionInLine = cursorPosition - cursorLineStart;
+
   return (
     <Box flexDirection="column">
       {lines.map((line, index) => {
-        const isLastLine = index === lines.length - 1;
-        const showCursor = isFocused && isLastLine;
+        const isCursorLine = isFocused && index === cursorLineIndex && hasContent;
         const isPlaceholder = !hasContent;
         const lineHasContent = line.length > 0;
-        const displayText = lineHasContent ? line : showCursor ? "" : " ";
+        const displayText = lineHasContent ? line : isCursorLine ? "" : " ";
+
+        if (isCursorLine) {
+          // Split the line at cursor position
+          const beforeCursor = line.slice(0, cursorPositionInLine);
+          const afterCursor = line.slice(cursorPositionInLine);
+
+          return (
+            <Text key={index}>
+              {beforeCursor}
+              <Text color={theme.colors.focused} dimColor>
+                ▌
+              </Text>
+              {afterCursor}
+            </Text>
+          );
+        }
 
         return (
           <Text key={index} dimColor={isPlaceholder}>
             {displayText}
-            {showCursor && (
+            {isFocused && index === lines.length - 1 && !hasContent && (
               <Text color={theme.colors.focused} dimColor>
                 ▌
               </Text>

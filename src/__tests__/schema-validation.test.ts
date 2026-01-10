@@ -101,7 +101,7 @@ describe("Schema Validation - Edge Cases", () => {
       const parsed = QuestionSchema.parse(validQuestion);
       expect(parsed.title).toBe("Language");
       expect(parsed.prompt).toBe("What is your choice?");
-      expect(parsed.options).toHaveLength(1);
+      expect(parsed.options).toHaveLength(2);
     });
 
     it("should accept valid question with all fields", () => {
@@ -124,7 +124,7 @@ describe("Schema Validation - Edge Cases", () => {
       expect(() => QuestionSchema.parse(validQuestion)).not.toThrow();
       const parsed = QuestionSchema.parse(validQuestion);
       expect(parsed.prompt).toBe("What is your choice?");
-      expect(parsed.options).toHaveLength(1);
+      expect(parsed.options).toHaveLength(2);
     });
 
     it("should accept valid question with description omitted", () => {

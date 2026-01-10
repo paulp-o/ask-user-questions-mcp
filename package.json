@@ -15,7 +15,7 @@
     "packages/opencode-plugin"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run sync-schemas && tsc",
     "prepare": "npm run build",
     "postinstall": "node scripts/postinstall.cjs",
     "deploy": "node scripts/deploy.mjs",
@@ -23,6 +23,7 @@
     "start": "tsx src/server.ts",
     "dev": "fastmcp dev src/server.ts",
     "lint": "prettier --check . && eslint . && tsc --noEmit",
+    "sync-schemas": "node scripts/sync-schemas.mjs",
     "test": "vitest run",
     "format": "prettier --write . && eslint --fix ."
   },
