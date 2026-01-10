@@ -427,26 +427,13 @@ console.clear();
 
 const { waitUntilExit } = render(<App />);
 
-// Periodically clear performance measures to prevent memory leak warnings
-// React development mode creates performance marks that can accumulate over time
-const clearPerformanceBuffer = () => {
-  if (typeof performance !== 'undefined' && performance.clearMeasures) {
-    performance.clearMeasures();
-  }
-};
-
-// Clear performance buffer every 5 minutes to prevent accumulation
-const performanceCleanupInterval = setInterval(clearPerformanceBuffer, 5 * 60 * 1000);
-
 // Handle Ctrl+C gracefully
 process.on("SIGINT", () => {
-  clearInterval(performanceCleanupInterval);
   process.exit(0);
 });
 
 // Show goodbye after Ink unmounts
 waitUntilExit().then(() => {
-  clearInterval(performanceCleanupInterval);
   process.stdout.write("\n");
   console.log("👋 Goodbye! See you next time.");
 });
