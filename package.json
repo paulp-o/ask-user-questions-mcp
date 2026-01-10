@@ -1,6 +1,6 @@
 {
   "name": "auq-mcp-server",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "main": "dist/index.js",
   "bin": {
     "auq": "dist/bin/auq.js"
