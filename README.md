@@ -170,26 +170,29 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ---
 
-## 🔌 OpenCode Plugin (Optional)
+## 🔌 Official OpenCode Plugin Support
 
-If you want the OpenCode tool to call `auq ask` directly (without MCP), install
-the plugin package and add it to your OpenCode config.
+We now have **official OpenCode plugin support**! We support OpenCode because OpenCode's MCP server seems to have some limitations (timeout), so we created an OpenCode-specific plugin that works perfectly together with OpenCode.
+
+The OpenCode plugin allows OpenCode to call `auq ask` directly (without MCP), providing seamless integration with OpenCode's workflow.
+
+### Installation
 
 ```bash
+# Install both CLI and plugin
 npm install -g auq-mcp-server
-npm install -g @paulp-o/opencode-auq
 ```
 
-Add to `opencode.json`:
+### Configuration
+
+Add to `opencode.json(c)`:
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
   "plugin": ["@paulp-o/opencode-auq"]
 }
 ```
 
-The plugin assumes `auq` is available on `PATH` (global install or equivalent).
 
 ---
 
