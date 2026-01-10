@@ -63,6 +63,17 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     (input, key) => {
       if (!isFocused) return;
 
+      // Handle up/down navigation even when custom input is focused
+      if (key.upArrow) {
+        setFocusedIndex((prev) => Math.max(0, prev - 1));
+        return;
+      }
+
+      if (key.downArrow) {
+        setFocusedIndex((prev) => Math.min(maxIndex, prev + 1));
+        return;
+      }
+
       // When custom input is focused, only handle escape to exit, let MultiLineTextInput handle other keys
       if (isCustomInputFocused) {
         if (key.escape) {
@@ -70,14 +81,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           setFocusedIndex(options.length - 1); // Focus on last option
         }
         return;
-      }
-
-      if (key.upArrow) {
-        setFocusedIndex((prev) => Math.max(0, prev - 1));
-      }
-
-      if (key.downArrow) {
-        setFocusedIndex((prev) => Math.min(maxIndex, prev + 1));
       }
 
       if (multiSelect) {
