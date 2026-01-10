@@ -8,6 +8,10 @@
 
 **A lightweight CLI tool that allows your LLMs to ask questions to you in a separate space with clean terminal UX. Supports both MCP server and official OpenCode plugin integration. Made for multi-agent parallel coding workflows.**
 
+🤔 [Why do I need it when I already have question tool in CC/OC?](#-why-auq-vs-built-in-ask-tools)
+
+[Setup](#setup-instructions) • [Features](#-features)
+
 ---
 
 ## What does it do?
