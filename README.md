@@ -1,18 +1,18 @@
 ![AUQ Demo](media/demo.png)
 
-# AUQ - ask-user-questions MCP
+# AUQ - Ask User Questions
 
 [![npm version](https://img.shields.io/npm/v/auq-mcp-server.svg)](https://www.npmjs.com/package/auq-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-**A lightweight MCP server & CLI tool that allows your LLMs to ask questions to you in a clean, separate space with great terminal UX. Made for multi-agent parallel coding workflows.**
+**A lightweight CLI tool that allows your LLMs to ask questions to you in a clean, separate space with great terminal UX. Supports both MCP server and official OpenCode plugin integration. Made for multi-agent parallel coding workflows.**
 
 ---
 
 ## What does it do?
 
-This MCP server lets your AI assistants generate clarifying questions consisting of multiple-choice/single-choice questions (with an "Other" option for custom input) while coding or working, and wait for your answers through a separate CLI tool without messing up your workflow.
+AUQ lets your AI assistants generate clarifying questions consisting of multiple-choice/single-choice questions (with an "Other" option for custom input) while coding or working, and wait for your answers through a separate CLI tool without messing up your workflow.
 
 You can keep the CLI running in advance, or start it when questions are pending. With simple arrow key navigation, you can select answers and send them back to the AI—all within a clean terminal interface.
 
@@ -22,7 +22,7 @@ In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been wi
 
 On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` tool. Inspired by it, I decided to build a similar tool that is:
 
-- **Tool-agnostic** - Works with any MCP client (Claude Desktop, Cursor, etc.)
+- **Integration-flexible** - Works with MCP clients (Claude Desktop, Cursor, etc.) and has official OpenCode plugin support
 - **Non-invasive** - Doesn't heavily integrate with your coding CLI workflow or occupy UI space
 - **Multi-agent friendly** - Supports receiving questions from multiple agents simultaneously in parallel workflows
 
@@ -56,9 +56,42 @@ Recent AI workflows often use parallel sub-agents for concurrent coding. AUQ han
 
 ---
 
+## 🤔 Why AUQ vs. Built-in Ask Tools?
+
+**Why should I use AUQ instead of the built-in "Question" tools in OpenCode, Claude Code, or other coding agents?**
+
+AUQ is designed for the era of parallel multi-agent workflows, with several key advantages:
+
+### 🚀 Non-Blocking Parallel Operation
+Unlike built-in ask tools that halt the entire AI workflow until you respond, AUQ **doesn't block the AI from continuing work**. Questions are queued asynchronously, allowing your AI assistants to keep coding while you review and answer questions at your own pace.
+
+### 🎯 Multi-Agent Question Set Support
+**The killer feature**: AUQ can handle question sets from **multiple agents simultaneously**. In modern AI coding workflows, you often have several sub-agents working in parallel—each might need clarification on different aspects of your codebase. With AUQ:
+
+- **No more screen switching** between different agent conversations
+- **Unified queue** for all agent questions, regardless of which AI tool they're coming from
+- **Sequential processing** of questions from multiple sources in one interface
+
+### 🌐 Cross-Platform Question Aggregation
+AUQ's **unified data origin** means you can answer questions from **different AI clients simultaneously**:
+- Claude Code questions
+- OpenCode questions
+- Cursor/MCP questions
+
+All appear in the **same CLI interface**, creating a single source of truth for all AI-agent questions across your entire development environment.
+
+### 💡 Perfect for Parallel Agent Workflows
+As AI coding moves toward sophisticated multi-agent systems, AUQ becomes essential. Instead of managing blocking questions across multiple agent screens, you get one streamlined interface that handles questions from your entire AI coding ecosystem—keeping your focus on the code, not the coordination.
+
+**TL;DR**: AUQ transforms AI-agent questions from blocking interruptions into a smooth, unified workflow that scales with your AI coding setup.
+
+---
+
 # Setup Instructions
 
-## 🚀 Step 1: Setup CLI
+## 🚀 Install CLI Tool
+
+First, install the AUQ CLI tool:
 
 ### Global Installation (Recommended)
 
@@ -87,7 +120,11 @@ npx auq
 
 ---
 
-## 🔌 Step 2: Setup MCP Server
+## 🔌 Choose Your Integration Method
+
+AUQ supports multiple AI coding environments. Choose the one that fits your workflow:
+
+### Option A: MCP Server (Recommended for most users)
 
 ### Cursor
 
@@ -168,24 +205,23 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 **Restart Claude Desktop** after saving.
 
----
-
-## 🔌 Official OpenCode Plugin Support
+### Option B: Official OpenCode Plugin
 
 We now have **official OpenCode plugin support**! We support OpenCode because OpenCode's MCP server seems to have some limitations (timeout), so we created an OpenCode-specific plugin that works perfectly together with OpenCode.
 
 The OpenCode plugin allows OpenCode to call `auq ask` directly (without MCP), providing seamless integration with OpenCode's workflow.
 
-### Installation
+#### Installation
 
 ```bash
 # Install both CLI and plugin
 npm install -g auq-mcp-server
+npm install -g @paulp-o/opencode-auq
 ```
 
-### Configuration
+#### Configuration
 
-Add to `opencode.json(c)`:
+Add to `opencode.json`:
 
 ```json
 {
