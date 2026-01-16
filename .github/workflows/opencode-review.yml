@@ -96,28 +96,19 @@ jobs:
             - New feature / Breaking change → Needs OpenSpec proposal in `openspec/changes/`
             - Check for conflicts with pending proposals
 
-            ### 3. For PRs: Compliance Checklist
-            - [ ] Uses HugeIcons (`@hugeicons/core-free-icons`) - NEVER Lucide
-            - [ ] Uses shadcn/ui components from `src/components/ui/`
-            - [ ] Korean-only UI text
-            - [ ] Semantic color tokens (no hardcoded colors)
-            - [ ] No type casting unless necessary
-            - [ ] TDD followed (tests exist)
-            - [ ] No startup/scale animations on buttons
+            ## Response Format (in English)
 
-            ## Response Format (Korean, but follow writer's language if not Korean)
+            ### Related Specs
+            - List of openspec documents reviewed
 
-            ### 관련 스펙
-            - 확인한 openspec 문서 목록
+            ### Classification
+            - Issue/PR type and whether an OpenSpec proposal is needed (required!)
 
-            ### 분류
-            - 이슈/PR 유형 및 OpenSpec 제안 필요 여부(반드시!)
+            ### Review Results (if PR)
+            - Checklist violations
+            - Suggestions for improvement
 
-            ### 검토 결과 (PR인 경우)
-            - 체크리스트 위반 사항
-            - 개선 제안
-
-            ### 가이드
-            - 구현자/리뷰어를 위한 안내사항
+            ### Guide
+            - Instructions for implementers/reviewers
 
             Be concise and constructive. Reference file paths when applicable. **MUST** Use "해요체" (example: 안녕하세요. 이슈/PR를 검토했어요. 체크리스트 위반 사항이 있어요. 개선 제안이 있어요.) if in Korean.
