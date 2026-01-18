@@ -55,7 +55,9 @@ server.addTool({
     "- If user seems not aware how to answer the question, inform them that they need to install the 'auq' cli tool.\n\n" +
     "Returns a formatted summary of all questions and answers.",
   execute: async (args, ctx) => {
-    const { log } = ctx as { log: { info: Function; warn: Function; error: Function } };
+    const { log } = ctx as {
+      log: { info: Function; warn: Function; error: Function };
+    };
 
     try {
       // Initialize session manager if not already done
@@ -81,8 +83,10 @@ server.addTool({
       // Generate a per-tool-call ID and persist it with the session
       const callId = randomUUID();
 
-      const { formattedResponse, sessionId } =
-        await askUserQuestionsCore.ask(args.questions, callId);
+      const { formattedResponse, sessionId } = await askUserQuestionsCore.ask(
+        args.questions,
+        callId,
+      );
 
       log.info("Session completed successfully", { sessionId, callId });
 

@@ -4,10 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import {
-  QuestionSchema,
-  QuestionsSchema,
-} from "../core/ask-user-questions.js";
+import { QuestionSchema, QuestionsSchema } from "../core/ask-user-questions.js";
 
 describe("Schema Validation - Edge Cases", () => {
   describe("Invalid Input (should reject)", () => {

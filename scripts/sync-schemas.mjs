@@ -2,7 +2,7 @@
 
 /**
  * Sync schemas script
- * Note: OpenCode plugin defines schemas inline, so no sync needed
+ * Note: OpenCode plugin now imports schemas from main project
  */
 
-console.log('✅ Schemas sync skipped - OpenCode plugin uses inline schemas');
+console.log("✅ Schemas sync skipped - OpenCode plugin imports from main schemas");

@@ -63,10 +63,7 @@ const updateVersion = (path) => {
 };
 
 const rootPkgPath = resolve(rootDir, "package.json");
-const pluginPkgPath = resolve(
-  rootDir,
-  "packages/opencode-plugin/package.json",
-);
+const pluginPkgPath = resolve(rootDir, "packages/opencode-plugin/package.json");
 
 ensureCleanGit();
 ensureTagAvailable(`v${version}`);
@@ -74,11 +71,46 @@ ensureTagAvailable(`v${version}`);
 updateVersion(rootPkgPath);
 updateVersion(pluginPkgPath);
 
+// 배포 전 확인
+console.log(`\n🚀 Ready to release version ${version}?`);
+console.log(`📦 Main package: auq-mcp-server@${version}`);
+console.log(`🔌 Plugin package: @paulp-o/opencode-auq@${version}`);
+console.log(`\n⚠️  This will:`);
+console.log(`   - Update package versions`);
+console.log(`   - Run tests and linting`);
+console.log(`   - Build all packages`);
+console.log(`   - Commit and tag the release`);
+console.log(`   - Publish to npm`);
+console.log(`   - Create GitHub release`);
+console.log(`\nPress Enter to continue or Ctrl+C to abort...`);
+
+// 사용자 확인 대기
+process.stdin.setRawMode(true);
+process.stdin.resume();
+await new Promise((resolve) => {
+  process.stdin.once('data', (key) => {
+    process.stdin.setRawMode(false);
+    process.stdin.pause();
+    // Enter 키가 아니면 종료
+    if (key[0] !== 13) {
+      console.log('\n❌ Release cancelled');
+      process.exit(1);
+    }
+    resolve();
+  });
+});
+
+console.log('\n✅ Starting release process...\n');
+
 run("npm install");
+run("npm run lint");
+run("npm run test");
 run("npm run build");
 run("npm run -w packages/opencode-plugin build");
 
-run("git add package.json package-lock.json packages/opencode-plugin/package.json");
+run(
+  "git add package.json package-lock.json packages/opencode-plugin/package.json",
+);
 run(`git commit -m "chore(release): v${version}"`);
 run(`git tag v${version}`);
 
@@ -86,4 +118,40 @@ run("npm publish");
 run("npm publish -w packages/opencode-plugin --access public");
 
 run("git push origin HEAD --tags");
-run(`gh release create v${version} --generate-notes`);
+
+console.log(`\n📝 Release created! Now create release notes:`);
+console.log(`   1. Write release notes in RELEASE_NOTES.md`);
+console.log(`   2. Run: gh release create v${version} --title "Release v${version}" --notes-file RELEASE_NOTES.md`);
+console.log(`   3. Or edit release notes directly on GitHub`);
+
+// 선택적으로 릴리즈 노트 파일 생성
+const releaseNotesPath = resolve(rootDir, "RELEASE_NOTES.md");
+const defaultNotes = `# Release v${version}
+
+## What's New
+-
+
+## Bug Fixes
+-
+
+## Improvements
+-
+
+## Breaking Changes
+-
+
+## Installation
+\`\`\`bash
+npm install auq-mcp-server@${version}
+npm install @paulp-o/opencode-auq@${version}
+\`\`\`
+`;
+
+try {
+  writeFileSync(releaseNotesPath, defaultNotes, "utf8");
+  console.log(`\n📄 Template release notes created at: RELEASE_NOTES.md`);
+  console.log(`   Edit this file with your release notes, then run:`);
+  console.log(`   gh release create v${version} --title "Release v${version}" --notes-file RELEASE_NOTES.md`);
+} catch (error) {
+  console.log(`\n⚠️  Could not create RELEASE_NOTES.md template: ${error.message}`);
+}

@@ -23,6 +23,7 @@ interface QuestionDisplayProps {
   >;
   onToggleOption?: (label: string) => void;
   multiSelect?: boolean;
+  onFocusContextChange?: (context: "option" | "custom-input") => void;
 }
 
 /**
@@ -42,11 +43,16 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   answers,
   onToggleOption,
   multiSelect,
+  onFocusContextChange,
 }) => {
-  // Track focus context for Footer component
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
     "option",
   );
+
+  const handleFocusContextChange = (context: "option" | "custom-input") => {
+    setFocusContext(context);
+    onFocusContextChange?.(context);
+  };
 
   // Handle option selection - clears custom answer only in single-select mode
   const handleSelectOption = (label: string) => {
@@ -97,7 +103,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         onToggle={onToggleOption}
         multiSelect={multiSelect}
         selectedOptions={answers.get(currentQuestionIndex)?.selectedOptions}
-        onFocusContextChange={setFocusContext}
+        onFocusContextChange={handleFocusContextChange}
       />
 
       {/* Footer with context-aware keybindings */}

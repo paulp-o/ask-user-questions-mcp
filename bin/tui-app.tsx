@@ -231,4 +231,3 @@ export const runTui = () => {
     console.log("👋 Goodbye! See you next time.");
   });
 };
-

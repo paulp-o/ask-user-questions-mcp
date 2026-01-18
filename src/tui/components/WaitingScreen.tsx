@@ -28,7 +28,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
 
   // Handle 'q' key to quit
   useInput((input, key) => {
-    if (input === 'q') {
+    if (input === "q") {
       process.exit(0);
     }
   });

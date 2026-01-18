@@ -1,7 +1,7 @@
 import { Box, Text, useInput } from "ink";
 import React, { useState } from "react";
 import { theme } from "../theme.js";
-import { MultiLineTextInput } from "./MultiLineTextInput.js";
+import { SingleLineTextInput } from "./SingleLineTextInput.js";
 
 interface ConfirmationDialogProps {
   message: string;
@@ -96,7 +96,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <Text dimColor>(Optional - helps the AI improve)</Text>
         </Box>
         <Box marginBottom={1}>
-          <MultiLineTextInput
+          <SingleLineTextInput
             isFocused={true}
             onChange={setRejectionReason}
             onSubmit={handleReasonSubmit}
@@ -105,7 +105,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           />
         </Box>
         <Box marginTop={1}>
-          <Text dimColor>Enter Submit | Shift+Enter Newline | Esc Skip</Text>
+          <Text dimColor>Enter Submit | Esc Skip</Text>
         </Box>
       </Box>
     );

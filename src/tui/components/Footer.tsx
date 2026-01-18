@@ -33,22 +33,13 @@ export const Footer: React.FC<FooterProps> = ({
 
     // Custom input focused
     if (focusContext === "custom-input") {
-      const hasContent = customInputValue.trim().length > 0;
-      const bindings: Keybinding[] = [
+      return [
         { key: "↑↓", action: "Options" },
-        { key: "Tab", action: "Next" },
-      ];
-
-      if (hasContent) {
-        bindings.push({ key: "Enter", action: "Submit" });
-      }
-
-      bindings.push(
-        { key: "Shift+Enter", action: "Newline" },
+        { key: "←→", action: "Cursor" },
+        { key: "Tab/S+Tab", action: "Questions" },
+        { key: "Enter", action: "Newline" },
         { key: "Esc", action: "Reject" },
-      );
-
-      return bindings;
+      ];
     }
 
     // Option focused
@@ -56,13 +47,11 @@ export const Footer: React.FC<FooterProps> = ({
       const bindings: Keybinding[] = [
         { key: "↑↓", action: "Options" },
         { key: "←→", action: "Questions" },
+        { key: "Tab/S+Tab", action: "Questions" },
       ];
 
       if (multiSelect) {
-        bindings.push(
-          { key: "Space", action: "Toggle" },
-          { key: "Tab", action: "Submit" },
-        );
+        bindings.push({ key: "Space", action: "Toggle" });
       } else {
         bindings.push({ key: "Enter", action: "Select" });
       }

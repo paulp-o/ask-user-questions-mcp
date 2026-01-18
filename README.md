@@ -67,27 +67,20 @@ Recent AI workflows often use parallel sub-agents for concurrent coding. AUQ han
 AUQ is designed for the era of parallel multi-agent workflows, with several key advantages:
 
 ### 🚀 Non-Blocking Parallel Operation
+
 Unlike built-in ask tools that halt the entire AI workflow until you respond, AUQ **doesn't block the AI from continuing work**. Questions are queued asynchronously, allowing your AI assistants to keep coding while you review and answer questions at your own pace.
 
 ### 🎯 Multi-Agent Question Set Support
-**The killer feature**: AUQ can handle question sets from **multiple agents simultaneously**. In modern AI coding workflows, you often have several sub-agents working in parallel—each might need clarification on different aspects of your codebase. With AUQ:
+
+AUQ can handle question sets from **multiple agents simultaneously**. In modern AI coding workflows, you often have several sub-agents working in parallel—each might need clarification on different aspects of your codebase. With AUQ:
 
 - **No more screen switching** between different agent conversations
 - **Unified queue** for all agent questions, regardless of which AI tool they're coming from
 - **Sequential processing** of questions from multiple sources in one interface
 
-### 🌐 Cross-Platform Question Aggregation
-AUQ's **unified data origin** means you can answer questions from **different AI clients simultaneously**:
-- Claude Code questions
-- OpenCode questions
-- Cursor/MCP questions
+### 🌐 Question Set Rejection Support
 
-All appear in the **same CLI interface**, creating a single source of truth for all AI-agent questions across your entire development environment.
-
-### 💡 Perfect for Parallel Agent Workflows
-As AI coding moves toward sophisticated multi-agent systems, AUQ becomes essential. Instead of managing blocking questions across multiple agent screens, you get one streamlined interface that handles questions from your entire AI coding ecosystem—keeping your focus on the code, not the coordination.
-
-**TL;DR**: AUQ transforms AI-agent questions from blocking interruptions into a smooth, unified workflow that scales with your AI coding setup.
+**Skip irrelevant question sets entirely** - reject whole question batches that don't apply to your current context, saving time and maintaining focus on relevant AI-agent questions.
 
 ---
 
@@ -103,8 +96,6 @@ First, install the AUQ CLI tool:
 # Install globally
 npm install -g auq-mcp-server
 
-# Start the TUI
-auq
 ```
 
 ### Local Installation (Project-specific)
@@ -113,8 +104,6 @@ auq
 # Install in your project
 npm install auq-mcp-server
 
-# Start the TUI from project directory
-npx auq
 ```
 
 **Session Storage:**
@@ -128,7 +117,7 @@ npx auq
 
 AUQ supports multiple AI coding environments. Choose the one that fits your workflow:
 
-### Option A: MCP Server (Recommended for most users)
+### Option A: MCP Server
 
 ### Cursor
 
@@ -215,14 +204,6 @@ We now have **official OpenCode plugin support**! We support OpenCode because Op
 
 The OpenCode plugin allows OpenCode to call `auq ask` directly (without MCP), providing seamless integration with OpenCode's workflow.
 
-#### Installation
-
-```bash
-# Install both CLI and plugin
-npm install -g auq-mcp-server
-npm install -g @paulp-o/opencode-auq
-```
-
 #### Configuration
 
 Add to `opencode.json`:
@@ -232,7 +213,6 @@ Add to `opencode.json`:
   "plugin": ["@paulp-o/opencode-auq"]
 }
 ```
-
 
 ---
 

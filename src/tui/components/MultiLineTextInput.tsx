@@ -13,7 +13,7 @@ interface MultiLineTextInputProps {
 /**
  * Multi-line text input component for Ink with cursor positioning
  * Supports left/right arrow keys for cursor movement
- * Shift+Enter for newlines, Enter to submit
+ * Enter for newlines, Tab to submit (portable across terminals)
  */
 export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   isFocused = true,
@@ -35,32 +35,23 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
     (input, key) => {
       if (!isFocused) return;
 
-      // Normalize Enter key sequences that may arrive as raw input ("\r"/"\n").
-      // Prevent accidental carriage return insertion which causes line overwrite in terminals.
-      if (input === "\r" || input === "\n") {
-        if (key.shift) {
-          const newValue = value.slice(0, cursorPosition) + "\n" + value.slice(cursorPosition);
-          onChange(newValue);
-          setCursorPosition(cursorPosition + 1);
-        } else if (onSubmit) {
-          onSubmit();
-        }
+      // Tab: Submit (also triggers question navigation via parent)
+      if (key.tab && !key.shift) {
+        onSubmit?.();
         return;
       }
 
-      // Shift+Enter: Add newline
-      if (key.return && key.shift) {
-        const newValue = value.slice(0, cursorPosition) + "\n" + value.slice(cursorPosition);
+      // Shift+Tab: Let parent handle for previous question navigation
+      if (key.tab && key.shift) {
+        return;
+      }
+
+      // Enter: Always add newline (portable behavior)
+      if (input === "\r" || input === "\n" || key.return) {
+        const newValue =
+          value.slice(0, cursorPosition) + "\n" + value.slice(cursorPosition);
         onChange(newValue);
         setCursorPosition(cursorPosition + 1);
-        return;
-      }
-
-      // Enter: Submit (empty input allowed)
-      if (key.return) {
-        if (onSubmit) {
-          onSubmit();
-        }
         return;
       }
 
@@ -79,7 +70,8 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
       // Backspace: Remove character before cursor
       if (key.backspace || key.delete) {
         if (cursorPosition > 0) {
-          const newValue = value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
+          const newValue =
+            value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
           onChange(newValue);
           setCursorPosition(cursorPosition - 1);
         }
@@ -95,7 +87,8 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         input !== "\r" &&
         input !== "\n"
       ) {
-        const newValue = value.slice(0, cursorPosition) + input + value.slice(cursorPosition);
+        const newValue =
+          value.slice(0, cursorPosition) + input + value.slice(cursorPosition);
         onChange(newValue);
         setCursorPosition(cursorPosition + 1);
       }
@@ -103,20 +96,23 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
     { isActive: isFocused },
   );
 
-  // Normalize any carriage returns that might already be present in value
   const normalizedValue = value.replace(/\r\n?/g, "\n");
   const hasContent = normalizedValue.length > 0;
   const lines = hasContent ? normalizedValue.split("\n") : [placeholder];
 
-  // Calculate which line and position the cursor is on
-  const cursorLineIndex = normalizedValue.slice(0, cursorPosition).split("\n").length - 1;
-  const cursorLineStart = normalizedValue.split("\n").slice(0, cursorLineIndex).join("\n").length + (cursorLineIndex > 0 ? cursorLineIndex : 0);
+  const cursorLineIndex =
+    normalizedValue.slice(0, cursorPosition).split("\n").length - 1;
+
+  const cursorLineStart =
+    normalizedValue.lastIndexOf("\n", cursorPosition - 1) + 1;
+
   const cursorPositionInLine = cursorPosition - cursorLineStart;
 
   return (
     <Box flexDirection="column">
       {lines.map((line, index) => {
-        const isCursorLine = isFocused && index === cursorLineIndex && hasContent;
+        const isCursorLine =
+          isFocused && index === cursorLineIndex && hasContent;
         const isPlaceholder = !hasContent;
         const lineHasContent = line.length > 0;
         const displayText = lineHasContent ? line : isCursorLine ? "" : " ";

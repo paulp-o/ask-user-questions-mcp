@@ -38,6 +38,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [showRejectionConfirm, setShowRejectionConfirm] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
+    "option",
+  );
 
   const currentQuestion = sessionRequest.questions[currentQuestionIndex];
   const sessionCreatedAt = useMemo(() => {
@@ -197,11 +200,26 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
-    // Question navigation with arrow keys
-    if (key.leftArrow && currentQuestionIndex > 0) {
+    // Tab/Shift+Tab: Global question navigation (works in all contexts)
+    if (key.tab && key.shift && currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+      return;
+    }
+    if (
+      key.tab &&
+      !key.shift &&
+      currentQuestionIndex < sessionRequest.questions.length - 1
+    ) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+      return;
+    }
+
+    const shouldNavigate = focusContext !== "custom-input";
+    if (shouldNavigate && key.leftArrow && currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
     if (
+      shouldNavigate &&
       key.rightArrow &&
       currentQuestionIndex < sessionRequest.questions.length - 1
     ) {
@@ -269,6 +287,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       questions={sessionRequest.questions}
       selectedOption={currentAnswer?.selectedOption}
       answers={answers}
+      onFocusContextChange={setFocusContext}
     />
   );
 };

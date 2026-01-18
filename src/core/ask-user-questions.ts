@@ -54,7 +54,10 @@ export const createAskUserQuestionsCore = (
   const ask = async (questions: QuestionInput[], callId?: string) => {
     await ensureInitialized();
     const parsedQuestions = QuestionsSchema.parse(questions);
-    return sessionManager.startSession(normalizeQuestions(parsedQuestions), callId);
+    return sessionManager.startSession(
+      normalizeQuestions(parsedQuestions),
+      callId,
+    );
   };
 
   return {

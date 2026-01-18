@@ -92,8 +92,9 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           }
         }
 
-        if (key.return || key.tab) {
-          // Enter OR Tab: Advance to next question (don't toggle)
+        if (key.return) {
+          // Enter: Advance to next question (don't toggle)
+          // Note: Tab is handled globally in StepperView for question navigation
           if (!isCustomInputFocused && onAdvance) {
             onAdvance();
           }
@@ -198,7 +199,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                   isFocused={true}
                   onChange={onCustomChange}
                   onSubmit={onAdvance}
-                  placeholder="Type your answer... (Shift+Enter for newline)"
+                  placeholder="Type your answer... (Enter for newline, Tab to submit)"
                   value={customValue}
                 />
               </Box>

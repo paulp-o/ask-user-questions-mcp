@@ -19,6 +19,7 @@
     "prepare": "npm run build",
     "postinstall": "node scripts/postinstall.cjs",
     "deploy": "node scripts/deploy.mjs",
+    "semantic-release": "semantic-release",
     "server": "node dist/src/server.js",
     "start": "tsx src/server.ts",
     "dev": "fastmcp dev src/server.ts",
