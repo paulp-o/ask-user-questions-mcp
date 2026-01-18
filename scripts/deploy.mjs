@@ -82,25 +82,14 @@ console.log(`   - Build all packages`);
 console.log(`   - Commit and tag the release`);
 console.log(`   - Publish to npm`);
 console.log(`   - Create GitHub release`);
-console.log(`\nPress Enter to continue or Ctrl+C to abort...`);
+console.log(`\nStarting release in 3 seconds... (Ctrl+C to cancel)`);
 
-// 사용자 확인 대기
-process.stdin.setRawMode(true);
-process.stdin.resume();
+// 3초 대기 후 자동 진행
 await new Promise((resolve) => {
-  process.stdin.once('data', (key) => {
-    process.stdin.setRawMode(false);
-    process.stdin.pause();
-    // Enter 키가 아니면 종료
-    if (key[0] !== 13) {
-      console.log('\n❌ Release cancelled');
-      process.exit(1);
-    }
-    resolve();
-  });
+  setTimeout(resolve, 3000);
 });
 
-console.log('\n✅ Starting release process...\n');
+console.log('✅ Starting release process...\n');
 
 run("npm install");
 run("npm run lint");
