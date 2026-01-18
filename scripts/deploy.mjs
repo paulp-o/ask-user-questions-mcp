@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-env node */
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
@@ -89,7 +90,7 @@ await new Promise((resolve) => {
   setTimeout(resolve, 3000);
 });
 
-console.log('✅ Starting release process...\n');
+console.log("✅ Starting release process...\n");
 
 run("npm install");
 run("npm run lint");
@@ -110,7 +111,9 @@ run("git push origin HEAD --tags");
 
 console.log(`\n📝 Release created! Now create release notes:`);
 console.log(`   1. Write release notes in RELEASE_NOTES.md`);
-console.log(`   2. Run: gh release create v${version} --title "Release v${version}" --notes-file RELEASE_NOTES.md`);
+console.log(
+  `   2. Run: gh release create v${version} --title "Release v${version}" --notes-file RELEASE_NOTES.md`,
+);
 console.log(`   3. Or edit release notes directly on GitHub`);
 
 // 선택적으로 릴리즈 노트 파일 생성
@@ -140,7 +143,11 @@ try {
   writeFileSync(releaseNotesPath, defaultNotes, "utf8");
   console.log(`\n📄 Template release notes created at: RELEASE_NOTES.md`);
   console.log(`   Edit this file with your release notes, then run:`);
-  console.log(`   gh release create v${version} --title "Release v${version}" --notes-file RELEASE_NOTES.md`);
+  console.log(
+    `   gh release create v${version} --title "Release v${version}" --notes-file RELEASE_NOTES.md`,
+  );
 } catch (error) {
-  console.log(`\n⚠️  Could not create RELEASE_NOTES.md template: ${error.message}`);
+  console.log(
+    `\n⚠️  Could not create RELEASE_NOTES.md template: ${error.message}`,
+  );
 }

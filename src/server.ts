@@ -56,7 +56,11 @@ server.addTool({
     "Returns a formatted summary of all questions and answers.",
   execute: async (args, ctx) => {
     const { log } = ctx as {
-      log: { info: Function; warn: Function; error: Function };
+      log: {
+        info: (...args: unknown[]) => void;
+        warn: (...args: unknown[]) => void;
+        error: (...args: unknown[]) => void;
+      };
     };
 
     try {

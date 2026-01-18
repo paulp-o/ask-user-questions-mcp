@@ -10,6 +10,16 @@ export default tseslint.config(
     ignores: ["**/*.js", "**/*.cjs"],
   },
   {
+    files: ["**/*.mjs"],
+    languageOptions: {
+      globals: {
+        console: "readonly",
+        process: "readonly",
+        setTimeout: "readonly",
+      },
+    },
+  },
+  {
     rules: {
       "@typescript-eslint/no-unused-vars": "warn",
     },

@@ -31,7 +31,7 @@ const runAuqAsk = async (payload: unknown): Promise<string> =>
     child.on("error", (error) => {
       reject(
         new Error(
-          `Failed to run \"auq ask\": ${error.message}. Is the auq CLI installed globally?`,
+          `Failed to run "auq ask": ${error.message}. Is the auq CLI installed globally?`,
         ),
       );
     });
