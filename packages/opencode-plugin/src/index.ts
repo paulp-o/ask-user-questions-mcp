@@ -5,7 +5,7 @@ import { tool } from "@opencode-ai/plugin/tool";
 import {
   AskUserQuestionsParametersSchema,
   TOOL_DESCRIPTION,
-} from "../../src/shared/schemas.js";
+} from "../../src/shared/schemas.ts";
 
 const z = tool.schema;
 
