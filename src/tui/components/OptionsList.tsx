@@ -114,12 +114,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           }
         }
 
-        if (key.tab) {
-          // Tab: Just advance (don't select)
-          if (onAdvance) {
-            onAdvance();
-          }
-        }
+        // Tab is handled globally in StepperView for question navigation
       }
     },
     { isActive: isFocused },
