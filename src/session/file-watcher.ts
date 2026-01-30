@@ -7,7 +7,7 @@
 
 import { EventEmitter } from "events";
 import { FSWatcher, watch } from "fs";
-import { join } from "path";
+import { basename, join } from "path";
 import { fileExists } from "./utils.js";
 
 import type { SessionConfig } from "./types.js";
@@ -241,7 +241,7 @@ export class PromiseFileWatcher extends EventEmitter {
       if (!stats.isDirectory()) return;
 
       // Extract session ID from directory name
-      const sessionId = sessionPath.split("/").pop() ?? "";
+      const sessionId = basename(sessionPath);
       if (!sessionId) return;
 
       // Verify it's a valid session (has request.json)

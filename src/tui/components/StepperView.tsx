@@ -42,7 +42,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
     "option",
   );
 
-  const currentQuestion = sessionRequest.questions[currentQuestionIndex];
+  const safeIndex = Math.min(
+    currentQuestionIndex,
+    sessionRequest.questions.length - 1,
+  );
+  const currentQuestion = sessionRequest.questions[safeIndex];
   const sessionCreatedAt = useMemo(() => {
     const parsed = Date.parse(sessionRequest.timestamp);
     return Number.isNaN(parsed) ? Date.now() : parsed;
@@ -201,16 +205,14 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
 
     // Tab/Shift+Tab: Global question navigation (works in all contexts)
-    if (key.tab && key.shift && currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => prev - 1);
+    if (key.tab && key.shift) {
+      setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
       return;
     }
-    if (
-      key.tab &&
-      !key.shift &&
-      currentQuestionIndex < sessionRequest.questions.length - 1
-    ) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+    if (key.tab && !key.shift) {
+      setCurrentQuestionIndex((prev) =>
+        Math.min(sessionRequest.questions.length - 1, prev + 1),
+      );
       return;
     }
 
