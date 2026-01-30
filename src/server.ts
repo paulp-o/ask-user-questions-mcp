@@ -10,16 +10,8 @@ const askUserQuestionsCore = createAskUserQuestionsCore();
 const server = new FastMCP({
   name: "AskUserQuestions",
   instructions:
-    "This MCP server provides a tool to ask structured questions to the user. " +
-    "Use the ask_user_questions tool when you need to:\n" +
-    "- Gather user preferences or requirements during execution\n" +
-    "- Clarify ambiguous instructions or implementation choices\n" +
-    "- Get decisions on what direction to take\n" +
-    "- Offer choices to the user about multiple valid approaches\n\n" +
-    "The tool allows AI models to pause execution and gather direct user input through an interactive TUI, " +
-    "returning formatted responses for continued reasoning. " +
-    "Each question supports 2-4 multiple-choice options with descriptions, and users can always provide custom text input. " +
-    "Both single-select and multi-select modes are supported.",
+    "MCP server for asking users structured questions during AI execution. " +
+    "Use ask_user_questions tool to gather preferences, clarify requirements, or make implementation decisions without blocking AI workflow.",
   version: "0.1.17",
 });
 

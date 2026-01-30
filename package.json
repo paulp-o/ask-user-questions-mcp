@@ -19,7 +19,8 @@
     "prepare": "npm run build",
     "postinstall": "node scripts/postinstall.cjs",
     "deploy": "node scripts/deploy.mjs",
-    "semantic-release": "semantic-release",
+    "release": "semantic-release",
+    "release:dry-run": "semantic-release --dry-run",
     "server": "node dist/src/server.js",
     "start": "tsx src/server.ts",
     "dev": "fastmcp dev src/server.ts",
@@ -59,17 +60,25 @@
   },
   "release": {
     "branches": [
-      "main"
+      "main",
+      "master"
     ],
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
+      ],
       "@semantic-release/npm",
       "@semantic-release/github"
     ]
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@semantic-release/changelog": "^6.0.3",
     "@tsconfig/node22": "^22.0.1",
     "@types/node": "^22.13.0",
     "@types/react": "^19.2.2",
