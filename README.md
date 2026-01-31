@@ -208,7 +208,7 @@ Add to `opencode.json`:
 
 ```json
 {
-  "plugin": ["@paulp-o/opencode-auq"]
+  "plugin": ["@paulp-o/opencode-auq@latest"]
 }
 ```
 
