@@ -227,7 +227,7 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
 
 /**
  * Create a simple TUI session watcher instance
- * Auto-detects session directory based on global vs local install
+ * Uses global XDG-compliant session directory path
  */
 export function createTUIWatcher(
   config?: TUIWatcherConfig,
