@@ -45,12 +45,11 @@ ASK COMMAND:
   - Multi-select mode (multiSelect: true): User can select MULTIPLE options
 
   USAGE NOTES:
-  - Always provide a descriptive 'title' field (max 12 chars) for each question
+  - Provide a descriptive 'title' field (max 12 chars) for each question
   - Use multiSelect: true when choices are not mutually exclusive
   - Option labels should be concise (1-5 words)
-  - Questions should end with a question mark
+  - To mark a recommended option, append '(recommended)' to its label
   - Don't include an 'Other' option - it's provided automatically
-  - Mark one option as recommended.
 
   Returns a formatted summary of all questions and answers.
 

@@ -24,6 +24,7 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: npm ci
@@ -37,8 +38,23 @@ jobs:
       - name: Build packages
         run: npm run build && npm run -w packages/opencode-plugin build
 
-      - name: Release
+      - name: Release main package
         run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish OpenCode plugin (if not already published)
+        run: |
+          cd packages/opencode-plugin
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          # Check if version already exists on npm
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version 2>/dev/null; then
+            echo "Version ${PACKAGE_VERSION} already published, skipping"
+          else
+            echo "Publishing ${PACKAGE_NAME}@${PACKAGE_VERSION}"
+            npm publish --access public --provenance
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

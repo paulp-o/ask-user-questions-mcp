@@ -1,6 +1,17 @@
-import { z } from "zod";
+/**
+ * AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
+ * 
+ * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
+ * Run "npm run sync-plugin-schemas" to regenerate.
+ * 
+ * Generated at: 2026-02-01T10:47:19.235Z
+ */
 
-export const OptionSchema = z.object({
+import { tool } from "@opencode-ai/plugin/tool";
+
+const z = tool.schema;
+
+const OptionSchema = z.object({
   label: z
     .string()
     .describe(
@@ -16,7 +27,7 @@ export const OptionSchema = z.object({
     ),
 });
 
-export const QuestionSchema = z.object({
+const QuestionSchema = z.object({
   prompt: z
     .string()
     .describe(
@@ -52,9 +63,9 @@ export const QuestionSchema = z.object({
     ),
 });
 
-export const QuestionsSchema = z.array(QuestionSchema).min(1).max(4);
+const QuestionsSchema = z.array(QuestionSchema).min(1).max(4);
 
-export const AskUserQuestionsParametersSchema = z.object({
+const AskUserQuestionsParametersSchema = z.object({
   questions: QuestionsSchema.describe(
     "Questions to ask the user (1-4 questions). " +
       "Each question must include: prompt (full question text), title (short label, max 12 chars), " +
@@ -66,7 +77,7 @@ export const AskUserQuestionsParametersSchema = z.object({
  * Comprehensive tool description - single source of truth.
  * Used by MCP server and should be synced to opencode-plugin.
  */
-export const TOOL_DESCRIPTION =
+const TOOL_DESCRIPTION =
   "Ask users structured questions during execution to gather preferences, clarify requirements, or make implementation decisions.\n\n" +
   "FEATURES:\n" +
   "- Non-blocking: doesn't halt AI workflow\n" +
@@ -81,4 +92,7 @@ export const TOOL_DESCRIPTION =
   "- Don't include an 'Other' option - it's provided automatically\n\n" +
   "Returns formatted responses for continued reasoning.";
 
-export type QuestionInput = z.infer<typeof QuestionSchema>;
+// Only export what the plugin needs
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const AskUserQuestionsArgs: any = AskUserQuestionsParametersSchema.shape;
+export { TOOL_DESCRIPTION };
