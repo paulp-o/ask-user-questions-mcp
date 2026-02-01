@@ -106,10 +106,7 @@ npm install auq-mcp-server
 
 ```
 
-**Session Storage:**
-
-- **Global install**: `~/Library/Application Support/auq/sessions` (macOS), `~/.local/share/auq/sessions` (Linux)
-- **Local install**: `.auq/sessions/` in your project root
+**Note:** Sessions are stored globally regardless of installation method. See [Troubleshooting](#troubleshooting) for session locations.
 
 ---
 
@@ -219,8 +216,8 @@ Add to `opencode.json`:
 ### Starting the CLI tool
 
 ```bash
-auq  # if you installed globally
-npx auq  # if you installed locally
+auq      # if installed globally (npm install -g)
+npx auq  # works from anywhere
 ```
 
 Then just start working with your coding agent or AI assistant. You may prompt to ask questions with the tool the agent got; it will mostly just get what you mean.
@@ -241,12 +238,94 @@ auq --help       # Show help
 Sessions auto-clean after completion or timeout. However, you can manually clean them up if you want to.
 
 ```bash
-# Global install
 rm -rf ~/Library/Application\ Support/auq/sessions/*  # macOS
 rm -rf ~/.local/share/auq/sessions/*                  # Linux
+```
 
-# Local install
-rm -rf .auq/sessions/*
+---
+
+<details>
+<summary>Local Development & Testing</summary>
+
+To test the MCP server and CLI locally during development:
+
+### 1. Start the MCP Server (Terminal 1)
+
+```bash
+# Option A: Run with tsx (recommended for development)
+npm run start
+
+# Option B: Run with fastmcp dev mode (includes web inspector at http://localhost:6274)
+npm run dev
+
+# Option C: Run the built version
+npm run build && npm run server
+```
+
+### 2. Create a Test Session (Terminal 2)
+
+Use the `auq ask` command to create a session and wait for answers:
+
+```bash
+# Run directly with tsx during development
+npx tsx bin/auq.tsx ask '{"questions": [{"prompt": "Which language?", "title": "Lang", "options": [{"label": "TypeScript"}, {"label": "Python"}], "multiSelect": false}]}'
+
+# Or pipe JSON to stdin
+echo '{"questions": [{"prompt": "Which database?", "title": "DB", "options": [{"label": "PostgreSQL"}, {"label": "MongoDB"}], "multiSelect": false}]}' | npx tsx bin/auq.tsx ask
+```
+
+This will create a session and wait for the TUI to provide answers.
+
+### 3. Answer with the TUI (Terminal 3)
+
+```bash
+# Run the TUI to answer pending questions
+npx tsx bin/auq.tsx
+```
+
+### Create Mock Sessions for TUI Testing
+
+To test the TUI with multiple pending sessions:
+
+```bash
+# Create 3 mock sessions (default)
+npx tsx scripts/create-mock-session.ts
+
+# Create a specific number of sessions
+npx tsx scripts/create-mock-session.ts 5
+```
+
+Then run the TUI to see and answer them:
+
+```bash
+npx tsx bin/auq.tsx
+```
+
+### Verify MCP and CLI Use Same Session Directory
+
+Both components should report the same session directory path. Check the logs:
+
+- MCP server logs session directory on startup
+- `auq ask` prints `[AUQ] Session directory: <path>` to stderr
+
+On macOS, both should use: `~/Library/Application Support/auq/sessions`
+
+</details>
+
+## Troubleshooting
+
+### Session Storage
+
+Sessions are stored in platform-specific global locations:
+
+- **macOS**: `~/Library/Application Support/auq/sessions`
+- **Linux**: `~/.local/share/auq/sessions` (or `$XDG_DATA_HOME/auq/sessions`)
+- **Windows**: `%APPDATA%\auq\sessions`
+
+To override the default location, set the `AUQ_SESSION_DIR` environment variable:
+
+```bash
+export AUQ_SESSION_DIR=/custom/path
 ```
 
 ---
