@@ -2,7 +2,6 @@ dist
 node_modules
 
 !.github/
-.*/
 .env
 CLAUDE.md
 .mcp*
