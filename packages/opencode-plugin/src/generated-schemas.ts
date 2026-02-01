@@ -4,7 +4,7 @@
  * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
  * Run "npm run sync-plugin-schemas" to regenerate.
  * 
- * Generated at: 2026-02-01T10:53:32.397Z
+ * Generated at: 2026-02-01T11:36:38.224Z
  */
 
 import { tool } from "@opencode-ai/plugin/tool";
@@ -78,19 +78,16 @@ const AskUserQuestionsParametersSchema = z.object({
  * Used by MCP server and should be synced to opencode-plugin.
  */
 const TOOL_DESCRIPTION =
-  "Ask users structured questions during execution to gather preferences, clarify requirements, or make implementation decisions.\n\n" +
-  "FEATURES:\n" +
-  "- Non-blocking: doesn't halt AI workflow\n" +
-  "- 1-4 questions with 2-4 options each\n" +
-  "- Single/multi-select modes\n" +
-  "- Custom text input always available\n\n" +
-  "USAGE NOTES:\n" +
-  "- Provide a descriptive 'title' field (max 12 chars) for each question\n" +
-  "- Use multiSelect: true when choices are not mutually exclusive\n" +
-  "- Option labels should be concise (1-5 words)\n" +
-  "- To mark a recommended option, append '(recommended)' to its label\n" +
-  "- Don't include an 'Other' option - it's provided automatically\n\n" +
-  "Returns formatted responses for continued reasoning.";
+  "Use this tool when you need to ask the user questions during execution. This allows you to:\n\n" +
+  "Gather user preferences or requirements\n" +
+  "Clarify ambiguous instructions\n" +
+  "Get decisions on implementation choices as you work\n" +
+  "Offer choices to the user about what direction to take.\n" +
+  "Usage notes:\n\n" +
+  "Users will always be able to select \"Other\" to provide custom text input\n" +
+  "Use multiSelect: true to allow multiple answers to be selected for a question\n" +
+  "Recommend an option unless absolutely necessary, make it the first option in the list and add \"(Recommended)\" at the end of the label\n" +
+  "Do NOT use this tool to ask \"Is my plan ready?\" or \"Should I proceed?\"";
 
 // Only export what the plugin needs
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
