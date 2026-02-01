@@ -45,6 +45,13 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Sync plugin version with main package
+        run: |
+          MAIN_VERSION=$(node -p "require('./package.json').version")
+          cd packages/opencode-plugin
+          npm pkg set version="$MAIN_VERSION"
+          echo "Plugin version synced to $MAIN_VERSION"
+
       - name: Publish OpenCode plugin (if not already published)
         run: |
           cd packages/opencode-plugin
