@@ -40,4 +40,3 @@ openspec/*
 # Release notes
 RELEASE_*.md
 .osgrep
-.npmrc
