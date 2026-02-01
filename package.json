@@ -72,7 +72,12 @@
           "changelogFile": "CHANGELOG.md"
         }
       ],
-      "@semantic-release/npm",
+      [
+        "@semantic-release/npm",
+        {
+          "workspaces": true
+        }
+      ],
       "@semantic-release/github"
     ]
   },
