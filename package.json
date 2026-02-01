@@ -15,17 +15,15 @@
     "packages/opencode-plugin"
   ],
   "scripts": {
-    "build": "npm run sync-schemas && npm run sync-plugin-schemas && tsc",
+    "build": "npm run sync-plugin-schemas && tsc",
     "prepare": "npm run build",
     "postinstall": "node scripts/postinstall.cjs",
-    "deploy": "node scripts/deploy.mjs",
     "release": "semantic-release",
     "release:dry-run": "semantic-release --dry-run",
     "server": "node dist/src/server.js",
     "start": "tsx src/server.ts",
     "dev": "fastmcp dev src/server.ts",
     "lint": "prettier --check . && eslint . && tsc --noEmit",
-    "sync-schemas": "node scripts/sync-schemas.mjs",
     "sync-plugin-schemas": "node scripts/sync-plugin-schemas.mjs",
     "test": "vitest run",
     "format": "prettier --write . && eslint --fix ."
