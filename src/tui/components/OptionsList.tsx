@@ -189,7 +189,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
               (custom answer)
             </Text>
             {isCustomInputFocused && onCustomChange && (
-              <Box marginLeft={2} marginTop={0.5}>
+              <Box marginLeft={4} marginTop={0} marginBottom={0}>
                 <MultiLineTextInput
                   isFocused={true}
                   onChange={onCustomChange}
@@ -200,7 +200,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
               </Box>
             )}
             {!isCustomInputFocused && customValue && (
-              <Box marginLeft={2} marginTop={0.5}>
+              <Box marginLeft={4} marginTop={0}>
                 <Text dimColor>
                   {customLines.map((line, idx) => (
                     <React.Fragment key={idx}>

@@ -15,6 +15,9 @@ interface Question {
   multiSelect?: boolean;
 }
 
+// Map tool callID -> derived title (used by tool.execute.after)
+const titleByCallId = new Map<string, string>();
+
 /**
  * Generate a summary title for the question set
  * Format: "Questions: [Q0] Language, [Q1] Framework"
@@ -24,6 +27,20 @@ function generateQuestionSummary(questions: Question[]): string {
     .map((q, i) => `[Q${i}] ${q.title}`)
     .join(", ");
   return `Questions: ${questionLabels}`;
+}
+
+function safeSummaryFromArgs(args: unknown): string | null {
+  if (!args || typeof args !== "object") return null;
+  const maybeQuestions = (args as { questions?: unknown }).questions;
+  if (!Array.isArray(maybeQuestions)) return null;
+  const questions = maybeQuestions as Array<Partial<Question>>;
+  const labels = questions
+    .map((q, i) => {
+      const title = (q.title || q.prompt || "").toString().trim();
+      return `[Q${i}] ${title || "(untitled)"}`;
+    })
+    .join(", ");
+  return `Questions: ${labels}`;
 }
 
 const runAuqAsk = async (payload: unknown): Promise<string> =>
@@ -76,18 +93,47 @@ export const AskUserQuestionsPlugin: Plugin = async () => ({
       description: TOOL_DESCRIPTION,
       args: AskUserQuestionsArgs,
       async execute(args, context) {
-        // Set metadata title to show question summary in OpenCode UI
+        // Best-effort: set call metadata (some OpenCode UIs won't render this title).
         const questions = args.questions as Question[];
         const summary = generateQuestionSummary(questions);
-        context.metadata({ title: summary });
+        context.metadata({
+          title: summary,
+          metadata: { auqQuestionSummary: summary },
+        });
 
         try {
-          return await runAuqAsk({ questions });
+          // Get working directory from OpenCode context
+          const workingDirectory = context.directory || context.worktree;
+
+          // Build payload explicitly
+          const payload: { questions: Question[]; workingDirectory?: string } =
+            {
+              questions,
+            };
+          if (workingDirectory) {
+            payload.workingDirectory = workingDirectory;
+          }
+
+          return await runAuqAsk(payload);
         } catch (error) {
           return `Error in session: ${String(error)}`;
         }
       },
     }),
+  },
+  // Force the tool call title in OpenCode UI.
+  "tool.execute.before": async (input, output) => {
+    if (input.tool !== "ask_user_questions") return;
+    const summary = safeSummaryFromArgs(output.args);
+    if (summary) titleByCallId.set(input.callID, summary);
+  },
+  "tool.execute.after": async (input, output) => {
+    if (input.tool !== "ask_user_questions") return;
+    const summary = titleByCallId.get(input.callID);
+    if (summary) {
+      output.title = summary;
+    }
+    titleByCallId.delete(input.callID);
   },
 });
 

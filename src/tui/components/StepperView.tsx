@@ -290,6 +290,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       selectedOption={currentAnswer?.selectedOption}
       answers={answers}
       onFocusContextChange={setFocusContext}
+      workingDirectory={sessionRequest.workingDirectory}
     />
   );
 };

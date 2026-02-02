@@ -82,11 +82,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
             <Box flexDirection="column" key={index} marginBottom={1}>
               {/* Question ID, title and prompt */}
               <Box>
-                <Text bold>{index + 1}. </Text>
                 <Text color={theme.components.review.questionId}>
                   [{questionId}]{" "}
                 </Text>
-                <Text bold>{questionTitle}</Text>
+                <Text bold>
+                  {questionTitle}. {question.prompt}
+                </Text>
               </Box>
 
               {/* Answer */}
@@ -117,6 +118,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                 {answer?.customText && (
                   <>
                     {answer.customText
+                      .replace(/\r\n?/g, "\n")
                       .split("\n")
                       .map((line, lineIndex, lines) => {
                         const isFirstLine = lineIndex === 0;

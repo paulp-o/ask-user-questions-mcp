@@ -147,6 +147,7 @@ if (command === "ask") {
   try {
     const input = JSON.parse(questionsJson);
     const questions = input.questions;
+    const workingDirectory: string | undefined = input.workingDirectory;
 
     if (!questions || !Array.isArray(questions) || questions.length === 0) {
       console.error(
@@ -188,6 +189,7 @@ if (command === "ask") {
     const { formattedResponse, sessionId } = await sessionManager.startSession(
       questions,
       callId,
+      workingDirectory,
     );
 
     console.error(`[AUQ] Session ${sessionId} completed.`);

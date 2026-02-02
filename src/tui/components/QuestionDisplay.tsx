@@ -25,6 +25,7 @@ interface QuestionDisplayProps {
   onToggleOption?: (label: string) => void;
   multiSelect?: boolean;
   onFocusContextChange?: (context: "option" | "custom-input") => void;
+  workingDirectory?: string;
 }
 
 /**
@@ -45,6 +46,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   onToggleOption,
   multiSelect,
   onFocusContextChange,
+  workingDirectory,
 }) => {
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
     "option",
@@ -73,6 +75,13 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
 
   return (
     <Box flexDirection="column">
+      {/* Working directory (if available from OpenCode) */}
+      {workingDirectory && (
+        <Box>
+          <Text dimColor>📁 {workingDirectory}</Text>
+        </Box>
+      )}
+
       {/* TabBar showing all question titles */}
       <TabBar
         currentIndex={currentQuestionIndex}
@@ -80,21 +89,18 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         answers={answers}
       />
 
-      {/* Question prompt */}
-      <Box flexDirection="row" justifyContent="space-between" marginTop={1}>
-        <Text bold>{currentQuestion.prompt}</Text>
+      {/* Question ID, prompt, and type indicator - all on one line */}
+      <Box flexDirection="row" justifyContent="space-between">
+        <Box>
+          <Text color={theme.components.questionDisplay.questionId}>
+            [Q{currentQuestionIndex}]
+          </Text>
+          <Text bold> {currentQuestion.prompt} </Text>
+          <Text color={theme.components.questionDisplay.typeIndicator}>
+            [{multiSelect ? "Multiple Choice" : "Single Choice"}]
+          </Text>
+        </Box>
         <Text dimColor>Elapsed {elapsedLabel}</Text>
-      </Box>
-
-      {/* Question ID and Type Indicator */}
-      <Box marginTop={0.5}>
-        <Text color={theme.components.questionDisplay.questionId}>
-          [Q{currentQuestionIndex}]
-        </Text>
-        <Text> </Text>
-        <Text color={theme.components.questionDisplay.typeIndicator}>
-          [{multiSelect ? "Multiple Choice" : "Single Choice"}]
-        </Text>
       </Box>
 
       {/* Options list with integrated custom input */}
