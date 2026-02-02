@@ -34,7 +34,6 @@ node_modules/
 # Task files
 # tasks.json
 # tasks/
-openspec/*
 
 # Release notes
 RELEASE_*.md
