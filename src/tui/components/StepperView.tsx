@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
 
+import { ResponseFormatter } from "../../session/ResponseFormatter.js";
 import { SessionManager } from "../../session/SessionManager.js";
 import { getSessionDirectory } from "../../session/utils.js";
 import { theme } from "../theme.js";
@@ -41,6 +42,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
     "option",
   );
+  const [hasRecommendedOptions, setHasRecommendedOptions] = useState(false);
 
   const safeIndex = Math.min(
     currentQuestionIndex,
@@ -204,6 +206,66 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
+    // Ctrl+Enter: Quick submit with recommended options
+    if (
+      key.return &&
+      key.ctrl &&
+      hasRecommendedOptions &&
+      focusContext === "option"
+    ) {
+      // Auto-fill all unanswered questions with recommended options
+      const newAnswers = new Map(answers);
+
+      for (let i = 0; i < sessionRequest.questions.length; i++) {
+        const question = sessionRequest.questions[i];
+        const existingAnswer = newAnswers.get(i);
+
+        // Skip if already answered
+        if (
+          existingAnswer?.selectedOption ||
+          existingAnswer?.selectedOptions?.length ||
+          existingAnswer?.customText
+        ) {
+          continue;
+        }
+
+        // Find recommended options for this question
+        const recommendedOptions = question.options.filter((opt) =>
+          isRecommendedOption(opt.label),
+        );
+
+        if (recommendedOptions.length > 0) {
+          if (question.multiSelect) {
+            // Multi-select: select all recommended
+            newAnswers.set(i, {
+              selectedOptions: recommendedOptions.map((opt) => opt.label),
+            });
+          } else {
+            // Single-select: select first recommended
+            newAnswers.set(i, {
+              selectedOption: recommendedOptions[0].label,
+            });
+          }
+        }
+      }
+
+      setAnswers(newAnswers);
+      setShowReview(true);
+      return;
+    }
+
+    // E key: Elaborate request (only when focus is on options, not in custom input)
+    if (input.toLowerCase() === "e" && focusContext === "option") {
+      void handleSpecialRequest("elaborate");
+      return;
+    }
+
+    // D key: Rephrase request (only when focus is on options, not in custom input)
+    if (input.toLowerCase() === "d" && focusContext === "option") {
+      void handleSpecialRequest("rephrase");
+      return;
+    }
+
     // Tab/Shift+Tab: Global question navigation (works in all contexts)
     if (key.tab && key.shift) {
       setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
@@ -230,6 +292,61 @@ export const StepperView: React.FC<StepperViewProps> = ({
   });
 
   const currentAnswer = answers.get(currentQuestionIndex);
+
+  // Helper to detect recommended options
+  const isRecommendedOption = (label: string): boolean => {
+    const pattern = /\[?\(?(recommended|추천)\)?\]?/i;
+    return pattern.test(label);
+  };
+
+  // Handle elaborate or rephrase special requests
+  const handleSpecialRequest = async (type: "elaborate" | "rephrase") => {
+    const question = currentQuestion;
+    if (!question) return;
+
+    setSubmitting(true);
+    try {
+      const sessionManager = new SessionManager({
+        baseDir: getSessionDirectory(),
+      });
+
+      // Create the formatted request
+      const requestText =
+        type === "elaborate"
+          ? ResponseFormatter.formatElaborateRequest(
+              currentQuestionIndex,
+              question.title,
+              question.prompt,
+            )
+          : ResponseFormatter.formatRephraseRequest(
+              currentQuestionIndex,
+              question.title,
+            );
+
+      // Save a special session answer with the request as customText
+      const specialAnswer: UserAnswer = {
+        customText: requestText,
+        questionIndex: currentQuestionIndex,
+        timestamp: new Date().toISOString(),
+      };
+
+      await sessionManager.saveSessionAnswers(sessionId, {
+        answers: [specialAnswer],
+        sessionId,
+        timestamp: new Date().toISOString(),
+        callId: sessionRequest.callId,
+      });
+
+      // Signal completion (successful submission with special request)
+      onComplete?.(false);
+    } catch (error) {
+      console.error(`Failed to save ${type} request:`, error);
+    } finally {
+      if (isMountedRef.current) {
+        setSubmitting(false);
+      }
+    }
+  };
 
   // Show rejection confirmation
   if (showRejectionConfirm) {
@@ -291,6 +408,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       answers={answers}
       onFocusContextChange={setFocusContext}
       workingDirectory={sessionRequest.workingDirectory}
+      onRecommendedDetected={setHasRecommendedOptions}
     />
   );
 };

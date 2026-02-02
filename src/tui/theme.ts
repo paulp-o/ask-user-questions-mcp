@@ -87,10 +87,10 @@ export const theme = {
       divider: "#2A3238",
     },
     options: {
-      focused: "#E7EEF5",
-      focusedBg: "#0B1F26",
-      selected: "#5AF78E",
-      selectedBg: "#0F2417",
+      focused: "#5AF78E", // green - active cursor
+      focusedBg: "#0F2417", // dark green bg
+      selected: "#46D9FF", // cyan - already picked
+      selectedBg: "#0B1F26", // dark cyan bg
       default: "#E7EEF5",
       description: "#8A949E",
       hint: "#8A949E",

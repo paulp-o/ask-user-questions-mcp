@@ -26,6 +26,9 @@ interface QuestionDisplayProps {
   multiSelect?: boolean;
   onFocusContextChange?: (context: "option" | "custom-input") => void;
   workingDirectory?: string;
+  // Recommended option detection
+  onRecommendedDetected?: (hasRecommended: boolean) => void;
+  hasRecommendedOptions?: boolean;
 }
 
 /**
@@ -47,6 +50,8 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   multiSelect,
   onFocusContextChange,
   workingDirectory,
+  onRecommendedDetected,
+  hasRecommendedOptions,
 }) => {
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
     "option",
@@ -124,6 +129,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         multiSelect={multiSelect}
         selectedOptions={answers.get(currentQuestionIndex)?.selectedOptions}
         onFocusContextChange={handleFocusContextChange}
+        onRecommendedDetected={onRecommendedDetected}
       />
 
       {/* Footer with context-aware keybindings */}
@@ -131,6 +137,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         focusContext={focusContext}
         multiSelect={multiSelect ?? false}
         customInputValue={customAnswer}
+        hasRecommendedOptions={hasRecommendedOptions}
       />
     </Box>
   );

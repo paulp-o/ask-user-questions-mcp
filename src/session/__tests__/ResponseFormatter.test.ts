@@ -868,4 +868,120 @@ describe("ResponseFormatter", () => {
       );
     });
   });
+
+  describe("formatElaborateRequest", () => {
+    it("should format elaborate request with basic values", () => {
+      const result = ResponseFormatter.formatElaborateRequest(
+        0,
+        "Language",
+        "What is your favorite programming language?",
+      );
+
+      expect(result).toBe(
+        "[ELABORATE_REQUEST] Please elaborate on question 'Language' (What is your favorite programming language?) with more detailed options\n" +
+          "Question index: 0",
+      );
+    });
+
+    it("should format elaborate request with different question index", () => {
+      const result = ResponseFormatter.formatElaborateRequest(
+        2,
+        "Framework",
+        "Which framework do you prefer?",
+      );
+
+      expect(result).toBe(
+        "[ELABORATE_REQUEST] Please elaborate on question 'Framework' (Which framework do you prefer?) with more detailed options\n" +
+          "Question index: 2",
+      );
+    });
+
+    it("should format elaborate request with special characters in title", () => {
+      const result = ResponseFormatter.formatElaborateRequest(
+        1,
+        "C++ & Rust",
+        "What's your system's language?",
+      );
+
+      expect(result).toBe(
+        "[ELABORATE_REQUEST] Please elaborate on question 'C++ & Rust' (What's your system's language?) with more detailed options\n" +
+          "Question index: 1",
+      );
+    });
+
+    it("should format elaborate request with special characters in prompt", () => {
+      const result = ResponseFormatter.formatElaborateRequest(
+        0,
+        "Config",
+        "Select your app's config (e.g., 'dev', 'test', 'prod')?",
+      );
+
+      expect(result).toBe(
+        "[ELABORATE_REQUEST] Please elaborate on question 'Config' (Select your app's config (e.g., 'dev', 'test', 'prod')?) with more detailed options\n" +
+          "Question index: 0",
+      );
+    });
+
+    it("should format elaborate request with empty strings", () => {
+      const result = ResponseFormatter.formatElaborateRequest(0, "", "");
+
+      expect(result).toBe(
+        "[ELABORATE_REQUEST] Please elaborate on question '' () with more detailed options\n" +
+          "Question index: 0",
+      );
+    });
+  });
+
+  describe("formatRephraseRequest", () => {
+    it("should format rephrase request with basic title", () => {
+      const result = ResponseFormatter.formatRephraseRequest(0, "Language");
+
+      expect(result).toBe(
+        "[REPHRASE_REQUEST] Please rephrase question 'Language' in a different way\n" +
+          "Question index: 0",
+      );
+    });
+
+    it("should format rephrase request with different question index", () => {
+      const result = ResponseFormatter.formatRephraseRequest(3, "Database");
+
+      expect(result).toBe(
+        "[REPHRASE_REQUEST] Please rephrase question 'Database' in a different way\n" +
+          "Question index: 3",
+      );
+    });
+
+    it("should format rephrase request with special characters in title", () => {
+      const result = ResponseFormatter.formatRephraseRequest(
+        1,
+        "API Key/Token",
+      );
+
+      expect(result).toBe(
+        "[REPHRASE_REQUEST] Please rephrase question 'API Key/Token' in a different way\n" +
+          "Question index: 1",
+      );
+    });
+
+    it("should format rephrase request with unicode characters in title", () => {
+      const result = ResponseFormatter.formatRephraseRequest(
+        2,
+        "Language 语言",
+      );
+
+      expect(result).toBe(
+        "[REPHRASE_REQUEST] Please rephrase question 'Language 语言' in a different way\n" +
+          "Question index: 2",
+      );
+    });
+
+    it("should format rephrase request with empty title", () => {
+      const result = ResponseFormatter.formatRephraseRequest(0, "");
+
+      expect(result).toBe(
+        "[REPHRASE_REQUEST] Please rephrase question '' in a different way\n" +
+          "Question index: 0",
+      );
+    });
+  });
 });

@@ -95,8 +95,6 @@ The system SHALL allow users to request rephrasing of individual questions.
 
 ---
 
-## MODIFIED Requirements
-
 ### Requirement: Footer Keybindings
 
 The system SHALL display context-aware keyboard shortcuts.

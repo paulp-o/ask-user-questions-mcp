@@ -137,6 +137,33 @@ export class ResponseFormatter {
   }
 
   /**
+   * Format an elaborate request for a question
+   *
+   * @param questionIndex - Index of the question to elaborate
+   * @param title - Title of the question
+   * @param prompt - Prompt text of the question
+   * @returns Formatted elaborate request string
+   */
+  static formatElaborateRequest(
+    questionIndex: number,
+    title: string,
+    prompt: string,
+  ): string {
+    return `[ELABORATE_REQUEST] Please elaborate on question '${title}' (${prompt}) with more detailed options\nQuestion index: ${questionIndex}`;
+  }
+
+  /**
+   * Format a rephrase request for a question
+   *
+   * @param questionIndex - Index of the question to rephrase
+   * @param title - Title of the question
+   * @returns Formatted rephrase request string
+   */
+  static formatRephraseRequest(questionIndex: number, title: string): string {
+    return `[REPHRASE_REQUEST] Please rephrase question '${title}' in a different way\nQuestion index: ${questionIndex}`;
+  }
+
+  /**
    * Format a single question and its answer
    *
    * @param question - The question data

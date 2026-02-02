@@ -23,7 +23,23 @@ interface OptionsListProps {
   selectedOptions?: string[];
   // Focus context tracking
   onFocusContextChange?: (context: "option" | "custom-input") => void;
+  // Recommended option detection callback
+  onRecommendedDetected?: (hasRecommended: boolean) => void;
 }
+
+/**
+ * Check if an option label contains a recommended indicator
+ * Supports: (recommended), [recommended], (추천), [추천] (case-insensitive)
+ */
+const isRecommendedOption = (label: string): boolean => {
+  const lowerLabel = label.toLowerCase();
+  return (
+    lowerLabel.includes("(recommend)") ||
+    lowerLabel.includes("[recommend]") ||
+    lowerLabel.includes("(추천)") ||
+    lowerLabel.includes("[추천]")
+  );
+};
 
 /**
  * OptionsList displays answer choices and handles arrow key navigation
@@ -42,6 +58,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   onToggle,
   selectedOptions = [],
   onFocusContextChange,
+  onRecommendedDetected,
 }) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const { stdout } = useStdout();
@@ -67,6 +84,38 @@ export const OptionsList: React.FC<OptionsListProps> = ({
       : "option";
     onFocusContextChange?.(newContext);
   }, [focusedIndex, isCustomInputFocused, onFocusContextChange]);
+
+  // Auto-select recommended options on mount
+  useEffect(() => {
+    const recommendedOptions = options.filter((opt) =>
+      isRecommendedOption(opt.label),
+    );
+    const hasRecommended = recommendedOptions.length > 0;
+
+    // Notify parent about recommended options
+    onRecommendedDetected?.(hasRecommended);
+
+    // Only auto-select if no option is already selected
+    if (hasRecommended) {
+      if (multiSelect) {
+        // For multi-select: auto-select all recommended options if none selected
+        const hasAnySelection = selectedOptions && selectedOptions.length > 0;
+        if (!hasAnySelection) {
+          recommendedOptions.forEach((opt) => {
+            onToggle?.(opt.label);
+          });
+        }
+      } else {
+        // For single-select: auto-select first recommended option if none selected
+        if (!selectedOption) {
+          const firstRecommended = recommendedOptions[0];
+          if (firstRecommended) {
+            onSelect(firstRecommended.label);
+          }
+        }
+      }
+    }
+  }, []); // Run only on mount
 
   useInput(
     (input, key) => {
@@ -133,6 +182,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     <Box flexDirection="column">
       {options.map((option, index) => {
         const isFocusedOption = isFocused && index === focusedIndex;
+        const isRecommended = isRecommendedOption(option.label);
 
         // Different icons for single vs multi-select
         const isSelected = multiSelect
@@ -159,7 +209,8 @@ export const OptionsList: React.FC<OptionsListProps> = ({
             ? theme.components.options.selected
             : theme.components.options.default;
 
-        const mainLine = `${isFocusedOption ? ">" : " "} ${selectionMark} ${option.label}`;
+        const starSuffix = isRecommended ? " ★" : "";
+        const mainLine = `${isFocusedOption ? ">" : " "} ${selectionMark} ${option.label}${starSuffix}`;
 
         return (
           <Box key={index} flexDirection="column">

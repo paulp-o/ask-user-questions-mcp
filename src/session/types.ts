@@ -35,7 +35,14 @@ export interface SessionConfig {
 export interface SessionRequest {
   questions: Question[];
   sessionId: string;
-  status: "completed" | "in-progress" | "pending" | "rejected" | "timed_out";
+  status:
+    | "completed"
+    | "elaborate_requested"
+    | "in-progress"
+    | "pending"
+    | "rejected"
+    | "rephrase_requested"
+    | "timed_out";
   timestamp: string;
   callId?: string;
   workingDirectory?: string; // Client's working directory at time of request (if available)
@@ -49,9 +56,11 @@ export interface SessionStatus {
   status:
     | "abandoned"
     | "completed"
+    | "elaborate_requested"
     | "in-progress"
     | "pending"
     | "rejected"
+    | "rephrase_requested"
     | "timed_out";
   totalQuestions: number;
   callId?: string;

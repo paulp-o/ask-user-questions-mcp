@@ -8,6 +8,7 @@ interface FooterProps {
   multiSelect: boolean;
   isReviewScreen?: boolean;
   customInputValue?: string;
+  hasRecommendedOptions?: boolean;
 }
 
 type Keybinding = { key: string; action: string };
@@ -21,6 +22,7 @@ export const Footer: React.FC<FooterProps> = ({
   multiSelect,
   isReviewScreen = false,
   customInputValue = "",
+  hasRecommendedOptions = false,
 }) => {
   const getKeybindings = (): Keybinding[] => {
     // Review screen mode
@@ -54,6 +56,13 @@ export const Footer: React.FC<FooterProps> = ({
         bindings.push({ key: "Space", action: "Toggle" });
       } else {
         bindings.push({ key: "Enter", action: "Select" });
+      }
+
+      bindings.push({ key: "E", action: "Elaborate" });
+      bindings.push({ key: "D", action: "Rephrase" });
+
+      if (hasRecommendedOptions) {
+        bindings.push({ key: "Ctrl+Enter", action: "Quick Submit" });
       }
 
       bindings.push({ key: "Esc", action: "Reject" });

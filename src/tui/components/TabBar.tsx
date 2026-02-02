@@ -1,4 +1,4 @@
-import { Box, Text } from "ink";
+import { Box, Text, useStdout } from "ink";
 import React from "react";
 
 import type { Question } from "../../session/types.js";
@@ -7,15 +7,43 @@ import { theme } from "../theme.js";
 interface TabBarProps {
   currentIndex: number;
   questions: Question[];
-  answers: Map<number, { customText?: string; selectedOption?: string }>;
+  answers: Map<
+    number,
+    {
+      customText?: string;
+      selectedOption?: string;
+      selectedOptions?: string[];
+    }
+  >;
   tabLabel?: string;
 }
 
+const truncate = (value: string, maxChars: number) => {
+  if (maxChars <= 0) return "";
+  if (value.length <= maxChars) return value;
+  if (maxChars === 1) return "…";
+  return `${value.slice(0, maxChars - 1)}…`;
+};
+
+const isAnswerPresent = (
+  answer:
+    | {
+        customText?: string;
+        selectedOption?: string;
+        selectedOptions?: string[];
+      }
+    | undefined,
+) => {
+  if (!answer) return false;
+  if (answer.selectedOption) return true;
+  if (answer.customText) return true;
+  if (answer.selectedOptions && answer.selectedOptions.length > 0) return true;
+  return false;
+};
+
 /**
- * TabBar component displays question titles horizontally with progress indicator
- * Visual: ☑ Language ☐ App Type ☐ Framework (2/3)
- * where ☑ indicates answered questions, ☐ indicates unanswered
- * Active tab has underline, cyan text, and blue background
+ * Minimal TabBar: no brackets, no full-row background.
+ * Active tab is clearly indicated; answered state is shown subtly via color.
  */
 export const TabBar: React.FC<TabBarProps> = ({
   currentIndex,
@@ -23,60 +51,86 @@ export const TabBar: React.FC<TabBarProps> = ({
   answers,
   tabLabel,
 }) => {
+  const { stdout } = useStdout();
+  const columns = stdout?.columns ?? 80;
+
+  // A little breathing room at both edges.
+  const paddingX = 1;
+  const innerWidth = Math.max(0, columns - paddingX * 2);
+
   const answeredCount = questions.reduce((count, _q, index) => {
     const answer = answers.get(index);
-    const isAnswered = Boolean(
-      answer && (answer.selectedOption || answer.customText),
-    );
+    const isAnswered = isAnswerPresent(answer);
     return count + (isAnswered ? 1 : 0);
   }, 0);
 
+  const progressText = `${answeredCount}/${questions.length}`;
+  const separator = " │ ";
+  const separatorLen = separator.length;
+
+  // Build labels and keep the entire bar to a single line.
+  const labelCount = Math.max(questions.length, 1);
+  const maxLeftWidth = Math.max(0, innerWidth - progressText.length - 1);
+  const availableForLabels = Math.max(
+    0,
+    maxLeftWidth - separatorLen * (labelCount - 1),
+  );
+  const maxLabelChars = Math.max(
+    4,
+    Math.floor(availableForLabels / labelCount),
+  );
+
+  const tabs = questions.map((question, index) => {
+    const isActive = index === currentIndex;
+    const answer = answers.get(index);
+    const isAnswered = isAnswerPresent(answer);
+
+    const baseLabel = tabLabel || question.title || `Question ${index + 1}`;
+    const label = truncate(baseLabel, maxLabelChars - 2); // Reserve space for status
+    const status = isAnswered ? "✓" : "·";
+
+    return { index, isActive, isAnswered, label, status };
+  });
+
   return (
-    <Box flexWrap="wrap" alignItems="center">
-      <Box paddingRight={1}>
-        <Text dimColor>
-          {answeredCount}/{questions.length}
-        </Text>
+    <Box width={columns} paddingX={paddingX} justifyContent="space-between">
+      <Box>
+        {tabs.map((tab, idx) => (
+          <Text key={tab.index}>
+            <Text
+              color={
+                tab.isAnswered
+                  ? theme.components.tabBar.answered
+                  : theme.components.tabBar.unanswered
+              }
+              dimColor={!tab.isAnswered && !tab.isActive}
+            >
+              {tab.status}
+            </Text>
+            <Text> </Text>
+            <Text
+              bold={tab.isActive}
+              underline={tab.isActive}
+              color={
+                tab.isActive
+                  ? theme.colors.primary
+                  : tab.isAnswered
+                    ? theme.components.tabBar.answered
+                    : theme.components.tabBar.unanswered
+              }
+              dimColor={!tab.isActive && !tab.isAnswered}
+            >
+              {tab.label}
+            </Text>
+            {idx < tabs.length - 1 && (
+              <Text color={theme.components.tabBar.divider}>{separator}</Text>
+            )}
+          </Text>
+        ))}
       </Box>
-      <Text color={theme.components.tabBar.divider} dimColor>
-        │
+      <Text color={theme.colors.textDim} dimColor>
+        {progressText}
       </Text>
-      <Box paddingLeft={1} flexWrap="wrap">
-        {questions.map((question, index) => {
-          const isActive = index === currentIndex;
-          const answer = answers.get(index);
-          const isAnswered = Boolean(
-            answer && (answer.selectedOption || answer.customText),
-          );
-
-          const displayLabel = tabLabel || question.title || "Question";
-          const compactTitle =
-            displayLabel.length > 18
-              ? `${displayLabel.slice(0, 17)}…`
-              : displayLabel;
-
-          const prefix = `Q${index}`;
-          const status = isAnswered ? "✓" : "·";
-
-          return (
-            <Box key={index} paddingRight={1}>
-              <Text
-                backgroundColor={
-                  isActive ? theme.components.tabBar.selectedBg : undefined
-                }
-                bold={isActive}
-                color={
-                  isActive
-                    ? theme.components.tabBar.selected
-                    : theme.components.tabBar.default
-                }
-              >
-                {` ${status} ${prefix} ${compactTitle} `}
-              </Text>
-            </Box>
-          );
-        })}
-      </Box>
     </Box>
   );
 };

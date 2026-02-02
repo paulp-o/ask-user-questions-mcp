@@ -231,6 +231,25 @@ auq --version    # Show version
 auq --help       # Show help
 ```
 
+### Keyboard Shortcuts
+
+| Key          | Action       | Description                                                            |
+| ------------ | ------------ | ---------------------------------------------------------------------- |
+| `E`          | Elaborate    | Request AI to elaborate on current question with more detailed options |
+| `D`          | Rephrase     | Request AI to rephrase the current question differently                |
+| `Ctrl+Enter` | Quick Submit | Auto-select recommended options for all questions and go to review     |
+
+### Recommended Options
+
+AUQ automatically detects recommended options provided by the AI:
+
+- Options containing `(recommended)`, `[recommended]`, `(추천)`, or `[추천]` are detected.
+- **Visual Aid**: Recommended options are highlighted with a ★ star badge.
+- **Auto-selection**:
+  - **Single-select**: The first recommended option is pre-selected.
+  - **Multi-select**: All recommended options are pre-selected.
+- You can always change the selection before submitting.
+
 ---
 
 ### Manual session cleanup
