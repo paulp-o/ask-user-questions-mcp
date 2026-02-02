@@ -147,8 +147,6 @@ The system SHALL adapt the header gradient based on active theme.
 - **THEN** the system SHALL use the custom gradient colors
 - **AND** if gradient is not specified, inherit from base theme
 
-## MODIFIED Requirements
-
 ### Requirement: Theming
 
 The system SHALL use a centralized theming system with dynamic theme support.

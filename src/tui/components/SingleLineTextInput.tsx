@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import React, { useState } from "react";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 interface SingleLineTextInputProps {
   isFocused?: boolean;
@@ -17,6 +17,7 @@ export const SingleLineTextInput: React.FC<SingleLineTextInputProps> = ({
   placeholder = "Type here...",
   value,
 }) => {
+  const { theme } = useTheme();
   const [cursorPosition, setCursorPosition] = useState(value.length);
 
   React.useEffect(() => {

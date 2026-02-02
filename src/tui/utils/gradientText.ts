@@ -1,29 +1,55 @@
 import gradient from "gradient-string";
 
-import { gradientColors } from "../theme.js";
+import type { Theme } from "../themes/types.js";
+import { darkTheme } from "../themes/dark.js";
 
 /**
- * Theme-based gradient for decorative text in the TUI.
- * Colors are defined in theme.ts and can be customized in one place.
+ * Create a gradient function from theme colors
  */
-export const themeGradient = gradient(gradientColors as unknown as string[]);
+function createGradient(theme: Theme) {
+  const colors = [
+    theme.gradient.start,
+    theme.gradient.middle,
+    theme.gradient.end,
+  ];
+  return gradient(colors);
+}
+
+/**
+ * Default gradient using dark theme (for backward compatibility)
+ */
+const defaultGradient = createGradient(darkTheme);
+
+/**
+ * Apply theme gradient to text.
+ * If no theme is provided, uses the default dark theme gradient.
+ * Returns ANSI-colored string compatible with Ink <Text> components.
+ */
+export function gradientText(text: string, theme?: Theme): string {
+  if (theme) {
+    return createGradient(theme)(text);
+  }
+  return defaultGradient(text);
+}
 
 /**
  * Apply theme gradient to welcome/decorative text.
- * Returns ANSI-colored string compatible with Ink <Text> components.
+ * @deprecated Use gradientText(text, theme) instead
  */
 export function welcomeText(text: string): string {
-  return themeGradient(text);
+  return defaultGradient(text);
 }
 
 /**
  * Apply theme gradient to goodbye/decorative text.
- * Returns ANSI-colored string compatible with Ink <Text> components.
+ * @deprecated Use gradientText(text, theme) instead
  */
 export function goodbyeText(text: string): string {
-  return themeGradient(text);
+  return defaultGradient(text);
 }
 
-export function gradientText(text: string): string {
-  return themeGradient(text);
-}
+/**
+ * Legacy export for backward compatibility
+ * @deprecated Import gradientText and pass theme instead
+ */
+export const themeGradient = defaultGradient;

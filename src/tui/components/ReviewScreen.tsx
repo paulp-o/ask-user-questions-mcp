@@ -2,7 +2,7 @@ import { Box, Text, useInput } from "ink";
 import React from "react";
 
 import type { Question, UserAnswer } from "../../session/types.js";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 import { Footer } from "./Footer.js";
 
 interface ReviewScreenProps {
@@ -28,6 +28,8 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   onGoBack,
   questions,
 }) => {
+  const { theme } = useTheme();
+
   useInput((input, key) => {
     if (key.return) {
       // Convert answers to UserAnswer format

@@ -2,7 +2,7 @@ import { Box, Text, useStdout } from "ink";
 import React from "react";
 
 import type { Question } from "../../session/types.js";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 interface TabBarProps {
   currentIndex: number;
@@ -51,6 +51,7 @@ export const TabBar: React.FC<TabBarProps> = ({
   answers,
   tabLabel,
 }) => {
+  const { theme } = useTheme();
   const { stdout } = useStdout();
   const columns = stdout?.columns ?? 80;
 

@@ -1,7 +1,7 @@
 import { Box, Text } from "ink";
 import React, { useEffect } from "react";
 
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 interface ToastProps {
   message: string;
@@ -22,6 +22,7 @@ export const Toast: React.FC<ToastProps> = ({
   duration = 2000,
   title,
 }) => {
+  const { theme } = useTheme();
   // Auto-dismiss after duration
   useEffect(() => {
     const timer = setTimeout(() => {

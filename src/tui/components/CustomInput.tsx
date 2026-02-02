@@ -2,7 +2,7 @@ import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import React from "react";
 
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 interface CustomInputProps {
   isFocused: boolean;
@@ -19,6 +19,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   onChange,
   value,
 }) => {
+  const { theme } = useTheme();
   return (
     <Box
       borderColor={

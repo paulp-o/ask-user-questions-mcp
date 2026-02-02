@@ -238,6 +238,7 @@ auq --help       # Show help
 | `E`          | Elaborate    | Request AI to elaborate on current question with more detailed options |
 | `D`          | Rephrase     | Request AI to rephrase the current question differently                |
 | `Ctrl+Enter` | Quick Submit | Auto-select recommended options for all questions and go to review     |
+| `Ctrl+T`     | Theme        | Cycle through available color themes                                   |
 
 ### Recommended Options
 
@@ -249,6 +250,58 @@ AUQ automatically detects recommended options provided by the AI:
   - **Single-select**: The first recommended option is pre-selected.
   - **Multi-select**: All recommended options are pre-selected.
 - You can always change the selection before submitting.
+
+---
+
+### 🎨 Themes
+
+AUQ supports **16 built-in color themes** with automatic persistence. Press `Ctrl+T` to cycle through themes.
+
+#### Built-in Themes
+
+| Theme            | Style                    |
+| ---------------- | ------------------------ |
+| AUQ dark         | Default dark theme       |
+| AUQ light        | Default light theme      |
+| Nord             | Arctic, bluish           |
+| Dracula          | Dark purple/pink         |
+| Catppuccin Mocha | Warm dark pastels        |
+| Catppuccin Latte | Warm light pastels       |
+| Solarized Dark   | Low contrast dark        |
+| Solarized Light  | Low contrast light       |
+| Gruvbox Dark     | Retro groove dark        |
+| Gruvbox Light    | Retro groove light       |
+| Tokyo Night      | Dark with vibrant colors |
+| One Dark         | Atom-inspired dark       |
+| Monokai          | Classic vibrant dark     |
+| GitHub Dark      | GitHub's dark mode       |
+| GitHub Light     | GitHub's light mode      |
+| Rosé Pine        | Warm, cozy pinks         |
+
+#### Theme Persistence
+
+Your selected theme is automatically saved to `~/.config/auq/config.json` and restored on next launch.
+
+#### Custom Themes
+
+Create custom themes by placing `.theme.json` files in:
+
+- **macOS/Linux**: `~/.config/auq/themes/`
+
+Example custom theme (`~/.config/auq/themes/my-theme.theme.json`):
+
+```json
+{
+  "name": "my-theme",
+  "colors": {
+    "primary": "#ff6b6b",
+    "success": "#51cf66",
+    "text": "#f8f9fa"
+  }
+}
+```
+
+Custom themes inherit from the default dark theme—only override the colors you want to change. See the [JSON schema](schemas/theme.schema.json) for all available properties.
 
 ---
 
@@ -351,13 +404,13 @@ export AUQ_SESSION_DIR=/custom/path
 
 ## 🚀 Roadmap
 
-- [ ] Light & dark mode themes
+- [x] Light & dark mode themes
+- [x] Custom color themes (16 built-in + custom theme support)
 - [ ] MCP prompt mode switch (Anthropic style / minimal)
-- [ ] Custom color themes
 - [ ] Multi-language support
 - [ ] Audio notifications on new question
 - [ ] Simple option to prompt the LLM to/not ask more questions after answering.
-- [ ] Optional 'context' field privided by the LLM, that describes the context of the questions - will be useful for multi-agent coding
+- [ ] Optional 'context' field provided by the LLM, that describes the context of the questions - will be useful for multi-agent coding
 
 ---
 

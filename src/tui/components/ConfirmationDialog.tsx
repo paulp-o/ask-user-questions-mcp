@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import React, { useState } from "react";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 import { SingleLineTextInput } from "./SingleLineTextInput.js";
 
 interface ConfirmationDialogProps {
@@ -21,6 +21,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onCancel,
   onQuit,
 }) => {
+  const { theme } = useTheme();
+
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [showReasonInput, setShowReasonInput] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");

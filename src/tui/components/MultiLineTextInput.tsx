@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import React, { useState } from "react";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 interface MultiLineTextInputProps {
   isFocused?: boolean;
@@ -22,6 +22,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   placeholder = "Type your answer...",
   value,
 }) => {
+  const { theme } = useTheme();
   const [cursorPosition, setCursorPosition] = useState(value.length);
 
   // Update cursor position when value changes externally

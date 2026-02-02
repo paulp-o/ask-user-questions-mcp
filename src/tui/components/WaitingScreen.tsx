@@ -1,7 +1,7 @@
 import { Box, Text, useInput } from "ink";
 import React, { useEffect, useState } from "react";
 import { AnimatedGradient } from "./AnimatedGradient.js";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 interface WaitingScreenProps {
   queueCount: number;
@@ -12,6 +12,8 @@ interface WaitingScreenProps {
  * Shows "Waiting for AI..." message or queue status
  */
 export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
+  const { theme } = useTheme();
+
   const [startTime] = useState(new Date());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 

@@ -1,8 +1,9 @@
 import { Box, Text } from "ink";
 import React, { useEffect, useState } from "react";
 
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 import { gradientText } from "../utils/gradientText.js";
+import { darkTheme } from "../themes/dark.js";
 import packageJson from "../../../package.json" with { type: "json" };
 
 interface HeaderProps {
@@ -14,6 +15,7 @@ interface HeaderProps {
  * Shows at the top of the TUI with gradient branding and live-updating pending queue count
  */
 export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
+  const { theme } = useTheme();
   const [flash, setFlash] = useState(false);
   const [prevCount, setPrevCount] = useState(pendingCount);
 
@@ -32,7 +34,8 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
     return packageJson.version || "unknown";
   }, []);
 
-  const wordmark = gradientText("AUQ");
+  // Brand colors are fixed (always use dark theme cyan gradient) for consistency
+  const wordmark = gradientText("AUQ", darkTheme);
   const tagline = "Ask User Questions";
 
   return (
@@ -46,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
     >
       <Box flexDirection="row" alignItems="center">
         <Text bold>{wordmark}</Text>
-        <Text dimColor> {tagline}</Text>
+        <Text color="#8A949E"> ⋆ {tagline}</Text>
       </Box>
 
       <Box flexDirection="row" alignItems="center">

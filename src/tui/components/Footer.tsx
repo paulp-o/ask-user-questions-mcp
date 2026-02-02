@@ -1,7 +1,7 @@
 import { Box, Text } from "ink";
 import React from "react";
 
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 interface FooterProps {
   focusContext: "option" | "custom-input";
@@ -24,6 +24,7 @@ export const Footer: React.FC<FooterProps> = ({
   customInputValue = "",
   hasRecommendedOptions = false,
 }) => {
+  const { theme } = useTheme();
   const getKeybindings = (): Keybinding[] => {
     // Review screen mode
     if (isReviewScreen) {
@@ -65,6 +66,7 @@ export const Footer: React.FC<FooterProps> = ({
         bindings.push({ key: "Ctrl+Enter", action: "Quick Submit" });
       }
 
+      bindings.push({ key: "Ctrl+T", action: "Theme" });
       bindings.push({ key: "Esc", action: "Reject" });
 
       return bindings;

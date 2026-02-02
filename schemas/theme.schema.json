@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/paulp-o/ask-user-questions-mcp/main/schemas/theme.schema.json",
+  "title": "AUQ Theme Schema",
+  "description": "JSON Schema for validating custom AUQ (Ask User Questions) theme files. Themes can be partial overrides that merge with the base dark theme.",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the theme"
+    },
+    "colors": {
+      "type": "object",
+      "description": "Semantic color definitions for the theme",
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Primary brand color (hex)"
+        },
+        "success": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Success state color (hex)"
+        },
+        "warning": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Warning state color (hex)"
+        },
+        "error": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Error state color (hex)"
+        },
+        "info": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Info state color (hex)"
+        },
+        "focused": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Focused element color (hex)"
+        },
+        "selected": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Selected element color (hex)"
+        },
+        "pending": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Pending state color (hex)"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Default text color (hex)"
+        },
+        "textDim": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Dimmed text color (hex)"
+        },
+        "textBold": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Bold/emphasized text color (hex)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "gradient": {
+      "type": "object",
+      "description": "Gradient color definitions",
+      "properties": {
+        "start": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Gradient start color (hex)"
+        },
+        "middle": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Gradient middle color (hex)"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Gradient end color (hex)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "borders": {
+      "type": "object",
+      "description": "Border color definitions",
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Primary border color (hex)"
+        },
+        "warning": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Warning border color (hex)"
+        },
+        "error": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Error border color (hex)"
+        },
+        "neutral": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Neutral border color (hex)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "components": {
+      "type": "object",
+      "description": "Component-specific style overrides",
+      "properties": {
+        "header": {
+          "type": "object",
+          "description": "Header component styles"
+        },
+        "directory": {
+          "type": "object",
+          "description": "Directory component styles"
+        },
+        "tabBar": {
+          "type": "object",
+          "description": "Tab bar component styles"
+        },
+        "options": {
+          "type": "object",
+          "description": "Options component styles"
+        },
+        "input": {
+          "type": "object",
+          "description": "Input component styles"
+        },
+        "review": {
+          "type": "object",
+          "description": "Review component styles"
+        },
+        "questionDisplay": {
+          "type": "object",
+          "description": "Question display component styles"
+        },
+        "footer": {
+          "type": "object",
+          "description": "Footer component styles"
+        },
+        "toast": {
+          "type": "object",
+          "description": "Toast notification styles"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

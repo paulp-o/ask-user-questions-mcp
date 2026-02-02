@@ -2,7 +2,7 @@ import { Box, Text } from "ink";
 import React, { useState } from "react";
 
 import type { Question } from "../../session/types.js";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 
 import { Footer } from "./Footer.js";
 import { OptionsList } from "./OptionsList.js";
@@ -53,6 +53,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   onRecommendedDetected,
   hasRecommendedOptions,
 }) => {
+  const { theme } = useTheme();
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
     "option",
   );
@@ -84,7 +85,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       {workingDirectory && (
         <Box>
           <Text color={theme.components.directory.label} dimColor>
-            dir
+            📁
           </Text>
           <Text
             color={theme.components.directory.path}

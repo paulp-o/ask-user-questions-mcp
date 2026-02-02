@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import type { Option } from "../../session/types.js";
 
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 import { MultiLineTextInput } from "./MultiLineTextInput.js";
 
 interface OptionsListProps {
@@ -60,6 +60,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   onFocusContextChange,
   onRecommendedDetected,
 }) => {
+  const { theme } = useTheme();
   const [focusedIndex, setFocusedIndex] = useState(0);
   const { stdout } = useStdout();
   const columns = stdout?.columns ?? 80;

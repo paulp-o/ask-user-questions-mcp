@@ -9,9 +9,11 @@ import {
 } from "../src/session/utils.js";
 import { Header } from "../src/tui/components/Header.js";
 import { StepperView } from "../src/tui/components/StepperView.js";
+import { ThemeIndicator } from "../src/tui/components/ThemeIndicator.js";
 import { Toast } from "../src/tui/components/Toast.js";
 import { WaitingScreen } from "../src/tui/components/WaitingScreen.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
+import { ThemeProvider } from "../src/tui/ThemeProvider.js";
 
 type AppState =
   | { mode: "PROCESSING"; session: SessionData }
@@ -192,25 +194,28 @@ const App: React.FC = () => {
 
   // Render with header, toast overlay, and main content
   return (
-    <Box flexDirection="column" paddingX={1}>
-      <Header pendingCount={sessionQueue.length} />
-      {toast && (
-        <Box marginBottom={1} marginTop={1}>
-          <Toast
-            message={toast.message}
-            onDismiss={() => setToast(null)}
-            type={toast.type}
-            title={toast.title}
-          />
-        </Box>
-      )}
-      {mainContent}
-      {showSessionLog && (
-        <Box marginTop={1}>
-          <Text dimColor>[AUQ] Session directory: {sessionDir}</Text>
-        </Box>
-      )}
-    </Box>
+    <ThemeProvider initialTheme="system">
+      <Box flexDirection="column" paddingX={1}>
+        <Header pendingCount={sessionQueue.length} />
+        {toast && (
+          <Box marginBottom={1} marginTop={1}>
+            <Toast
+              message={toast.message}
+              onDismiss={() => setToast(null)}
+              type={toast.type}
+              title={toast.title}
+            />
+          </Box>
+        )}
+        {mainContent}
+        {showSessionLog && (
+          <Box marginTop={1}>
+            <Text dimColor>[AUQ] Session directory: {sessionDir}</Text>
+          </Box>
+        )}
+        <ThemeIndicator />
+      </Box>
+    </ThemeProvider>
   );
 };
 

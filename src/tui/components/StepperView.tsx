@@ -6,7 +6,7 @@ import type { SessionRequest, UserAnswer } from "../../session/types.js";
 import { ResponseFormatter } from "../../session/ResponseFormatter.js";
 import { SessionManager } from "../../session/SessionManager.js";
 import { getSessionDirectory } from "../../session/utils.js";
-import { theme } from "../theme.js";
+import { useTheme } from "../ThemeContext.js";
 import { ConfirmationDialog } from "./ConfirmationDialog.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
 import { ReviewScreen } from "./ReviewScreen.js";
@@ -32,6 +32,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   sessionId,
   sessionRequest,
 }) => {
+  const { theme } = useTheme();
   const { exit } = useApp();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
