@@ -22,6 +22,7 @@ export interface SessionAnswer {
   sessionId: string;
   timestamp: string;
   callId?: string;
+  workingDirectory?: string; // Client's working directory at time of request (if available)
 }
 
 export interface SessionConfig {
@@ -37,6 +38,7 @@ export interface SessionRequest {
   status: "completed" | "in-progress" | "pending" | "rejected" | "timed_out";
   timestamp: string;
   callId?: string;
+  workingDirectory?: string; // Client's working directory at time of request (if available)
 }
 
 export interface SessionStatus {
@@ -54,6 +56,7 @@ export interface SessionStatus {
   totalQuestions: number;
   callId?: string;
   rejectionReason?: string | null; // User's feedback when rejecting a question set
+  workingDirectory?: string; // Client's working directory at time of request (if available)
 }
 
 export interface UserAnswer {

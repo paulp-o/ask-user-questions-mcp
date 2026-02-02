@@ -40,3 +40,4 @@ openspec/*
 RELEASE_*.md
 .osgrep
 opencode.jsonc
+oc-docs-for-references/*

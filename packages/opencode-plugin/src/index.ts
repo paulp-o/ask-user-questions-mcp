@@ -7,6 +7,25 @@ import { tool } from "@opencode-ai/plugin/tool";
 // Run "npm run sync-plugin-schemas" to regenerate
 import { AskUserQuestionsArgs, TOOL_DESCRIPTION } from "./generated-schemas.js";
 
+/** Question type for OpenCode plugin */
+interface Question {
+  title: string;
+  prompt: string;
+  options: Array<{ label: string; description?: string }>;
+  multiSelect?: boolean;
+}
+
+/**
+ * Generate a summary title for the question set
+ * Format: "Questions: [Q0] Language, [Q1] Framework"
+ */
+function generateQuestionSummary(questions: Question[]): string {
+  const questionLabels = questions
+    .map((q, i) => `[Q${i}] ${q.title}`)
+    .join(", ");
+  return `Questions: ${questionLabels}`;
+}
+
 const runAuqAsk = async (payload: unknown): Promise<string> =>
   new Promise((resolve, reject) => {
     const child = spawn("auq", ["ask"], {
@@ -56,9 +75,14 @@ export const AskUserQuestionsPlugin: Plugin = async () => ({
     ask_user_questions: tool({
       description: TOOL_DESCRIPTION,
       args: AskUserQuestionsArgs,
-      async execute(args) {
+      async execute(args, context) {
+        // Set metadata title to show question summary in OpenCode UI
+        const questions = args.questions as Question[];
+        const summary = generateQuestionSummary(questions);
+        context.metadata({ title: summary });
+
         try {
-          return await runAuqAsk({ questions: args.questions });
+          return await runAuqAsk({ questions });
         } catch (error) {
           return `Error in session: ${String(error)}`;
         }

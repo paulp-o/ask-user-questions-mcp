@@ -16,6 +16,7 @@ export type AskUserQuestionsCore = {
   ask: (
     questions: QuestionInput[],
     callId?: string,
+    workingDirectory?: string,
   ) => Promise<{ formattedResponse: string; sessionId: string }>;
   cleanupExpiredSessions: () => Promise<number>;
   ensureInitialized: () => Promise<void>;
@@ -51,12 +52,17 @@ export const createAskUserQuestionsCore = (
       multiSelect: question.multiSelect,
     }));
 
-  const ask = async (questions: QuestionInput[], callId?: string) => {
+  const ask = async (
+    questions: QuestionInput[],
+    callId?: string,
+    workingDirectory?: string,
+  ) => {
     await ensureInitialized();
     const parsedQuestions = QuestionsSchema.parse(questions);
     return sessionManager.startSession(
       normalizeQuestions(parsedQuestions),
       callId,
+      workingDirectory,
     );
   };
 

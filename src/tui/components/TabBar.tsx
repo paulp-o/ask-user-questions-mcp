@@ -8,6 +8,7 @@ interface TabBarProps {
   currentIndex: number;
   questions: Question[];
   answers: Map<number, { customText?: string; selectedOption?: string }>;
+  tabLabel?: string;
 }
 
 /**
@@ -20,6 +21,7 @@ export const TabBar: React.FC<TabBarProps> = ({
   currentIndex,
   questions,
   answers,
+  tabLabel,
 }) => {
   return (
     <Box flexWrap="wrap">
@@ -28,8 +30,8 @@ export const TabBar: React.FC<TabBarProps> = ({
       </Box>
       {questions.map((question, index) => {
         const isActive = index === currentIndex;
-        // Use provided title or fallback to "Q1", "Q2", etc.
-        const title = question.title || `Q${index + 1}`;
+        // Use tabLabel prop when available, otherwise fallback to title or Q{index}
+        const displayLabel = tabLabel || question.title || `Q${index}`;
 
         // Check if question is answered
         const answer = answers.get(index);
@@ -55,7 +57,7 @@ export const TabBar: React.FC<TabBarProps> = ({
               }
               underline={isActive}
             >
-              {title}
+              {displayLabel}
             </Text>
           </Box>
         );

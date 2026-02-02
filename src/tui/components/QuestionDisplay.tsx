@@ -2,6 +2,7 @@ import { Box, Text } from "ink";
 import React, { useState } from "react";
 
 import type { Question } from "../../session/types.js";
+import { theme } from "../theme.js";
 
 import { Footer } from "./Footer.js";
 import { OptionsList } from "./OptionsList.js";
@@ -79,15 +80,21 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         answers={answers}
       />
 
-      {/* Question prompt with type indicator */}
+      {/* Question prompt */}
       <Box flexDirection="row" justifyContent="space-between" marginTop={1}>
-        <Box>
-          <Text bold>{currentQuestion.prompt} </Text>
-          <Text dimColor>
-            {multiSelect ? "[Multiple Choice]" : "[Single Choice]"}
-          </Text>
-        </Box>
+        <Text bold>{currentQuestion.prompt}</Text>
         <Text dimColor>Elapsed {elapsedLabel}</Text>
+      </Box>
+
+      {/* Question ID and Type Indicator */}
+      <Box marginTop={0.5}>
+        <Text color={theme.components.questionDisplay.questionId}>
+          [Q{currentQuestionIndex}]
+        </Text>
+        <Text> </Text>
+        <Text color={theme.components.questionDisplay.typeIndicator}>
+          [{multiSelect ? "Multiple Choice" : "Single Choice"}]
+        </Text>
       </Box>
 
       {/* Options list with integrated custom input */}

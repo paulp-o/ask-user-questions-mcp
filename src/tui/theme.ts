@@ -103,6 +103,11 @@ export const theme = {
       confirmBorder: "yellow" as const,
       selectedOption: "green" as const,
       customAnswer: "yellow" as const,
+      questionId: "gray" as const, // Q0, Q1, etc. in review summary
+    },
+    questionDisplay: {
+      questionId: "blue" as const, // [Q0], [Q1] identifier
+      typeIndicator: "gray" as const, // [Single Choice], [Multiple Choice]
     },
     toast: {
       success: "green" as const,

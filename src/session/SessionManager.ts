@@ -80,7 +80,10 @@ export class SessionManager {
   /**
    * Create a new session with unique ID
    */
-  async createSession(questions: Question[]): Promise<string> {
+  async createSession(
+    questions: Question[],
+    workingDirectory?: string,
+  ): Promise<string> {
     if (!questions || questions.length === 0) {
       throw new Error("At least one question is required to create a session");
     }
@@ -99,6 +102,7 @@ export class SessionManager {
       sessionId,
       status: "pending",
       timestamp,
+      ...(workingDirectory && { workingDirectory }),
     };
 
     // Create session status
@@ -108,6 +112,7 @@ export class SessionManager {
       sessionId,
       status: "pending",
       totalQuestions: questions.length,
+      ...(workingDirectory && { workingDirectory }),
     };
 
     // Write session files
@@ -318,21 +323,23 @@ export class SessionManager {
   async startSession(
     questions: Question[],
     callId?: string,
+    workingDirectory?: string,
   ): Promise<{
     formattedResponse: string;
     sessionId: string;
   }> {
     // Step 1: Create the session
-    const sessionId = await this.createSession(questions);
+    const sessionId = await this.createSession(questions, workingDirectory);
 
-    // Optionally attach callId metadata to request and status
-    if (callId) {
+    // Optionally attach callId and workingDirectory metadata to request and status
+    if (callId || workingDirectory) {
       try {
         const req = await this.getSessionRequest(sessionId);
         if (req) {
           await this.writeSessionFile(sessionId, SESSION_FILES.REQUEST, {
             ...req,
-            callId,
+            ...(callId && { callId }),
+            ...(workingDirectory && { workingDirectory }),
           } as SessionRequest);
         }
 
@@ -340,11 +347,12 @@ export class SessionManager {
         if (stat) {
           await this.writeSessionFile(sessionId, SESSION_FILES.STATUS, {
             ...stat,
-            callId,
+            ...(callId && { callId }),
+            ...(workingDirectory && { workingDirectory }),
           } as SessionStatus);
         }
       } catch (e) {
-        console.warn("Failed to write callId metadata:", e);
+        console.warn("Failed to write metadata:", e);
       }
     }
 

@@ -75,14 +75,19 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
       <Box flexDirection="column" marginBottom={1}>
         {questions.map((question, index) => {
           const answer = answers.get(index);
-          const questionTitle = question.title || `Q${index + 1}`;
+          const questionId = `Q${index}`;
+          const questionTitle = question.title || questionId;
 
           return (
             <Box flexDirection="column" key={index} marginBottom={1}>
-              {/* Question title and prompt */}
-              <Text bold>
-                {questionTitle}. {question.prompt}
-              </Text>
+              {/* Question ID, title and prompt */}
+              <Box>
+                <Text bold>{index + 1}. </Text>
+                <Text color={theme.components.review.questionId}>
+                  [{questionId}]{" "}
+                </Text>
+                <Text bold>{questionTitle}</Text>
+              </Box>
 
               {/* Answer */}
               <Box flexDirection="column" marginLeft={2} marginTop={0.5}>

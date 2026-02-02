@@ -59,9 +59,16 @@ server.addTool({
       // Generate a per-tool-call ID and persist it with the session
       const callId = randomUUID();
 
+      // Capture working directory if available from MCP context
+      // Note: MCP protocol does not currently expose client working directory
+      // This field is reserved for future protocol enhancements
+      const workingDirectory = (ctx as { workingDirectory?: string })
+        .workingDirectory;
+
       const { formattedResponse, sessionId } = await askUserQuestionsCore.ask(
         args.questions,
         callId,
+        workingDirectory,
       );
 
       log.info("Session completed successfully", { sessionId, callId });
