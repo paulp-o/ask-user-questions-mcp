@@ -23,52 +23,59 @@ export const TabBar: React.FC<TabBarProps> = ({
   answers,
   tabLabel,
 }) => {
+  const answeredCount = questions.reduce((count, _q, index) => {
+    const answer = answers.get(index);
+    const isAnswered = Boolean(
+      answer && (answer.selectedOption || answer.customText),
+    );
+    return count + (isAnswered ? 1 : 0);
+  }, 0);
+
   return (
-    <Box flexWrap="wrap">
+    <Box flexWrap="wrap" alignItems="center">
       <Box paddingRight={1}>
-        <Text color={theme.colors.info}>←</Text>
-      </Box>
-      {questions.map((question, index) => {
-        const isActive = index === currentIndex;
-        // Use tabLabel prop when available, otherwise fallback to title or Q{index}
-        const displayLabel = tabLabel || question.title || `Q${index}`;
-
-        // Check if question is answered
-        const answer = answers.get(index);
-        const isAnswered =
-          answer && (answer.selectedOption || answer.customText);
-        const icon = isAnswered ? "☑" : "☐";
-        const iconColor = isAnswered
-          ? theme.components.tabBar.answered
-          : theme.components.tabBar.unanswered;
-
-        return (
-          <Box key={index} minWidth={15} paddingRight={1}>
-            <Text color={iconColor}>{icon} </Text>
-            <Text
-              bold={isActive}
-              color={
-                isActive
-                  ? theme.components.tabBar.selected
-                  : theme.components.tabBar.default
-              }
-              backgroundColor={
-                isActive ? theme.components.tabBar.selectedBg : undefined
-              }
-              underline={isActive}
-            >
-              {displayLabel}
-            </Text>
-          </Box>
-        );
-      })}
-      <Box paddingRight={1}>
-        <Text color={theme.colors.info}>→</Text>
-      </Box>
-      <Box minWidth={10}>
-        <Text color={theme.colors.info}>
-          [{currentIndex + 1}/{questions.length}]
+        <Text dimColor>
+          {answeredCount}/{questions.length}
         </Text>
+      </Box>
+      <Text color={theme.components.tabBar.divider} dimColor>
+        │
+      </Text>
+      <Box paddingLeft={1} flexWrap="wrap">
+        {questions.map((question, index) => {
+          const isActive = index === currentIndex;
+          const answer = answers.get(index);
+          const isAnswered = Boolean(
+            answer && (answer.selectedOption || answer.customText),
+          );
+
+          const displayLabel = tabLabel || question.title || "Question";
+          const compactTitle =
+            displayLabel.length > 18
+              ? `${displayLabel.slice(0, 17)}…`
+              : displayLabel;
+
+          const prefix = `Q${index}`;
+          const status = isAnswered ? "✓" : "·";
+
+          return (
+            <Box key={index} paddingRight={1}>
+              <Text
+                backgroundColor={
+                  isActive ? theme.components.tabBar.selectedBg : undefined
+                }
+                bold={isActive}
+                color={
+                  isActive
+                    ? theme.components.tabBar.selected
+                    : theme.components.tabBar.default
+                }
+              >
+                {` ${status} ${prefix} ${compactTitle} `}
+              </Text>
+            </Box>
+          );
+        })}
       </Box>
     </Box>
   );

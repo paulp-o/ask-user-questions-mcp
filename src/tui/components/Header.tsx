@@ -1,8 +1,8 @@
 import { Box, Text } from "ink";
-import gradient from "gradient-string";
 import React, { useEffect, useState } from "react";
 
 import { theme } from "../theme.js";
+import { gradientText } from "../utils/gradientText.js";
 import packageJson from "../../../package.json" with { type: "json" };
 
 interface HeaderProps {
@@ -32,23 +32,28 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
     return packageJson.version || "unknown";
   }, []);
 
-  // Use the selected gradient theme from theme.ts
-  const headerText = (
-    gradient as unknown as Record<string, (text: string) => string>
-  )[theme.headerGradient](".𖥔 AUQ ⋆ Ask User Questions ⋆ ");
+  const wordmark = gradientText("AUQ");
+  const tagline = "Ask User Questions";
 
   return (
     <Box
       borderColor={theme.components.header.border}
-      borderStyle="single"
+      borderStyle="round"
       flexDirection="row"
       justifyContent="space-between"
       paddingX={1}
+      paddingY={0}
     >
-      <Text bold>{headerText}</Text>
-      <Box>
-        <Text dimColor>v{version} │</Text>
+      <Box flexDirection="row" alignItems="center">
+        <Text bold>{wordmark}</Text>
+        <Text dimColor> {tagline}</Text>
+      </Box>
+
+      <Box flexDirection="row" alignItems="center">
+        <Text dimColor>v{version}</Text>
+        <Text dimColor> </Text>
         <Text
+          backgroundColor={theme.components.header.pillBg}
           bold={flash}
           color={
             flash
@@ -58,8 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
                 : theme.components.header.queueEmpty
           }
         >
-          {" "}
-          {pendingCount} more on queue
+          {pendingCount > 0 ? ` ${pendingCount} queued ` : " idle "}
         </Text>
       </Box>
     </Box>

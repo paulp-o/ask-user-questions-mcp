@@ -2,6 +2,8 @@ import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import React from "react";
 
+import { theme } from "../theme.js";
+
 interface CustomInputProps {
   isFocused: boolean;
   onChange: (value: string) => void;
@@ -19,13 +21,19 @@ export const CustomInput: React.FC<CustomInputProps> = ({
 }) => {
   return (
     <Box
-      borderColor={isFocused ? "cyan" : "gray"}
-      borderStyle="single"
+      borderColor={
+        isFocused
+          ? theme.components.input.borderFocused
+          : theme.components.input.border
+      }
+      borderStyle="round"
       flexDirection="column"
       marginTop={1}
       padding={0.5}
     >
-      <Text dimColor={!isFocused}>{isFocused ? "→" : " "} Custom answer: </Text>
+      <Text color={theme.colors.textDim} dimColor={!isFocused}>
+        {isFocused ? ">" : " "} Custom answer
+      </Text>
       <Box marginTop={0.5}>
         {isFocused ? (
           <TextInput
@@ -34,7 +42,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
             value={value}
           />
         ) : (
-          <Text color={value ? "white" : "gray"}>
+          <Text color={value ? theme.colors.text : theme.colors.textDim}>
             {value || "(Press Tab to enter custom answer)"}
           </Text>
         )}

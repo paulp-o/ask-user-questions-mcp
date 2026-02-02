@@ -78,7 +78,12 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       {/* Working directory (if available from OpenCode) */}
       {workingDirectory && (
         <Box>
-          <Text dimColor>📁 {workingDirectory}</Text>
+          <Text color={theme.components.directory.label} dimColor>
+            dir
+          </Text>
+          <Text
+            color={theme.components.directory.path}
+          >{` ${workingDirectory}`}</Text>
         </Box>
       )}
 
@@ -95,12 +100,14 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
           <Text color={theme.components.questionDisplay.questionId}>
             [Q{currentQuestionIndex}]
           </Text>
-          <Text bold> {currentQuestion.prompt} </Text>
+          <Text bold>{` ${currentQuestion.prompt} `}</Text>
           <Text color={theme.components.questionDisplay.typeIndicator}>
             [{multiSelect ? "Multiple Choice" : "Single Choice"}]
           </Text>
         </Box>
-        <Text dimColor>Elapsed {elapsedLabel}</Text>
+        <Text color={theme.components.questionDisplay.elapsed} dimColor>
+          {elapsedLabel}
+        </Text>
       </Box>
 
       {/* Options list with integrated custom input */}

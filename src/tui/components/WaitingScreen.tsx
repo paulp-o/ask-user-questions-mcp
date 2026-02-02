@@ -1,7 +1,7 @@
 import { Box, Text, useInput } from "ink";
 import React, { useEffect, useState } from "react";
 import { AnimatedGradient } from "./AnimatedGradient.js";
-// import { theme } from "../theme.js";
+import { theme } from "../theme.js";
 
 interface WaitingScreenProps {
   queueCount: number;
@@ -35,31 +35,50 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
 
   if (queueCount === 0) {
     return (
-      <Box flexDirection="column">
-        {/* <Text color={theme.colors.warning}>No pending question sets found.</Text> */}
-        <Box justifyContent="center" paddingY={1}>
-          <AnimatedGradient text="Waiting for AI to ask questions…" />
-        </Box>
-        <Box justifyContent="center" paddingY={1}>
-          <Text dimColor>Press Ctrl+C to quit</Text>
-        </Box>
-        <Box justifyContent="center" paddingY={1}>
-          <Text dimColor>Time elapsed: {elapsedSeconds}s</Text>
+      <Box flexDirection="column" alignItems="center" paddingY={1}>
+        <Box
+          borderColor={theme.borders.neutral}
+          borderStyle="round"
+          flexDirection="column"
+          paddingX={2}
+          paddingY={1}
+          width="100%"
+        >
+          <Box justifyContent="center">
+            <AnimatedGradient text="Waiting for a question set…" />
+          </Box>
+          <Box justifyContent="center" marginTop={1}>
+            <Text dimColor>
+              Ctrl+C quit
+              <Text color={theme.colors.textDim}> •</Text> {elapsedSeconds}s
+            </Text>
+          </Box>
         </Box>
       </Box>
     );
   }
 
   return (
-    <Box flexDirection="column">
-      <AnimatedGradient
-        text={`Processing question set... (${queueCount} remaining in queue)`}
-      />
-      <Box justifyContent="center" paddingY={1}>
-        <Text dimColor>Press Ctrl+C to quit</Text>
-      </Box>
-      <Box justifyContent="center" paddingY={1}>
-        <Text dimColor>Time elapsed: {elapsedSeconds}s</Text>
+    <Box flexDirection="column" alignItems="center" paddingY={1}>
+      <Box
+        borderColor={theme.borders.neutral}
+        borderStyle="round"
+        flexDirection="column"
+        paddingX={2}
+        paddingY={1}
+        width="100%"
+      >
+        <Box justifyContent="center">
+          <AnimatedGradient
+            text={`Processing… (${queueCount} waiting in queue)`}
+          />
+        </Box>
+        <Box justifyContent="center" marginTop={1}>
+          <Text dimColor>
+            Ctrl+C quit
+            <Text color={theme.colors.textDim}> •</Text> {elapsedSeconds}s
+          </Text>
+        </Box>
       </Box>
     </Box>
   );

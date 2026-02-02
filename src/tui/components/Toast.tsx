@@ -1,6 +1,8 @@
 import { Box, Text } from "ink";
 import React, { useEffect } from "react";
 
+import { theme } from "../theme.js";
+
 interface ToastProps {
   message: string;
   type?: "success" | "error" | "info";
@@ -31,11 +33,15 @@ export const Toast: React.FC<ToastProps> = ({
 
   // Color based on type
   const color =
-    type === "success" ? "green" : type === "error" ? "red" : "cyan";
+    type === "success"
+      ? theme.components.toast.success
+      : type === "error"
+        ? theme.components.toast.error
+        : theme.components.toast.info;
 
   return (
     <Box
-      borderColor={color}
+      borderColor={theme.components.toast.border}
       borderStyle="round"
       paddingX={2}
       paddingY={0}
@@ -46,7 +52,9 @@ export const Toast: React.FC<ToastProps> = ({
           {title}
         </Text>
       )}
-      <Text color={color}>{message}</Text>
+      <Text color={message ? theme.colors.text : theme.colors.textDim}>
+        {message || " "}
+      </Text>
     </Box>
   );
 };

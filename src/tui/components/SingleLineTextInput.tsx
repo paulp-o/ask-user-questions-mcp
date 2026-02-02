@@ -82,21 +82,20 @@ export const SingleLineTextInput: React.FC<SingleLineTextInputProps> = ({
     return (
       <Text>
         {beforeCursor}
-        <Text color={theme.colors.focused} dimColor>
-          ▌
-        </Text>
+        <Text color={theme.components.input.cursor}>▌</Text>
         {afterCursor}
       </Text>
     );
   }
 
   return (
-    <Text dimColor={!hasContent}>
+    <Text
+      color={!hasContent ? theme.components.input.placeholder : undefined}
+      dimColor={!hasContent}
+    >
       {displayText}
       {isFocused && !hasContent && (
-        <Text color={theme.colors.focused} dimColor>
-          ▌
-        </Text>
+        <Text color={theme.components.input.cursor}>▌</Text>
       )}
     </Text>
   );

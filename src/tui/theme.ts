@@ -10,70 +10,57 @@
  * - Bright: "gray", "grey", "brightRed", "brightGreen", etc.
  * - Or use hex colors: "#FF5733"
  *
- * HEADER GRADIENT THEMES (from gradient-string):
- * Change 'headerGradient' below to any of these beautiful premade gradients:
- * - "cristal"    - Crystal clear blues
- * - "teen"       - Vibrant teen energy
- * - "mind"       - Psychedelic colors
- * - "morning"    - Sunrise colors
- * - "vice"       - Neon vice city
- * - "passion"    - Passionate reds
- * - "fruit"      - Fruity colors
- * - "instagram"  - Instagram gradient
- * - "atlas"      - Atlas blue
- * - "retro"      - Retro gaming
- * - "summer"     - Summer vibes
- * - "pastel"     - Soft pastels
- * - "rainbow"    - Full rainbow
+ * Gradients:
+ * This project uses gradient-string, but we keep the brand gradient constrained
+ * to a small set of stops (defined below) for a calmer, more modern TUI.
  */
 
 export const theme = {
   /**
-   * Header Gradient Theme
-   * To change: Replace "pastel" with any gradient name from the list above
+   * Visual direction: graphite + electric-cyan accent.
+   * Keep the palette tight; lean on neutrals for structure.
    */
-  headerGradient: "vice" as const,
 
   /**
-   * Gradient Colors (deprecated - use headerGradient instead)
-   * Used for logo, welcome messages, and decorative text
+   * Gradient Colors
+   * Used for the AUQ wordmark and subtle motion accents.
    */
   gradient: {
-    start: "cyan",
-    middle: "green",
-    end: "yellow",
+    start: "#46D9FF",
+    middle: "#B8F2FF",
+    end: "#46D9FF",
   },
 
   /**
    * UI State Colors
    */
   colors: {
-    // Primary UI colors
-    primary: "cyan" as const,
-    success: "green" as const,
-    warning: "yellow" as const,
-    error: "red" as const,
-    info: "blue" as const,
+    // Semantic colors (keep to 4 hues)
+    primary: "#46D9FF", // accent cyan
+    success: "#5AF78E", // green
+    warning: "#FFD36A", // amber
+    error: "#FF5C57", // red
+    info: "#46D9FF", // same as primary
 
     // Interactive states
-    focused: "cyan" as const,
-    selected: "green" as const,
-    pending: "yellow" as const,
+    focused: "#46D9FF",
+    selected: "#5AF78E",
+    pending: "#FFD36A",
 
     // Text colors
-    text: "white" as const,
-    textDim: "gray" as const,
-    textBold: "white" as const,
+    text: "#E7EEF5",
+    textDim: "#8A949E",
+    textBold: "#F5FAFF",
   },
 
   /**
    * Border Colors
    */
   borders: {
-    primary: "cyan" as const,
-    warning: "yellow" as const,
-    error: "red" as const,
-    neutral: "gray" as const,
+    primary: "#46D9FF",
+    warning: "#FFD36A",
+    error: "#FF5C57",
+    neutral: "#2A3238",
   },
 
   /**
@@ -81,38 +68,65 @@ export const theme = {
    */
   components: {
     header: {
-      border: "cyan" as const,
-      queueActive: "yellow" as const,
-      queueEmpty: "green" as const,
-      queueFlash: "cyan" as const,
+      border: "#2A3238",
+      queueActive: "#46D9FF",
+      queueEmpty: "#8A949E",
+      queueFlash: "#B8F2FF",
+      pillBg: "#0B1F26",
+    },
+    directory: {
+      label: "#8A949E",
+      path: "#E7EEF5",
     },
     tabBar: {
-      selected: "cyan" as const,
-      selectedBg: "black" as const,
-      default: "white" as const,
-      answered: "green" as const,
-      unanswered: "gray" as const,
+      selected: "#E7EEF5",
+      selectedBg: "#0B1F26",
+      default: "#8A949E",
+      answered: "#5AF78E",
+      unanswered: "#8A949E",
+      divider: "#2A3238",
     },
     options: {
-      focused: "cyan" as const,
-      selected: "green" as const,
-      default: "white" as const,
+      focused: "#E7EEF5",
+      focusedBg: "#0B1F26",
+      selected: "#5AF78E",
+      selectedBg: "#0F2417",
+      default: "#E7EEF5",
+      description: "#8A949E",
+      hint: "#8A949E",
+    },
+    input: {
+      border: "#2A3238",
+      borderFocused: "#46D9FF",
+      placeholder: "#8A949E",
+      cursor: "#46D9FF",
+      cursorDim: "#B8F2FF",
     },
     review: {
-      border: "cyan" as const,
-      confirmBorder: "yellow" as const,
-      selectedOption: "green" as const,
-      customAnswer: "yellow" as const,
-      questionId: "gray" as const, // Q0, Q1, etc. in review summary
+      border: "#2A3238",
+      confirmBorder: "#46D9FF",
+      selectedOption: "#5AF78E",
+      customAnswer: "#FFD36A",
+      questionId: "#8A949E", // Q0, Q1, etc.
+      divider: "#2A3238",
     },
     questionDisplay: {
-      questionId: "blue" as const, // [Q0], [Q1] identifier
-      typeIndicator: "gray" as const, // [Single Choice], [Multiple Choice]
+      questionId: "#46D9FF", // [Q0] identifier
+      typeIndicator: "#8A949E", // [Single Choice], [Multiple Choice]
+      elapsed: "#8A949E",
+    },
+    footer: {
+      border: "#2A3238",
+      keyBg: "#0B1F26",
+      keyFg: "#46D9FF",
+      action: "#8A949E",
+      separator: "#2A3238",
     },
     toast: {
-      success: "green" as const,
-      error: "red" as const,
-      info: "cyan" as const,
+      success: "#5AF78E",
+      error: "#FF5C57",
+      info: "#46D9FF",
+      border: "#2A3238",
     },
   },
 } as const;

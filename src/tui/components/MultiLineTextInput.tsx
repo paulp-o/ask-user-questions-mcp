@@ -125,21 +125,23 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
           return (
             <Text key={index}>
               {beforeCursor}
-              <Text color={theme.colors.focused} dimColor>
-                ▌
-              </Text>
+              <Text color={theme.components.input.cursor}>▌</Text>
               {afterCursor}
             </Text>
           );
         }
 
         return (
-          <Text key={index} dimColor={isPlaceholder}>
+          <Text
+            key={index}
+            color={
+              isPlaceholder ? theme.components.input.placeholder : undefined
+            }
+            dimColor={isPlaceholder}
+          >
             {displayText}
             {isFocused && index === lines.length - 1 && !hasContent && (
-              <Text color={theme.colors.focused} dimColor>
-                ▌
-              </Text>
+              <Text color={theme.components.input.cursor}>▌</Text>
             )}
           </Text>
         );

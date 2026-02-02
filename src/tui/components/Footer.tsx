@@ -67,18 +67,28 @@ export const Footer: React.FC<FooterProps> = ({
   const keybindings = getKeybindings();
 
   return (
-    <Box borderColor={theme.borders.neutral} borderStyle="single" paddingX={1}>
-      <Text dimColor>
-        {keybindings.map((binding, idx) => (
-          <React.Fragment key={idx}>
-            {idx > 0 && <Text dimColor> | </Text>}
-            <Text bold color="cyan">
-              {binding.key}
-            </Text>
-            <Text dimColor> {binding.action}</Text>
-          </React.Fragment>
-        ))}
-      </Text>
+    <Box
+      borderColor={theme.components.footer.border}
+      borderStyle="round"
+      paddingX={1}
+      paddingY={0}
+      flexDirection="row"
+      flexWrap="wrap"
+    >
+      {keybindings.map((binding, idx) => (
+        <Box key={idx} paddingRight={2}>
+          <Text
+            backgroundColor={theme.components.footer.keyBg}
+            bold
+            color={theme.components.footer.keyFg}
+          >
+            {` ${binding.key} `}
+          </Text>
+          <Text color={theme.components.footer.action} dimColor>
+            {` ${binding.action}`}
+          </Text>
+        </Box>
+      ))}
     </Box>
   );
 };

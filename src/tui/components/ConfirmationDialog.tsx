@@ -83,7 +83,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     return (
       <Box
         borderColor={theme.borders.warning}
-        borderStyle="single"
+        borderStyle="round"
         flexDirection="column"
         padding={1}
       >
@@ -115,7 +115,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   return (
     <Box
       borderColor={theme.borders.warning}
-      borderStyle="single"
+      borderStyle="round"
       flexDirection="column"
       padding={1}
     >
@@ -126,13 +126,17 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       </Box>
       {options.map((option, index) => {
         const isFocused = index === focusedIndex;
+        const rowBg = isFocused
+          ? theme.components.options.focusedBg
+          : undefined;
         return (
           <Box key={index} marginTop={index > 0 ? 0.5 : 0}>
             <Text
+              backgroundColor={rowBg}
               bold={isFocused}
               color={isFocused ? theme.colors.focused : theme.colors.text}
             >
-              {isFocused ? "→ " : "  "}
+              {isFocused ? "> " : "  "}
               {index + 1}. {option.label} ({option.key})
             </Text>
           </Box>

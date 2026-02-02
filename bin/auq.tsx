@@ -179,20 +179,12 @@ if (command === "ask") {
 
     const callId = randomUUID();
 
-    // Log status to stderr so stdout contains only the formatted response
-    console.error(`[AUQ] Session directory: ${sessionDir}`);
-    console.error(
-      `[AUQ] Waiting for user to answer ${questions.length} question(s)...`,
-    );
-    console.error(`[AUQ] User should run 'auq' in another terminal to answer.`);
-
     const { formattedResponse, sessionId } = await sessionManager.startSession(
       questions,
       callId,
       workingDirectory,
     );
 
-    console.error(`[AUQ] Session ${sessionId} completed.`);
     console.log(formattedResponse);
 
     process.exit(0);

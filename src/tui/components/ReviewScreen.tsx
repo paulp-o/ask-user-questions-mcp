@@ -58,16 +58,15 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
     <Box flexDirection="column">
       {/* Header */}
       <Box
-        borderColor={theme.components.review.border}
-        borderStyle="single"
+        borderColor={theme.components.review.confirmBorder}
+        borderStyle="round"
         marginBottom={1}
-        padding={0.5}
+        paddingX={1}
+        paddingY={0}
       >
         <Box flexDirection="row" justifyContent="space-between" width="100%">
-          <Text bold color={theme.components.review.border}>
-            Review Your Answers
-          </Text>
-          <Text dimColor>Elapsed {elapsedLabel}</Text>
+          <Text bold>Review</Text>
+          <Text dimColor>{elapsedLabel}</Text>
         </Box>
       </Box>
 
@@ -101,7 +100,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                           key={idx}
                           color={theme.components.review.selectedOption}
                         >
-                          → {option}
+                          {">"} {option}
                         </Text>
                       ))}
                     </>
@@ -110,7 +109,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                 {/* Single-select answer */}
                 {answer?.selectedOption && (
                   <Text color={theme.components.review.selectedOption}>
-                    → {answer.selectedOption}
+                    {">"} {answer.selectedOption}
                   </Text>
                 )}
 
@@ -129,7 +128,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                             key={lineIndex}
                             color={theme.components.review.customAnswer}
                           >
-                            {isFirstLine ? '→ Custom: "' : "  "}
+                            {isFirstLine ? '  Custom: "' : "  "}
                             {line}
                             {isLastLine ? '"' : ""}
                           </Text>
@@ -142,7 +141,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                 {!answer?.selectedOption &&
                   !answer?.selectedOptions &&
                   !answer?.customText && (
-                    <Text dimColor>→ (No answer provided)</Text>
+                    <Text dimColor> (No answer provided)</Text>
                   )}
               </Box>
             </Box>

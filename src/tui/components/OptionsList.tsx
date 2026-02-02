@@ -1,4 +1,4 @@
-import { Box, Newline, Text, useInput } from "ink";
+import { Box, Newline, Text, useInput, useStdout } from "ink";
 import React, { useEffect, useState } from "react";
 
 import type { Option } from "../../session/types.js";
@@ -44,6 +44,15 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   onFocusContextChange,
 }) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
+  const { stdout } = useStdout();
+  const columns = stdout?.columns ?? 80;
+  const rowWidth = Math.max(20, columns - 2);
+
+  const fitRow = (text: string) => {
+    if (text.length >= rowWidth)
+      return text.slice(0, Math.max(0, rowWidth - 1)) + "…";
+    return text + " ".repeat(rowWidth - text.length);
+  };
 
   // Calculate max index: include custom input option if enabled
   const maxIndex = showCustomInput ? options.length : options.length - 1;
@@ -125,9 +134,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
       {options.map((option, index) => {
         const isFocusedOption = isFocused && index === focusedIndex;
 
-        // Visual indicators
-        const indicator = isFocusedOption ? "→" : " ";
-
         // Different icons for single vs multi-select
         const isSelected = multiSelect
           ? selectedOptions?.includes(option.label) || false
@@ -135,39 +141,47 @@ export const OptionsList: React.FC<OptionsListProps> = ({
 
         const selectionMark = multiSelect
           ? isSelected
-            ? "[✔]"
-            : "[ ]" // Checkbox for multi-select
+            ? "[x]"
+            : "[ ]"
           : isSelected
-            ? "●"
-            : "○"; // Radio for single-select
+            ? "(*)"
+            : "( )";
+
+        const rowBg = isFocusedOption
+          ? theme.components.options.focusedBg
+          : isSelected
+            ? theme.components.options.selectedBg
+            : undefined;
+
+        const rowColor = isFocusedOption
+          ? theme.components.options.focused
+          : isSelected
+            ? theme.components.options.selected
+            : theme.components.options.default;
+
+        const mainLine = `${isFocusedOption ? ">" : " "} ${selectionMark} ${option.label}`;
 
         return (
-          <Box key={index} flexDirection="column" marginTop={0}>
+          <Box key={index} flexDirection="column">
             <Text
+              backgroundColor={rowBg}
               bold={isFocusedOption || isSelected}
-              color={
-                isFocusedOption
-                  ? theme.components.options.focused
-                  : isSelected
-                    ? theme.components.options.selected
-                    : theme.components.options.default
-              }
+              color={rowColor}
             >
-              {indicator} {selectionMark} {option.label}
+              {fitRow(mainLine)}
             </Text>
             {option.description && (
-              <Box marginLeft={4}>
-                <Text
-                  color={
-                    isFocusedOption
-                      ? theme.components.options.focused
-                      : undefined
-                  }
-                  dimColor={!isFocusedOption}
-                >
-                  {option.description}
-                </Text>
-              </Box>
+              <Text
+                backgroundColor={
+                  isFocusedOption
+                    ? theme.components.options.focusedBg
+                    : undefined
+                }
+                color={theme.components.options.description}
+                dimColor={!isFocusedOption}
+              >
+                {fitRow(`   ${option.description}`)}
+              </Text>
             )}
           </Box>
         );
@@ -177,38 +191,62 @@ export const OptionsList: React.FC<OptionsListProps> = ({
       {showCustomInput && (
         <Box marginTop={0}>
           <Box flexDirection="column">
-            <Text
-              bold={isCustomInputFocused}
-              color={
-                isCustomInputFocused
-                  ? theme.components.options.focused
-                  : theme.components.options.default
-              }
-            >
-              {isCustomInputFocused ? "→" : " "} {customValue ? "●" : "○"} Other
-              (custom answer)
-            </Text>
+            {(() => {
+              const isSelected = customValue.trim().length > 0;
+              const selectionMark = isSelected ? "(*)" : "( )";
+              const rowBg = isCustomInputFocused
+                ? theme.components.options.focusedBg
+                : isSelected
+                  ? theme.components.options.selectedBg
+                  : undefined;
+              const rowColor = isCustomInputFocused
+                ? theme.components.options.focused
+                : isSelected
+                  ? theme.components.options.selected
+                  : theme.components.options.default;
+              const mainLine = `${isCustomInputFocused ? ">" : " "} ${selectionMark} Other (custom)`;
+
+              return (
+                <Text
+                  backgroundColor={rowBg}
+                  bold={isCustomInputFocused || isSelected}
+                  color={rowColor}
+                >
+                  {fitRow(mainLine)}
+                </Text>
+              );
+            })()}
             {isCustomInputFocused && onCustomChange && (
-              <Box marginLeft={4} marginTop={0} marginBottom={0}>
+              <Box
+                borderColor={theme.components.input.borderFocused}
+                borderStyle="round"
+                marginBottom={1}
+                marginLeft={2}
+                marginTop={0}
+                paddingX={1}
+                paddingY={0}
+              >
                 <MultiLineTextInput
                   isFocused={true}
                   onChange={onCustomChange}
                   onSubmit={onAdvance}
-                  placeholder="Type your answer... (Enter for newline, Tab to submit)"
+                  placeholder="Type your answer (Enter = newline, Tab = done)"
                   value={customValue}
                 />
               </Box>
             )}
             {!isCustomInputFocused && customValue && (
-              <Box marginLeft={4} marginTop={0}>
-                <Text dimColor>
-                  {customLines.map((line, idx) => (
+              <Box marginLeft={2} marginTop={0}>
+                <Text color={theme.components.options.hint} dimColor>
+                  {customLines.slice(0, 3).map((line, idx) => (
                     <React.Fragment key={idx}>
-                      {idx === 0 ? "❯ " : "  "}
+                      {idx === 0 ? "   " : "   "}
                       {line || " "}
-                      {idx < customLines.length - 1 && <Newline />}
+                      {idx < Math.min(customLines.length, 3) - 1 && <Newline />}
                     </React.Fragment>
                   ))}
+                  {customLines.length > 3 && <Newline />}
+                  {customLines.length > 3 && "   …"}
                 </Text>
               </Box>
             )}
