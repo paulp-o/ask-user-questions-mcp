@@ -437,7 +437,7 @@ Settings from local config override global config, which overrides defaults.
 | `sessionTimeout`        | number  | 0         | 0+ (milliseconds)               | Session timeout (0 = no timeout)                      |
 | `retentionPeriod`       | number  | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
 | `notifications.enabled` | boolean | true      | true/false                      | Enable desktop notifications for new questions        |
-| `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications (kitty only)            |
+| `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications                         |
 
 ### Language Support
 
@@ -450,30 +450,23 @@ Language is auto-detected from system locale (`LANG`, `LC_ALL`, `LC_MESSAGES` en
 
 ### Desktop Notifications
 
-AUQ sends desktop notifications when new questions arrive, helping you notice when AI assistants have questions waiting while you're focused on other work.
+AUQ uses native desktop notifications to alert you when new questions arrive.
 
-#### Supported Terminals
+#### Platform Requirements
 
-| Terminal         | Notification | Progress Bar | Protocol |
-| ---------------- | ------------ | ------------ | -------- |
-| iTerm2           | ✅           | ✅           | OSC 9    |
-| kitty            | ✅           | ❌           | OSC 99   |
-| Ghostty          | ✅           | ✅           | OSC 9    |
-| WezTerm          | ✅           | ✅           | OSC 9    |
-| Windows Terminal | ✅           | ✅           | OSC 9    |
-| Hyper            | ✅           | ❌           | OSC 9    |
-| VS Code Terminal | ✅           | ❌           | OSC 9    |
-| rxvt/urxvt       | ✅           | ❌           | OSC 777  |
-| Alacritty        | ❌           | ❌           | -        |
-| Terminal.app     | ❌           | ❌           | -        |
-| GNOME Terminal   | ❌           | ❌           | -        |
-| Konsole          | ❌           | ❌           | -        |
+| Platform | Status                  | Notes                                         |
+| -------- | ----------------------- | --------------------------------------------- |
+| macOS    | ✅ Works out of the box | Uses Notification Center                      |
+| Windows  | ✅ Works out of the box | Uses Action Center                            |
+| Linux    | ⚠️ Requires libnotify   | Install: `sudo apt-get install libnotify-bin` |
+
+Notifications can be disabled in configuration if needed.
 
 **Features:**
 
 - **Batched Notifications**: Rapid session arrivals are batched into a single notification
-- **Progress Bar**: Shows question completion progress in terminal dock icon (supported terminals)
-- **Auto-Detection**: Terminal type is detected automatically via environment variables
+- **Progress Bar**: Shows question completion progress in terminal dock icon (supported terminals like iTerm2 and WezTerm)
+- **Native Integration**: Uses system-native notification centers
 
 **Configuration:**
 
@@ -486,6 +479,9 @@ AUQ sends desktop notifications when new questions arrive, helping you notice wh
 }
 ```
 
+- `notifications.enabled` (default: `true`): Enable desktop notifications
+- `notifications.sound` (default: `true`): Play sound with notifications
+
 Set `notifications.enabled` to `false` to disable all notifications.
 
 ---
@@ -496,7 +492,7 @@ Set `notifications.enabled` to `false` to disable all notifications.
 - [x] Custom color themes (16 built-in + custom theme support)
 - [x] Multi-language support (English, Korean)
 - [x] Configuration file support (`.auqrc.json`)
-- [x] Desktop notifications with progress bar (OSC 9/99/777)
+- [x] Native desktop notifications
 - [ ] MCP prompt mode switch (Anthropic style / minimal)
 - [ ] Simple option to prompt the LLM to/not ask more questions after answering.
 - [ ] Optional 'context' field provided by the LLM, that describes the context of the questions - will be useful for multi-agent coding

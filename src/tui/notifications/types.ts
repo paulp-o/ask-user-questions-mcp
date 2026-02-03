@@ -1,37 +1,38 @@
 /**
- * OSC Notification Types
+ * Notification Types
  *
- * Types and interfaces for OSC 9 (iTerm2), OSC 99 (kitty), and OSC 777 (rxvt)
- * terminal notifications with comprehensive terminal support.
+ * Types and interfaces for native OS notifications and OSC progress bars.
+ * Notifications use node-notifier for cross-platform support (macOS, Windows, Linux).
+ * Progress bars use OSC 9;4 sequences for terminals that support them.
  */
 
 /**
- * Supported terminal protocols for notifications
- * - osc9: iTerm2 protocol (most widely supported)
- * - osc99: Kitty protocol (advanced features, Base64 encoded)
- * - osc777: rxvt extension protocol (notify extension)
- * - none: Terminal doesn't support notifications
+ * Supported protocols
+ * - native: OS-native notifications via node-notifier (default for notifications)
+ * - osc9: iTerm2 protocol (used for progress bar only)
+ * - none: Feature disabled or unsupported
  */
-export type TerminalProtocol = "osc9" | "osc99" | "osc777" | "none";
+export type TerminalProtocol = "native" | "osc9" | "none";
 
 /**
  * Detected terminal type
- * Based on TERM_PROGRAM environment variable and other detection methods
+ * Based on TERM_PROGRAM environment variable and other detection methods.
+ * Used primarily for determining progress bar support.
  */
 export type TerminalType =
-  | "iterm" // iTerm.app - OSC 9, progress bar
-  | "kitty" // kitty - OSC 99 (preferred), OSC 9 compat
-  | "ghostty" // ghostty - OSC 9, OSC 777, progress bar
-  | "wezterm" // WezTerm - OSC 9, OSC 777, progress bar
-  | "alacritty" // Alacritty - no notification support (bell only)
-  | "apple-terminal" // Terminal.app - no notification support
-  | "gnome-terminal" // GNOME Terminal - no notification support
-  | "konsole" // Konsole - no notification support
-  | "hyper" // Hyper - try OSC 9
-  | "vscode" // VS Code integrated terminal - limited support
-  | "rxvt" // rxvt/urxvt - OSC 777
-  | "windows-terminal" // Windows Terminal - OSC 9
-  | "unknown"; // Unknown terminal, try OSC 9
+  | "iterm" // iTerm.app - progress bar supported
+  | "kitty" // kitty - no progress bar
+  | "ghostty" // Ghostty - progress bar supported
+  | "wezterm" // WezTerm - progress bar supported
+  | "alacritty" // Alacritty - no progress bar
+  | "apple-terminal" // Terminal.app - no progress bar
+  | "gnome-terminal" // GNOME Terminal - no progress bar
+  | "konsole" // Konsole - no progress bar
+  | "hyper" // Hyper - no progress bar
+  | "vscode" // VS Code terminal - no progress bar
+  | "rxvt" // rxvt/urxvt - no progress bar
+  | "windows-terminal" // Windows Terminal - progress bar supported
+  | "unknown"; // Unknown terminal
 
 /**
  * Terminal detection result
@@ -64,29 +65,6 @@ export const DEFAULT_NOTIFICATION_CONFIG: NotificationConfig = {
   enabled: true,
   sound: true,
 };
-
-/**
- * OSC 9 notification options (iTerm2)
- */
-export interface OSC9NotificationOptions {
-  /** The notification message */
-  message: string;
-}
-
-/**
- * OSC 99 notification options (kitty)
- * See: https://sw.kovidgoyal.net/kitty/desktop-notifications/
- */
-export interface OSC99NotificationOptions {
-  /** The notification message (will be Base64 encoded) */
-  message: string;
-  /** Application identifier (default: "auq") */
-  appName?: string;
-  /** Notification type: "im" for instant message (default: "im") */
-  notificationType?: string;
-  /** Whether to play notification sound */
-  sound?: boolean;
-}
 
 /**
  * OSC 9 progress bar state

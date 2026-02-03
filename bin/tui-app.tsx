@@ -18,6 +18,7 @@ import {
   showProgress,
   clearProgress,
   calculateProgress,
+  checkLinuxDependencies,
   type NotificationBatcher,
 } from "../src/tui/notifications/index.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
@@ -82,6 +83,9 @@ const App: React.FC<AppProps> = ({ config }) => {
       try {
         // Step 0: Ensure session directory exists
         await ensureDirectoryExists(sessionDir);
+
+        // Step 0.5: Check Linux dependencies for native notifications
+        await checkLinuxDependencies();
 
         // Step 1: Load existing pending sessions
         const watcher = createTUIWatcher();

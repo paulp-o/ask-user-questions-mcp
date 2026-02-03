@@ -1,9 +1,9 @@
 /**
  * Terminal Detection
  *
- * Detects terminal type and selects appropriate OSC protocol based on environment variables.
- * Supports comprehensive terminal detection for: iTerm2, kitty, Ghostty, WezTerm,
- * Alacritty, Terminal.app, GNOME Terminal, Konsole, Hyper, VS Code, rxvt, Windows Terminal.
+ * Detects terminal type for progress bar support (OSC 9;4).
+ * Note: Notifications now use native OS notifications via node-notifier,
+ * so terminal detection is only needed for progress bar functionality.
  */
 
 import type {
@@ -24,69 +24,71 @@ interface TerminalCapabilities {
 
 /**
  * Map of TERM_PROGRAM values to terminal capabilities
+ * Note: protocol is now only relevant for progress bar (osc9)
+ * Notifications use native OS notifications on all platforms
  */
 const TERMINAL_MAP: Record<string, TerminalCapabilities> = {
-  // iTerm2 - Full OSC 9 support with progress bar
+  // iTerm2 - OSC 9;4 progress bar support
   "iTerm.app": {
     type: "iterm",
     protocol: "osc9",
-    supportsNotifications: true,
+    supportsNotifications: true, // Native notifications work everywhere
     supportsProgress: true,
   },
-  // kitty - OSC 99 preferred (advanced features)
+  // kitty - No progress bar support
   kitty: {
     type: "kitty",
-    protocol: "osc99",
+    protocol: "none",
     supportsNotifications: true,
-    supportsProgress: false, // kitty doesn't support OSC 9;4 progress
+    supportsProgress: false,
   },
-  // Ghostty - OSC 9 notifications, OSC 9;4 progress bar
+  // Ghostty - OSC 9;4 progress bar support
   ghostty: {
     type: "ghostty",
     protocol: "osc9",
     supportsNotifications: true,
     supportsProgress: true,
   },
-  // WezTerm - OSC 9 notifications, OSC 9;4 progress bar
+  // WezTerm - OSC 9;4 progress bar support
   WezTerm: {
     type: "wezterm",
     protocol: "osc9",
     supportsNotifications: true,
     supportsProgress: true,
   },
-  // Hyper - Try OSC 9 (limited support)
+  // Hyper - No progress bar support
   Hyper: {
     type: "hyper",
-    protocol: "osc9",
+    protocol: "none",
     supportsNotifications: true,
     supportsProgress: false,
   },
-  // VS Code integrated terminal
+  // VS Code integrated terminal - No progress bar support
   vscode: {
     type: "vscode",
-    protocol: "osc9",
+    protocol: "none",
     supportsNotifications: true,
     supportsProgress: false,
   },
-  // Apple Terminal - No notification support
+  // Apple Terminal - No progress bar support
   Apple_Terminal: {
     type: "apple-terminal",
     protocol: "none",
-    supportsNotifications: false,
+    supportsNotifications: true,
     supportsProgress: false,
   },
-  // GNOME Terminal - No notification support
+  // GNOME Terminal - No progress bar support
   "gnome-terminal": {
     type: "gnome-terminal",
     protocol: "none",
-    supportsNotifications: false,
+    supportsNotifications: true,
     supportsProgress: false,
   },
-  // Konsole - No notification support
+  // Konsole - No progress bar support
   konsole: {
     type: "konsole",
     protocol: "none",
-    supportsNotifications: false,
+    supportsNotifications: true,
     supportsProgress: false,
   },
 };
@@ -118,12 +120,13 @@ export function detectTerminal(): TerminalDetection {
   }
 
   // Check for Alacritty (uses ALACRITTY_* env vars, not TERM_PROGRAM)
+  // Alacritty has no progress bar support, but native notifications work
   if (process.env.ALACRITTY_WINDOW_ID || process.env.ALACRITTY_SOCKET) {
     return {
       type: "alacritty",
       protocol: "none",
       termProgram,
-      supportsNotifications: false,
+      supportsNotifications: true,
       supportsProgress: false,
     };
   }
@@ -150,11 +153,11 @@ export function detectTerminal(): TerminalDetection {
     };
   }
 
-  // Check TERM for rxvt/urxvt (uses OSC 777)
+  // Check TERM for rxvt/urxvt - no progress bar support
   if (term && (term.includes("rxvt") || term.includes("urxvt"))) {
     return {
       type: "rxvt",
-      protocol: "osc777",
+      protocol: "none",
       termProgram,
       supportsNotifications: true,
       supportsProgress: false,

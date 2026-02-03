@@ -1,89 +1,15 @@
 /**
- * Tests for OSC escape sequence generators
+ * Tests for OSC escape sequence generators (progress bar only)
+ *
+ * Note: OSC notification tests (OSC 9/99/777) have been removed as notifications
+ * now use native OS notifications via node-notifier. This file tests only the
+ * progress bar functionality which still uses OSC sequences.
  */
 
 import { describe, expect, it } from "vitest";
-import {
-  generateOSC9Notification,
-  generateOSC99Notification,
-  generateOSC777Notification,
-  generateProgressBar,
-} from "../osc.js";
+import { generateProgressBar } from "../osc.js";
 
 describe("OSC Escape Sequence Generators", () => {
-  describe("generateOSC9Notification", () => {
-    it("should generate correct OSC 9 sequence", () => {
-      const result = generateOSC9Notification("Hello World");
-      expect(result).toBe("\x1b]9;Hello World\x07");
-    });
-
-    it("should handle empty message", () => {
-      const result = generateOSC9Notification("");
-      expect(result).toBe("\x1b]9;\x07");
-    });
-
-    it("should handle special characters", () => {
-      const result = generateOSC9Notification("Test: 1/2 questions");
-      expect(result).toBe("\x1b]9;Test: 1/2 questions\x07");
-    });
-  });
-
-  describe("generateOSC99Notification", () => {
-    it("should generate correct OSC 99 sequence with defaults", () => {
-      const result = generateOSC99Notification({ message: "Hello" });
-      // Message "Hello" -> Base64 "SGVsbG8="
-      expect(result).toContain("\x1b]99;");
-      expect(result).toContain("f=auq");
-      expect(result).toContain("t=im");
-      expect(result).toContain("d=0");
-      expect(result).toContain("s=dialog-information");
-      expect(result).toContain("p=body;");
-      expect(result).toContain(btoa("Hello"));
-      expect(result.endsWith("\x07")).toBe(true);
-    });
-
-    it("should omit sound parameter when sound is false", () => {
-      const result = generateOSC99Notification({
-        message: "Test",
-        sound: false,
-      });
-      expect(result).not.toContain("s=dialog-information");
-    });
-
-    it("should use custom app name", () => {
-      const result = generateOSC99Notification({
-        message: "Test",
-        appName: "myapp",
-      });
-      expect(result).toContain("f=myapp");
-    });
-
-    it("should use custom notification type", () => {
-      const result = generateOSC99Notification({
-        message: "Test",
-        notificationType: "alert",
-      });
-      expect(result).toContain("t=alert");
-    });
-  });
-
-  describe("generateOSC777Notification", () => {
-    it("should generate correct OSC 777 sequence", () => {
-      const result = generateOSC777Notification("AUQ", "New question");
-      expect(result).toBe("\x1b]777;notify;AUQ;New question\x07");
-    });
-
-    it("should handle empty title", () => {
-      const result = generateOSC777Notification("", "Message only");
-      expect(result).toBe("\x1b]777;notify;;Message only\x07");
-    });
-
-    it("should handle special characters in body", () => {
-      const result = generateOSC777Notification("App", "Question 1/5: How?");
-      expect(result).toBe("\x1b]777;notify;App;Question 1/5: How?\x07");
-    });
-  });
-
   describe("generateProgressBar", () => {
     it("should generate remove progress sequence (state 0)", () => {
       const result = generateProgressBar({ state: 0 });

@@ -1,5 +1,8 @@
 /**
  * Tests for terminal detection
+ *
+ * Note: With native OS notifications, all terminals now support notifications.
+ * The protocol field is only relevant for progress bar support (osc9).
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -23,7 +26,7 @@ describe("Terminal Detection", () => {
   });
 
   describe("detectTerminal", () => {
-    it("should detect iTerm2", () => {
+    it("should detect iTerm2 with progress bar support", () => {
       process.env.TERM_PROGRAM = "iTerm.app";
       const result = detectTerminal();
 
@@ -33,17 +36,17 @@ describe("Terminal Detection", () => {
       expect(result.supportsProgress).toBe(true);
     });
 
-    it("should detect kitty", () => {
+    it("should detect kitty without progress bar support", () => {
       process.env.TERM_PROGRAM = "kitty";
       const result = detectTerminal();
 
       expect(result.type).toBe("kitty");
-      expect(result.protocol).toBe("osc99");
-      expect(result.supportsNotifications).toBe(true);
+      expect(result.protocol).toBe("none"); // No progress bar
+      expect(result.supportsNotifications).toBe(true); // Native notifications work
       expect(result.supportsProgress).toBe(false);
     });
 
-    it("should detect Ghostty", () => {
+    it("should detect Ghostty with progress bar support", () => {
       process.env.TERM_PROGRAM = "ghostty";
       const result = detectTerminal();
 
@@ -79,7 +82,7 @@ describe("Terminal Detection", () => {
 
       expect(result.type).toBe("alacritty");
       expect(result.protocol).toBe("none");
-      expect(result.supportsNotifications).toBe(false);
+      expect(result.supportsNotifications).toBe(true); // Native notifications work
       expect(result.supportsProgress).toBe(false);
     });
 
@@ -94,49 +97,53 @@ describe("Terminal Detection", () => {
       expect(result.supportsProgress).toBe(true);
     });
 
-    it("should detect Apple Terminal", () => {
+    it("should detect Apple Terminal without progress bar", () => {
       process.env.TERM_PROGRAM = "Apple_Terminal";
       const result = detectTerminal();
 
       expect(result.type).toBe("apple-terminal");
       expect(result.protocol).toBe("none");
-      expect(result.supportsNotifications).toBe(false);
+      expect(result.supportsNotifications).toBe(true); // Native notifications work
+      expect(result.supportsProgress).toBe(false);
     });
 
-    it("should detect GNOME Terminal", () => {
+    it("should detect GNOME Terminal without progress bar", () => {
       process.env.TERM_PROGRAM = "gnome-terminal";
       const result = detectTerminal();
 
       expect(result.type).toBe("gnome-terminal");
       expect(result.protocol).toBe("none");
-      expect(result.supportsNotifications).toBe(false);
+      expect(result.supportsNotifications).toBe(true); // Native notifications work
+      expect(result.supportsProgress).toBe(false);
     });
 
-    it("should detect rxvt/urxvt via TERM", () => {
+    it("should detect rxvt/urxvt via TERM without progress bar", () => {
       process.env.TERM_PROGRAM = undefined;
       process.env.TERM = "rxvt-unicode-256color";
       const result = detectTerminal();
 
       expect(result.type).toBe("rxvt");
-      expect(result.protocol).toBe("osc777");
+      expect(result.protocol).toBe("none"); // No progress bar
       expect(result.supportsNotifications).toBe(true);
       expect(result.supportsProgress).toBe(false);
     });
 
-    it("should detect Hyper", () => {
+    it("should detect Hyper without progress bar", () => {
       process.env.TERM_PROGRAM = "Hyper";
       const result = detectTerminal();
 
       expect(result.type).toBe("hyper");
-      expect(result.protocol).toBe("osc9");
+      expect(result.protocol).toBe("none"); // No progress bar
+      expect(result.supportsNotifications).toBe(true);
     });
 
-    it("should detect VS Code terminal", () => {
+    it("should detect VS Code terminal without progress bar", () => {
       process.env.TERM_PROGRAM = "vscode";
       const result = detectTerminal();
 
       expect(result.type).toBe("vscode");
-      expect(result.protocol).toBe("osc9");
+      expect(result.protocol).toBe("none"); // No progress bar
+      expect(result.supportsNotifications).toBe(true);
     });
 
     it("should fall back to unknown for unrecognized terminals", () => {
@@ -173,16 +180,18 @@ describe("Terminal Detection", () => {
   });
 
   describe("supportsNotifications", () => {
-    it("should return true for terminals with notification support", () => {
+    it("should return true for all terminals (native notifications)", () => {
+      // iTerm2
       process.env.TERM_PROGRAM = "iTerm.app";
-      const detection = detectTerminal();
-      expect(supportsNotifications(detection)).toBe(true);
-    });
+      expect(supportsNotifications(detectTerminal())).toBe(true);
 
-    it("should return false for terminals without notification support", () => {
+      // Apple Terminal (previously didn't support OSC notifications)
       process.env.TERM_PROGRAM = "Apple_Terminal";
-      const detection = detectTerminal();
-      expect(supportsNotifications(detection)).toBe(false);
+      expect(supportsNotifications(detectTerminal())).toBe(true);
+
+      // GNOME Terminal
+      process.env.TERM_PROGRAM = "gnome-terminal";
+      expect(supportsNotifications(detectTerminal())).toBe(true);
     });
   });
 });

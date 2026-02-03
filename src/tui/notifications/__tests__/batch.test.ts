@@ -1,32 +1,28 @@
 /**
  * Tests for notification batching
+ *
+ * Note: With native notifications, we mock the sendNotification function
+ * instead of checking stdout.write
  */
 
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-  type MockInstance,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createNotificationBatcher } from "../batch.js";
 import type { NotificationConfig } from "../types.js";
+import * as notifyModule from "../notify.js";
 
 describe("Notification Batching", () => {
-  let stdoutWriteSpy: MockInstance;
-
   beforeEach(() => {
     vi.useFakeTimers();
-    stdoutWriteSpy = vi
-      .spyOn(process.stdout, "write")
-      .mockImplementation(() => true);
+    // Mock sendNotification to track calls
+    vi.spyOn(notifyModule, "sendNotification").mockReturnValue({
+      sent: true,
+      protocol: "native",
+    });
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    stdoutWriteSpy.mockRestore();
+    vi.restoreAllMocks();
   });
 
   const enabledConfig: NotificationConfig = { enabled: true, sound: true };
@@ -52,11 +48,11 @@ describe("Notification Batching", () => {
 
       // Advance timer but not past batch window
       vi.advanceTimersByTime(400);
-      expect(stdoutWriteSpy).not.toHaveBeenCalled();
+      expect(notifyModule.sendNotification).not.toHaveBeenCalled();
 
       // Advance past batch window
       vi.advanceTimersByTime(100);
-      expect(stdoutWriteSpy).toHaveBeenCalled();
+      expect(notifyModule.sendNotification).toHaveBeenCalled();
       expect(batcher.getPendingCount()).toBe(0);
     });
 
@@ -75,9 +71,12 @@ describe("Notification Batching", () => {
       vi.advanceTimersByTime(500);
 
       // Should have sent one notification with count 3
-      expect(stdoutWriteSpy).toHaveBeenCalledTimes(1);
-      const call = stdoutWriteSpy.mock.calls[0][0] as string;
-      expect(call).toContain("3 new question(s)");
+      expect(notifyModule.sendNotification).toHaveBeenCalledTimes(1);
+      // Verify the message contains the count
+      expect(notifyModule.sendNotification).toHaveBeenCalledWith(
+        expect.stringContaining("3 new question(s)"),
+        expect.any(Object),
+      );
     });
 
     it("should not queue when notifications are disabled", () => {
@@ -87,7 +86,7 @@ describe("Notification Batching", () => {
       expect(batcher.getPendingCount()).toBe(0);
 
       vi.advanceTimersByTime(600);
-      expect(stdoutWriteSpy).not.toHaveBeenCalled();
+      expect(notifyModule.sendNotification).not.toHaveBeenCalled();
     });
 
     it("should reset timer on each new queue", () => {
@@ -101,11 +100,11 @@ describe("Notification Batching", () => {
       vi.advanceTimersByTime(400);
 
       // Still not sent
-      expect(stdoutWriteSpy).not.toHaveBeenCalled();
+      expect(notifyModule.sendNotification).not.toHaveBeenCalled();
 
       // Now advance past new batch window
       vi.advanceTimersByTime(100);
-      expect(stdoutWriteSpy).toHaveBeenCalled();
+      expect(notifyModule.sendNotification).toHaveBeenCalled();
     });
   });
 
@@ -120,7 +119,7 @@ describe("Notification Batching", () => {
 
       expect(result).not.toBeNull();
       expect(result?.sent).toBe(true);
-      expect(stdoutWriteSpy).toHaveBeenCalled();
+      expect(notifyModule.sendNotification).toHaveBeenCalled();
       expect(batcher.getPendingCount()).toBe(0);
     });
 
@@ -139,7 +138,7 @@ describe("Notification Batching", () => {
 
       // Advance past batch window - should not trigger another send
       vi.advanceTimersByTime(600);
-      expect(stdoutWriteSpy).toHaveBeenCalledTimes(1);
+      expect(notifyModule.sendNotification).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -155,7 +154,7 @@ describe("Notification Batching", () => {
 
       expect(batcher.getPendingCount()).toBe(0);
       vi.advanceTimersByTime(600);
-      expect(stdoutWriteSpy).not.toHaveBeenCalled();
+      expect(notifyModule.sendNotification).not.toHaveBeenCalled();
     });
   });
 

@@ -1,80 +1,19 @@
 /**
  * OSC Escape Sequence Generators
  *
- * Low-level functions to generate OSC 9 (iTerm2), OSC 99 (kitty), and OSC 777 (rxvt)
- * escape sequences for terminal notifications and progress bars.
+ * Low-level functions to generate OSC 9 escape sequences for progress bars.
+ * Note: OSC notification sequences (OSC 9/99/777) have been replaced with
+ * native OS notifications via node-notifier. This file now only contains
+ * progress bar functionality.
  */
 
-import {
-  type OSC99NotificationOptions,
-  type ProgressBarOptions,
-} from "./types.js";
+import { type ProgressBarOptions } from "./types.js";
 
 /**
  * OSC sequence delimiters
  */
 const ESC = "\x1b]"; // ESC ]
 const BEL = "\x07"; // BEL character
-
-/**
- * Generate an OSC 9 notification escape sequence (iTerm2 protocol)
- *
- * Format: \x1b]9;{message}\x07
- *
- * @param message - The notification message
- * @returns The complete OSC 9 escape sequence
- */
-export function generateOSC9Notification(message: string): string {
-  return `${ESC}9;${message}${BEL}`;
-}
-
-/**
- * Generate an OSC 99 notification escape sequence (kitty protocol)
- *
- * Format: \x1b]99;{params}\x07
- * Params format: f={appName}:t={type}:d=0:{sound}:p=body;{base64body}
- * Where sound is `s=dialog-information` if enabled
- *
- * @param options - OSC 99 notification options
- * @returns The complete OSC 99 escape sequence
- */
-export function generateOSC99Notification(
-  options: OSC99NotificationOptions,
-): string {
-  const {
-    message,
-    appName = "auq",
-    notificationType = "im",
-    sound = true,
-  } = options;
-
-  // Base64 encode the message body
-  const base64Body = btoa(message);
-
-  // Build the params string
-  // Format: f={appName}:t={type}:d=0:{sound}:p=body;{base64body}
-  const soundParam = sound ? "s=dialog-information" : "";
-  const params = `f=${appName}:t=${notificationType}:d=0${soundParam ? ":" + soundParam : ""}:p=body;${base64Body}`;
-
-  return `${ESC}99;${params}${BEL}`;
-}
-
-/**
- * Generate an OSC 777 notification escape sequence (rxvt/urxvt protocol)
- *
- * Format: \x1b]777;notify;{title};{body}\x07
- * Used by: urxvt, Ghostty, WezTerm
- *
- * @param title - The notification title
- * @param body - The notification body/message
- * @returns The complete OSC 777 escape sequence
- */
-export function generateOSC777Notification(
-  title: string,
-  body: string,
-): string {
-  return `${ESC}777;notify;${title};${body}${BEL}`;
-}
 
 /**
  * Generate an OSC 9 progress bar escape sequence (iTerm2/ConEmu protocol)

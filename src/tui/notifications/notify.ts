@@ -1,37 +1,30 @@
 /**
  * High-Level Notification API
  *
- * Provides an easy-to-use interface for sending terminal notifications
- * using OSC 9 (iTerm2), OSC 99 (kitty), and OSC 777 (rxvt) protocols.
- * Automatically detects terminal and uses the appropriate protocol.
+ * Provides an easy-to-use interface for sending native OS notifications.
+ * Uses node-notifier for cross-platform support (macOS, Windows, Linux).
  */
 
-import type {
-  NotificationConfig,
-  NotificationResult,
-  TerminalProtocol,
-} from "./types.js";
-import { detectTerminal, supportsNotifications } from "./detect.js";
+import type { NotificationConfig, NotificationResult } from "./types.js";
 import {
-  generateOSC9Notification,
-  generateOSC99Notification,
-  generateOSC777Notification,
-} from "./osc.js";
+  sendNativeNotification,
+  type NativeNotificationResult,
+} from "./native.js";
 
-/** Default title for OSC 777 notifications */
+/** Default title for notifications */
 const DEFAULT_TITLE = "AUQ";
 
 /**
- * Sends a notification to the terminal using the appropriate OSC protocol.
+ * Sends a native OS notification.
  *
- * Supports:
- * - OSC 9 (iTerm2, Ghostty, WezTerm, Windows Terminal, Hyper)
- * - OSC 99 (kitty)
- * - OSC 777 (rxvt/urxvt)
+ * Platform support:
+ * - macOS: Notification Center (works out of the box)
+ * - Windows: Action Center (works out of the box)
+ * - Linux: notify-send (requires libnotify-bin package)
  *
  * @param message - The notification message to display
  * @param config - Notification configuration
- * @returns NotificationResult indicating success/failure and protocol used
+ * @returns NotificationResult indicating success/failure
  */
 export function sendNotification(
   message: string,
@@ -47,48 +40,22 @@ export function sendNotification(
   }
 
   try {
-    // Detect terminal type and appropriate protocol
-    const detection = detectTerminal();
-    const { protocol } = detection;
+    // Send native notification (fire and forget - don't await)
+    // We use Promise.resolve to handle the async function without blocking
+    sendNativeNotification(DEFAULT_TITLE, message, config)
+      .then((result: NativeNotificationResult) => {
+        if (!result.sent && result.error) {
+          // Error already logged in native.ts
+        }
+      })
+      .catch(() => {
+        // Errors already handled in native.ts
+      });
 
-    // Check if terminal supports notifications
-    if (!supportsNotifications(detection) || protocol === "none") {
-      return {
-        sent: false,
-        protocol: "none",
-        error: `Terminal "${detection.type}" does not support notifications`,
-      };
-    }
-
-    // Generate the appropriate OSC sequence based on protocol
-    let oscSequence: string;
-    switch (protocol) {
-      case "osc99":
-        // Kitty protocol with Base64 encoding
-        oscSequence = generateOSC99Notification({
-          message,
-          appName: "auq",
-          notificationType: "im",
-          sound: config.sound,
-        });
-        break;
-      case "osc777":
-        // rxvt protocol with title;body format
-        oscSequence = generateOSC777Notification(DEFAULT_TITLE, message);
-        break;
-      case "osc9":
-      default:
-        // iTerm2 protocol (most widely supported)
-        oscSequence = generateOSC9Notification(message);
-        break;
-    }
-
-    // Write directly to stdout to avoid console buffering
-    process.stdout.write(oscSequence);
-
+    // Return success immediately (notification is async)
     return {
       sent: true,
-      protocol,
+      protocol: "native",
     };
   } catch (error) {
     return {

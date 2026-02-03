@@ -1,24 +1,16 @@
 /**
- * OSC Notification Module
+ * Notification Module
  *
- * Provides OSC 9 (iTerm2), OSC 99 (kitty), and OSC 777 (rxvt) terminal
- * notification support with progress bar functionality and notification batching.
+ * Provides native OS notifications (via node-notifier) and OSC progress bar
+ * functionality for terminal dock icons.
  *
- * Supported terminals:
- * - iTerm2 (OSC 9, progress bar)
- * - kitty (OSC 99)
- * - Ghostty (OSC 9, OSC 777, progress bar)
- * - WezTerm (OSC 9, OSC 777, progress bar)
- * - Windows Terminal (OSC 9, progress bar)
- * - Hyper (OSC 9)
- * - rxvt/urxvt (OSC 777)
- * - VS Code terminal (OSC 9)
+ * Native notifications supported on:
+ * - macOS: Notification Center (works out of the box)
+ * - Windows: Action Center (works out of the box)
+ * - Linux: notify-send (requires libnotify-bin package)
  *
- * Unsupported terminals (gracefully skipped):
- * - Alacritty (no notification support)
- * - Terminal.app (no notification support)
- * - GNOME Terminal (no notification support)
- * - Konsole (no notification support)
+ * Progress bars supported in:
+ * - iTerm2, Ghostty, WezTerm, Windows Terminal
  */
 
 // Types
@@ -27,8 +19,6 @@ export type {
   TerminalType,
   TerminalDetection,
   NotificationConfig,
-  OSC9NotificationOptions,
-  OSC99NotificationOptions,
   ProgressState,
   ProgressBarOptions,
   NotificationEvent,
@@ -38,20 +28,23 @@ export type {
 
 export { DEFAULT_NOTIFICATION_CONFIG } from "./types.js";
 
-// Terminal detection
+// Terminal detection (for progress bar support)
 export {
   detectTerminal,
   supportsProgressBar,
   supportsNotifications,
 } from "./detect.js";
 
-// Low-level OSC sequence generators
+// Low-level OSC sequence generators (progress bar only)
+export { generateProgressBar } from "./osc.js";
+
+// Native notification API
 export {
-  generateOSC9Notification,
-  generateOSC99Notification,
-  generateOSC777Notification,
-  generateProgressBar,
-} from "./osc.js";
+  sendNativeNotification,
+  checkLinuxDependencies,
+  isNativeNotificationSupported,
+  type NativeNotificationResult,
+} from "./native.js";
 
 // High-level notification API
 export { sendNotification, formatNotificationMessage } from "./notify.js";
@@ -59,7 +52,7 @@ export { sendNotification, formatNotificationMessage } from "./notify.js";
 // Progress bar API
 export { showProgress, clearProgress, calculateProgress } from "./progress.js";
 
-// Batching API (exported from batch.ts)
+// Batching API
 export {
   createNotificationBatcher,
   type NotificationBatcher,
