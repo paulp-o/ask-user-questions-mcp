@@ -2,10 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/paulp-o/ask-user-questions-mcp/main/.auqrc.schema.json",
 
   "// Limits": "Configure question and option limits",
-  "maxOptions": 4,
-  "maxQuestions": 4,
-  "recommendedOptions": 3,
-  "recommendedQuestions": 3,
+  "maxOptions": 5,
+  "maxQuestions": 5,
+  "recommendedOptions": 4,
+  "recommendedQuestions": 4,
 
   "// Session": "Session behavior settings",
   "sessionTimeout": 0,

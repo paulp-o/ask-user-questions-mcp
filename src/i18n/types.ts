@@ -6,7 +6,6 @@ export interface FooterTranslations {
   select: string;
   toggle: string;
   elaborate: string;
-  rephrase: string;
   reject: string;
   quickSubmit: string;
   theme: string;

@@ -261,12 +261,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
-    // D key: Rephrase request (only when focus is on options, not in custom input)
-    if (input.toLowerCase() === "d" && focusContext === "option") {
-      void handleSpecialRequest("rephrase");
-      return;
-    }
-
     // Tab/Shift+Tab: Global question navigation (works in all contexts)
     if (key.tab && key.shift) {
       setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));

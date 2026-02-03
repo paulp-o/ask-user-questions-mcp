@@ -5,7 +5,6 @@ export const en = {
     select: "Select",
     toggle: "Toggle",
     elaborate: "Elaborate",
-    rephrase: "Rephrase",
     reject: "Reject",
     quickSubmit: "Quick Submit",
     theme: "Theme",

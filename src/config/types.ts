@@ -2,10 +2,10 @@ import { z } from "zod";
 
 export const AUQConfigSchema = z.object({
   // Limits
-  maxOptions: z.number().min(2).max(10).default(4),
-  maxQuestions: z.number().min(1).max(10).default(4),
-  recommendedOptions: z.number().min(1).max(10).default(3),
-  recommendedQuestions: z.number().min(1).max(10).default(3),
+  maxOptions: z.number().min(2).max(10).default(5),
+  maxQuestions: z.number().min(1).max(10).default(5),
+  recommendedOptions: z.number().min(1).max(10).default(4),
+  recommendedQuestions: z.number().min(1).max(10).default(4),
 
   // Session
   sessionTimeout: z.number().min(0).default(0), // 0 = infinite, milliseconds

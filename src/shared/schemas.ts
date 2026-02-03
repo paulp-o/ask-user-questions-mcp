@@ -15,10 +15,10 @@ export const SCHEMA_LIMITS = {
  * Default recommended limits (used when no config is provided)
  */
 export const DEFAULT_LIMITS = {
-  maxOptions: 4,
-  maxQuestions: 4,
-  recommendedOptions: 3,
-  recommendedQuestions: 3,
+  maxOptions: 5,
+  maxQuestions: 5,
+  recommendedOptions: 4,
+  recommendedQuestions: 4,
 } as const;
 
 export const OptionSchema = z.object({

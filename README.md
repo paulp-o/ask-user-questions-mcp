@@ -236,7 +236,6 @@ auq --help       # Show help
 | Key          | Action       | Description                                                            |
 | ------------ | ------------ | ---------------------------------------------------------------------- |
 | `E`          | Elaborate    | Request AI to elaborate on current question with more detailed options |
-| `D`          | Rephrase     | Request AI to rephrase the current question differently                |
 | `Ctrl+Enter` | Quick Submit | Auto-select recommended options for all questions and go to review     |
 | `Ctrl+T`     | Theme        | Cycle through available color themes                                   |
 
@@ -400,14 +399,62 @@ To override the default location, set the `AUQ_SESSION_DIR` environment variable
 export AUQ_SESSION_DIR=/custom/path
 ```
 
+## ⚙️ Configuration
+
+AUQ can be configured via a `.auqrc.json` file. Settings are loaded from (in priority order):
+
+1. **Local**: `./.auqrc.json` (project directory)
+2. **Global**: `~/.config/auq/.auqrc.json` (or `$XDG_CONFIG_HOME/auq/.auqrc.json`)
+3. **Defaults**: Built-in values
+
+Settings from local config override global config, which overrides defaults.
+
+### Example Configuration
+
+```json
+{
+  "maxOptions": 5,
+  "maxQuestions": 5,
+  "recommendedOptions": 4,
+  "recommendedQuestions": 4,
+  "language": "auto",
+  "theme": "system",
+  "sessionTimeout": 0,
+  "retentionPeriod": 604800000
+}
+```
+
+### Available Settings
+
+| Setting                | Type   | Default   | Range/Values                    | Description                                           |
+| ---------------------- | ------ | --------- | ------------------------------- | ----------------------------------------------------- |
+| `maxOptions`           | number | 5         | 2-10                            | Maximum options per question                          |
+| `maxQuestions`         | number | 5         | 1-10                            | Maximum questions per session                         |
+| `recommendedOptions`   | number | 4         | 1-10                            | Suggested number of options (for AI guidance)         |
+| `recommendedQuestions` | number | 4         | 1-10                            | Suggested number of questions (for AI guidance)       |
+| `language`             | string | "auto"    | "auto", "en", "ko"              | UI language (auto-detects from system if "auto")      |
+| `theme`                | string | "system"  | "system", "dark", "light", etc. | Color theme for TUI                                   |
+| `sessionTimeout`       | number | 0         | 0+ (milliseconds)               | Session timeout (0 = no timeout)                      |
+| `retentionPeriod`      | number | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
+
+### Language Support
+
+AUQ supports multiple languages for the TUI interface:
+
+- **English** (`en`) - Default
+- **Korean** (`ko`) - 한국어
+
+Language is auto-detected from system locale (`LANG`, `LC_ALL`, `LC_MESSAGES` environment variables) when set to `"auto"`.
+
 ---
 
 ## 🚀 Roadmap
 
 - [x] Light & dark mode themes
 - [x] Custom color themes (16 built-in + custom theme support)
+- [x] Multi-language support (English, Korean)
+- [x] Configuration file support (`.auqrc.json`)
 - [ ] MCP prompt mode switch (Anthropic style / minimal)
-- [ ] Multi-language support
 - [ ] Audio notifications on new question
 - [ ] Simple option to prompt the LLM to/not ask more questions after answering.
 - [ ] Optional 'context' field provided by the LLM, that describes the context of the questions - will be useful for multi-agent coding

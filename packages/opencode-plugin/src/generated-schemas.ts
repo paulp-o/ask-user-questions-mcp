@@ -4,7 +4,7 @@
  * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
  * Run "npm run sync-plugin-schemas" to regenerate.
  * 
- * Generated at: 2026-02-03T02:44:39.355Z
+ * Generated at: 2026-02-03T03:08:57.719Z
  */
 
 import { tool } from "@opencode-ai/plugin/tool";
@@ -26,10 +26,10 @@ const SCHEMA_LIMITS = {
  * Default recommended limits (used when no config is provided)
  */
 const DEFAULT_LIMITS = {
-  maxOptions: 4,
-  maxQuestions: 4,
-  recommendedOptions: 3,
-  recommendedQuestions: 3,
+  maxOptions: 5,
+  maxQuestions: 5,
+  recommendedOptions: 4,
+  recommendedQuestions: 4,
 } as const;
 
 const OptionSchema = z.object({

@@ -60,6 +60,9 @@
 
 - [x] 6.1 Create example `.auqrc.json` file in repo root
   - Created as `.auqrc.example.json`
-- [ ] 6.2 Update README with configuration documentation
-- [ ] 6.3 Document all available settings with defaults and ranges
-- [ ] 6.4 Add troubleshooting section for config issues
+- [x] 6.2 Update README with configuration documentation
+  - Added "Configuration" section with file locations, example, and settings table
+- [x] 6.3 Document all available settings with defaults and ranges
+  - Full table in README with type, default, range, and description for each setting
+- [x] 6.4 Add troubleshooting section for config issues
+  - Added "Configuration Issues" subsection under Troubleshooting

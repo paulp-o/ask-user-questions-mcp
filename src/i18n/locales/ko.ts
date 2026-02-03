@@ -5,7 +5,6 @@ export const ko = {
     select: "선택",
     toggle: "토글",
     elaborate: "자세히",
-    rephrase: "재질문",
     reject: "거부",
     quickSubmit: "빠른 제출",
     theme: "테마",
