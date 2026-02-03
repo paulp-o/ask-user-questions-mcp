@@ -1,5 +1,5 @@
 import { Box, Text, useInput } from "ink";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTheme } from "../ThemeContext.js";
 
 interface SingleLineTextInputProps {
@@ -20,6 +20,20 @@ export const SingleLineTextInput: React.FC<SingleLineTextInputProps> = ({
   const { theme } = useTheme();
   const [cursorPosition, setCursorPosition] = useState(value.length);
 
+  // Use refs to avoid stale closures in useInput callback
+  // This fixes missed keystrokes during fast typing
+  const valueRef = useRef(value);
+  const cursorRef = useRef(cursorPosition);
+
+  // Keep refs in sync with state
+  React.useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  React.useEffect(() => {
+    cursorRef.current = cursorPosition;
+  }, [cursorPosition]);
+
   React.useEffect(() => {
     if (cursorPosition > value.length) {
       setCursorPosition(value.length);
@@ -30,27 +44,32 @@ export const SingleLineTextInput: React.FC<SingleLineTextInputProps> = ({
     (input, key) => {
       if (!isFocused) return;
 
+      // Use refs to get current values (avoids stale closures)
+      const currentValue = valueRef.current;
+      const currentCursor = cursorRef.current;
+
       if (key.return) {
         onSubmit?.();
         return;
       }
 
       if (key.leftArrow) {
-        setCursorPosition(Math.max(0, cursorPosition - 1));
+        setCursorPosition(Math.max(0, currentCursor - 1));
         return;
       }
 
       if (key.rightArrow) {
-        setCursorPosition(Math.min(value.length, cursorPosition + 1));
+        setCursorPosition(Math.min(currentValue.length, currentCursor + 1));
         return;
       }
 
       if (key.backspace || key.delete) {
-        if (cursorPosition > 0) {
+        if (currentCursor > 0) {
           const newValue =
-            value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
+            currentValue.slice(0, currentCursor - 1) +
+            currentValue.slice(currentCursor);
           onChange(newValue);
-          setCursorPosition(cursorPosition - 1);
+          setCursorPosition(currentCursor - 1);
         }
         return;
       }
@@ -65,9 +84,11 @@ export const SingleLineTextInput: React.FC<SingleLineTextInputProps> = ({
         input !== "\n"
       ) {
         const newValue =
-          value.slice(0, cursorPosition) + input + value.slice(cursorPosition);
+          currentValue.slice(0, currentCursor) +
+          input +
+          currentValue.slice(currentCursor);
         onChange(newValue);
-        setCursorPosition(cursorPosition + 1);
+        setCursorPosition(currentCursor + 1);
       }
     },
     { isActive: isFocused },
