@@ -1,7 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import React, { useEffect, useState } from "react";
 import { AnimatedGradient } from "./AnimatedGradient.js";
-import { Spinner } from "./Spinner.js";
 import { useTheme } from "../ThemeContext.js";
 import { t } from "../../i18n/index.js";
 
@@ -49,8 +48,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
           width="100%"
         >
           <Box justifyContent="center">
-            <AnimatedGradient text={t("waiting.title").replace("...", "")} />
-            <Spinner />
+            <AnimatedGradient text={t("waiting.title").replace("...", "…")} />
           </Box>
           <Box justifyContent="center" marginTop={1}>
             <Text dimColor>
@@ -75,9 +73,8 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
       >
         <Box justifyContent="center">
           <AnimatedGradient
-            text={`${t("waiting.processing").replace("...", "")} (${t("waiting.queueCount").replace("{count}", String(queueCount))})`}
+            text={`${t("waiting.processing").replace("...", "…")} (${t("waiting.queueCount").replace("{count}", String(queueCount))})`}
           />
-          <Spinner />
         </Box>
         <Box justifyContent="center" marginTop={1}>
           <Text dimColor>
