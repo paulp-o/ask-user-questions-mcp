@@ -63,7 +63,11 @@ export const Footer: React.FC<FooterProps> = ({
       bindings.push({ key: "E", action: t("footer.elaborate") });
 
       if (hasRecommendedOptions) {
-        bindings.push({ key: "Ctrl+Enter", action: t("footer.quickSubmit") });
+        bindings.push({ key: "R", action: t("footer.recommended") });
+      }
+
+      if (hasRecommendedOptions) {
+        bindings.push({ key: "Ctrl+R", action: t("footer.quickSubmit") });
       }
 
       bindings.push({ key: "Ctrl+T", action: t("footer.theme") });

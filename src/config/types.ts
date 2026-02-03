@@ -26,6 +26,7 @@ export const AUQConfigSchema = z.object({
   // UI
   language: z.string().default("auto"),
   theme: z.string().default("system"),
+  autoSelectRecommended: z.boolean().default(true),
 
   // Notifications (OSC 9/99)
   notifications: NotificationConfigSchema.default({

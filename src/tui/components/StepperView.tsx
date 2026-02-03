@@ -47,6 +47,13 @@ export const StepperView: React.FC<StepperViewProps> = ({
     "option",
   );
   const [hasRecommendedOptions, setHasRecommendedOptions] = useState(false);
+  // Elaborate marks: Map<questionIndex, customExplanation>
+  const [elaborateMarks, setElaborateMarks] = useState<Map<number, string>>(
+    new Map(),
+  );
+  // Show elaborate input UI for capturing custom explanation
+  const [showElaborateInput, setShowElaborateInput] = useState(false);
+  const [elaborateInputText, setElaborateInputText] = useState("");
 
   const safeIndex = Math.min(
     currentQuestionIndex,
@@ -146,6 +153,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setSubmitting(false);
     setShowRejectionConfirm(false);
     setElapsedSeconds(0);
+    setElaborateMarks(new Map());
+    setShowElaborateInput(false);
+    setElaborateInputText("");
   }, [sessionId]);
 
   // Update elapsed time since session creation
@@ -165,8 +175,29 @@ export const StepperView: React.FC<StepperViewProps> = ({
       const sessionManager = new SessionManager({
         baseDir: getSessionDirectory(),
       });
+
+      // Add elaborate requests for marked questions
+      const allAnswers = [...userAnswers];
+      elaborateMarks.forEach((customExplanation, questionIndex) => {
+        const question = sessionRequest.questions[questionIndex];
+        if (question) {
+          const elaborateRequest = ResponseFormatter.formatElaborateRequest(
+            questionIndex,
+            question.title,
+            question.prompt,
+            customExplanation || undefined,
+          );
+          // Add as a special answer entry
+          allAnswers.push({
+            questionIndex,
+            customText: elaborateRequest,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      });
+
       await sessionManager.saveSessionAnswers(sessionId, {
-        answers: userAnswers,
+        answers: allAnswers,
         sessionId,
         timestamp: new Date().toISOString(),
         callId: sessionRequest.callId,
@@ -216,10 +247,41 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
   };
 
+  // Handle elaborate input confirmation
+  const handleElaborateConfirm = () => {
+    setElaborateMarks((prev) => {
+      const newMarks = new Map(prev);
+      newMarks.set(currentQuestionIndex, elaborateInputText);
+      return newMarks;
+    });
+    setShowElaborateInput(false);
+    setElaborateInputText("");
+  };
+
+  // Handle elaborate input cancellation
+  const handleElaborateCancel = () => {
+    setShowElaborateInput(false);
+    setElaborateInputText("");
+  };
+
   // Global keyboard shortcuts and navigation
   useInput((input, key) => {
     // Don't handle navigation when showing review, submitting, or confirming rejection
     if (showReview || submitting || showRejectionConfirm) return;
+
+    // Handle elaborate input mode
+    if (showElaborateInput) {
+      if (key.return) {
+        handleElaborateConfirm();
+        return;
+      }
+      if (key.escape) {
+        handleElaborateCancel();
+        return;
+      }
+      // Let text input handle other keys
+      return;
+    }
 
     // Esc key - show rejection confirmation
     if (key.escape) {
@@ -227,9 +289,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
-    // Ctrl+Enter: Quick submit with recommended options
+    // Ctrl+R: Quick submit with recommended options (select all recommended and go to review)
     if (
-      key.return &&
+      input.toLowerCase() === "r" &&
       key.ctrl &&
       hasRecommendedOptions &&
       focusContext === "option"
@@ -275,9 +337,54 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
-    // E key: Elaborate request (only when focus is on options, not in custom input)
+    // R key: Select recommended options for current question
+    if (
+      input.toLowerCase() === "r" &&
+      !key.ctrl &&
+      focusContext === "option" &&
+      hasRecommendedOptions
+    ) {
+      const question = currentQuestion;
+      const recommendedOptions = question.options.filter((opt) =>
+        isRecommendedOption(opt.label),
+      );
+
+      if (recommendedOptions.length > 0) {
+        if (question.multiSelect) {
+          // Multi-select: select all recommended
+          setAnswers((prev) => {
+            const newAnswers = new Map(prev);
+            newAnswers.set(currentQuestionIndex, {
+              ...newAnswers.get(currentQuestionIndex),
+              selectedOptions: recommendedOptions.map((opt) => opt.label),
+            });
+            return newAnswers;
+          });
+        } else {
+          // Single-select: select first recommended
+          handleSelectOption(recommendedOptions[0].label);
+        }
+      }
+      return;
+    }
+
+    // E key: Toggle elaborate mark (only when focus is on options, not in custom input)
     if (input.toLowerCase() === "e" && focusContext === "option") {
-      void handleSpecialRequest("elaborate");
+      // Toggle elaborate mark for current question
+      setElaborateMarks((prev) => {
+        const newMarks = new Map(prev);
+        if (newMarks.has(currentQuestionIndex)) {
+          // Remove elaborate mark
+          newMarks.delete(currentQuestionIndex);
+          setShowElaborateInput(false);
+          setElaborateInputText("");
+        } else {
+          // Show elaborate input UI to capture custom explanation
+          setShowElaborateInput(true);
+          setElaborateInputText("");
+        }
+        return newMarks;
+      });
       return;
     }
 
@@ -403,7 +510,38 @@ export const StepperView: React.FC<StepperViewProps> = ({
         onGoBack={handleGoBack}
         questions={sessionRequest.questions}
         sessionId={sessionId}
+        elaborateMarks={elaborateMarks}
       />
+    );
+  }
+
+  // Show elaborate input UI
+  if (showElaborateInput) {
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Box
+          borderColor={theme.colors.warning}
+          borderStyle="round"
+          padding={1}
+          flexDirection="column"
+        >
+          <Text bold color={theme.colors.warning}>
+            ★ Mark for Elaboration
+          </Text>
+          <Text dimColor>
+            Add a note explaining what you want elaborated (optional):
+          </Text>
+          <Box marginTop={1}>
+            <Text color={theme.colors.primary}>{">"} </Text>
+            <Text>
+              {elaborateInputText || "(Press Enter to confirm, Esc to cancel)"}
+            </Text>
+          </Box>
+        </Box>
+        <Box marginTop={1}>
+          <Text dimColor>Enter: Confirm | Esc: Cancel</Text>
+        </Box>
+      </Box>
     );
   }
 
@@ -425,6 +563,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onFocusContextChange={setFocusContext}
       workingDirectory={sessionRequest.workingDirectory}
       onRecommendedDetected={setHasRecommendedOptions}
+      elaborateMarks={elaborateMarks}
     />
   );
 };

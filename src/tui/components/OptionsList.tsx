@@ -25,6 +25,10 @@ interface OptionsListProps {
   onFocusContextChange?: (context: "option" | "custom-input") => void;
   // Recommended option detection callback
   onRecommendedDetected?: (hasRecommended: boolean) => void;
+  // Focus reset support
+  questionKey?: string | number;
+  // Config-based auto-select
+  autoSelectRecommended?: boolean;
 }
 
 /**
@@ -59,6 +63,8 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   selectedOptions = [],
   onFocusContextChange,
   onRecommendedDetected,
+  questionKey,
+  autoSelectRecommended = true,
 }) => {
   const { theme } = useTheme();
   const [focusedIndex, setFocusedIndex] = useState(0);
@@ -86,6 +92,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     onFocusContextChange?.(newContext);
   }, [focusedIndex, isCustomInputFocused, onFocusContextChange]);
 
+  // Reset focus when question changes
+  useEffect(() => {
+    setFocusedIndex(0);
+  }, [questionKey]);
+
   // Auto-select recommended options on mount
   useEffect(() => {
     const recommendedOptions = options.filter((opt) =>
@@ -96,8 +107,8 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     // Notify parent about recommended options
     onRecommendedDetected?.(hasRecommended);
 
-    // Only auto-select if no option is already selected
-    if (hasRecommended) {
+    // Only auto-select if no option is already selected and autoSelectRecommended is enabled
+    if (hasRecommended && autoSelectRecommended) {
       if (multiSelect) {
         // For multi-select: auto-select all recommended options if none selected
         const hasAnySelection = selectedOptions && selectedOptions.length > 0;

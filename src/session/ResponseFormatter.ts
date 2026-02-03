@@ -142,14 +142,20 @@ export class ResponseFormatter {
    * @param questionIndex - Index of the question to elaborate
    * @param title - Title of the question
    * @param prompt - Prompt text of the question
+   * @param customExplanation - Optional custom explanation text from the user
    * @returns Formatted elaborate request string
    */
   static formatElaborateRequest(
     questionIndex: number,
     title: string,
     prompt: string,
+    customExplanation?: string,
   ): string {
-    return `[ELABORATE_REQUEST] Please elaborate on question '${title}' (${prompt}) with more detailed options\nQuestion index: ${questionIndex}`;
+    let result = `[ELABORATE_REQUEST] Please elaborate on question '${title}' (${prompt}) with more detailed options\nQuestion index: ${questionIndex}`;
+    if (customExplanation) {
+      result += `\nUser note: ${customExplanation}`;
+    }
+    return result;
   }
 
   /**

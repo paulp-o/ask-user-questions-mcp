@@ -29,6 +29,8 @@ interface QuestionDisplayProps {
   // Recommended option detection
   onRecommendedDetected?: (hasRecommended: boolean) => void;
   hasRecommendedOptions?: boolean;
+  // Elaborate marks for visual indicators
+  elaborateMarks?: Map<number, string>;
 }
 
 /**
@@ -52,6 +54,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   workingDirectory,
   onRecommendedDetected,
   hasRecommendedOptions,
+  elaborateMarks,
 }) => {
   const { theme } = useTheme();
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
@@ -98,6 +101,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         currentIndex={currentQuestionIndex}
         questions={questions}
         answers={answers}
+        elaborateMarks={elaborateMarks}
       />
 
       {/* Question ID, prompt, and type indicator - all on one line */}
@@ -131,6 +135,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         selectedOptions={answers.get(currentQuestionIndex)?.selectedOptions}
         onFocusContextChange={handleFocusContextChange}
         onRecommendedDetected={onRecommendedDetected}
+        questionKey={currentQuestionIndex}
       />
 
       {/* Footer with context-aware keybindings */}

@@ -103,17 +103,19 @@ The system SHALL display context-aware keyboard shortcuts.
 #### Scenario: Option Focus Context
 
 - **WHEN** an option is focused
-- **THEN** footer SHALL show: `↑↓ Options` | `←→ Questions` | `Enter Select` (or `Space Toggle` for multi-select) | `E Elaborate` | `D Rephrase` | `Esc Reject`
+- **THEN** footer SHALL show: `↑↓ Options` | `←→ Questions` | `Enter Select` (or `Space Toggle` for multi-select) | `E Elaborate` | `R Recommended` | `Ctrl+R Quick Submit` | `Esc Reject`
 
 #### Scenario: Custom Input Focus Context
 
 - **WHEN** custom input is focused
-- **THEN** footer SHALL show: `↑↓ Options` | `Tab Next` | `Enter Newline` | `E Elaborate` | `D Rephrase` | `Esc Reject`
+- **THEN** footer SHALL show: `↑↓ Options` | `Tab Next` | `Enter Newline` | `Esc Reject`
 
-#### Scenario: Quick Submit Hint
+#### Scenario: Recommended Key Visibility
 
-- **WHEN** recommended options are available in any question
-- **THEN** footer SHALL show: `Ctrl+Enter Quick Submit`
+- **WHEN** current question has recommended options
+- **THEN** footer SHALL show `R Recommended` keybinding
+- **WHEN** any question in the session has recommended options
+- **THEN** footer SHALL show `Ctrl+R Quick Submit` keybinding
 
 ### Requirement: Theme Provider Architecture
 
@@ -279,43 +281,6 @@ The system SHALL use a centralized theming system with dynamic theme support.
 - **WHEN** displaying the header
 - **THEN** the logo SHALL use gradient colors from the active theme
 
-### Requirement: OSC Desktop Notifications
-
-The system SHALL send desktop notifications via OSC escape sequences when new questions arrive.
-
-#### Scenario: Notification on new session
-
-- **WHEN** a new session is added to the queue
-- **AND** `notifications.enabled` is `true` in config (default)
-- **THEN** the system SHALL send an OSC notification to the terminal
-- **AND** the notification message SHALL be `AUQ: {N} new question(s)` where N is the count
-
-#### Scenario: OSC 9 for iTerm2
-
-- **WHEN** `TERM_PROGRAM` is `iTerm.app`
-- **THEN** the system SHALL use OSC 9 format: `ESC]9;{message}BEL`
-
-#### Scenario: OSC 99 for kitty
-
-- **WHEN** `TERM_PROGRAM` is `kitty`
-- **THEN** the system SHALL use OSC 99 format with Base64-encoded parameters
-- **AND** include application name `auq` in the `f` parameter
-- **AND** include notification type `im` in the `t` parameter
-
-#### Scenario: Default protocol for unknown terminals
-
-- **WHEN** terminal type cannot be determined
-- **THEN** the system SHALL use OSC 9 format (most widely ignored by unsupported terminals)
-
-#### Scenario: Unsupported terminal handling
-
-- **WHEN** the terminal does not support OSC notifications
-- **THEN** the system SHALL send the escape sequence anyway
-- **AND** the terminal SHALL silently ignore the unrecognized sequence
-- **AND** no error SHALL be shown to the user
-
----
-
 ### Requirement: Notification Batching
 
 The system SHALL batch rapid notification events into a single notification.
@@ -354,25 +319,19 @@ The system SHALL show question completion progress via OSC 9 progress bar sequen
 
 ### Requirement: Notification Sound
 
-The system SHALL support configurable notification sounds.
+The system SHALL support configurable notification sounds via OS-native sound settings.
 
 #### Scenario: Sound enabled (default)
 
 - **WHEN** `notifications.sound` is `true` (default)
-- **AND** using OSC 99 (kitty)
-- **THEN** the notification SHALL include sound parameter `s=dialog-information`
+- **THEN** the system SHALL set `sound: true` in node-notifier options
+- **AND** the OS SHALL play its default notification sound
 
 #### Scenario: Sound disabled
 
 - **WHEN** `notifications.sound` is `false`
-- **AND** using OSC 99 (kitty)
-- **THEN** the notification SHALL omit the sound parameter
-
-#### Scenario: OSC 9 sound behavior
-
-- **WHEN** using OSC 9 (iTerm2)
-- **THEN** sound behavior SHALL be controlled by the terminal's notification settings
-- **AND** the application SHALL not explicitly control sound
+- **THEN** the system SHALL set `sound: false` in node-notifier options
+- **AND** no sound SHALL be played
 
 ---
 
@@ -403,6 +362,132 @@ The system SHALL support notification settings in the configuration file.
 #### Scenario: Disabled notifications
 
 - **WHEN** `notifications.enabled` is `false`
-- **THEN** the system SHALL NOT send any OSC notification sequences
-- **AND** the system SHALL NOT show progress bar
+- **THEN** the system SHALL NOT send any native notifications
+- **AND** the system SHALL NOT show progress bar (unchanged behavior)
+
+### Requirement: OS-Native Desktop Notifications
+
+The system SHALL send desktop notifications via OS-native APIs (node-notifier) when new questions arrive.
+
+#### Scenario: Notification on new session
+
+- **WHEN** a new session is added to the queue
+- **AND** `notifications.enabled` is `true` in config (default)
+- **THEN** the system SHALL send a native OS notification
+- **AND** the notification title SHALL be `AUQ`
+- **AND** the notification message SHALL be `{N} new question(s) waiting` where N is the count
+
+#### Scenario: macOS notification
+
+- **WHEN** running on macOS (`process.platform === 'darwin'`)
+- **THEN** the system SHALL use node-notifier's NotificationCenter backend
+- **AND** no additional configuration SHALL be required
+
+#### Scenario: Windows notification
+
+- **WHEN** running on Windows (`process.platform === 'win32'`)
+- **THEN** the system SHALL use node-notifier's WindowsToaster backend
+- **AND** the system SHALL set `appID` to `'com.auq.mcp'` for Action Center persistence
+
+#### Scenario: Linux notification
+
+- **WHEN** running on Linux (`process.platform === 'linux'`)
+- **THEN** the system SHALL use node-notifier's NotifySend backend
+- **AND** the system SHALL require `notify-send` binary (from libnotify-bin package)
+
+#### Scenario: Notification failure handling
+
+- **WHEN** node-notifier fails to send a notification
+- **THEN** the system SHALL log a warning message once
+- **AND** the system SHALL continue operating without notifications
+- **AND** the system SHALL NOT crash or throw errors to the user
+
+---
+
+### Requirement: Linux Dependency Detection
+
+The system SHALL detect missing Linux notification dependencies at startup.
+
+#### Scenario: notify-send available
+
+- **WHEN** running on Linux
+- **AND** `notify-send` binary is found in PATH
+- **THEN** the system SHALL proceed normally without warnings
+
+#### Scenario: notify-send missing
+
+- **WHEN** running on Linux
+- **AND** `notify-send` binary is NOT found in PATH
+- **THEN** the system SHALL log a warning at startup
+- **AND** the warning SHALL include: `notify-send not found. Install libnotify-bin for desktop notifications.`
+- **AND** the system SHALL continue operating without notifications
+
+#### Scenario: Non-Linux platforms
+
+- **WHEN** running on macOS or Windows
+- **THEN** the system SHALL NOT perform dependency checks
+- **AND** notifications SHALL work without additional system dependencies
+
+---
+
+### Requirement: Notification Icon
+
+The system SHALL support a custom notification icon.
+
+#### Scenario: Icon file exists
+
+- **WHEN** an icon file exists at `src/tui/notifications/assets/icon.png`
+- **THEN** the system SHALL use that icon in native notifications
+- **AND** the icon path SHALL be resolved as an absolute path
+
+#### Scenario: Icon file missing
+
+- **WHEN** no icon file exists at the expected path
+- **THEN** the system SHALL use the OS default notification icon
+- **AND** no error or warning SHALL be logged
+
+---
+
+### Requirement: R Key Recommended Selection
+
+The system SHALL provide keyboard shortcuts for quickly selecting recommended options.
+
+#### Scenario: R Key Current Question
+
+- **WHEN** user presses `R` key while viewing a question with recommended options
+- **AND** focus is on options (not custom input)
+- **THEN** the system SHALL:
+  - For single-select: select the first recommended option
+  - For multi-select: select all recommended options
+
+#### Scenario: Ctrl+R Quick Submit
+
+- **WHEN** user presses `Ctrl+R` at any point during question answering
+- **THEN** the system SHALL:
+  1. For each unanswered question, select the recommended option(s) if available
+  2. Navigate directly to the review screen
+  3. Allow user to confirm or go back to edit
+
+#### Scenario: R Key No Recommended Available
+
+- **WHEN** user presses `R` key on a question with no recommended options
+- **THEN** the system SHALL take no action (no-op)
+
+---
+
+### Requirement: Navigation Focus Reset
+
+The system SHALL reset option focus when navigating between questions.
+
+#### Scenario: Arrow Key Navigation Focus
+
+- **WHEN** user navigates to a different question using `←` or `→` arrow keys
+- **THEN** the system SHALL reset the focused option index to 0 (first option)
+
+#### Scenario: Tab Navigation Focus
+
+- **WHEN** user navigates to a different question using `Tab` or `Shift+Tab`
+- **THEN** the system SHALL reset the focused option index to 0 (first option)
+
+---
 

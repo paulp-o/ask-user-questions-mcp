@@ -16,6 +16,7 @@ interface TabBarProps {
     }
   >;
   tabLabel?: string;
+  elaborateMarks?: Map<number, string>;
 }
 
 const truncate = (value: string, maxChars: number) => {
@@ -50,6 +51,7 @@ export const TabBar: React.FC<TabBarProps> = ({
   questions,
   answers,
   tabLabel,
+  elaborateMarks,
 }) => {
   const { theme } = useTheme();
   const { stdout } = useStdout();
@@ -85,12 +87,13 @@ export const TabBar: React.FC<TabBarProps> = ({
     const isActive = index === currentIndex;
     const answer = answers.get(index);
     const isAnswered = isAnswerPresent(answer);
+    const isElaborate = elaborateMarks?.has(index) ?? false;
 
     const baseLabel = tabLabel || question.title || `Question ${index + 1}`;
-    const label = truncate(baseLabel, maxLabelChars - 2); // Reserve space for status
-    const status = isAnswered ? "✓" : "·";
+    const label = truncate(baseLabel, maxLabelChars - 2);
+    const status = isElaborate ? "★" : isAnswered ? "✓" : "·";
 
-    return { index, isActive, isAnswered, label, status };
+    return { index, isActive, isAnswered, isElaborate, label, status };
   });
 
   return (
@@ -100,11 +103,13 @@ export const TabBar: React.FC<TabBarProps> = ({
           <Text key={tab.index}>
             <Text
               color={
-                tab.isAnswered
-                  ? theme.components.tabBar.answered
-                  : theme.components.tabBar.unanswered
+                tab.isElaborate
+                  ? theme.colors.warning
+                  : tab.isAnswered
+                    ? theme.components.tabBar.answered
+                    : theme.components.tabBar.unanswered
               }
-              dimColor={!tab.isAnswered && !tab.isActive}
+              dimColor={!tab.isAnswered && !tab.isActive && !tab.isElaborate}
             >
               {tab.status}
             </Text>

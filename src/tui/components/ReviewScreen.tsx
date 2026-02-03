@@ -16,6 +16,7 @@ interface ReviewScreenProps {
   onGoBack: () => void;
   questions: Question[];
   sessionId: string;
+  elaborateMarks?: Map<number, string>;
 }
 
 /**
@@ -28,6 +29,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   onConfirm,
   onGoBack,
   questions,
+  elaborateMarks,
 }) => {
   const { theme } = useTheme();
 
@@ -148,6 +150,17 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                   !answer?.customText && (
                     <Text dimColor> {t("review.unanswered")}</Text>
                   )}
+
+                {/* Elaborate request indicator */}
+                {elaborateMarks?.has(index) && (
+                  <Box marginTop={0.5}>
+                    <Text color={theme.colors.warning}>
+                      {"★"} Marked for elaboration
+                      {elaborateMarks.get(index) &&
+                        `: "${elaborateMarks.get(index)}"`}
+                    </Text>
+                  </Box>
+                )}
               </Box>
             </Box>
           );

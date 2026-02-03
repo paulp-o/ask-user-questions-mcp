@@ -6,6 +6,8 @@ export interface FooterTranslations {
   select: string;
   toggle: string;
   elaborate: string;
+  recommended: string;
+  elaborateInput: string;
   reject: string;
   quickSubmit: string;
   theme: string;
