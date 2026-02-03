@@ -261,15 +261,16 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
-    // Tab/Shift+Tab: Global question navigation (works in all contexts)
-    if (key.tab && key.shift) {
-      setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
-      return;
-    }
-    if (key.tab && !key.shift) {
-      setCurrentQuestionIndex((prev) =>
-        Math.min(sessionRequest.questions.length - 1, prev + 1),
-      );
+    // Tab/Shift+Tab: Global question navigation
+    // Skip when in custom-input mode - MultiLineTextInput handles Tab via onSubmit
+    if (key.tab && focusContext !== "custom-input") {
+      if (key.shift) {
+        setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
+      } else {
+        setCurrentQuestionIndex((prev) =>
+          Math.min(sessionRequest.questions.length - 1, prev + 1),
+        );
+      }
       return;
     }
 
