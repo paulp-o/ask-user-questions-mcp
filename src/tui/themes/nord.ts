@@ -63,8 +63,8 @@ export const nordTheme: Theme = {
       selected: "#88c0d0", // nord8 - cyan selected
       selectedBg: "#3b4252", // nord1
       default: "#eceff4", // nord6
-      description: "#d8dee9", // nord4 - lighter for readability
-      hint: "#d8dee9", // nord4 - lighter for readability
+      description: "#eceff4", // nord6
+      hint: "#eceff4", // nord6
     },
     input: {
       border: "#3b4252", // nord1
@@ -89,7 +89,7 @@ export const nordTheme: Theme = {
     footer: {
       border: "#3b4252", // nord1
       keyBg: "#3b4252", // nord1
-      keyFg: "#88c0d0", // nord8
+      keyFg: "#eceff4", // nord6
       action: "#4c566a", // nord3
       separator: "#3b4252", // nord1
     },

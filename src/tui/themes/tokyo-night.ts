@@ -63,8 +63,8 @@ export const tokyoNightTheme: Theme = {
       selected: "#7aa2f7",
       selectedBg: "#24283b",
       default: "#c0caf5",
-      description: "#9aa5ce", // lighter for readability
-      hint: "#9aa5ce", // lighter for readability
+      description: "#c0caf5", // foreground
+      hint: "#c0caf5", // foreground
     },
     input: {
       border: "#24283b",
@@ -89,7 +89,7 @@ export const tokyoNightTheme: Theme = {
     footer: {
       border: "#24283b",
       keyBg: "#24283b",
-      keyFg: "#7aa2f7",
+      keyFg: "#c0caf5",
       action: "#565f89",
       separator: "#24283b",
     },

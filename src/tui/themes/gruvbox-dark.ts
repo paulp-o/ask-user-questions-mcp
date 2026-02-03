@@ -63,8 +63,8 @@ export const gruvboxDarkTheme: Theme = {
       selected: "#458588",
       selectedBg: "#3c3836",
       default: "#ebdbb2",
-      description: "#bdae93", // light3 - lighter for readability
-      hint: "#bdae93", // light3 - lighter for readability
+      description: "#ebdbb2", // light1
+      hint: "#ebdbb2", // light1
     },
     input: {
       border: "#3c3836",
@@ -89,7 +89,7 @@ export const gruvboxDarkTheme: Theme = {
     footer: {
       border: "#3c3836",
       keyBg: "#3c3836",
-      keyFg: "#458588",
+      keyFg: "#fbf1c7",
       action: "#928374",
       separator: "#3c3836",
     },

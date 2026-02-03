@@ -64,8 +64,8 @@ export const rosePineTheme: Theme = {
       selected: "#ebbcba",
       selectedBg: "#1f1d2e",
       default: "#e0def4",
-      description: "#6e6a86",
-      hint: "#6e6a86",
+      description: "#e0def4",
+      hint: "#e0def4",
     },
     input: {
       border: "#26233a",
@@ -90,7 +90,7 @@ export const rosePineTheme: Theme = {
     footer: {
       border: "#26233a",
       keyBg: "#1f1d2e",
-      keyFg: "#ebbcba",
+      keyFg: "#e0def4",
       action: "#6e6a86",
       separator: "#26233a",
     },

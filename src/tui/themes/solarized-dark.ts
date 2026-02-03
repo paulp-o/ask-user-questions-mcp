@@ -63,8 +63,8 @@ export const solarizedDarkTheme: Theme = {
       selected: "#268bd2",
       selectedBg: "#073642",
       default: "#839496",
-      description: "#93a1a1", // base1 - lighter for readability
-      hint: "#93a1a1", // base1 - lighter for readability
+      description: "#839496", // base0
+      hint: "#839496", // base0
     },
     input: {
       border: "#073642",
@@ -89,7 +89,7 @@ export const solarizedDarkTheme: Theme = {
     footer: {
       border: "#073642",
       keyBg: "#073642",
-      keyFg: "#268bd2",
+      keyFg: "#93a1a1",
       action: "#586e75",
       separator: "#073642",
     },

@@ -63,8 +63,8 @@ export const catppuccinLatteTheme: Theme = {
       selected: "#1e66f5",
       selectedBg: "#ccd0da",
       default: "#4c4f69",
-      description: "#6c6f85", // subtext0 - darker for readability
-      hint: "#6c6f85", // subtext0 - darker for readability
+      description: "#4c4f69", // text
+      hint: "#4c4f69", // text
     },
     input: {
       border: "#ccd0da",
@@ -89,7 +89,7 @@ export const catppuccinLatteTheme: Theme = {
     footer: {
       border: "#ccd0da",
       keyBg: "#ccd0da",
-      keyFg: "#1e66f5",
+      keyFg: "#4c4f69",
       action: "#9ca0b0",
       separator: "#ccd0da",
     },

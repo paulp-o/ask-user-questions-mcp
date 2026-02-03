@@ -62,8 +62,8 @@ export const githubDarkTheme: Theme = {
       selected: "#58a6ff",
       selectedBg: "#161b22",
       default: "#c9d1d9",
-      description: "#8b949e",
-      hint: "#8b949e",
+      description: "#c9d1d9",
+      hint: "#c9d1d9",
     },
     input: {
       border: "#30363d",
@@ -88,7 +88,7 @@ export const githubDarkTheme: Theme = {
     footer: {
       border: "#30363d",
       keyBg: "#161b22",
-      keyFg: "#58a6ff",
+      keyFg: "#f0f6fc",
       action: "#8b949e",
       separator: "#30363d",
     },

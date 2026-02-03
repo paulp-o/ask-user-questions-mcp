@@ -64,8 +64,8 @@ export const darkTheme: Theme = {
       selected: "#46D9FF",
       selectedBg: "#0B1F26",
       default: "#E7EEF5",
-      description: "#8A949E",
-      hint: "#8A949E",
+      description: "#E7EEF5",
+      hint: "#E7EEF5",
     },
     input: {
       border: "#2A3238",
@@ -90,7 +90,7 @@ export const darkTheme: Theme = {
     footer: {
       border: "#2A3238",
       keyBg: "#0B1F26",
-      keyFg: "#46D9FF",
+      keyFg: "#F5FAFF",
       action: "#8A949E",
       separator: "#2A3238",
     },

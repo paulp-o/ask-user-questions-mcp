@@ -63,8 +63,8 @@ export const catppuccinMochaTheme: Theme = {
       selected: "#89b4fa",
       selectedBg: "#313244",
       default: "#cdd6f4",
-      description: "#a6adc8", // subtext0 - lighter for readability
-      hint: "#a6adc8", // subtext0 - lighter for readability
+      description: "#cdd6f4", // text
+      hint: "#cdd6f4", // text
     },
     input: {
       border: "#313244",
@@ -89,7 +89,7 @@ export const catppuccinMochaTheme: Theme = {
     footer: {
       border: "#313244",
       keyBg: "#313244",
-      keyFg: "#89b4fa",
+      keyFg: "#cdd6f4",
       action: "#6c7086",
       separator: "#313244",
     },

@@ -63,8 +63,8 @@ export const lightTheme: Theme = {
       selected: "#007EA7", // Cyan selected
       selectedBg: "#E0F7FA", // Light cyan bg
       default: "#24292F",
-      description: "#57606A",
-      hint: "#57606A",
+      description: "#24292F",
+      hint: "#24292F",
     },
     input: {
       border: "#D0D7DE",
@@ -89,7 +89,7 @@ export const lightTheme: Theme = {
     footer: {
       border: "#D0D7DE",
       keyBg: "#F6F8FA", // Light key cap
-      keyFg: "#007EA7",
+      keyFg: "#050505",
       action: "#57606A",
       separator: "#D0D7DE",
     },

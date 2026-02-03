@@ -63,8 +63,8 @@ export const oneDarkTheme: Theme = {
       selected: "#61afef",
       selectedBg: "#3e4451",
       default: "#abb2bf",
-      description: "#848b98", // lighter for readability
-      hint: "#848b98", // lighter for readability
+      description: "#abb2bf", // foreground
+      hint: "#abb2bf", // foreground
     },
     input: {
       border: "#3e4451",
@@ -89,7 +89,7 @@ export const oneDarkTheme: Theme = {
     footer: {
       border: "#3e4451",
       keyBg: "#3e4451",
-      keyFg: "#61afef",
+      keyFg: "#d7dae0",
       action: "#5c6370",
       separator: "#3e4451",
     },

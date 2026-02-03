@@ -62,8 +62,8 @@ export const githubLightTheme: Theme = {
       selected: "#0969DA", // Blue selected
       selectedBg: "#DDF4FF", // Light blue bg
       default: "#24292F",
-      description: "#57606A",
-      hint: "#57606A",
+      description: "#24292F",
+      hint: "#24292F",
     },
     input: {
       border: "#D0D7DE",
@@ -88,7 +88,7 @@ export const githubLightTheme: Theme = {
     footer: {
       border: "#D0D7DE",
       keyBg: "#F6F8FA", // Light key cap
-      keyFg: "#0969DA",
+      keyFg: "#1F2328",
       action: "#57606A",
       separator: "#D0D7DE",
     },

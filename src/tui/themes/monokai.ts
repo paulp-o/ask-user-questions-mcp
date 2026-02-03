@@ -64,8 +64,8 @@ export const monokaiTheme: Theme = {
       selected: "#66D9EF",
       selectedBg: "#3E3D32",
       default: "#F8F8F2",
-      description: "#75715E",
-      hint: "#75715E",
+      description: "#F8F8F2",
+      hint: "#F8F8F2",
     },
     input: {
       border: "#49483E",
@@ -90,7 +90,7 @@ export const monokaiTheme: Theme = {
     footer: {
       border: "#49483E",
       keyBg: "#3E3D32",
-      keyFg: "#66D9EF",
+      keyFg: "#F8F8F2",
       action: "#75715E",
       separator: "#49483E",
     },

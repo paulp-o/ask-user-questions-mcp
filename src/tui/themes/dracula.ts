@@ -63,8 +63,8 @@ export const draculaTheme: Theme = {
       selected: "#bd93f9",
       selectedBg: "#44475a",
       default: "#f8f8f2",
-      description: "#bd93f9", // lighter purple for readability
-      hint: "#f8f8f2", // foreground for readability
+      description: "#f8f8f2", // foreground
+      hint: "#f8f8f2", // foreground
     },
     input: {
       border: "#44475a",
@@ -89,7 +89,7 @@ export const draculaTheme: Theme = {
     footer: {
       border: "#44475a",
       keyBg: "#44475a",
-      keyFg: "#bd93f9",
+      keyFg: "#f8f8f2",
       action: "#6272a4",
       separator: "#44475a",
     },
