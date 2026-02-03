@@ -1,6 +1,7 @@
 import { Box, Text, useInput } from "ink";
 import React, { useRef, useState } from "react";
 import { useTheme } from "../ThemeContext.js";
+import { getVisualWidth, isWideChar } from "../utils/visualWidth.js";
 
 interface MultiLineTextInputProps {
   isFocused?: boolean;
@@ -23,7 +24,8 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   value,
 }) => {
   const { theme } = useTheme();
-  const [cursorPosition, setCursorPosition] = useState(value.length);
+  // Initialize cursor at end of text (using character count for CJK support)
+  const [cursorPosition, setCursorPosition] = useState([...value].length);
 
   // Use refs to avoid stale closures in useInput callback
   // This fixes missed keystrokes during fast typing
@@ -40,11 +42,13 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   }, [cursorPosition]);
 
   // Update cursor position when value changes externally
+  // Use character count (spread into array) for proper CJK handling
   React.useEffect(() => {
-    if (cursorPosition > value.length) {
-      setCursorPosition(value.length);
+    const charCount = [...value].length;
+    if (cursorPosition > charCount) {
+      setCursorPosition(charCount);
     }
-  }, [value.length, cursorPosition]);
+  }, [value, cursorPosition]);
 
   useInput(
     (input, key) => {
@@ -67,40 +71,53 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
 
       // Enter: Always add newline (portable behavior)
       if (input === "\r" || input === "\n" || key.return) {
-        const newValue =
-          currentValue.slice(0, currentCursor) +
-          "\n" +
-          currentValue.slice(currentCursor);
+        const chars = [...currentValue];
+        const before = chars.slice(0, currentCursor).join("");
+        const after = chars.slice(currentCursor).join("");
+        const newValue = before + "\n" + after;
         onChange(newValue);
         setCursorPosition(currentCursor + 1);
         return;
       }
 
-      // Left arrow: Move cursor left
+      // Left arrow: Move cursor left (accounting for CJK characters)
       if (key.leftArrow) {
-        setCursorPosition(Math.max(0, currentCursor - 1));
+        if (currentCursor > 0) {
+          // Move back by one character (which may be wide)
+          const chars = [...currentValue];
+          const newCursor = Math.max(0, currentCursor - 1);
+          setCursorPosition(newCursor);
+        }
         return;
       }
 
-      // Right arrow: Move cursor right
+      // Right arrow: Move cursor right (accounting for CJK characters)
       if (key.rightArrow) {
-        setCursorPosition(Math.min(currentValue.length, currentCursor + 1));
+        const chars = [...currentValue];
+        if (currentCursor < chars.length) {
+          // Move forward by one character (which may be wide)
+          setCursorPosition(Math.min(chars.length, currentCursor + 1));
+        }
         return;
       }
 
-      // Backspace: Remove character before cursor
+      // Backspace/Delete key handling
+      // Following ink-text-input's approach: treat both key.backspace and key.delete
+      // as backspace (delete character before cursor). Forward-delete is not reliably
+      // detectable across terminals.
       if (key.backspace || key.delete) {
         if (currentCursor > 0) {
-          const newValue =
-            currentValue.slice(0, currentCursor - 1) +
-            currentValue.slice(currentCursor);
-          onChange(newValue);
+          const chars = [...currentValue];
+          const before = chars.slice(0, currentCursor - 1).join("");
+          const after = chars.slice(currentCursor).join("");
+          onChange(before + after);
           setCursorPosition(currentCursor - 1);
         }
         return;
       }
 
       // Regular character input (insert at cursor)
+      // Also handles paste events (input.length > 1)
       if (
         input &&
         !key.ctrl &&
@@ -109,26 +126,38 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         input !== "\r" &&
         input !== "\n"
       ) {
-        const newValue =
-          currentValue.slice(0, currentCursor) +
-          input +
-          currentValue.slice(currentCursor);
+        const chars = [...currentValue];
+        const before = chars.slice(0, currentCursor).join("");
+        const after = chars.slice(currentCursor).join("");
+        const newValue = before + input + after;
         onChange(newValue);
-        setCursorPosition(currentCursor + 1);
+
+        // Move cursor to end of inserted content
+        // For paste events (input.length > 1), this moves cursor to end of pasted text
+        const insertedChars = [...input].length;
+        setCursorPosition(currentCursor + insertedChars);
       }
     },
     { isActive: isFocused },
   );
 
   const normalizedValue = value.replace(/\r\n?/g, "\n");
-  const hasContent = normalizedValue.length > 0;
+  const chars = [...normalizedValue];
+  const hasContent = chars.length > 0;
   const lines = hasContent ? normalizedValue.split("\n") : [placeholder];
 
-  const cursorLineIndex =
-    normalizedValue.slice(0, cursorPosition).split("\n").length - 1;
+  // Calculate cursor line and position using character arrays for CJK support
+  const charsBeforeCursor = chars.slice(0, cursorPosition).join("");
+  const cursorLineIndex = charsBeforeCursor.split("\n").length - 1;
 
-  const cursorLineStart =
-    normalizedValue.lastIndexOf("\n", cursorPosition - 1) + 1;
+  // Find the start of the current line in character indices
+  let cursorLineStart = 0;
+  for (let i = cursorPosition - 1; i >= 0; i--) {
+    if (chars[i] === "\n") {
+      cursorLineStart = i + 1;
+      break;
+    }
+  }
 
   const cursorPositionInLine = cursorPosition - cursorLineStart;
 
@@ -142,9 +171,12 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         const displayText = lineHasContent ? line : isCursorLine ? "" : " ";
 
         if (isCursorLine) {
-          // Split the line at cursor position
-          const beforeCursor = line.slice(0, cursorPositionInLine);
-          const afterCursor = line.slice(cursorPositionInLine);
+          // Split the line at cursor position using character array for CJK support
+          const lineChars = [...line];
+          const beforeCursor = lineChars
+            .slice(0, cursorPositionInLine)
+            .join("");
+          const afterCursor = lineChars.slice(cursorPositionInLine).join("");
 
           return (
             <Text key={index}>

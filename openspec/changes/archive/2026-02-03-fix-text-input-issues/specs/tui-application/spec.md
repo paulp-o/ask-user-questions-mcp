@@ -100,8 +100,6 @@ The system SHALL correctly navigate cursor through CJK text.
 
 ---
 
-## MODIFIED Requirements
-
 ### Requirement: Custom Input Text Entry
 
 The system SHALL provide a text input field for custom answers with correct character handling.

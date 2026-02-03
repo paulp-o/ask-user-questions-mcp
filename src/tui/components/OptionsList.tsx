@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import type { Option } from "../../session/types.js";
 
 import { useTheme } from "../ThemeContext.js";
+import { fitToVisualWidth } from "../utils/visualWidth.js";
 import { MultiLineTextInput } from "./MultiLineTextInput.js";
 
 interface OptionsListProps {
@@ -73,9 +74,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   const rowWidth = Math.max(20, columns - 2);
 
   const fitRow = (text: string) => {
-    if (text.length >= rowWidth)
-      return text.slice(0, Math.max(0, rowWidth - 1)) + "…";
-    return text + " ".repeat(rowWidth - text.length);
+    return fitToVisualWidth(text, rowWidth);
   };
 
   // Calculate max index: include custom input option if enabled

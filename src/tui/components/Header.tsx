@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 import { gradientText } from "../utils/gradientText.js";
+import { padToVisualWidth } from "../utils/visualWidth.js";
 import { darkTheme } from "../themes/dark.js";
 import packageJson from "../../../package.json" with { type: "json" };
 
@@ -67,7 +68,9 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
                 : theme.components.header.queueEmpty
           }
         >
-          {pendingCount > 0 ? ` ${pendingCount} queued ` : " idle "}
+          {pendingCount > 0
+            ? padToVisualWidth(` ${pendingCount} queued `, 12)
+            : padToVisualWidth(" idle ", 12)}
         </Text>
       </Box>
     </Box>

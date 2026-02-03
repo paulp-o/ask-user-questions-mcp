@@ -3,6 +3,7 @@ import React from "react";
 
 import type { Question } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
+import { truncateToVisualWidth } from "../utils/visualWidth.js";
 
 interface TabBarProps {
   currentIndex: number;
@@ -20,10 +21,7 @@ interface TabBarProps {
 }
 
 const truncate = (value: string, maxChars: number) => {
-  if (maxChars <= 0) return "";
-  if (value.length <= maxChars) return value;
-  if (maxChars === 1) return "…";
-  return `${value.slice(0, maxChars - 1)}…`;
+  return truncateToVisualWidth(value, maxChars);
 };
 
 const isAnswerPresent = (
