@@ -19,27 +19,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       # - name: Run linting
       #   run: npm run lint
 
       - name: Run tests
-        run: npm run test
+        run: bun run test
 
       - name: Build packages
-        run: npm run build && npm run -w packages/opencode-plugin build
+        run: bun run build && bun run --cwd packages/opencode-plugin build
 
       - name: Release main package
-        run: npm run release
+        run: bun run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

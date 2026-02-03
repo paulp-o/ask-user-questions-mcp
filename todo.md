@@ -6,7 +6,7 @@
 - [x] remove the review screen by pressing 'r' key. Instead, just show it when user finishes answering all questions.
 - [x] make 'esc' key to reject the question set (session) - this is to reject answering the question set or when the user knows that an outdated question set is being asked. (confirm the user if they're sure they want to reject the question set)
 - [x] For custom input, newline isn't supported yet. It should be supported.
-- [x] there should be a npx based installer which set up proper aliases so that users can just run 'auq' to start the tool. (npm install -g @paulp-o/auq)
+- [x] there should be a npx based installer which set up proper aliases so that users can just run 'auq' to start the tool. (bun add -g @paulp-o/auq)
 - [x] add proper way to setup this MCP server connectable to a MCP client like Claude Desktop or Cursor; make it so that it can be added through Claude Code. for example:
 
 ```json

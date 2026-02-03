@@ -16,6 +16,10 @@ if (!isGlobal) {
   process.exit(0);
 }
 
+// Detect if installed via Bun
+const isBun = process.env.BUN_INSTALL || typeof Bun !== "undefined";
+const runCmd = isBun ? "bunx" : "npx";
+
 console.log("\n✅ AUQ MCP Server installed successfully!\n");
 console.log("📝 Optional: Set up shell aliases for convenience\n");
 
@@ -28,13 +32,13 @@ let aliasCommand = "";
 
 if (shell.includes("zsh")) {
   configFile = path.join(homeDir, ".zshrc");
-  aliasCommand = 'alias auq="npx auq-mcp-server"';
+  aliasCommand = `alias auq="${runCmd} auq-mcp-server"`;
 } else if (shell.includes("bash")) {
   configFile = path.join(homeDir, ".bashrc");
-  aliasCommand = 'alias auq="npx auq-mcp-server"';
+  aliasCommand = `alias auq="${runCmd} auq-mcp-server"`;
 } else if (shell.includes("fish")) {
   configFile = path.join(homeDir, ".config/fish/config.fish");
-  aliasCommand = 'alias auq "npx auq-mcp-server"';
+  aliasCommand = `alias auq "${runCmd} auq-mcp-server"`;
 }
 
 if (configFile) {
@@ -45,7 +49,7 @@ if (configFile) {
   console.log(`Then restart your terminal or run: source ${configFile}\n`);
 } else {
   console.log("To set up a shell alias, add this to your shell config:\n");
-  console.log('  alias auq="npx auq-mcp-server"\n');
+  console.log(`  alias auq="${runCmd} auq-mcp-server"\n`);
   console.log("Then restart your terminal.\n");
 }
 

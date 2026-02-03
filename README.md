@@ -2,26 +2,30 @@
 
 # AUQ - Ask User Questions
 
+_`AskUserQuestion` pushed to the max_
+
 [![npm version](https://img.shields.io/npm/v/auq-mcp-server.svg)](https://www.npmjs.com/package/auq-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-**I pushed `AskUserQuestion` to the max! A complete toolset that enables maximum level of human-in-the-loop onto any general/coding task with LLM. 
-Supports multi-agent interoperability, question queueing, question rejection with explanation, elaboration request, automatic recommendation & quick submission, theming. Can be used as MCP or OpenCode plugin.**
-
-🤔 [Why do I need it when I already have question tool in CC/OC?](#-why-auq-vs-built-in-ask-tools)
+**A complete toolset that enables maximum level of human-in-the-loop onto any general/coding task with LLM.**
+Single/multiple choice questions, custom options, multi-agent interoperability, question queueing, question rejection with explanation, elaboration requesting, automatic recommendation, themes, native OS notification, terminal progress bar, multi-language support... and many more. You can customize them all!
+**Can be used as MCP server or as OpenCode plugin.**
 
 [Setup](#setup-instructions) • [Features](#-features)
+
+> 🤔 [I already have question tool in CC/OC/Cursor. Why use this?](#-why-auq-vs-built-in-ask-tools)
 
 ---
 
 ## What does it do?
 
-AUQ lets your AI assistants generate clarifying questions consisting of multiple-choice/single-choice questions (with an "Other" option for custom input) while coding or working, and wait for your answers through a separate CLI tool without messing up your workflow.
+AUQ lets your AI assistants **ask clarifying questions** consisting of multiple-choice/single-choice questions (with an "Other" option for custom input / rejection / ask for elaboration) while coding or working, and **wait** for your answers through a **separate CLI tool** without messing up your workflow.
 
-You can keep the CLI running in advance, or start it when questions are pending. With simple arrow key navigation, you can select answers and send them back to the AI—all within a clean terminal interface.
+This lets you put your **intent** to  long-running autonomous AI tasks, while you don't need to keep switching windows, babysitting AIs desperately waiting for your reponses. You can turn on the CLI at any time, even remotely via SSH!
 
-## Background
+<details>
+<summary><i>A no fun background story</i></summary>
 
 In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been widely recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code [1].
 
@@ -31,57 +35,13 @@ On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` t
 - **Non-invasive** - Doesn't heavily integrate with your coding CLI workflow or occupy UI space
 - **Multi-agent friendly** - Supports receiving questions from multiple agents simultaneously in parallel workflows
 
+</details>
+
 ---
 
-## ✨ Features
+## ✨ Demo
 
 <https://github.com/user-attachments/assets/3a135a13-fcb1-4795-9a6b-f426fa079674>
-
-### 🖥️ CLI-Based
-
-- **Lightweight**: Adds only ~150 tokens to your context per question
-- **SSH-compatible**: Use over remote connections
-- **Fast**: Instant startup, minimal resource usage
-
-### 📦 100% Local
-
-All information operates based on your local file system. No data leaves your machine.
-
-### 🔄 Resumable & Stateless
-
-The CLI app doesn't need to be running in advance. Whether the model calls the MCP first and you start the CLI later, or you keep it running—you can immediately answer pending questions in FIFO order.
-
-### ❌ Question Set Rejection with Feedback Loop
-
-When the LLM asks about the wrong domain entirely, you can reject the question set, optionally providing the reason to the LLM. The rejection feedback is sent back to the LLM, allowing it to ask more helpful questions or align on what's important for the project.
-
-### 📋 Question Set Queuing
-
-Recent AI workflows often use parallel sub-agents for concurrent coding. AUQ handles multiple simultaneous LLM calls gracefully—when a new question set arrives while you're answering another, it's queued and processed sequentially. Perfect for multi-agent parallel coding workflows.
-
----
-
-## 🤔 Why AUQ vs. Built-in Ask Tools?
-
-**Why should I use AUQ instead of the built-in "Question" tools in OpenCode, Claude Code, or other coding agents?**
-
-AUQ is designed for the era of parallel multi-agent workflows, with several key advantages:
-
-### 🚀 Non-Blocking Parallel Operation
-
-Unlike built-in ask tools that halt the entire AI workflow until you respond, AUQ **doesn't block the AI from continuing work**. Questions are queued asynchronously, allowing your AI assistants to keep coding while you review and answer questions at your own pace.
-
-### 🎯 Multi-Agent Question Set Support
-
-AUQ can handle question sets from **multiple agents simultaneously**. In modern AI coding workflows, you often have several sub-agents working in parallel—each might need clarification on different aspects of your codebase. With AUQ:
-
-- **No more screen switching** between different agent conversations
-- **Unified queue** for all agent questions, regardless of which AI tool they're coming from
-- **Sequential processing** of questions from multiple sources in one interface
-
-### 🌐 Question Set Rejection Support
-
-**Skip irrelevant question sets entirely** - reject whole question batches that don't apply to your current context, saving time and maintaining focus on relevant AI-agent questions.
 
 ---
 
@@ -95,15 +55,17 @@ First, install the AUQ CLI tool:
 
 ```bash
 # Install globally
-npm install -g auq-mcp-server
+bun add -g auq-mcp-server
 
 ```
+
+> **Note:** npm, pnpm, and yarn also work.
 
 ### Local Installation (Project-specific)
 
 ```bash
 # Install in your project
-npm install auq-mcp-server
+bun add auq-mcp-server
 
 ```
 
@@ -117,6 +79,8 @@ AUQ supports multiple AI coding environments. Choose the one that fits your work
 
 ### Option A: MCP Server
 
+_Note: Due to the implementation differences between MCP clients, AUQ can be timed out in certain clients. If you're using OpenCode, use [OpenCode plugin](#option-b-official-opencode-plugin) instead._
+
 ### Cursor
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
@@ -126,8 +90,10 @@ AUQ supports multiple AI coding environments. Choose the one that fits your work
 **Method 1: Using CLI** (Recommended)
 
 ```bash
-claude mcp add --transport stdio ask-user-questions -- npx -y auq-mcp-server server
+claude mcp add --transport stdio ask-user-questions -- bunx -y auq-mcp-server server
 ```
+
+> **Note:** `npx` also works if you prefer npm.
 
 **Method 2: Manual Configuration**
 
@@ -138,7 +104,7 @@ Add to `.mcp.json` in your project root (for team-wide sharing):
   "mcpServers": {
     "ask-user-questions": {
       "type": "stdio",
-      "command": "npx",
+      "command": "bunx",
       "args": ["-y", "auq-mcp-server", "server"]
     }
   }
@@ -146,6 +112,8 @@ Add to `.mcp.json` in your project root (for team-wide sharing):
 ```
 
 Or add to `~/.claude.json` for global access across all projects.
+
+> **Note:** Replace `bunx` with `npx` if using npm.
 
 **Verify setup:** Type `/mcp` in Claude Code to check server status.
 
@@ -155,15 +123,17 @@ Add to `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.ask-user-questions]
-command = "npx"
+command = "bunx"
 args = ["-y", "auq-mcp-server", "server"]
 ```
+
+> **Note:** Replace `bunx` with `npx` if using npm.
 
 **Full configuration example** (with optional settings):
 
 ```toml
 [mcp_servers.ask-user-questions]
-command = "npx"
+command = "bunx"
 args = ["-y", "auq-mcp-server", "server"]
 
 # Optional: Additional environment variables
@@ -187,12 +157,14 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 {
   "mcpServers": {
     "ask-user-questions": {
-      "command": "npx",
+      "command": "bunx",
       "args": ["-y", "auq-mcp-server", "server"]
     }
   }
 }
 ```
+
+> **Note:** Replace `bunx` with `npx` if using npm.
 
 **Restart Claude Desktop** after saving.
 
@@ -217,8 +189,9 @@ Add to `opencode.json`:
 ### Starting the CLI tool
 
 ```bash
-auq      # if installed globally (npm install -g)
-npx auq  # works from anywhere
+auq       # if installed globally (bun add -g)
+bunx auq  # works from anywhere
+npx auq   # also works with npm
 ```
 
 Then just start working with your coding agent or AI assistant. You may prompt to ask questions with the tool the agent got; it will mostly just get what you mean.
@@ -325,13 +298,13 @@ To test the MCP server and CLI locally during development:
 
 ```bash
 # Option A: Run with tsx (recommended for development)
-npm run start
+bun run start
 
 # Option B: Run with fastmcp dev mode (includes web inspector at http://localhost:6274)
-npm run dev
+bun run dev
 
 # Option C: Run the built version
-npm run build && npm run server
+bun run build && bun run server
 ```
 
 ### 2. Create a Test Session (Terminal 2)
@@ -339,12 +312,14 @@ npm run build && npm run server
 Use the `auq ask` command to create a session and wait for answers:
 
 ```bash
-# Run directly with tsx during development
-npx tsx bin/auq.tsx ask '{"questions": [{"prompt": "Which language?", "title": "Lang", "options": [{"label": "TypeScript"}, {"label": "Python"}], "multiSelect": false}]}'
+# Run directly with bun during development
+bun run bin/auq.tsx ask '{"questions": [{"prompt": "Which language?", "title": "Lang", "options": [{"label": "TypeScript"}, {"label": "Python"}], "multiSelect": false}]}'
 
 # Or pipe JSON to stdin
-echo '{"questions": [{"prompt": "Which database?", "title": "DB", "options": [{"label": "PostgreSQL"}, {"label": "MongoDB"}], "multiSelect": false}]}' | npx tsx bin/auq.tsx ask
+echo '{"questions": [{"prompt": "Which database?", "title": "DB", "options": [{"label": "PostgreSQL"}, {"label": "MongoDB"}], "multiSelect": false}]}' | bun run bin/auq.tsx ask
 ```
+
+> **Note:** `npx tsx` also works if you prefer npm.
 
 This will create a session and wait for the TUI to provide answers.
 
@@ -352,8 +327,10 @@ This will create a session and wait for the TUI to provide answers.
 
 ```bash
 # Run the TUI to answer pending questions
-npx tsx bin/auq.tsx
+bun run bin/auq.tsx
 ```
+
+> **Note:** `npx tsx` also works if you prefer npm.
 
 ### Create Mock Sessions for TUI Testing
 
@@ -361,17 +338,19 @@ To test the TUI with multiple pending sessions:
 
 ```bash
 # Create 3 mock sessions (default)
-npx tsx scripts/create-mock-session.ts
+bun run scripts/create-mock-session.ts
 
 # Create a specific number of sessions
-npx tsx scripts/create-mock-session.ts 5
+bun run scripts/create-mock-session.ts 5
 ```
 
 Then run the TUI to see and answer them:
 
 ```bash
-npx tsx bin/auq.tsx
+bun run bin/auq.tsx
 ```
+
+> **Note:** `npx tsx` also works if you prefer npm.
 
 ### Verify MCP and CLI Use Same Session Directory
 
@@ -484,6 +463,30 @@ Notifications can be disabled in configuration if needed.
 - `notifications.sound` (default: `true`): Play sound with notifications
 
 Set `notifications.enabled` to `false` to disable all notifications.
+
+---
+
+## 🤔 Why AUQ vs. Built-in Ask Tools?
+
+**Why should I use AUQ instead of the built-in "Question" tools in OpenCode, Claude Code, or other coding agents?**
+
+AUQ is designed for the era of parallel multi-agent workflows, with several key advantages:
+
+### 🚀 Non-Blocking Parallel Operation
+
+Unlike built-in ask tools that halt the entire AI workflow until you respond, AUQ **doesn't block the AI from continuing work**. Questions are queued asynchronously, allowing your AI assistants to keep coding while you review and answer questions at your own pace.
+
+### 🎯 Multi-Agent Question Set Support
+
+AUQ can handle question sets from **multiple agents simultaneously**. In modern AI coding workflows, you often have several sub-agents working in parallel—each might need clarification on different aspects of your codebase. With AUQ:
+
+- **No more screen switching** between different agent conversations
+- **Unified queue** for all agent questions, regardless of which AI tool they're coming from
+- **Sequential processing** of questions from multiple sources in one interface
+
+### 🌐 Question Set Rejection Support
+
+**Skip irrelevant question sets entirely** - reject whole question batches that don't apply to your current context, saving time and maintaining focus on relevant AI-agent questions.
 
 ---
 

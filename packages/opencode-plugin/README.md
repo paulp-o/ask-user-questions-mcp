@@ -5,8 +5,8 @@ OpenCode plugin that forwards `ask_user_questions` to the `auq ask` CLI.
 ## Install
 
 ```bash
-npm install -g auq-mcp-server
-npm install -g @paulp-o/opencode-auq
+bun add -g auq-mcp-server
+bun add -g @paulp-o/opencode-auq
 ```
 
 ## Configure OpenCode
