@@ -1,6 +1,6 @@
 # Session Management - Configuration System Delta
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Session Configuration
 
