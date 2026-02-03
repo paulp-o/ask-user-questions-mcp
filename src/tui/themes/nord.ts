@@ -26,7 +26,7 @@ export const nordTheme: Theme = {
     pending: "#ebcb8b", // nord13
 
     text: "#eceff4", // nord6 - snow storm
-    textDim: "#4c566a", // nord3 - polar night
+    textDim: "#616E88", // nord3 brightened
     textBold: "#eceff4", // nord6
   },
 
@@ -41,20 +41,20 @@ export const nordTheme: Theme = {
     header: {
       border: "#4c566a", // nord3 - slightly more visible
       queueActive: "#88c0d0", // nord8
-      queueEmpty: "#4c566a", // nord3
+      queueEmpty: "#616E88", // nord3 brightened
       queueFlash: "#8fbcbb", // nord7
       pillBg: "#3b4252", // nord1
     },
     directory: {
-      label: "#4c566a", // nord3
+      label: "#616E88", // nord3 brightened
       path: "#eceff4", // nord6
     },
     tabBar: {
       selected: "#eceff4", // nord6
       selectedBg: "#3b4252", // nord1
-      default: "#4c566a", // nord3
+      default: "#616E88", // nord3 brightened
       answered: "#a3be8c", // nord14
-      unanswered: "#4c566a", // nord3
+      unanswered: "#616E88", // nord3 brightened
       divider: "#3b4252", // nord1
     },
     options: {
@@ -63,13 +63,13 @@ export const nordTheme: Theme = {
       selected: "#88c0d0", // nord8 - cyan selected
       selectedBg: "#3b4252", // nord1
       default: "#eceff4", // nord6
-      description: "#eceff4", // nord6
-      hint: "#eceff4", // nord6
+      description: "#d8dee9", // nord4 - lighter for readability
+      hint: "#d8dee9", // nord4 - lighter for readability
     },
     input: {
       border: "#3b4252", // nord1
       borderFocused: "#88c0d0", // nord8
-      placeholder: "#4c566a", // nord3
+      placeholder: "#616E88", // nord3 brightened
       cursor: "#88c0d0", // nord8
       cursorDim: "#5e81ac", // nord10
     },
@@ -78,19 +78,19 @@ export const nordTheme: Theme = {
       confirmBorder: "#88c0d0", // nord8
       selectedOption: "#a3be8c", // nord14
       customAnswer: "#ebcb8b", // nord13
-      questionId: "#4c566a", // nord3
+      questionId: "#616E88", // nord3 brightened
       divider: "#3b4252", // nord1
     },
     questionDisplay: {
       questionId: "#88c0d0", // nord8
-      typeIndicator: "#4c566a", // nord3
-      elapsed: "#4c566a", // nord3
+      typeIndicator: "#616E88", // nord3 brightened
+      elapsed: "#616E88", // nord3 brightened
     },
     footer: {
       border: "#3b4252", // nord1
       keyBg: "#3b4252", // nord1
-      keyFg: "#eceff4", // nord6
-      action: "#4c566a", // nord3
+      keyFg: "#88c0d0", // nord8
+      action: "#7B88A1", // nord3 brightened
       separator: "#3b4252", // nord1
     },
     toast: {

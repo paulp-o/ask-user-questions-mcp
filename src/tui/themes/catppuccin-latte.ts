@@ -26,7 +26,7 @@ export const catppuccinLatteTheme: Theme = {
     pending: "#fe640b", // peach
 
     text: "#4c4f69", // text
-    textDim: "#9ca0b0", // overlay0
+    textDim: "#acb0c0", // overlay0 lightened
     textBold: "#4c4f69",
   },
 
@@ -41,20 +41,20 @@ export const catppuccinLatteTheme: Theme = {
     header: {
       border: "#9ca0b0", // overlay0 - slightly more visible
       queueActive: "#1e66f5",
-      queueEmpty: "#9ca0b0",
+      queueEmpty: "#acb0c0",
       queueFlash: "#8839ef",
       pillBg: "#ccd0da",
     },
     directory: {
-      label: "#9ca0b0",
+      label: "#acb0c0",
       path: "#4c4f69",
     },
     tabBar: {
       selected: "#4c4f69",
       selectedBg: "#ccd0da",
-      default: "#9ca0b0",
+      default: "#acb0c0",
       answered: "#40a02b",
-      unanswered: "#9ca0b0",
+      unanswered: "#acb0c0",
       divider: "#ccd0da",
     },
     options: {
@@ -63,13 +63,13 @@ export const catppuccinLatteTheme: Theme = {
       selected: "#1e66f5",
       selectedBg: "#ccd0da",
       default: "#4c4f69",
-      description: "#4c4f69", // text
-      hint: "#4c4f69", // text
+      description: "#6c6f85", // subtext0 - darker for readability
+      hint: "#6c6f85", // subtext0 - darker for readability
     },
     input: {
       border: "#ccd0da",
       borderFocused: "#1e66f5",
-      placeholder: "#9ca0b0",
+      placeholder: "#acb0c0",
       cursor: "#1e66f5",
       cursorDim: "#8839ef",
     },
@@ -78,19 +78,19 @@ export const catppuccinLatteTheme: Theme = {
       confirmBorder: "#1e66f5",
       selectedOption: "#40a02b",
       customAnswer: "#df8e1d",
-      questionId: "#9ca0b0",
+      questionId: "#acb0c0",
       divider: "#ccd0da",
     },
     questionDisplay: {
       questionId: "#1e66f5",
-      typeIndicator: "#9ca0b0",
-      elapsed: "#9ca0b0",
+      typeIndicator: "#acb0c0",
+      elapsed: "#acb0c0",
     },
     footer: {
       border: "#ccd0da",
       keyBg: "#ccd0da",
-      keyFg: "#4c4f69",
-      action: "#9ca0b0",
+      keyFg: "#1e66f5",
+      action: "#7c7f93", // overlay1 - darker for visibility
       separator: "#ccd0da",
     },
     toast: {

@@ -27,7 +27,7 @@ export const monokaiTheme: Theme = {
     pending: "#E6DB74",
 
     text: "#F8F8F2",
-    textDim: "#75715E",
+    textDim: "#908B78", // brightened
     textBold: "#F8F8F2",
   },
 
@@ -42,20 +42,20 @@ export const monokaiTheme: Theme = {
     header: {
       border: "#49483E",
       queueActive: "#66D9EF",
-      queueEmpty: "#75715E",
+      queueEmpty: "#908B78",
       queueFlash: "#F8F8F2",
       pillBg: "#3E3D32",
     },
     directory: {
-      label: "#75715E",
+      label: "#908B78",
       path: "#F8F8F2",
     },
     tabBar: {
       selected: "#F8F8F2",
       selectedBg: "#3E3D32",
-      default: "#75715E",
+      default: "#908B78",
       answered: "#A6E22E",
-      unanswered: "#75715E",
+      unanswered: "#908B78",
       divider: "#49483E",
     },
     options: {
@@ -64,13 +64,13 @@ export const monokaiTheme: Theme = {
       selected: "#66D9EF",
       selectedBg: "#3E3D32",
       default: "#F8F8F2",
-      description: "#F8F8F2",
-      hint: "#F8F8F2",
+      description: "#A0998A",
+      hint: "#A0998A",
     },
     input: {
       border: "#49483E",
       borderFocused: "#66D9EF",
-      placeholder: "#75715E",
+      placeholder: "#908B78",
       cursor: "#66D9EF",
       cursorDim: "#F8F8F2",
     },
@@ -79,19 +79,19 @@ export const monokaiTheme: Theme = {
       confirmBorder: "#66D9EF",
       selectedOption: "#A6E22E",
       customAnswer: "#E6DB74",
-      questionId: "#75715E",
+      questionId: "#908B78",
       divider: "#49483E",
     },
     questionDisplay: {
       questionId: "#66D9EF",
-      typeIndicator: "#75715E",
-      elapsed: "#75715E",
+      typeIndicator: "#908B78",
+      elapsed: "#908B78",
     },
     footer: {
       border: "#49483E",
       keyBg: "#3E3D32",
-      keyFg: "#F8F8F2",
-      action: "#75715E",
+      keyFg: "#66D9EF",
+      action: "#A0998A",
       separator: "#49483E",
     },
     toast: {

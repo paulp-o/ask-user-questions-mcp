@@ -26,7 +26,7 @@ export const oneDarkTheme: Theme = {
     pending: "#d19a66",
 
     text: "#abb2bf", // foreground
-    textDim: "#5c6370", // comment gray
+    textDim: "#767D8A", // comment gray brightened
     textBold: "#d7dae0", // lighter
   },
 
@@ -41,20 +41,20 @@ export const oneDarkTheme: Theme = {
     header: {
       border: "#4b5263", // slightly more visible
       queueActive: "#61afef",
-      queueEmpty: "#5c6370",
+      queueEmpty: "#767D8A",
       queueFlash: "#56b6c2",
       pillBg: "#3e4451",
     },
     directory: {
-      label: "#5c6370",
+      label: "#767D8A",
       path: "#abb2bf",
     },
     tabBar: {
       selected: "#abb2bf",
       selectedBg: "#3e4451",
-      default: "#5c6370",
+      default: "#767D8A",
       answered: "#98c379",
-      unanswered: "#5c6370",
+      unanswered: "#767D8A",
       divider: "#3e4451",
     },
     options: {
@@ -63,13 +63,13 @@ export const oneDarkTheme: Theme = {
       selected: "#61afef",
       selectedBg: "#3e4451",
       default: "#abb2bf",
-      description: "#abb2bf", // foreground
-      hint: "#abb2bf", // foreground
+      description: "#848b98", // lighter for readability
+      hint: "#848b98", // lighter for readability
     },
     input: {
       border: "#3e4451",
       borderFocused: "#61afef",
-      placeholder: "#5c6370",
+      placeholder: "#767D8A",
       cursor: "#61afef",
       cursorDim: "#56b6c2",
     },
@@ -78,19 +78,19 @@ export const oneDarkTheme: Theme = {
       confirmBorder: "#61afef",
       selectedOption: "#98c379",
       customAnswer: "#d19a66",
-      questionId: "#5c6370",
+      questionId: "#767D8A",
       divider: "#3e4451",
     },
     questionDisplay: {
       questionId: "#61afef",
-      typeIndicator: "#5c6370",
-      elapsed: "#5c6370",
+      typeIndicator: "#767D8A",
+      elapsed: "#767D8A",
     },
     footer: {
       border: "#3e4451",
       keyBg: "#3e4451",
-      keyFg: "#d7dae0",
-      action: "#5c6370",
+      keyFg: "#61afef",
+      action: "#848b98",
       separator: "#3e4451",
     },
     toast: {

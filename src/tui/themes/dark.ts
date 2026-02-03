@@ -27,7 +27,7 @@ export const darkTheme: Theme = {
     pending: "#FFD36A",
 
     text: "#E7EEF5",
-    textDim: "#8A949E",
+    textDim: "#A0AAB4",
     textBold: "#F5FAFF",
   },
 
@@ -42,20 +42,20 @@ export const darkTheme: Theme = {
     header: {
       border: "#3D4852", // slightly more visible
       queueActive: "#46D9FF",
-      queueEmpty: "#8A949E",
+      queueEmpty: "#A0AAB4",
       queueFlash: "#B8F2FF",
       pillBg: "#0B1F26",
     },
     directory: {
-      label: "#8A949E",
+      label: "#A0AAB4",
       path: "#E7EEF5",
     },
     tabBar: {
       selected: "#E7EEF5",
       selectedBg: "#0B1F26",
-      default: "#8A949E",
+      default: "#A0AAB4",
       answered: "#5AF78E",
-      unanswered: "#8A949E",
+      unanswered: "#A0AAB4",
       divider: "#2A3238",
     },
     options: {
@@ -64,13 +64,13 @@ export const darkTheme: Theme = {
       selected: "#46D9FF",
       selectedBg: "#0B1F26",
       default: "#E7EEF5",
-      description: "#E7EEF5",
-      hint: "#E7EEF5",
+      description: "#A8B2BC",
+      hint: "#A8B2BC",
     },
     input: {
       border: "#2A3238",
       borderFocused: "#46D9FF",
-      placeholder: "#8A949E",
+      placeholder: "#A0AAB4",
       cursor: "#46D9FF",
       cursorDim: "#B8F2FF",
     },
@@ -79,19 +79,19 @@ export const darkTheme: Theme = {
       confirmBorder: "#46D9FF",
       selectedOption: "#5AF78E",
       customAnswer: "#FFD36A",
-      questionId: "#8A949E",
+      questionId: "#A0AAB4",
       divider: "#2A3238",
     },
     questionDisplay: {
       questionId: "#46D9FF",
-      typeIndicator: "#8A949E",
-      elapsed: "#8A949E",
+      typeIndicator: "#A0AAB4",
+      elapsed: "#A0AAB4",
     },
     footer: {
       border: "#2A3238",
       keyBg: "#0B1F26",
-      keyFg: "#F5FAFF",
-      action: "#8A949E",
+      keyFg: "#46D9FF",
+      action: "#A8B2BC",
       separator: "#2A3238",
     },
     toast: {

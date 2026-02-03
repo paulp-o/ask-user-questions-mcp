@@ -26,7 +26,7 @@ export const tokyoNightTheme: Theme = {
     pending: "#e0af68",
 
     text: "#c0caf5", // foreground
-    textDim: "#565f89", // comment
+    textDim: "#7078A3", // comment brightened
     textBold: "#c0caf5",
   },
 
@@ -41,20 +41,20 @@ export const tokyoNightTheme: Theme = {
     header: {
       border: "#3b4261", // slightly more visible
       queueActive: "#7aa2f7",
-      queueEmpty: "#565f89",
+      queueEmpty: "#7078A3",
       queueFlash: "#7dcfff",
       pillBg: "#24283b",
     },
     directory: {
-      label: "#565f89",
+      label: "#7078A3",
       path: "#c0caf5",
     },
     tabBar: {
       selected: "#c0caf5",
       selectedBg: "#24283b",
-      default: "#565f89",
+      default: "#7078A3",
       answered: "#9ece6a",
-      unanswered: "#565f89",
+      unanswered: "#7078A3",
       divider: "#24283b",
     },
     options: {
@@ -63,13 +63,13 @@ export const tokyoNightTheme: Theme = {
       selected: "#7aa2f7",
       selectedBg: "#24283b",
       default: "#c0caf5",
-      description: "#c0caf5", // foreground
-      hint: "#c0caf5", // foreground
+      description: "#9aa5ce", // lighter for readability
+      hint: "#9aa5ce", // lighter for readability
     },
     input: {
       border: "#24283b",
       borderFocused: "#7aa2f7",
-      placeholder: "#565f89",
+      placeholder: "#7078A3",
       cursor: "#7aa2f7",
       cursorDim: "#7dcfff",
     },
@@ -78,19 +78,19 @@ export const tokyoNightTheme: Theme = {
       confirmBorder: "#7aa2f7",
       selectedOption: "#9ece6a",
       customAnswer: "#e0af68",
-      questionId: "#565f89",
+      questionId: "#7078A3",
       divider: "#24283b",
     },
     questionDisplay: {
       questionId: "#7aa2f7",
-      typeIndicator: "#565f89",
-      elapsed: "#565f89",
+      typeIndicator: "#7078A3",
+      elapsed: "#7078A3",
     },
     footer: {
       border: "#24283b",
       keyBg: "#24283b",
-      keyFg: "#c0caf5",
-      action: "#565f89",
+      keyFg: "#7aa2f7",
+      action: "#7B88A1",
       separator: "#24283b",
     },
     toast: {

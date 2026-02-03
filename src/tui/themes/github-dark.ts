@@ -25,7 +25,7 @@ export const githubDarkTheme: Theme = {
     pending: "#d29922",
 
     text: "#c9d1d9",
-    textDim: "#8b949e",
+    textDim: "#a0a8b4", // brightened
     textBold: "#f0f6fc",
   },
 
@@ -40,20 +40,20 @@ export const githubDarkTheme: Theme = {
     header: {
       border: "#30363d",
       queueActive: "#58a6ff",
-      queueEmpty: "#8b949e",
+      queueEmpty: "#a0a8b4",
       queueFlash: "#79c0ff",
       pillBg: "#161b22",
     },
     directory: {
-      label: "#8b949e",
+      label: "#a0a8b4",
       path: "#c9d1d9",
     },
     tabBar: {
       selected: "#c9d1d9",
       selectedBg: "#161b22",
-      default: "#8b949e",
+      default: "#a0a8b4",
       answered: "#3fb950",
-      unanswered: "#8b949e",
+      unanswered: "#a0a8b4",
       divider: "#30363d",
     },
     options: {
@@ -62,13 +62,13 @@ export const githubDarkTheme: Theme = {
       selected: "#58a6ff",
       selectedBg: "#161b22",
       default: "#c9d1d9",
-      description: "#c9d1d9",
-      hint: "#c9d1d9",
+      description: "#b1bac4", // brighter for readability
+      hint: "#b1bac4", // brighter for readability
     },
     input: {
       border: "#30363d",
       borderFocused: "#58a6ff",
-      placeholder: "#8b949e",
+      placeholder: "#a0a8b4",
       cursor: "#58a6ff",
       cursorDim: "#79c0ff",
     },
@@ -77,19 +77,19 @@ export const githubDarkTheme: Theme = {
       confirmBorder: "#58a6ff",
       selectedOption: "#3fb950",
       customAnswer: "#d29922",
-      questionId: "#8b949e",
+      questionId: "#a0a8b4",
       divider: "#30363d",
     },
     questionDisplay: {
       questionId: "#58a6ff",
-      typeIndicator: "#8b949e",
-      elapsed: "#8b949e",
+      typeIndicator: "#a0a8b4",
+      elapsed: "#a0a8b4",
     },
     footer: {
       border: "#30363d",
       keyBg: "#161b22",
-      keyFg: "#f0f6fc",
-      action: "#8b949e",
+      keyFg: "#58a6ff",
+      action: "#b1bac4", // brighter for visibility
       separator: "#30363d",
     },
     toast: {

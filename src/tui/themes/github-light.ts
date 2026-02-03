@@ -25,7 +25,7 @@ export const githubLightTheme: Theme = {
     pending: "#9A6700",
 
     text: "#24292F", // GitHub foreground
-    textDim: "#57606A", // Muted text
+    textDim: "#6E7781", // Muted text lightened
     textBold: "#1F2328",
   },
 
@@ -40,20 +40,20 @@ export const githubLightTheme: Theme = {
     header: {
       border: "#A0A8B0",
       queueActive: "#0969DA",
-      queueEmpty: "#57606A",
+      queueEmpty: "#6E7781",
       queueFlash: "#DDF4FF", // Light blue flash
       pillBg: "#DDF4FF", // Light blue bg
     },
     directory: {
-      label: "#57606A",
+      label: "#6E7781",
       path: "#24292F",
     },
     tabBar: {
       selected: "#24292F",
       selectedBg: "#F6F8FA", // Very light gray
-      default: "#57606A",
+      default: "#6E7781",
       answered: "#1A7F37",
-      unanswered: "#57606A",
+      unanswered: "#6E7781",
       divider: "#D0D7DE",
     },
     options: {
@@ -62,8 +62,8 @@ export const githubLightTheme: Theme = {
       selected: "#0969DA", // Blue selected
       selectedBg: "#DDF4FF", // Light blue bg
       default: "#24292F",
-      description: "#24292F",
-      hint: "#24292F",
+      description: "#424a53", // darker for readability
+      hint: "#424a53", // darker for readability
     },
     input: {
       border: "#D0D7DE",
@@ -77,19 +77,19 @@ export const githubLightTheme: Theme = {
       confirmBorder: "#0969DA",
       selectedOption: "#1A7F37",
       customAnswer: "#9A6700",
-      questionId: "#57606A",
+      questionId: "#6E7781",
       divider: "#D0D7DE",
     },
     questionDisplay: {
       questionId: "#0969DA",
-      typeIndicator: "#57606A",
-      elapsed: "#57606A",
+      typeIndicator: "#6E7781",
+      elapsed: "#6E7781",
     },
     footer: {
       border: "#D0D7DE",
       keyBg: "#F6F8FA", // Light key cap
-      keyFg: "#1F2328",
-      action: "#57606A",
+      keyFg: "#0969DA",
+      action: "#424a53", // darker for visibility
       separator: "#D0D7DE",
     },
     toast: {

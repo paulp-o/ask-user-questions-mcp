@@ -26,7 +26,7 @@ export const solarizedDarkTheme: Theme = {
     pending: "#b58900",
 
     text: "#839496", // base0
-    textDim: "#586e75", // base01
+    textDim: "#6c7c83", // base01 brightened
     textBold: "#93a1a1", // base1
   },
 
@@ -41,20 +41,20 @@ export const solarizedDarkTheme: Theme = {
     header: {
       border: "#586e75", // base01 - slightly more visible
       queueActive: "#268bd2",
-      queueEmpty: "#586e75",
+      queueEmpty: "#6c7c83",
       queueFlash: "#2aa198",
       pillBg: "#073642",
     },
     directory: {
-      label: "#586e75",
+      label: "#6c7c83",
       path: "#839496",
     },
     tabBar: {
       selected: "#93a1a1",
       selectedBg: "#073642",
-      default: "#586e75",
+      default: "#6c7c83",
       answered: "#859900",
-      unanswered: "#586e75",
+      unanswered: "#6c7c83",
       divider: "#073642",
     },
     options: {
@@ -63,13 +63,13 @@ export const solarizedDarkTheme: Theme = {
       selected: "#268bd2",
       selectedBg: "#073642",
       default: "#839496",
-      description: "#839496", // base0
-      hint: "#839496", // base0
+      description: "#93a1a1", // base1 - lighter for readability
+      hint: "#93a1a1", // base1 - lighter for readability
     },
     input: {
       border: "#073642",
       borderFocused: "#268bd2",
-      placeholder: "#586e75",
+      placeholder: "#6c7c83",
       cursor: "#268bd2",
       cursorDim: "#2aa198",
     },
@@ -78,19 +78,19 @@ export const solarizedDarkTheme: Theme = {
       confirmBorder: "#268bd2",
       selectedOption: "#859900",
       customAnswer: "#b58900",
-      questionId: "#586e75",
+      questionId: "#6c7c83",
       divider: "#073642",
     },
     questionDisplay: {
       questionId: "#268bd2",
-      typeIndicator: "#586e75",
-      elapsed: "#586e75",
+      typeIndicator: "#6c7c83",
+      elapsed: "#6c7c83",
     },
     footer: {
       border: "#073642",
       keyBg: "#073642",
-      keyFg: "#93a1a1",
-      action: "#586e75",
+      keyFg: "#268bd2",
+      action: "#839496", // base0 - brighter for visibility
       separator: "#073642",
     },
     toast: {

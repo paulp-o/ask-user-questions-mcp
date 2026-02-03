@@ -26,7 +26,7 @@ export const gruvboxLightTheme: Theme = {
     pending: "#b57614",
 
     text: "#3c3836", // dark1
-    textDim: "#928374", // gray
+    textDim: "#a89984", // gray lightened
     textBold: "#282828", // dark0
   },
 
@@ -41,20 +41,20 @@ export const gruvboxLightTheme: Theme = {
     header: {
       border: "#a89984", // gray - slightly more visible
       queueActive: "#076678",
-      queueEmpty: "#928374",
+      queueEmpty: "#a89984",
       queueFlash: "#427b58",
       pillBg: "#ebdbb2", // light1
     },
     directory: {
-      label: "#928374",
+      label: "#a89984",
       path: "#3c3836",
     },
     tabBar: {
       selected: "#3c3836",
       selectedBg: "#ebdbb2",
-      default: "#928374",
+      default: "#a89984",
       answered: "#79740e",
-      unanswered: "#928374",
+      unanswered: "#a89984",
       divider: "#d5c4a1",
     },
     options: {
@@ -63,13 +63,13 @@ export const gruvboxLightTheme: Theme = {
       selected: "#076678",
       selectedBg: "#ebdbb2",
       default: "#3c3836",
-      description: "#3c3836", // dark1
-      hint: "#3c3836", // dark1
+      description: "#665c54", // dark3 - darker for readability
+      hint: "#665c54", // dark3 - darker for readability
     },
     input: {
       border: "#d5c4a1",
       borderFocused: "#076678",
-      placeholder: "#928374",
+      placeholder: "#a89984",
       cursor: "#076678",
       cursorDim: "#427b58",
     },
@@ -78,19 +78,19 @@ export const gruvboxLightTheme: Theme = {
       confirmBorder: "#076678",
       selectedOption: "#79740e",
       customAnswer: "#b57614",
-      questionId: "#928374",
+      questionId: "#a89984",
       divider: "#d5c4a1",
     },
     questionDisplay: {
       questionId: "#076678",
-      typeIndicator: "#928374",
-      elapsed: "#928374",
+      typeIndicator: "#a89984",
+      elapsed: "#a89984",
     },
     footer: {
       border: "#d5c4a1",
       keyBg: "#ebdbb2",
-      keyFg: "#282828",
-      action: "#928374",
+      keyFg: "#076678",
+      action: "#665c54", // dark3 - darker for visibility
       separator: "#d5c4a1",
     },
     toast: {

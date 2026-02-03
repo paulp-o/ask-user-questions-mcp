@@ -26,7 +26,7 @@ export const gruvboxDarkTheme: Theme = {
     pending: "#d79921", // yellow
 
     text: "#ebdbb2", // light1
-    textDim: "#928374", // gray
+    textDim: "#a89984", // gray brightened
     textBold: "#fbf1c7", // light0
   },
 
@@ -41,20 +41,20 @@ export const gruvboxDarkTheme: Theme = {
     header: {
       border: "#504945", // dark2 - slightly more visible
       queueActive: "#458588",
-      queueEmpty: "#928374",
+      queueEmpty: "#a89984",
       queueFlash: "#689d6a",
       pillBg: "#3c3836",
     },
     directory: {
-      label: "#928374",
+      label: "#a89984",
       path: "#ebdbb2",
     },
     tabBar: {
       selected: "#ebdbb2",
       selectedBg: "#3c3836",
-      default: "#928374",
+      default: "#a89984",
       answered: "#98971a",
-      unanswered: "#928374",
+      unanswered: "#a89984",
       divider: "#3c3836",
     },
     options: {
@@ -63,13 +63,13 @@ export const gruvboxDarkTheme: Theme = {
       selected: "#458588",
       selectedBg: "#3c3836",
       default: "#ebdbb2",
-      description: "#ebdbb2", // light1
-      hint: "#ebdbb2", // light1
+      description: "#bdae93", // light3 - lighter for readability
+      hint: "#bdae93", // light3 - lighter for readability
     },
     input: {
       border: "#3c3836",
       borderFocused: "#458588",
-      placeholder: "#928374",
+      placeholder: "#a89984",
       cursor: "#458588",
       cursorDim: "#689d6a",
     },
@@ -78,19 +78,19 @@ export const gruvboxDarkTheme: Theme = {
       confirmBorder: "#458588",
       selectedOption: "#98971a",
       customAnswer: "#d79921",
-      questionId: "#928374",
+      questionId: "#a89984",
       divider: "#3c3836",
     },
     questionDisplay: {
       questionId: "#458588",
-      typeIndicator: "#928374",
-      elapsed: "#928374",
+      typeIndicator: "#a89984",
+      elapsed: "#a89984",
     },
     footer: {
       border: "#3c3836",
       keyBg: "#3c3836",
-      keyFg: "#fbf1c7",
-      action: "#928374",
+      keyFg: "#458588",
+      action: "#bdae93", // light3 - brighter for visibility
       separator: "#3c3836",
     },
     toast: {

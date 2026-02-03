@@ -27,7 +27,7 @@ export const rosePineTheme: Theme = {
     pending: "#f6c177",
 
     text: "#e0def4",
-    textDim: "#6e6a86",
+    textDim: "#8884a0", // brightened
     textBold: "#e0def4",
   },
 
@@ -42,20 +42,20 @@ export const rosePineTheme: Theme = {
     header: {
       border: "#403d52",
       queueActive: "#ebbcba",
-      queueEmpty: "#6e6a86",
+      queueEmpty: "#8884a0",
       queueFlash: "#f6c177",
       pillBg: "#1f1d2e",
     },
     directory: {
-      label: "#6e6a86",
+      label: "#8884a0",
       path: "#e0def4",
     },
     tabBar: {
       selected: "#e0def4",
       selectedBg: "#1f1d2e",
-      default: "#6e6a86",
+      default: "#8884a0",
       answered: "#31748f",
-      unanswered: "#6e6a86",
+      unanswered: "#8884a0",
       divider: "#26233a",
     },
     options: {
@@ -64,13 +64,13 @@ export const rosePineTheme: Theme = {
       selected: "#ebbcba",
       selectedBg: "#1f1d2e",
       default: "#e0def4",
-      description: "#e0def4",
-      hint: "#e0def4",
+      description: "#908caa", // subtle - brighter for readability
+      hint: "#908caa", // subtle - brighter for readability
     },
     input: {
       border: "#26233a",
       borderFocused: "#ebbcba",
-      placeholder: "#6e6a86",
+      placeholder: "#8884a0",
       cursor: "#ebbcba",
       cursorDim: "#f6c177",
     },
@@ -79,19 +79,19 @@ export const rosePineTheme: Theme = {
       confirmBorder: "#ebbcba",
       selectedOption: "#31748f",
       customAnswer: "#f6c177",
-      questionId: "#6e6a86",
+      questionId: "#8884a0",
       divider: "#26233a",
     },
     questionDisplay: {
       questionId: "#ebbcba",
-      typeIndicator: "#6e6a86",
-      elapsed: "#6e6a86",
+      typeIndicator: "#8884a0",
+      elapsed: "#8884a0",
     },
     footer: {
       border: "#26233a",
       keyBg: "#1f1d2e",
-      keyFg: "#e0def4",
-      action: "#6e6a86",
+      keyFg: "#ebbcba",
+      action: "#908caa", // subtle - brighter for visibility
       separator: "#26233a",
     },
     toast: {
