@@ -7,7 +7,6 @@ import { useTheme } from "../ThemeContext.js";
 
 import { Footer } from "./Footer.js";
 import { OptionsList } from "./OptionsList.js";
-import { SingleLineTextInput } from "./SingleLineTextInput.js";
 import { TabBar } from "./TabBar.js";
 
 interface QuestionDisplayProps {
@@ -35,12 +34,8 @@ interface QuestionDisplayProps {
   hasAnyRecommendedInSession?: boolean;
   // Elaborate marks for visual indicators
   elaborateMarks?: Map<number, string>;
-  // Inline elaborate input
-  showElaborateInput?: boolean;
-  elaborateInputText?: string;
-  onElaborateInputChange?: (text: string) => void;
-  onElaborateConfirm?: () => void;
-  onElaborateCancel?: () => void;
+  // Elaborate selection handler
+  onElaborateSelect?: () => void;
 }
 
 /**
@@ -66,11 +61,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   hasRecommendedOptions,
   hasAnyRecommendedInSession,
   elaborateMarks,
-  showElaborateInput,
-  elaborateInputText = "",
-  onElaborateInputChange,
-  onElaborateConfirm,
-  onElaborateCancel,
+  onElaborateSelect,
 }) => {
   const { theme } = useTheme();
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
@@ -141,10 +132,10 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         </Text>
       </Box>
 
-      {/* Options list with integrated custom input */}
+      {/* Options list with integrated custom input and elaborate option */}
       <OptionsList
         customValue={customAnswer}
-        isFocused={!showElaborateInput}
+        isFocused={true}
         onAdvance={onAdvanceToNext}
         onCustomChange={handleCustomAnswerChange}
         onSelect={handleSelectOption}
@@ -157,30 +148,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         onFocusContextChange={handleFocusContextChange}
         onRecommendedDetected={onRecommendedDetected}
         questionKey={currentQuestionIndex}
+        isElaborateMarked={elaborateMarks?.has(currentQuestionIndex)}
+        onElaborateSelect={onElaborateSelect}
       />
-
-      {/* Inline elaborate input */}
-      {showElaborateInput && (
-        <Box
-          borderColor={theme.colors.warning}
-          borderStyle="round"
-          paddingX={1}
-          marginTop={1}
-          flexDirection="row"
-          alignItems="center"
-        >
-          <Text color={theme.colors.warning}>{"★ "}</Text>
-          <Text dimColor>{t("stepper.elaboratePrompt")}: </Text>
-          <SingleLineTextInput
-            isFocused={true}
-            placeholder={t("stepper.elaborateHint")}
-            value={elaborateInputText}
-            onChange={onElaborateInputChange ?? (() => {})}
-            onSubmit={onElaborateConfirm}
-          />
-          <Text dimColor>{" (Enter to confirm, Esc to cancel)"}</Text>
-        </Box>
-      )}
 
       {/* Footer with context-aware keybindings */}
       <Footer

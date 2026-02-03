@@ -56,9 +56,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [elaborateMarks, setElaborateMarks] = useState<Map<number, string>>(
     new Map(),
   );
-  // Show elaborate input UI for capturing custom explanation
-  const [showElaborateInput, setShowElaborateInput] = useState(false);
-  const [elaborateInputText, setElaborateInputText] = useState("");
 
   const safeIndex = Math.min(
     currentQuestionIndex,
@@ -159,8 +156,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setShowRejectionConfirm(false);
     setElapsedSeconds(0);
     setElaborateMarks(new Map());
-    setShowElaborateInput(false);
-    setElaborateInputText("");
 
     // Compute session-level recommended flag: true if ANY question has recommended options
     const anyHasRecommended = sessionRequest.questions.some((question) =>
@@ -258,41 +253,27 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
   };
 
-  // Handle elaborate input confirmation
-  const handleElaborateConfirm = () => {
+  // Handle elaborate option selection - marks question and auto-advances
+  const handleElaborateSelect = () => {
     setElaborateMarks((prev) => {
       const newMarks = new Map(prev);
-      newMarks.set(currentQuestionIndex, elaborateInputText);
+      if (newMarks.has(currentQuestionIndex)) {
+        // Toggle off if already marked
+        newMarks.delete(currentQuestionIndex);
+      } else {
+        // Mark for elaboration
+        newMarks.set(currentQuestionIndex, "");
+      }
       return newMarks;
     });
-    setShowElaborateInput(false);
-    setElaborateInputText("");
-  };
-
-  // Handle elaborate input cancellation
-  const handleElaborateCancel = () => {
-    setShowElaborateInput(false);
-    setElaborateInputText("");
+    // Auto-advance to next question
+    handleAdvanceToNext();
   };
 
   // Global keyboard shortcuts and navigation
   useInput((input, key) => {
     // Don't handle navigation when showing review, submitting, or confirming rejection
     if (showReview || submitting || showRejectionConfirm) return;
-
-    // Handle elaborate input mode
-    if (showElaborateInput) {
-      if (key.return) {
-        handleElaborateConfirm();
-        return;
-      }
-      if (key.escape) {
-        handleElaborateCancel();
-        return;
-      }
-      // Let text input handle other keys
-      return;
-    }
 
     // Esc key - show rejection confirmation
     if (key.escape) {
@@ -376,26 +357,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
           handleSelectOption(recommendedOptions[0].label);
         }
       }
-      return;
-    }
-
-    // E key: Toggle elaborate mark (only when focus is on options, not in custom input)
-    if (input.toLowerCase() === "e" && focusContext === "option") {
-      // Toggle elaborate mark for current question
-      setElaborateMarks((prev) => {
-        const newMarks = new Map(prev);
-        if (newMarks.has(currentQuestionIndex)) {
-          // Remove elaborate mark
-          newMarks.delete(currentQuestionIndex);
-          setShowElaborateInput(false);
-          setElaborateInputText("");
-        } else {
-          // Show elaborate input UI to capture custom explanation
-          setShowElaborateInput(true);
-          setElaborateInputText("");
-        }
-        return newMarks;
-      });
       return;
     }
 
@@ -542,11 +503,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onRecommendedDetected={setHasRecommendedOptions}
       hasAnyRecommendedInSession={hasAnyRecommendedInSession}
       elaborateMarks={elaborateMarks}
-      showElaborateInput={showElaborateInput}
-      elaborateInputText={elaborateInputText}
-      onElaborateInputChange={setElaborateInputText}
-      onElaborateConfirm={handleElaborateConfirm}
-      onElaborateCancel={handleElaborateCancel}
+      onElaborateSelect={handleElaborateSelect}
     />
   );
 };

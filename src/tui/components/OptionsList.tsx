@@ -33,6 +33,9 @@ interface OptionsListProps {
   questionKey?: string | number;
   // Config-based auto-select (overrides config if provided)
   autoSelectRecommended?: boolean;
+  // Elaborate option
+  isElaborateMarked?: boolean;
+  onElaborateSelect?: () => void;
 }
 
 // isRecommendedOption is imported from ../utils/recommended.js
@@ -57,6 +60,8 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   onRecommendedDetected,
   questionKey,
   autoSelectRecommended: autoSelectRecommendedProp,
+  isElaborateMarked = false,
+  onElaborateSelect,
 }) => {
   const { theme } = useTheme();
   const config = useConfig();
@@ -72,10 +77,14 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     return fitToVisualWidth(text, rowWidth);
   };
 
-  // Calculate max index: include custom input option if enabled
-  const maxIndex = showCustomInput ? options.length : options.length - 1;
+  // Calculate max index: include custom input and elaborate options if enabled
+  // Options: [0..n-1] = regular options, [n] = custom input, [n+1] = elaborate
+  const customInputIndex = options.length;
+  const elaborateIndex = options.length + 1;
+  const maxIndex = showCustomInput ? elaborateIndex : options.length - 1;
   const isCustomInputFocused =
-    showCustomInput && focusedIndex === options.length;
+    showCustomInput && focusedIndex === customInputIndex;
+  const isElaborateFocused = showCustomInput && focusedIndex === elaborateIndex;
   const customLines = customValue.replace(/\r\n?/g, "\n").split("\n");
 
   // Track and emit focus context changes
@@ -154,11 +163,17 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         return;
       }
 
+      // Handle elaborate option selection
+      if (isElaborateFocused && key.return) {
+        onElaborateSelect?.();
+        return;
+      }
+
       if (multiSelect) {
         // Multi-select mode
         if (input === " ") {
           // Spacebar: Toggle selection WITHOUT advancing
-          if (!isCustomInputFocused) {
+          if (!isCustomInputFocused && !isElaborateFocused) {
             onToggle?.(options[focusedIndex].label);
           }
         }
@@ -166,15 +181,15 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         if (key.return) {
           // Enter: Advance to next question (don't toggle)
           // Note: Tab is handled globally in StepperView for question navigation
-          if (!isCustomInputFocused && onAdvance) {
+          if (!isCustomInputFocused && !isElaborateFocused && onAdvance) {
             onAdvance();
           }
         }
       } else {
         // Single-select mode
         if (key.return) {
-          // Don't handle Return when custom input is focused - MultiLineTextInput handles it
-          if (isCustomInputFocused) {
+          // Don't handle Return when custom input or elaborate is focused
+          if (isCustomInputFocused || isElaborateFocused) {
             return;
           }
 
@@ -321,6 +336,36 @@ export const OptionsList: React.FC<OptionsListProps> = ({
               </Box>
             )}
           </Box>
+        </Box>
+      )}
+
+      {/* Request Elaboration option */}
+      {showCustomInput && (
+        <Box marginTop={0}>
+          {(() => {
+            const selectionMark = isElaborateMarked ? "(★)" : "( )";
+            const rowBg = isElaborateFocused
+              ? theme.components.options.focusedBg
+              : isElaborateMarked
+                ? theme.components.options.selectedBg
+                : undefined;
+            const rowColor = isElaborateFocused
+              ? theme.components.options.focused
+              : isElaborateMarked
+                ? theme.colors.warning
+                : theme.components.options.default;
+            const mainLine = `${isElaborateFocused ? ">" : " "} ${selectionMark} ${t("footer.elaborate")}`;
+
+            return (
+              <Text
+                backgroundColor={rowBg}
+                bold={isElaborateFocused || isElaborateMarked}
+                color={rowColor}
+              >
+                {fitRow(mainLine)}
+              </Text>
+            );
+          })()}
         </Box>
       )}
     </Box>

@@ -4,9 +4,8 @@ export const ko = {
     questions: "질문",
     select: "선택",
     toggle: "토글",
-    elaborate: "자세히",
+    elaborate: "설명 요청",
     recommended: "추천",
-    elaborateInput: "자세히 메모",
     reject: "거부",
     quickSubmit: "빠른 제출",
     theme: "테마",
@@ -38,9 +37,6 @@ export const ko = {
   },
   stepper: {
     submitting: "답변 제출 중...",
-    elaborateTitle: "자세히 설명 요청",
-    elaboratePrompt: "자세히 설명이 필요한 내용을 입력하세요 (선택사항):",
-    elaborateHint: "Enter: 확인 | Esc: 취소",
   },
   input: {
     customAnswerLabel: "직접 입력",

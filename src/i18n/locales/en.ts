@@ -4,9 +4,8 @@ export const en = {
     questions: "Questions",
     select: "Select",
     toggle: "Toggle",
-    elaborate: "Elaborate",
+    elaborate: "Request Elaboration",
     recommended: "Recommended",
-    elaborateInput: "Elaborate Note",
     reject: "Reject",
     quickSubmit: "Quick Submit",
     theme: "Theme",
@@ -38,10 +37,6 @@ export const en = {
   },
   stepper: {
     submitting: "Submitting answers...",
-    elaborateTitle: "Mark for Elaboration",
-    elaboratePrompt:
-      "Add a note explaining what you want elaborated (optional):",
-    elaborateHint: "Enter: Confirm | Esc: Cancel",
   },
   input: {
     customAnswerLabel: "Custom answer",

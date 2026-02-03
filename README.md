@@ -6,7 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-**A lightweight CLI tool that allows your LLMs to ask questions to you in a separate space with clean terminal UX. Supports both MCP server and official OpenCode plugin integration. Made for multi-agent parallel coding workflows.**
+**I pushed `AskUserQuestion` to the max! A complete toolset that enables maximum level of human-in-the-loop onto any general/coding task with LLM. 
+Supports multi-agent interoperability, question queueing, question rejection with explanation, elaboration request, automatic recommendation & quick submission, theming. Can be used as MCP or OpenCode plugin.**
 
 🤔 [Why do I need it when I already have question tool in CC/OC?](#-why-auq-vs-built-in-ask-tools)
 
