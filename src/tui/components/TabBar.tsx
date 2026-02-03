@@ -105,9 +105,8 @@ export const TabBar: React.FC<TabBarProps> = ({
                   ? theme.colors.warning
                   : tab.isAnswered
                     ? theme.components.tabBar.answered
-                    : theme.components.tabBar.unanswered
+                    : theme.colors.unansweredHighlight
               }
-              dimColor={!tab.isAnswered && !tab.isActive && !tab.isElaborate}
             >
               {tab.status}
             </Text>

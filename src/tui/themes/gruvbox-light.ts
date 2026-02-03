@@ -24,6 +24,7 @@ export const gruvboxLightTheme: Theme = {
     focused: "#076678",
     selected: "#79740e",
     pending: "#b57614",
+    unansweredHighlight: "#cc241d", // gruvbox red
 
     text: "#3c3836", // dark1
     textDim: "#a89984", // gray lightened
@@ -95,6 +96,7 @@ export const gruvboxLightTheme: Theme = {
     },
     toast: {
       success: "#79740e",
+      successPillBg: "#ebdbb2", // light1 - light bg
       error: "#9d0006",
       info: "#076678",
       border: "#d5c4a1",

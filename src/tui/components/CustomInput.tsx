@@ -2,6 +2,7 @@ import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import React from "react";
 
+import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 
 interface CustomInputProps {
@@ -33,7 +34,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
       padding={0.5}
     >
       <Text color={theme.colors.textDim} dimColor={!isFocused}>
-        {isFocused ? ">" : " "} Custom answer
+        {isFocused ? ">" : " "} {t("input.customAnswerLabel")}
       </Text>
       <Box marginTop={0.5}>
         {isFocused ? (
@@ -44,7 +45,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
           />
         ) : (
           <Text color={value ? theme.colors.text : theme.colors.textDim}>
-            {value || "(Press Tab to enter custom answer)"}
+            {value || t("input.customAnswerHint")}
           </Text>
         )}
       </Box>

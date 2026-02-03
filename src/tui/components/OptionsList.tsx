@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 
 import type { Option } from "../../session/types.js";
 
+import { t } from "../../i18n/index.js";
+import { useConfig } from "../ConfigContext.js";
 import { useTheme } from "../ThemeContext.js";
+import { isRecommendedOption } from "../utils/recommended.js";
 import { fitToVisualWidth } from "../utils/visualWidth.js";
 import { MultiLineTextInput } from "./MultiLineTextInput.js";
 
@@ -28,23 +31,11 @@ interface OptionsListProps {
   onRecommendedDetected?: (hasRecommended: boolean) => void;
   // Focus reset support
   questionKey?: string | number;
-  // Config-based auto-select
+  // Config-based auto-select (overrides config if provided)
   autoSelectRecommended?: boolean;
 }
 
-/**
- * Check if an option label contains a recommended indicator
- * Supports: (recommended), [recommended], (추천), [추천] (case-insensitive)
- */
-const isRecommendedOption = (label: string): boolean => {
-  const lowerLabel = label.toLowerCase();
-  return (
-    lowerLabel.includes("(recommend)") ||
-    lowerLabel.includes("[recommend]") ||
-    lowerLabel.includes("(추천)") ||
-    lowerLabel.includes("[추천]")
-  );
-};
+// isRecommendedOption is imported from ../utils/recommended.js
 
 /**
  * OptionsList displays answer choices and handles arrow key navigation
@@ -65,9 +56,13 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   onFocusContextChange,
   onRecommendedDetected,
   questionKey,
-  autoSelectRecommended = true,
+  autoSelectRecommended: autoSelectRecommendedProp,
 }) => {
   const { theme } = useTheme();
+  const config = useConfig();
+  // Use prop if provided, otherwise use config value
+  const autoSelectRecommended =
+    autoSelectRecommendedProp ?? config.autoSelectRecommended;
   const [focusedIndex, setFocusedIndex] = useState(0);
   const { stdout } = useStdout();
   const columns = stdout?.columns ?? 80;
@@ -96,37 +91,44 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     setFocusedIndex(0);
   }, [questionKey]);
 
-  // Auto-select recommended options on mount
+  // Detect recommended options and notify parent
   useEffect(() => {
     const recommendedOptions = options.filter((opt) =>
       isRecommendedOption(opt.label),
     );
     const hasRecommended = recommendedOptions.length > 0;
-
-    // Notify parent about recommended options
     onRecommendedDetected?.(hasRecommended);
+  }, [options, onRecommendedDetected]);
 
-    // Only auto-select if no option is already selected and autoSelectRecommended is enabled
-    if (hasRecommended && autoSelectRecommended) {
-      if (multiSelect) {
-        // For multi-select: auto-select all recommended options if none selected
-        const hasAnySelection = selectedOptions && selectedOptions.length > 0;
-        if (!hasAnySelection) {
-          recommendedOptions.forEach((opt) => {
-            onToggle?.(opt.label);
-          });
-        }
-      } else {
-        // For single-select: auto-select first recommended option if none selected
-        if (!selectedOption) {
-          const firstRecommended = recommendedOptions[0];
-          if (firstRecommended) {
-            onSelect(firstRecommended.label);
-          }
+  // Auto-select recommended options when question changes
+  useEffect(() => {
+    if (!autoSelectRecommended) return;
+
+    const recommendedOptions = options.filter((opt) =>
+      isRecommendedOption(opt.label),
+    );
+    if (recommendedOptions.length === 0) return;
+
+    if (multiSelect) {
+      // For multi-select: auto-select all recommended options if none selected
+      const hasAnySelection = selectedOptions && selectedOptions.length > 0;
+      if (!hasAnySelection) {
+        recommendedOptions.forEach((opt) => {
+          onToggle?.(opt.label);
+        });
+      }
+    } else {
+      // For single-select: auto-select first recommended option if none selected
+      if (!selectedOption) {
+        const firstRecommended = recommendedOptions[0];
+        if (firstRecommended) {
+          onSelect(firstRecommended.label);
         }
       }
     }
-  }, []); // Run only on mount
+    // Only re-run when question changes (questionKey), not on every selection change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questionKey, autoSelectRecommended]);
 
   useInput(
     (input, key) => {
@@ -255,7 +257,13 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           <Box flexDirection="column">
             {(() => {
               const isSelected = customValue.trim().length > 0;
-              const selectionMark = isSelected ? "(*)" : "( )";
+              const selectionMark = multiSelect
+                ? isSelected
+                  ? "[x]"
+                  : "[ ]"
+                : isSelected
+                  ? "(*)"
+                  : "( )";
               const rowBg = isCustomInputFocused
                 ? theme.components.options.focusedBg
                 : isSelected
@@ -266,7 +274,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 : isSelected
                   ? theme.components.options.selected
                   : theme.components.options.default;
-              const mainLine = `${isCustomInputFocused ? ">" : " "} ${selectionMark} Other (custom)`;
+              const mainLine = `${isCustomInputFocused ? ">" : " "} ${selectionMark} ${t("input.otherCustom")}`;
 
               return (
                 <Text
@@ -292,7 +300,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                   isFocused={true}
                   onChange={onCustomChange}
                   onSubmit={onAdvance}
-                  placeholder="Type your answer (Enter = newline, Tab = done)"
+                  placeholder={t("input.placeholder")}
                   value={customValue}
                 />
               </Box>

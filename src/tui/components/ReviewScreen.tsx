@@ -148,14 +148,17 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                 {!answer?.selectedOption &&
                   !answer?.selectedOptions &&
                   !answer?.customText && (
-                    <Text dimColor> {t("review.unanswered")}</Text>
+                    <Text color={theme.colors.unansweredHighlight}>
+                      {" "}
+                      {t("review.unanswered")}
+                    </Text>
                   )}
 
                 {/* Elaborate request indicator */}
                 {elaborateMarks?.has(index) && (
                   <Box marginTop={0.5}>
                     <Text color={theme.colors.warning}>
-                      {"★"} Marked for elaboration
+                      {"★"} {t("review.markedForElaboration")}
                       {elaborateMarks.get(index) &&
                         `: "${elaborateMarks.get(index)}"`}
                     </Text>

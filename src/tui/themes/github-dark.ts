@@ -23,6 +23,7 @@ export const githubDarkTheme: Theme = {
     focused: "#58a6ff",
     selected: "#3fb950",
     pending: "#d29922",
+    unansweredHighlight: "#f85149",
 
     text: "#c9d1d9",
     textDim: "#a0a8b4", // brightened
@@ -94,6 +95,7 @@ export const githubDarkTheme: Theme = {
     },
     toast: {
       success: "#3fb950",
+      successPillBg: "#161b22",
       error: "#f85149",
       info: "#58a6ff",
       border: "#30363d",

@@ -3,10 +3,12 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
 
+import { t } from "../../i18n/index.js";
 import { ResponseFormatter } from "../../session/ResponseFormatter.js";
 import { SessionManager } from "../../session/SessionManager.js";
 import { getSessionDirectory } from "../../session/utils.js";
 import { useTheme } from "../ThemeContext.js";
+import { isRecommendedOption } from "../utils/recommended.js";
 import { ConfirmationDialog } from "./ConfirmationDialog.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
 import { ReviewScreen } from "./ReviewScreen.js";
@@ -47,6 +49,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
     "option",
   );
   const [hasRecommendedOptions, setHasRecommendedOptions] = useState(false);
+  // Session-level flag: true if ANY question in the session has recommended options
+  const [hasAnyRecommendedInSession, setHasAnyRecommendedInSession] =
+    useState(false);
   // Elaborate marks: Map<questionIndex, customExplanation>
   const [elaborateMarks, setElaborateMarks] = useState<Map<number, string>>(
     new Map(),
@@ -156,7 +161,13 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setElaborateMarks(new Map());
     setShowElaborateInput(false);
     setElaborateInputText("");
-  }, [sessionId]);
+
+    // Compute session-level recommended flag: true if ANY question has recommended options
+    const anyHasRecommended = sessionRequest.questions.some((question) =>
+      question.options.some((opt) => isRecommendedOption(opt.label)),
+    );
+    setHasAnyRecommendedInSession(anyHasRecommended);
+  }, [sessionId, sessionRequest.questions]);
 
   // Update elapsed time since session creation
   useEffect(() => {
@@ -293,7 +304,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     if (
       input.toLowerCase() === "r" &&
       key.ctrl &&
-      hasRecommendedOptions &&
+      hasAnyRecommendedInSession &&
       focusContext === "option"
     ) {
       // Auto-fill all unanswered questions with recommended options
@@ -416,11 +427,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
   const currentAnswer = answers.get(currentQuestionIndex);
 
-  // Helper to detect recommended options
-  const isRecommendedOption = (label: string): boolean => {
-    const pattern = /\[?\(?(recommended|추천)\)?\]?/i;
-    return pattern.test(label);
-  };
+  // isRecommendedOption is imported from ../utils/recommended.js
 
   // Handle elaborate or rephrase special requests
   const handleSpecialRequest = async (type: "elaborate" | "rephrase") => {
@@ -476,7 +483,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     return (
       <Box flexDirection="column" padding={1}>
         <ConfirmationDialog
-          message="Are you sure you want to reject this question set?"
+          message={t("confirmation.rejectMessage")}
           onCancel={() => setShowRejectionConfirm(false)}
           onQuit={() => exit()}
           onReject={handleRejectSession}
@@ -494,7 +501,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
           borderStyle="single"
           padding={1}
         >
-          <Text color={theme.colors.pending}>Submitting answers...</Text>
+          <Text color={theme.colors.pending}>{t("stepper.submitting")}</Text>
         </Box>
       </Box>
     );
@@ -512,36 +519,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
         sessionId={sessionId}
         elaborateMarks={elaborateMarks}
       />
-    );
-  }
-
-  // Show elaborate input UI
-  if (showElaborateInput) {
-    return (
-      <Box flexDirection="column" padding={1}>
-        <Box
-          borderColor={theme.colors.warning}
-          borderStyle="round"
-          padding={1}
-          flexDirection="column"
-        >
-          <Text bold color={theme.colors.warning}>
-            ★ Mark for Elaboration
-          </Text>
-          <Text dimColor>
-            Add a note explaining what you want elaborated (optional):
-          </Text>
-          <Box marginTop={1}>
-            <Text color={theme.colors.primary}>{">"} </Text>
-            <Text>
-              {elaborateInputText || "(Press Enter to confirm, Esc to cancel)"}
-            </Text>
-          </Box>
-        </Box>
-        <Box marginTop={1}>
-          <Text dimColor>Enter: Confirm | Esc: Cancel</Text>
-        </Box>
-      </Box>
     );
   }
 
@@ -563,7 +540,13 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onFocusContextChange={setFocusContext}
       workingDirectory={sessionRequest.workingDirectory}
       onRecommendedDetected={setHasRecommendedOptions}
+      hasAnyRecommendedInSession={hasAnyRecommendedInSession}
       elaborateMarks={elaborateMarks}
+      showElaborateInput={showElaborateInput}
+      elaborateInputText={elaborateInputText}
+      onElaborateInputChange={setElaborateInputText}
+      onElaborateConfirm={handleElaborateConfirm}
+      onElaborateCancel={handleElaborateCancel}
     />
   );
 };

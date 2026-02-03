@@ -24,6 +24,7 @@ export const tokyoNightTheme: Theme = {
     focused: "#7aa2f7",
     selected: "#9ece6a",
     pending: "#e0af68",
+    unansweredHighlight: "#f7768e",
 
     text: "#c0caf5", // foreground
     textDim: "#7078A3", // comment brightened
@@ -95,6 +96,7 @@ export const tokyoNightTheme: Theme = {
     },
     toast: {
       success: "#9ece6a",
+      successPillBg: "#1a1b26",
       error: "#f7768e",
       info: "#7aa2f7",
       border: "#24283b",

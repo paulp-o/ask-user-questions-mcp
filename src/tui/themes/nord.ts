@@ -24,6 +24,7 @@ export const nordTheme: Theme = {
     focused: "#88c0d0", // nord8
     selected: "#a3be8c", // nord14
     pending: "#ebcb8b", // nord13
+    unansweredHighlight: "#bf616a", // nord11 aurora red
 
     text: "#eceff4", // nord6 - snow storm
     textDim: "#616E88", // nord3 brightened
@@ -95,6 +96,7 @@ export const nordTheme: Theme = {
     },
     toast: {
       success: "#a3be8c", // nord14
+      successPillBg: "#3b4252", // nord1
       error: "#bf616a", // nord11
       info: "#88c0d0", // nord8
       border: "#3b4252", // nord1

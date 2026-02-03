@@ -39,10 +39,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   const options = [
     {
       key: "y",
-      label: "Yes, inform the AI that I rejected this question set",
+      label: t("confirmation.rejectYes"),
       action: () => setShowReasonInput(true),
     },
-    { key: "n", label: "No, go back to answering questions", action: onCancel },
+    { key: "n", label: t("confirmation.rejectNo"), action: onCancel },
   ];
 
   useInput((input, key) => {
@@ -148,9 +148,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         );
       })}
       <Box marginTop={1}>
-        <Text dimColor>
-          ↑↓ Navigate | Enter Select | y/n Shortcuts | Esc Quit
-        </Text>
+        <Text dimColor>{"↑↓ " + t("confirmation.keybindings")}</Text>
       </Box>
     </Box>
   );

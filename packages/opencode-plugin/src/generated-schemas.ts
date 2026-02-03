@@ -4,7 +4,7 @@
  * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
  * Run "npm run sync-plugin-schemas" to regenerate.
  * 
- * Generated at: 2026-02-03T07:37:48.462Z
+ * Generated at: 2026-02-03T09:30:20.133Z
  */
 
 import { tool } from "@opencode-ai/plugin/tool";
@@ -159,6 +159,7 @@ const TOOL_DESCRIPTION =
   'Users will always be able to select "Other" to provide custom text input\n' +
   "Use multiSelect: true to allow multiple answers to be selected for a question\n" +
   'Recommend an option unless absolutely necessary, make it the first option in the list and add "(Recommended)" at the end of the label\n' +
+  'For multiSelect questions, you MAY mark multiple options as "(Recommended)" if several choices are advisable\n' +
   'Do NOT use this tool to ask "Is my plan ready?" or "Should I proceed?"';
 
 // Only export what the plugin needs

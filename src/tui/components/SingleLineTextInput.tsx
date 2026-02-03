@@ -1,5 +1,6 @@
 import { Text, useInput } from "ink";
 import React, { useRef, useState } from "react";
+import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 
 interface SingleLineTextInputProps {
@@ -14,7 +15,7 @@ export const SingleLineTextInput: React.FC<SingleLineTextInputProps> = ({
   isFocused = true,
   onChange,
   onSubmit,
-  placeholder = "Type here...",
+  placeholder = t("input.singleLinePlaceholder"),
   value,
 }) => {
   const { theme } = useTheme();

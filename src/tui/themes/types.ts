@@ -26,6 +26,7 @@ export interface Theme {
     focused: string;
     selected: string;
     pending: string;
+    unansweredHighlight: string; // Red-family color for unanswered questions emphasis
 
     // Text colors
     text: string;
@@ -104,6 +105,7 @@ export interface Theme {
     };
     toast: {
       success: string;
+      successPillBg: string; // Background color for success pill/badge style
       error: string;
       info: string;
       border: string;

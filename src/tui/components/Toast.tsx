@@ -9,6 +9,7 @@ interface ToastProps {
   onDismiss: () => void;
   duration?: number; // in milliseconds
   title?: string; // Optional bold title shown before message
+  variant?: "default" | "pill";
 }
 
 /**
@@ -21,6 +22,7 @@ export const Toast: React.FC<ToastProps> = ({
   onDismiss,
   duration = 2000,
   title,
+  variant = "default",
 }) => {
   const { theme } = useTheme();
   // Auto-dismiss after duration
@@ -40,10 +42,18 @@ export const Toast: React.FC<ToastProps> = ({
         ? theme.components.toast.error
         : theme.components.toast.info;
 
+  const isPill = variant === "pill";
+  const backgroundColor =
+    isPill && type === "success"
+      ? theme.components.toast.successPillBg
+      : undefined;
+
   return (
     <Box
       borderColor={theme.components.toast.border}
-      borderStyle="round"
+      borderStyle={isPill ? undefined : "round"}
+      backgroundColor={backgroundColor}
+      justifyContent={isPill ? "center" : undefined}
       paddingX={2}
       paddingY={0}
       flexDirection="column"

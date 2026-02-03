@@ -24,6 +24,7 @@ export const lightTheme: Theme = {
     focused: "#007EA7",
     selected: "#2DA44E",
     pending: "#B07D00",
+    unansweredHighlight: "#CF222E",
 
     text: "#24292F", // Graphite
     textDim: "#6E7781", // Slate gray - softened
@@ -95,6 +96,7 @@ export const lightTheme: Theme = {
     },
     toast: {
       success: "#2DA44E",
+      successPillBg: "#E6F9EE",
       error: "#CF222E",
       info: "#007EA7",
       border: "#D0D7DE",

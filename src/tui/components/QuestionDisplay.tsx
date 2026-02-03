@@ -1,11 +1,13 @@
 import { Box, Text } from "ink";
 import React, { useState } from "react";
 
+import { t } from "../../i18n/index.js";
 import type { Question } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
 
 import { Footer } from "./Footer.js";
 import { OptionsList } from "./OptionsList.js";
+import { SingleLineTextInput } from "./SingleLineTextInput.js";
 import { TabBar } from "./TabBar.js";
 
 interface QuestionDisplayProps {
@@ -29,8 +31,16 @@ interface QuestionDisplayProps {
   // Recommended option detection
   onRecommendedDetected?: (hasRecommended: boolean) => void;
   hasRecommendedOptions?: boolean;
+  // Session-level recommended flag for Ctrl+R visibility
+  hasAnyRecommendedInSession?: boolean;
   // Elaborate marks for visual indicators
   elaborateMarks?: Map<number, string>;
+  // Inline elaborate input
+  showElaborateInput?: boolean;
+  elaborateInputText?: string;
+  onElaborateInputChange?: (text: string) => void;
+  onElaborateConfirm?: () => void;
+  onElaborateCancel?: () => void;
 }
 
 /**
@@ -54,7 +64,13 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   workingDirectory,
   onRecommendedDetected,
   hasRecommendedOptions,
+  hasAnyRecommendedInSession,
   elaborateMarks,
+  showElaborateInput,
+  elaborateInputText = "",
+  onElaborateInputChange,
+  onElaborateConfirm,
+  onElaborateCancel,
 }) => {
   const { theme } = useTheme();
   const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
@@ -104,26 +120,31 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         elaborateMarks={elaborateMarks}
       />
 
-      {/* Question ID, prompt, and type indicator - all on one line */}
-      <Box flexDirection="row" justifyContent="space-between">
-        <Box>
+      {/* Question ID, prompt, and type indicator */}
+      <Box>
+        <Text>
           <Text color={theme.components.questionDisplay.questionId}>
             [Q{currentQuestionIndex}]
           </Text>
-          <Text bold>{` ${currentQuestion.prompt} `}</Text>
+          <Text bold> {currentQuestion.prompt} </Text>
           <Text color={theme.components.questionDisplay.typeIndicator}>
-            [{multiSelect ? "Multiple Choice" : "Single Choice"}]
+            [
+            {multiSelect
+              ? t("question.multipleChoice")
+              : t("question.singleChoice")}
+            ]
           </Text>
-        </Box>
-        <Text color={theme.components.questionDisplay.elapsed} dimColor>
-          {elapsedLabel}
+          <Text> </Text>
+          <Text color={theme.components.questionDisplay.elapsed} dimColor>
+            {elapsedLabel}
+          </Text>
         </Text>
       </Box>
 
       {/* Options list with integrated custom input */}
       <OptionsList
         customValue={customAnswer}
-        isFocused={true}
+        isFocused={!showElaborateInput}
         onAdvance={onAdvanceToNext}
         onCustomChange={handleCustomAnswerChange}
         onSelect={handleSelectOption}
@@ -138,12 +159,36 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         questionKey={currentQuestionIndex}
       />
 
+      {/* Inline elaborate input */}
+      {showElaborateInput && (
+        <Box
+          borderColor={theme.colors.warning}
+          borderStyle="round"
+          paddingX={1}
+          marginTop={1}
+          flexDirection="row"
+          alignItems="center"
+        >
+          <Text color={theme.colors.warning}>{"★ "}</Text>
+          <Text dimColor>{t("stepper.elaboratePrompt")}: </Text>
+          <SingleLineTextInput
+            isFocused={true}
+            placeholder={t("stepper.elaborateHint")}
+            value={elaborateInputText}
+            onChange={onElaborateInputChange ?? (() => {})}
+            onSubmit={onElaborateConfirm}
+          />
+          <Text dimColor>{" (Enter to confirm, Esc to cancel)"}</Text>
+        </Box>
+      )}
+
       {/* Footer with context-aware keybindings */}
       <Footer
         focusContext={focusContext}
         multiSelect={multiSelect ?? false}
         customInputValue={customAnswer}
         hasRecommendedOptions={hasRecommendedOptions}
+        hasAnyRecommendedInSession={hasAnyRecommendedInSession}
       />
     </Box>
   );

@@ -25,6 +25,7 @@ export const darkTheme: Theme = {
     focused: "#46D9FF",
     selected: "#5AF78E",
     pending: "#FFD36A",
+    unansweredHighlight: "#FF6B6B",
 
     text: "#E7EEF5",
     textDim: "#A0AAB4",
@@ -96,6 +97,7 @@ export const darkTheme: Theme = {
     },
     toast: {
       success: "#5AF78E",
+      successPillBg: "#0F2417",
       error: "#FF5C57",
       info: "#46D9FF",
       border: "#2A3238",

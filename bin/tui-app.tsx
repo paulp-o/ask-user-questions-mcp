@@ -23,6 +23,7 @@ import {
 } from "../src/tui/notifications/index.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
 import { ThemeProvider } from "../src/tui/ThemeProvider.js";
+import { ConfigProvider } from "../src/tui/ConfigContext.js";
 
 type AppState =
   | { mode: "PROCESSING"; session: SessionData }
@@ -246,28 +247,30 @@ const App: React.FC<AppProps> = ({ config }) => {
   const initialTheme = config?.theme || "system";
 
   return (
-    <ThemeProvider initialTheme={initialTheme}>
-      <Box flexDirection="column" paddingX={1}>
-        <Header pendingCount={sessionQueue.length} />
-        {toast && (
-          <Box marginBottom={1} marginTop={1}>
-            <Toast
-              message={toast.message}
-              onDismiss={() => setToast(null)}
-              type={toast.type}
-              title={toast.title}
-            />
-          </Box>
-        )}
-        {mainContent}
-        {showSessionLog && (
-          <Box marginTop={1}>
-            <Text dimColor>[AUQ] Session directory: {sessionDir}</Text>
-          </Box>
-        )}
-        <ThemeIndicator />
-      </Box>
-    </ThemeProvider>
+    <ConfigProvider config={config}>
+      <ThemeProvider initialTheme={initialTheme}>
+        <Box flexDirection="column" paddingX={1}>
+          <Header pendingCount={sessionQueue.length} />
+          {toast && (
+            <Box marginBottom={1} marginTop={1}>
+              <Toast
+                message={toast.message}
+                onDismiss={() => setToast(null)}
+                type={toast.type}
+                title={toast.title}
+              />
+            </Box>
+          )}
+          {mainContent}
+          {showSessionLog && (
+            <Box marginTop={1}>
+              <Text dimColor>[AUQ] Session directory: {sessionDir}</Text>
+            </Box>
+          )}
+          <ThemeIndicator />
+        </Box>
+      </ThemeProvider>
+    </ConfigProvider>
   );
 };
 

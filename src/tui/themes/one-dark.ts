@@ -24,6 +24,7 @@ export const oneDarkTheme: Theme = {
     focused: "#61afef",
     selected: "#98c379",
     pending: "#d19a66",
+    unansweredHighlight: "#e06c75",
 
     text: "#abb2bf", // foreground
     textDim: "#767D8A", // comment gray brightened
@@ -95,6 +96,7 @@ export const oneDarkTheme: Theme = {
     },
     toast: {
       success: "#98c379",
+      successPillBg: "#282c34",
       error: "#e06c75",
       info: "#61afef",
       border: "#3e4451",

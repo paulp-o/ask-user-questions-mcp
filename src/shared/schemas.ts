@@ -148,6 +148,7 @@ export const TOOL_DESCRIPTION =
   'Users will always be able to select "Other" to provide custom text input\n' +
   "Use multiSelect: true to allow multiple answers to be selected for a question\n" +
   'Recommend an option unless absolutely necessary, make it the first option in the list and add "(Recommended)" at the end of the label\n' +
+  'For multiSelect questions, you MAY mark multiple options as "(Recommended)" if several choices are advisable\n' +
   'Do NOT use this tool to ask "Is my plan ready?" or "Should I proceed?"';
 
 export type QuestionInput = z.infer<typeof QuestionSchema>;

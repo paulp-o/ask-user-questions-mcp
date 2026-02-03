@@ -25,6 +25,7 @@ export const rosePineTheme: Theme = {
     focused: "#ebbcba",
     selected: "#31748f",
     pending: "#f6c177",
+    unansweredHighlight: "#eb6f92",
 
     text: "#e0def4",
     textDim: "#8884a0", // brightened
@@ -96,6 +97,7 @@ export const rosePineTheme: Theme = {
     },
     toast: {
       success: "#31748f",
+      successPillBg: "#191724",
       error: "#eb6f92",
       info: "#9ccfd8",
       border: "#26233a",

@@ -9,7 +9,10 @@ interface FooterProps {
   multiSelect: boolean;
   isReviewScreen?: boolean;
   customInputValue?: string;
+  /** True if CURRENT question has recommended options (for R key visibility) */
   hasRecommendedOptions?: boolean;
+  /** True if ANY question in the session has recommended options (for Ctrl+R visibility) */
+  hasAnyRecommendedInSession?: boolean;
 }
 
 type Keybinding = { key: string; action: string };
@@ -24,6 +27,7 @@ export const Footer: React.FC<FooterProps> = ({
   isReviewScreen = false,
   customInputValue = "",
   hasRecommendedOptions = false,
+  hasAnyRecommendedInSession = false,
 }) => {
   const { theme } = useTheme();
   const getKeybindings = (): Keybinding[] => {
@@ -39,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({
     if (focusContext === "custom-input") {
       return [
         { key: "↑↓", action: t("footer.options") },
-        { key: "←→", action: "Cursor" },
+        { key: "←→", action: t("footer.cursor") },
         { key: "Tab/S+Tab", action: t("footer.questions") },
         { key: "Enter", action: t("footer.newline") },
         { key: "Esc", action: t("footer.reject") },
@@ -66,7 +70,8 @@ export const Footer: React.FC<FooterProps> = ({
         bindings.push({ key: "R", action: t("footer.recommended") });
       }
 
-      if (hasRecommendedOptions) {
+      // Ctrl+R shows when ANY question in session has recommended (not just current)
+      if (hasAnyRecommendedInSession) {
         bindings.push({ key: "Ctrl+R", action: t("footer.quickSubmit") });
       }
 

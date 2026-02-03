@@ -73,7 +73,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
       >
         <Box justifyContent="center">
           <AnimatedGradient
-            text={`Processing… (${queueCount} waiting in queue)`}
+            text={`${t("waiting.processing")} (${t("waiting.queueCount").replace("{count}", String(queueCount))})`}
           />
         </Box>
         <Box justifyContent="center" marginTop={1}>

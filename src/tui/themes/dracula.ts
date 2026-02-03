@@ -24,6 +24,7 @@ export const draculaTheme: Theme = {
     focused: "#bd93f9",
     selected: "#50fa7b",
     pending: "#ffb86c", // orange
+    unansweredHighlight: "#ff5555", // dracula red
 
     text: "#f8f8f2", // foreground
     textDim: "#7C8BBE", // comment brightened
@@ -95,6 +96,7 @@ export const draculaTheme: Theme = {
     },
     toast: {
       success: "#50fa7b",
+      successPillBg: "#44475a", // current line
       error: "#ff5555",
       info: "#bd93f9",
       border: "#44475a",

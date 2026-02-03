@@ -25,6 +25,7 @@ export const monokaiTheme: Theme = {
     focused: "#66D9EF",
     selected: "#A6E22E",
     pending: "#E6DB74",
+    unansweredHighlight: "#f92672",
 
     text: "#F8F8F2",
     textDim: "#908B78", // brightened
@@ -96,6 +97,7 @@ export const monokaiTheme: Theme = {
     },
     toast: {
       success: "#A6E22E",
+      successPillBg: "#272822",
       error: "#F92672",
       info: "#66D9EF",
       border: "#49483E",

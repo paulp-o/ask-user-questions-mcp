@@ -23,6 +23,7 @@ export const githubLightTheme: Theme = {
     focused: "#0969DA",
     selected: "#1A7F37",
     pending: "#9A6700",
+    unansweredHighlight: "#cf222e",
 
     text: "#24292F", // GitHub foreground
     textDim: "#6E7781", // Muted text lightened
@@ -94,6 +95,7 @@ export const githubLightTheme: Theme = {
     },
     toast: {
       success: "#1A7F37",
+      successPillBg: "#f6f8fa",
       error: "#CF222E",
       info: "#0969DA",
       border: "#D0D7DE",

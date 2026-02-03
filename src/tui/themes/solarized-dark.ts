@@ -24,6 +24,7 @@ export const solarizedDarkTheme: Theme = {
     focused: "#268bd2",
     selected: "#859900",
     pending: "#b58900",
+    unansweredHighlight: "#dc322f",
 
     text: "#839496", // base0
     textDim: "#6c7c83", // base01 brightened
@@ -95,6 +96,7 @@ export const solarizedDarkTheme: Theme = {
     },
     toast: {
       success: "#859900",
+      successPillBg: "#073642",
       error: "#dc322f",
       info: "#268bd2",
       border: "#073642",

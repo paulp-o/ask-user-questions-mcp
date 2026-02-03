@@ -13,5 +13,6 @@
 
   "// UI": "User interface settings",
   "language": "auto",
-  "theme": "system"
+  "theme": "system",
+  "autoSelectRecommended": true
 }

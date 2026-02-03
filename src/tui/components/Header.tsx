@@ -68,9 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
                 : theme.components.header.queueEmpty
           }
         >
-          {pendingCount > 0
-            ? padToVisualWidth(` ${pendingCount} queued `, 12)
-            : padToVisualWidth(" idle ", 12)}
+          {pendingCount > 0 ? ` ${pendingCount} queued ` : " idle "}
         </Text>
       </Box>
     </Box>

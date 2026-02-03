@@ -1,5 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import React, { useRef, useState } from "react";
+import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 import { getVisualWidth, isWideChar } from "../utils/visualWidth.js";
 
@@ -20,7 +21,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   isFocused = true,
   onChange,
   onSubmit,
-  placeholder = "Type your answer...",
+  placeholder = t("input.multiLinePlaceholder"),
   value,
 }) => {
   const { theme } = useTheme();

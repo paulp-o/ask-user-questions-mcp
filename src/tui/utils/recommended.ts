@@ -5,20 +5,23 @@
 
 /**
  * Regex patterns for detecting recommended markers in labels.
+ * Requires matching delimiters: either (word) or [word].
  * Matches case-insensitively and supports both parentheses and brackets.
  */
 export const RECOMMENDED_PATTERNS = {
-  /** Matches (recommended) or [recommended] - case insensitive */
-  EN: /\[?\(?(recommended)\)?\]?/i,
-  /** Matches (추천) or [추천] - case insensitive */
-  KO: /\[?\(?(추천)\)?\]?/i,
+  /** Matches (recommended) or [recommended] - case insensitive, requires matching delimiters */
+  EN: /(?:\(recommended\)|\[recommended\])/i,
+  /** Matches (추천) or [추천] - requires matching delimiters */
+  KO: /(?:\(추천\)|\[추천\])/,
 } as const;
 
 /**
  * Combined regex for detecting any recommended pattern.
- * Matches case-insensitively and supports both parentheses and brackets.
+ * Requires matching delimiters: either (word) or [word].
+ * Matches case-insensitively for English, exactly for Korean.
  */
-const RECOMMENDED_REGEX = /\[?\(?(recommended|추천)\)?\]?/i;
+const RECOMMENDED_REGEX =
+  /(?:\(recommended\)|\[recommended\]|\(추천\)|\[추천\])/i;
 
 /**
  * Detects if a label contains a recommended pattern.

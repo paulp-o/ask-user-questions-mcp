@@ -1,6 +1,7 @@
 import { Box, Text } from "ink";
 import React, { useEffect, useRef, useState } from "react";
 
+import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 
 /**
@@ -41,7 +42,8 @@ export const ThemeIndicator: React.FC = () => {
   return (
     <Box justifyContent="center" marginY={0}>
       <Text color={theme.colors.textDim}>
-        theme: <Text color={theme.colors.primary}>{themeName}</Text>
+        {t("ui.themeLabel")}{" "}
+        <Text color={theme.colors.primary}>{themeName}</Text>
       </Text>
     </Box>
   );

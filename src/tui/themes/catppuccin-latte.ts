@@ -24,6 +24,7 @@ export const catppuccinLatteTheme: Theme = {
     focused: "#1e66f5",
     selected: "#40a02b",
     pending: "#fe640b", // peach
+    unansweredHighlight: "#d20f39",
 
     text: "#4c4f69", // text
     textDim: "#acb0c0", // overlay0 lightened
@@ -95,6 +96,7 @@ export const catppuccinLatteTheme: Theme = {
     },
     toast: {
       success: "#40a02b",
+      successPillBg: "#dce0e8",
       error: "#d20f39",
       info: "#1e66f5",
       border: "#ccd0da",
