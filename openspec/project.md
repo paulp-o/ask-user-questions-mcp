@@ -16,7 +16,7 @@ AUQ (Ask User Questions) is a lightweight CLI tool and MCP server that enables A
 ### Core Technologies
 
 - **TypeScript** - Primary language (strict mode)
-- **Bun 1.1+** - Runtime environment
+- **Bun 1.1+** - Runtime and package manager
 - **Zod v4** - Runtime schema validation
 - **UUID v13** - Session ID generation
 
@@ -95,7 +95,7 @@ packages/
 
 - **Unit Tests**: Vitest for schemas, formatting, atomic operations
 - **Integration Tests**: Server integration tests with mock sessions
-- **Manual Testing**: TUI tested manually via `npm run dev`
+- **Manual Testing**: TUI tested manually via `bun run dev`
 - **Test Location**: `__tests__/` directories colocated with source
 - **Naming**: `*.test.ts` suffix
 

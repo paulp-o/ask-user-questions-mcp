@@ -26,7 +26,9 @@ interface OptionsListProps {
   onToggle?: (label: string) => void;
   selectedOptions?: string[];
   // Focus context tracking
-  onFocusContextChange?: (context: "option" | "custom-input") => void;
+  onFocusContextChange?: (
+    context: "option" | "custom-input" | "elaborate-input",
+  ) => void;
   // Recommended option detection callback
   onRecommendedDetected?: (hasRecommended: boolean) => void;
   // Focus reset support
@@ -36,6 +38,9 @@ interface OptionsListProps {
   // Elaborate option
   isElaborateMarked?: boolean;
   onElaborateSelect?: () => void;
+  // Elaborate input text support
+  elaborateText?: string;
+  onElaborateTextChange?: (value: string) => void;
 }
 
 // isRecommendedOption is imported from ../utils/recommended.js
@@ -62,6 +67,8 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   autoSelectRecommended: autoSelectRecommendedProp,
   isElaborateMarked = false,
   onElaborateSelect,
+  elaborateText = "",
+  onElaborateTextChange,
 }) => {
   const { theme } = useTheme();
   const config = useConfig();
@@ -86,14 +93,23 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     showCustomInput && focusedIndex === customInputIndex;
   const isElaborateFocused = showCustomInput && focusedIndex === elaborateIndex;
   const customLines = customValue.replace(/\r\n?/g, "\n").split("\n");
+  const elaborateLines = elaborateText.replace(/\r\n?/g, "\n").split("\n");
 
   // Track and emit focus context changes
   useEffect(() => {
-    const newContext: "option" | "custom-input" = isCustomInputFocused
-      ? "custom-input"
-      : "option";
+    const newContext: "option" | "custom-input" | "elaborate-input" =
+      isElaborateFocused
+        ? "elaborate-input"
+        : isCustomInputFocused
+          ? "custom-input"
+          : "option";
     onFocusContextChange?.(newContext);
-  }, [focusedIndex, isCustomInputFocused, onFocusContextChange]);
+  }, [
+    focusedIndex,
+    isCustomInputFocused,
+    isElaborateFocused,
+    onFocusContextChange,
+  ]);
 
   // Reset focus when question changes
   useEffect(() => {
@@ -133,9 +149,12 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         return;
       }
 
-      // Handle elaborate option selection
-      if (isElaborateFocused && key.return) {
-        onElaborateSelect?.();
+      // When elaborate input is focused, only handle escape to exit, let MultiLineTextInput handle other keys
+      if (isElaborateFocused) {
+        if (key.escape) {
+          // Escape: Exit elaborate input mode and go back to custom input option
+          setFocusedIndex(customInputIndex);
+        }
         return;
       }
 
@@ -330,30 +349,74 @@ export const OptionsList: React.FC<OptionsListProps> = ({
       {/* Request Elaboration option */}
       {showCustomInput && (
         <Box marginTop={0}>
-          {(() => {
-            const selectionMark = isElaborateMarked ? "(★)" : "( )";
-            const rowBg = isElaborateFocused
-              ? theme.components.options.focusedBg
-              : isElaborateMarked
-                ? theme.components.options.selectedBg
-                : undefined;
-            const rowColor = isElaborateFocused
-              ? theme.components.options.focused
-              : isElaborateMarked
-                ? theme.colors.warning
-                : theme.components.options.default;
-            const mainLine = `${isElaborateFocused ? ">" : " "} ${selectionMark} ${t("footer.elaborate")}`;
+          <Box flexDirection="column">
+            {(() => {
+              const selectionMark = isElaborateMarked ? "(★)" : "( )";
+              const rowBg = isElaborateFocused
+                ? theme.components.options.focusedBg
+                : isElaborateMarked
+                  ? theme.components.options.selectedBg
+                  : undefined;
+              const rowColor = isElaborateFocused
+                ? theme.components.options.focused
+                : isElaborateMarked
+                  ? theme.colors.warning
+                  : theme.components.options.default;
+              const mainLine = `${isElaborateFocused ? ">" : " "} ${selectionMark} ${t("footer.elaborate")}`;
 
-            return (
-              <Text
-                backgroundColor={rowBg}
-                bold={isElaborateFocused || isElaborateMarked}
-                color={rowColor}
+              return (
+                <Text
+                  backgroundColor={rowBg}
+                  bold={isElaborateFocused || isElaborateMarked}
+                  color={rowColor}
+                >
+                  {fitRow(mainLine)}
+                </Text>
+              );
+            })()}
+            {/* Elaborate input box - shown when elaborate option is focused */}
+            {isElaborateFocused && onElaborateTextChange && (
+              <Box
+                borderColor={theme.components.input.borderFocused}
+                borderStyle="round"
+                marginBottom={1}
+                marginLeft={2}
+                marginTop={0}
+                paddingX={1}
+                paddingY={0}
               >
-                {fitRow(mainLine)}
-              </Text>
-            );
-          })()}
+                <MultiLineTextInput
+                  isFocused={true}
+                  onChange={onElaborateTextChange}
+                  onSubmit={() => {
+                    // Tab submits: mark for elaboration and advance
+                    onElaborateSelect?.();
+                    onAdvance?.();
+                  }}
+                  placeholder={t("input.elaboratePlaceholder")}
+                  value={elaborateText}
+                />
+              </Box>
+            )}
+            {/* Preview when not focused but has text */}
+            {!isElaborateFocused && elaborateText && (
+              <Box marginLeft={2} marginTop={0}>
+                <Text color={theme.components.options.hint} dimColor>
+                  {elaborateLines.slice(0, 3).map((line, idx) => (
+                    <React.Fragment key={idx}>
+                      {idx === 0 ? "   " : "   "}
+                      {line || " "}
+                      {idx < Math.min(elaborateLines.length, 3) - 1 && (
+                        <Newline />
+                      )}
+                    </React.Fragment>
+                  ))}
+                  {elaborateLines.length > 3 && <Newline />}
+                  {elaborateLines.length > 3 && "   …"}
+                </Text>
+              </Box>
+            )}
+          </Box>
         </Box>
       )}
     </Box>

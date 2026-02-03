@@ -45,6 +45,7 @@ export const ko = {
     placeholder: "답변을 입력하세요 (Enter = 줄바꿈, Tab = 완료)",
     singleLinePlaceholder: "여기에 입력...",
     multiLinePlaceholder: "답변을 입력하세요...",
+    elaboratePlaceholder: "AI에게 원하는 것을 알려주세요...",
   },
   question: {
     multipleChoice: "복수 선택",

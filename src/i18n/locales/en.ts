@@ -45,6 +45,7 @@ export const en = {
     placeholder: "Type your answer (Enter = newline, Tab = done)",
     singleLinePlaceholder: "Type here...",
     multiLinePlaceholder: "Type your answer...",
+    elaboratePlaceholder: "Tell the AI what you need...",
   },
   question: {
     multipleChoice: "Multiple Choice",

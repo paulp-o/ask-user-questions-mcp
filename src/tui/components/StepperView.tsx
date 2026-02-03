@@ -47,9 +47,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [showRejectionConfirm, setShowRejectionConfirm] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
-    "option",
-  );
+  const [focusContext, setFocusContext] = useState<
+    "option" | "custom-input" | "elaborate-input"
+  >("option");
   const [hasRecommendedOptions, setHasRecommendedOptions] = useState(false);
   // Session-level flag: true if ANY question in the session has recommended options
   const [hasAnyRecommendedInSession, setHasAnyRecommendedInSession] =
@@ -329,13 +329,23 @@ export const StepperView: React.FC<StepperViewProps> = ({
         // Toggle off if already marked
         newMarks.delete(currentQuestionIndex);
       } else {
-        // Mark for elaboration
-        newMarks.set(currentQuestionIndex, "");
+        // Mark for elaboration (preserve any existing text)
+        const existingText = prev.get(currentQuestionIndex) || "";
+        newMarks.set(currentQuestionIndex, existingText);
       }
       return newMarks;
     });
     // Auto-advance to next question
     handleAdvanceToNext();
+  };
+
+  // Handle elaborate text change
+  const handleElaborateTextChange = (text: string) => {
+    setElaborateMarks((prev) => {
+      const newMarks = new Map(prev);
+      newMarks.set(currentQuestionIndex, text);
+      return newMarks;
+    });
   };
 
   // Global keyboard shortcuts and navigation
@@ -429,8 +439,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
 
     // Tab/Shift+Tab: Global question navigation
-    // Skip when in custom-input mode - MultiLineTextInput handles Tab via onSubmit
-    if (key.tab && focusContext !== "custom-input") {
+    // Skip when in custom-input or elaborate-input mode - MultiLineTextInput handles Tab via onSubmit
+    if (
+      key.tab &&
+      focusContext !== "custom-input" &&
+      focusContext !== "elaborate-input"
+    ) {
       if (key.shift) {
         setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
       } else {
@@ -441,7 +455,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
-    const shouldNavigate = focusContext !== "custom-input";
+    const shouldNavigate =
+      focusContext !== "custom-input" && focusContext !== "elaborate-input";
     if (shouldNavigate && key.leftArrow && currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
@@ -572,6 +587,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
       hasAnyRecommendedInSession={hasAnyRecommendedInSession}
       elaborateMarks={elaborateMarks}
       onElaborateSelect={handleElaborateSelect}
+      elaborateText={elaborateMarks.get(currentQuestionIndex) || ""}
+      onElaborateTextChange={handleElaborateTextChange}
     />
   );
 };

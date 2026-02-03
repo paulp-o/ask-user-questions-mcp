@@ -25,7 +25,9 @@ interface QuestionDisplayProps {
   >;
   onToggleOption?: (label: string) => void;
   multiSelect?: boolean;
-  onFocusContextChange?: (context: "option" | "custom-input") => void;
+  onFocusContextChange?: (
+    context: "option" | "custom-input" | "elaborate-input",
+  ) => void;
   workingDirectory?: string;
   // Recommended option detection
   onRecommendedDetected?: (hasRecommended: boolean) => void;
@@ -36,6 +38,9 @@ interface QuestionDisplayProps {
   elaborateMarks?: Map<number, string>;
   // Elaborate selection handler
   onElaborateSelect?: () => void;
+  // Elaborate text input support
+  elaborateText?: string;
+  onElaborateTextChange?: (text: string) => void;
 }
 
 /**
@@ -62,13 +67,17 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   hasAnyRecommendedInSession,
   elaborateMarks,
   onElaborateSelect,
+  elaborateText = "",
+  onElaborateTextChange,
 }) => {
   const { theme } = useTheme();
-  const [focusContext, setFocusContext] = useState<"option" | "custom-input">(
-    "option",
-  );
+  const [focusContext, setFocusContext] = useState<
+    "option" | "custom-input" | "elaborate-input"
+  >("option");
 
-  const handleFocusContextChange = (context: "option" | "custom-input") => {
+  const handleFocusContextChange = (
+    context: "option" | "custom-input" | "elaborate-input",
+  ) => {
     setFocusContext(context);
     onFocusContextChange?.(context);
   };
@@ -150,6 +159,8 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         questionKey={currentQuestionIndex}
         isElaborateMarked={elaborateMarks?.has(currentQuestionIndex)}
         onElaborateSelect={onElaborateSelect}
+        elaborateText={elaborateText}
+        onElaborateTextChange={onElaborateTextChange}
       />
 
       {/* Footer with context-aware keybindings */}

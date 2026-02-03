@@ -5,7 +5,7 @@ import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 
 interface FooterProps {
-  focusContext: "option" | "custom-input";
+  focusContext: "option" | "custom-input" | "elaborate-input";
   multiSelect: boolean;
   isReviewScreen?: boolean;
   customInputValue?: string;
@@ -41,6 +41,17 @@ export const Footer: React.FC<FooterProps> = ({
 
     // Custom input focused
     if (focusContext === "custom-input") {
+      return [
+        { key: "↑↓", action: t("footer.options") },
+        { key: "←→", action: t("footer.cursor") },
+        { key: "Tab/S+Tab", action: t("footer.questions") },
+        { key: "Enter", action: t("footer.newline") },
+        { key: "Esc", action: t("footer.reject") },
+      ];
+    }
+
+    // Elaborate input focused
+    if (focusContext === "elaborate-input") {
       return [
         { key: "↑↓", action: t("footer.options") },
         { key: "←→", action: t("footer.cursor") },

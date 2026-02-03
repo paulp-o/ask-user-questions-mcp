@@ -143,6 +143,7 @@ export class ResponseFormatter {
    * @param title - Title of the question
    * @param prompt - Prompt text of the question
    * @param customExplanation - Optional custom explanation text from the user
+   * @param elaborateText - Optional user guidance text for elaboration
    * @returns Formatted elaborate request string
    */
   static formatElaborateRequest(
@@ -150,10 +151,15 @@ export class ResponseFormatter {
     title: string,
     prompt: string,
     customExplanation?: string,
+    elaborateText?: string,
   ): string {
     let result = `[ELABORATE_REQUEST] Please elaborate on question '${title}' (${prompt}) with more detailed options\nQuestion index: ${questionIndex}`;
     if (customExplanation) {
       result += `\nUser note: ${customExplanation}`;
+    }
+    if (elaborateText && elaborateText.trim() !== "") {
+      const escapedText = elaborateText.replace(/"/g, '\\"');
+      result += `\nUser guidance: "${escapedText}"`;
     }
     return result;
   }

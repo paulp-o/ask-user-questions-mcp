@@ -158,9 +158,15 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                 {elaborateMarks?.has(index) && (
                   <Box marginTop={0.5}>
                     <Text color={theme.colors.warning}>
-                      {"★"} {t("review.markedForElaboration")}
-                      {elaborateMarks.get(index) &&
-                        `: "${elaborateMarks.get(index)}"`}
+                      {(() => {
+                        const text = elaborateMarks.get(index);
+                        if (text) {
+                          const displayText =
+                            text.length > 50 ? text.slice(0, 50) + "..." : text;
+                          return `Marked for elaboration: "${displayText}"`;
+                        }
+                        return "Marked for elaboration";
+                      })()}
                     </Text>
                   </Box>
                 )}
