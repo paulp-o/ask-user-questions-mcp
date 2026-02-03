@@ -1,6 +1,7 @@
 import { Box, Text } from "ink";
 import React from "react";
 
+import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 
 interface FooterProps {
@@ -29,45 +30,45 @@ export const Footer: React.FC<FooterProps> = ({
     // Review screen mode
     if (isReviewScreen) {
       return [
-        { key: "Enter", action: "Submit" },
-        { key: "n", action: "Back" },
+        { key: "Enter", action: t("footer.submit") },
+        { key: "n", action: t("footer.back") },
       ];
     }
 
     // Custom input focused
     if (focusContext === "custom-input") {
       return [
-        { key: "↑↓", action: "Options" },
+        { key: "↑↓", action: t("footer.options") },
         { key: "←→", action: "Cursor" },
-        { key: "Tab/S+Tab", action: "Questions" },
-        { key: "Enter", action: "Newline" },
-        { key: "Esc", action: "Reject" },
+        { key: "Tab/S+Tab", action: t("footer.questions") },
+        { key: "Enter", action: t("footer.newline") },
+        { key: "Esc", action: t("footer.reject") },
       ];
     }
 
     // Option focused
     if (focusContext === "option") {
       const bindings: Keybinding[] = [
-        { key: "↑↓", action: "Options" },
-        { key: "←→", action: "Questions" },
-        { key: "Tab/S+Tab", action: "Questions" },
+        { key: "↑↓", action: t("footer.options") },
+        { key: "←→", action: t("footer.questions") },
+        { key: "Tab/S+Tab", action: t("footer.questions") },
       ];
 
       if (multiSelect) {
-        bindings.push({ key: "Space", action: "Toggle" });
+        bindings.push({ key: "Space", action: t("footer.toggle") });
       } else {
-        bindings.push({ key: "Enter", action: "Select" });
+        bindings.push({ key: "Enter", action: t("footer.select") });
       }
 
-      bindings.push({ key: "E", action: "Elaborate" });
-      bindings.push({ key: "D", action: "Rephrase" });
+      bindings.push({ key: "E", action: t("footer.elaborate") });
+      bindings.push({ key: "D", action: t("footer.rephrase") });
 
       if (hasRecommendedOptions) {
-        bindings.push({ key: "Ctrl+Enter", action: "Quick Submit" });
+        bindings.push({ key: "Ctrl+Enter", action: t("footer.quickSubmit") });
       }
 
-      bindings.push({ key: "Ctrl+T", action: "Theme" });
-      bindings.push({ key: "Esc", action: "Reject" });
+      bindings.push({ key: "Ctrl+T", action: t("footer.theme") });
+      bindings.push({ key: "Esc", action: t("footer.reject") });
 
       return bindings;
     }

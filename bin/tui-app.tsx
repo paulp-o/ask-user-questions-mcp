@@ -1,6 +1,7 @@
 import { Box, render, Text } from "ink";
 import React, { useEffect, useState } from "react";
 
+import type { AUQConfig } from "../src/config/types.js";
 import type { SessionRequest } from "../src/session/types.js";
 
 import {
@@ -31,7 +32,11 @@ interface ToastData {
   title?: string;
 }
 
-const App: React.FC = () => {
+interface AppProps {
+  config?: AUQConfig;
+}
+
+const App: React.FC<AppProps> = ({ config }) => {
   const [state, setState] = useState<AppState>({ mode: "WAITING" });
   const [sessionQueue, setSessionQueue] = useState<SessionData[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -193,8 +198,11 @@ const App: React.FC = () => {
   }
 
   // Render with header, toast overlay, and main content
+  // Use theme from config, falling back to "system" if not specified
+  const initialTheme = config?.theme || "system";
+
   return (
-    <ThemeProvider initialTheme="system">
+    <ThemeProvider initialTheme={initialTheme}>
       <Box flexDirection="column" paddingX={1}>
         <Header pendingCount={sessionQueue.length} />
         {toast && (
@@ -219,11 +227,11 @@ const App: React.FC = () => {
   );
 };
 
-export const runTui = () => {
+export const runTui = (config?: AUQConfig) => {
   // Clear terminal before showing app
   console.clear();
 
-  const { waitUntilExit } = render(<App />);
+  const { waitUntilExit } = render(<App config={config} />);
 
   // Handle Ctrl+C gracefully
   process.on("SIGINT", () => {

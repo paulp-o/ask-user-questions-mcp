@@ -1,5 +1,5 @@
 import { Box, Text, useInput } from "ink";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTheme } from "../ThemeContext.js";
 
 interface MultiLineTextInputProps {
@@ -25,6 +25,20 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   const { theme } = useTheme();
   const [cursorPosition, setCursorPosition] = useState(value.length);
 
+  // Use refs to avoid stale closures in useInput callback
+  // This fixes missed keystrokes during fast typing
+  const valueRef = useRef(value);
+  const cursorRef = useRef(cursorPosition);
+
+  // Keep refs in sync with state
+  React.useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  React.useEffect(() => {
+    cursorRef.current = cursorPosition;
+  }, [cursorPosition]);
+
   // Update cursor position when value changes externally
   React.useEffect(() => {
     if (cursorPosition > value.length) {
@@ -35,6 +49,10 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   useInput(
     (input, key) => {
       if (!isFocused) return;
+
+      // Use refs to get current values (avoids stale closures)
+      const currentValue = valueRef.current;
+      const currentCursor = cursorRef.current;
 
       // Tab: Submit (also triggers question navigation via parent)
       if (key.tab && !key.shift) {
@@ -50,31 +68,34 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
       // Enter: Always add newline (portable behavior)
       if (input === "\r" || input === "\n" || key.return) {
         const newValue =
-          value.slice(0, cursorPosition) + "\n" + value.slice(cursorPosition);
+          currentValue.slice(0, currentCursor) +
+          "\n" +
+          currentValue.slice(currentCursor);
         onChange(newValue);
-        setCursorPosition(cursorPosition + 1);
+        setCursorPosition(currentCursor + 1);
         return;
       }
 
       // Left arrow: Move cursor left
       if (key.leftArrow) {
-        setCursorPosition(Math.max(0, cursorPosition - 1));
+        setCursorPosition(Math.max(0, currentCursor - 1));
         return;
       }
 
       // Right arrow: Move cursor right
       if (key.rightArrow) {
-        setCursorPosition(Math.min(value.length, cursorPosition + 1));
+        setCursorPosition(Math.min(currentValue.length, currentCursor + 1));
         return;
       }
 
       // Backspace: Remove character before cursor
       if (key.backspace || key.delete) {
-        if (cursorPosition > 0) {
+        if (currentCursor > 0) {
           const newValue =
-            value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
+            currentValue.slice(0, currentCursor - 1) +
+            currentValue.slice(currentCursor);
           onChange(newValue);
-          setCursorPosition(cursorPosition - 1);
+          setCursorPosition(currentCursor - 1);
         }
         return;
       }
@@ -89,9 +110,11 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         input !== "\n"
       ) {
         const newValue =
-          value.slice(0, cursorPosition) + input + value.slice(cursorPosition);
+          currentValue.slice(0, currentCursor) +
+          input +
+          currentValue.slice(currentCursor);
         onChange(newValue);
-        setCursorPosition(cursorPosition + 1);
+        setCursorPosition(currentCursor + 1);
       }
     },
     { isActive: isFocused },

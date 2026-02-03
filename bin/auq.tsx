@@ -209,5 +209,13 @@ if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = "production";
 }
 
+// Load configuration before starting TUI
+const { getConfig } = await import("../src/config/index.js");
+const { initI18n } = await import("../src/i18n/index.js");
+
+// Initialize config and i18n
+const config = getConfig();
+initI18n(config.language);
+
 const { runTui } = await import("./tui-app.js");
-runTui();
+runTui(config);

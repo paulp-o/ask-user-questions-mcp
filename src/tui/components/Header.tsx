@@ -1,6 +1,7 @@
 import { Box, Text } from "ink";
 import React, { useEffect, useState } from "react";
 
+import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
 import { gradientText } from "../utils/gradientText.js";
 import { darkTheme } from "../themes/dark.js";
@@ -36,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
 
   // Brand colors are fixed (always use dark theme cyan gradient) for consistency
   const wordmark = gradientText("AUQ", darkTheme);
-  const tagline = "Ask User Questions";
+  const tagline = t("header.title");
 
   return (
     <Box

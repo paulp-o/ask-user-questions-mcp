@@ -2,6 +2,7 @@ import { Box, Text, useInput } from "ink";
 import React, { useState } from "react";
 import { useTheme } from "../ThemeContext.js";
 import { SingleLineTextInput } from "./SingleLineTextInput.js";
+import { t } from "../../i18n/index.js";
 
 interface ConfirmationDialogProps {
   message: string;
@@ -91,11 +92,11 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       >
         <Box marginBottom={1}>
           <Text bold color={theme.colors.warning}>
-            Why are you rejecting this question set?
+            {t("confirmation.rejectTitle")}
           </Text>
         </Box>
         <Box marginBottom={1}>
-          <Text dimColor>(Optional - helps the AI improve)</Text>
+          <Text dimColor>{t("confirmation.rejectMessage")}</Text>
         </Box>
         <Box marginBottom={1}>
           <SingleLineTextInput
@@ -107,7 +108,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           />
         </Box>
         <Box marginTop={1}>
-          <Text dimColor>Enter Submit | Esc Skip</Text>
+          <Text dimColor>
+            Enter {t("footer.submit")} | Esc {t("footer.cancel")}
+          </Text>
         </Box>
       </Box>
     );

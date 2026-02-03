@@ -1,6 +1,7 @@
 import { Box, Text, useInput } from "ink";
 import React from "react";
 
+import { t } from "../../i18n/index.js";
 import type { Question, UserAnswer } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
 import { Footer } from "./Footer.js";
@@ -67,7 +68,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
         paddingY={0}
       >
         <Box flexDirection="row" justifyContent="space-between" width="100%">
-          <Text bold>Review</Text>
+          <Text bold>{t("review.title")}</Text>
           <Text dimColor>{elapsedLabel}</Text>
         </Box>
       </Box>
@@ -130,7 +131,9 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                             key={lineIndex}
                             color={theme.components.review.customAnswer}
                           >
-                            {isFirstLine ? '  Custom: "' : "  "}
+                            {isFirstLine
+                              ? `  ${t("review.customAnswer")}: "`
+                              : "  "}
                             {line}
                             {isLastLine ? '"' : ""}
                           </Text>
@@ -143,7 +146,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                 {!answer?.selectedOption &&
                   !answer?.selectedOptions &&
                   !answer?.customText && (
-                    <Text dimColor> (No answer provided)</Text>
+                    <Text dimColor> {t("review.unanswered")}</Text>
                   )}
               </Box>
             </Box>

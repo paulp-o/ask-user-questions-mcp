@@ -2,6 +2,7 @@ import { Box, Text, useInput } from "ink";
 import React, { useEffect, useState } from "react";
 import { AnimatedGradient } from "./AnimatedGradient.js";
 import { useTheme } from "../ThemeContext.js";
+import { t } from "../../i18n/index.js";
 
 interface WaitingScreenProps {
   queueCount: number;
@@ -47,11 +48,11 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
           width="100%"
         >
           <Box justifyContent="center">
-            <AnimatedGradient text="Waiting for a question set…" />
+            <AnimatedGradient text={t("waiting.title")} />
           </Box>
           <Box justifyContent="center" marginTop={1}>
             <Text dimColor>
-              Ctrl+C quit
+              {t("waiting.hint")}
               <Text color={theme.colors.textDim}> •</Text> {elapsedSeconds}s
             </Text>
           </Box>
@@ -77,7 +78,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
         </Box>
         <Box justifyContent="center" marginTop={1}>
           <Text dimColor>
-            Ctrl+C quit
+            {t("waiting.hint")}
             <Text color={theme.colors.textDim}> •</Text> {elapsedSeconds}s
           </Text>
         </Box>

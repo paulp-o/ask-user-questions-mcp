@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/paulp-o/ask-user-questions-mcp/main/.auqrc.schema.json",
+
+  "// Limits": "Configure question and option limits",
+  "maxOptions": 4,
+  "maxQuestions": 4,
+  "recommendedOptions": 3,
+  "recommendedQuestions": 3,
+
+  "// Session": "Session behavior settings",
+  "sessionTimeout": 0,
+  "retentionPeriod": 604800000,
+
+  "// UI": "User interface settings",
+  "language": "auto",
+  "theme": "system"
+}
