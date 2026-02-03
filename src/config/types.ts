@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+/**
+ * Notification configuration schema
+ */
+export const NotificationConfigSchema = z.object({
+  /** Whether notifications are enabled (default: true) */
+  enabled: z.boolean().default(true),
+  /** Whether to play sound with notifications (default: true) */
+  sound: z.boolean().default(true),
+});
+
+export type NotificationConfig = z.infer<typeof NotificationConfigSchema>;
+
 export const AUQConfigSchema = z.object({
   // Limits
   maxOptions: z.number().min(2).max(10).default(5),
@@ -14,6 +26,12 @@ export const AUQConfigSchema = z.object({
   // UI
   language: z.string().default("auto"),
   theme: z.string().default("system"),
+
+  // Notifications (OSC 9/99)
+  notifications: NotificationConfigSchema.default({
+    enabled: true,
+    sound: true,
+  }),
 });
 
 export type AUQConfig = z.infer<typeof AUQConfigSchema>;

@@ -426,16 +426,18 @@ Settings from local config override global config, which overrides defaults.
 
 ### Available Settings
 
-| Setting                | Type   | Default   | Range/Values                    | Description                                           |
-| ---------------------- | ------ | --------- | ------------------------------- | ----------------------------------------------------- |
-| `maxOptions`           | number | 5         | 2-10                            | Maximum options per question                          |
-| `maxQuestions`         | number | 5         | 1-10                            | Maximum questions per session                         |
-| `recommendedOptions`   | number | 4         | 1-10                            | Suggested number of options (for AI guidance)         |
-| `recommendedQuestions` | number | 4         | 1-10                            | Suggested number of questions (for AI guidance)       |
-| `language`             | string | "auto"    | "auto", "en", "ko"              | UI language (auto-detects from system if "auto")      |
-| `theme`                | string | "system"  | "system", "dark", "light", etc. | Color theme for TUI                                   |
-| `sessionTimeout`       | number | 0         | 0+ (milliseconds)               | Session timeout (0 = no timeout)                      |
-| `retentionPeriod`      | number | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
+| Setting                 | Type    | Default   | Range/Values                    | Description                                           |
+| ----------------------- | ------- | --------- | ------------------------------- | ----------------------------------------------------- |
+| `maxOptions`            | number  | 5         | 2-10                            | Maximum options per question                          |
+| `maxQuestions`          | number  | 5         | 1-10                            | Maximum questions per session                         |
+| `recommendedOptions`    | number  | 4         | 1-10                            | Suggested number of options (for AI guidance)         |
+| `recommendedQuestions`  | number  | 4         | 1-10                            | Suggested number of questions (for AI guidance)       |
+| `language`              | string  | "auto"    | "auto", "en", "ko"              | UI language (auto-detects from system if "auto")      |
+| `theme`                 | string  | "system"  | "system", "dark", "light", etc. | Color theme for TUI                                   |
+| `sessionTimeout`        | number  | 0         | 0+ (milliseconds)               | Session timeout (0 = no timeout)                      |
+| `retentionPeriod`       | number  | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
+| `notifications.enabled` | boolean | true      | true/false                      | Enable desktop notifications for new questions        |
+| `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications (kitty only)            |
 
 ### Language Support
 
@@ -446,6 +448,46 @@ AUQ supports multiple languages for the TUI interface:
 
 Language is auto-detected from system locale (`LANG`, `LC_ALL`, `LC_MESSAGES` environment variables) when set to `"auto"`.
 
+### Desktop Notifications
+
+AUQ sends desktop notifications when new questions arrive, helping you notice when AI assistants have questions waiting while you're focused on other work.
+
+#### Supported Terminals
+
+| Terminal         | Notification | Progress Bar | Protocol |
+| ---------------- | ------------ | ------------ | -------- |
+| iTerm2           | ✅           | ✅           | OSC 9    |
+| kitty            | ✅           | ❌           | OSC 99   |
+| Ghostty          | ✅           | ✅           | OSC 9    |
+| WezTerm          | ✅           | ✅           | OSC 9    |
+| Windows Terminal | ✅           | ✅           | OSC 9    |
+| Hyper            | ✅           | ❌           | OSC 9    |
+| VS Code Terminal | ✅           | ❌           | OSC 9    |
+| rxvt/urxvt       | ✅           | ❌           | OSC 777  |
+| Alacritty        | ❌           | ❌           | -        |
+| Terminal.app     | ❌           | ❌           | -        |
+| GNOME Terminal   | ❌           | ❌           | -        |
+| Konsole          | ❌           | ❌           | -        |
+
+**Features:**
+
+- **Batched Notifications**: Rapid session arrivals are batched into a single notification
+- **Progress Bar**: Shows question completion progress in terminal dock icon (supported terminals)
+- **Auto-Detection**: Terminal type is detected automatically via environment variables
+
+**Configuration:**
+
+```json
+{
+  "notifications": {
+    "enabled": true,
+    "sound": true
+  }
+}
+```
+
+Set `notifications.enabled` to `false` to disable all notifications.
+
 ---
 
 ## 🚀 Roadmap
@@ -454,8 +496,8 @@ Language is auto-detected from system locale (`LANG`, `LC_ALL`, `LC_MESSAGES` en
 - [x] Custom color themes (16 built-in + custom theme support)
 - [x] Multi-language support (English, Korean)
 - [x] Configuration file support (`.auqrc.json`)
+- [x] Desktop notifications with progress bar (OSC 9/99/777)
 - [ ] MCP prompt mode switch (Anthropic style / minimal)
-- [ ] Audio notifications on new question
 - [ ] Simple option to prompt the LLM to/not ask more questions after answering.
 - [ ] Optional 'context' field provided by the LLM, that describes the context of the questions - will be useful for multi-agent coding
 

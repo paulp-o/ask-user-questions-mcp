@@ -19,6 +19,8 @@ interface Answer {
 
 interface StepperViewProps {
   onComplete?: (wasRejected?: boolean, rejectionReason?: string | null) => void;
+  /** Called when progress changes (for progress bar support) */
+  onProgress?: (answered: number, total: number) => void;
   sessionId: string;
   sessionRequest: SessionRequest;
 }
@@ -29,6 +31,7 @@ interface StepperViewProps {
  */
 export const StepperView: React.FC<StepperViewProps> = ({
   onComplete,
+  onProgress,
   sessionId,
   sessionRequest,
 }) => {
@@ -63,6 +66,23 @@ export const StepperView: React.FC<StepperViewProps> = ({
       .map((value) => value.toString().padStart(2, "0"))
       .join(":");
   }, [elapsedSeconds]);
+
+  // Report progress when question index changes
+  useEffect(() => {
+    if (onProgress) {
+      // answered = currentQuestionIndex (0-indexed means 0 answered when on first question)
+      // When on review screen, all questions are answered
+      const answered = showReview
+        ? sessionRequest.questions.length
+        : currentQuestionIndex;
+      onProgress(answered, sessionRequest.questions.length);
+    }
+  }, [
+    currentQuestionIndex,
+    showReview,
+    sessionRequest.questions.length,
+    onProgress,
+  ]);
 
   // Handle option selection
   const handleSelectOption = (label: string) => {

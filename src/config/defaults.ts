@@ -9,4 +9,8 @@ export const DEFAULT_CONFIG: AUQConfig = {
   retentionPeriod: 604800000, // 7 days
   language: "auto",
   theme: "system",
+  notifications: {
+    enabled: true,
+    sound: true,
+  },
 };

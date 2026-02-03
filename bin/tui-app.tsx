@@ -1,5 +1,5 @@
 import { Box, render, Text } from "ink";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import type { AUQConfig } from "../src/config/types.js";
 import type { SessionRequest } from "../src/session/types.js";
@@ -13,6 +13,13 @@ import { StepperView } from "../src/tui/components/StepperView.js";
 import { ThemeIndicator } from "../src/tui/components/ThemeIndicator.js";
 import { Toast } from "../src/tui/components/Toast.js";
 import { WaitingScreen } from "../src/tui/components/WaitingScreen.js";
+import {
+  createNotificationBatcher,
+  showProgress,
+  clearProgress,
+  calculateProgress,
+  type NotificationBatcher,
+} from "../src/tui/notifications/index.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
 import { ThemeProvider } from "../src/tui/ThemeProvider.js";
 
@@ -45,6 +52,19 @@ const App: React.FC<AppProps> = ({ config }) => {
 
   // Get session directory for logging
   const sessionDir = getSessionDirectory();
+
+  // Notification configuration from config
+  const notificationConfig = useMemo(
+    () => config?.notifications ?? { enabled: true, sound: true },
+    [config?.notifications],
+  );
+
+  // Create notification batcher (memoized to persist across renders)
+  const notificationBatcherRef = useRef<NotificationBatcher | null>(null);
+  if (!notificationBatcherRef.current) {
+    notificationBatcherRef.current =
+      createNotificationBatcher(notificationConfig);
+  }
 
   // Auto-hide session log after 3 seconds
   useEffect(() => {
@@ -98,6 +118,11 @@ const App: React.FC<AppProps> = ({ config }) => {
               return prev;
             }
 
+            // Queue notification for new session (batched)
+            if (notificationBatcherRef.current) {
+              notificationBatcherRef.current.queue(event.sessionId);
+            }
+
             // Add to end of queue
             return [
               ...prev,
@@ -117,13 +142,18 @@ const App: React.FC<AppProps> = ({ config }) => {
 
     initialize();
 
-    // Cleanup: stop watcher on unmount
+    // Cleanup: stop watcher and cancel notifications on unmount
     return () => {
       if (watcherInstance) {
         watcherInstance.stop();
       }
+      if (notificationBatcherRef.current) {
+        notificationBatcherRef.current.cancel();
+      }
+      // Clear progress bar on unmount
+      clearProgress(notificationConfig);
     };
-  }, []);
+  }, [notificationConfig]);
 
   // Auto-transition: WAITING → PROCESSING when queue has items
   useEffect(() => {
@@ -145,11 +175,20 @@ const App: React.FC<AppProps> = ({ config }) => {
     setToast({ message, type, title });
   };
 
+  // Handle progress updates from StepperView
+  const handleProgressUpdate = (answered: number, total: number) => {
+    const percent = calculateProgress(answered, total);
+    showProgress(percent, notificationConfig);
+  };
+
   // Handle session completion
   const handleSessionComplete = (
     wasRejected = false,
     rejectionReason?: string | null,
   ) => {
+    // Clear progress bar on session completion
+    clearProgress(notificationConfig);
+
     // Show appropriate toast
     if (wasRejected) {
       if (rejectionReason) {
@@ -191,6 +230,7 @@ const App: React.FC<AppProps> = ({ config }) => {
       <StepperView
         key={session.sessionId}
         onComplete={handleSessionComplete}
+        onProgress={handleProgressUpdate}
         sessionId={session.sessionId}
         sessionRequest={session.sessionRequest}
       />
