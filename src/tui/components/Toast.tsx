@@ -63,9 +63,7 @@ export const Toast: React.FC<ToastProps> = ({
           {title}
         </Text>
       )}
-      <Text color={message ? theme.colors.text : theme.colors.textDim}>
-        {message || " "}
-      </Text>
+      {message && <Text color={theme.colors.text}>{message}</Text>}
     </Box>
   );
 };

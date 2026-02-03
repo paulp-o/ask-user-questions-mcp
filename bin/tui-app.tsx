@@ -198,15 +198,15 @@ const App: React.FC<AppProps> = ({ config }) => {
     if (wasRejected) {
       if (rejectionReason) {
         showToast(
-          `Rejection reason: ${rejectionReason}`,
+          `Reason: ${rejectionReason}`,
           "info",
-          "Question set rejected",
+          "🙅 Question set rejected",
         );
       } else {
-        showToast("", "info", "Question set rejected");
+        showToast("Question set rejected", "info");
       }
     } else {
-      showToast("✓ Answers submitted successfully!", "success");
+      showToast("✅ Answers submitted successfully!", "success");
     }
 
     if (sessionQueue.length > 0) {
@@ -252,7 +252,7 @@ const App: React.FC<AppProps> = ({ config }) => {
         <Box flexDirection="column" paddingX={1}>
           <Header pendingCount={sessionQueue.length} />
           {toast && (
-            <Box marginBottom={1} marginTop={1}>
+            <Box marginBottom={1} marginTop={1} justifyContent="center">
               <Toast
                 message={toast.message}
                 onDismiss={() => setToast(null)}

@@ -95,7 +95,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     onProgress,
   ]);
 
-  // Handle option selection
+  // Handle option selection (single-select mode)
   const handleSelectOption = (label: string) => {
     setAnswers((prev) => {
       const newAnswers = new Map(prev);
@@ -105,6 +105,15 @@ export const StepperView: React.FC<StepperViewProps> = ({
         selectedOption: label,
       });
       return newAnswers;
+    });
+    // Clear elaborate mark when selecting a regular option (single-select behavior)
+    setElaborateMarks((prev) => {
+      if (prev.has(currentQuestionIndex)) {
+        const newMarks = new Map(prev);
+        newMarks.delete(currentQuestionIndex);
+        return newMarks;
+      }
+      return prev;
     });
   };
 
@@ -323,6 +332,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
   // Handle elaborate option selection - marks question and auto-advances
   const handleElaborateSelect = () => {
+    const isMarking = !elaborateMarks.has(currentQuestionIndex);
+
     setElaborateMarks((prev) => {
       const newMarks = new Map(prev);
       if (newMarks.has(currentQuestionIndex)) {
@@ -335,6 +346,23 @@ export const StepperView: React.FC<StepperViewProps> = ({
       }
       return newMarks;
     });
+
+    // In single-select mode, clear selected option when marking elaborate
+    if (isMarking && !currentQuestion.multiSelect) {
+      setAnswers((prev) => {
+        const existing = prev.get(currentQuestionIndex);
+        if (existing?.selectedOption) {
+          const newAnswers = new Map(prev);
+          newAnswers.set(currentQuestionIndex, {
+            ...existing,
+            selectedOption: undefined,
+          });
+          return newAnswers;
+        }
+        return prev;
+      });
+    }
+
     // Auto-advance to next question
     handleAdvanceToNext();
   };

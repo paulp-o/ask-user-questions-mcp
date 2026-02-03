@@ -162,12 +162,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         // Multi-select mode
         if (input === " ") {
           // Spacebar: Toggle selection WITHOUT advancing
-          // Prevent selection when elaborate is marked
-          if (
-            !isCustomInputFocused &&
-            !isElaborateFocused &&
-            !isElaborateMarked
-          ) {
+          if (!isCustomInputFocused && !isElaborateFocused) {
             onToggle?.(options[focusedIndex].label);
           }
         }
@@ -184,11 +179,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         if (key.return) {
           // Don't handle Return when custom input or elaborate is focused
           if (isCustomInputFocused || isElaborateFocused) {
-            return;
-          }
-
-          // Prevent selection when elaborate is marked
-          if (isElaborateMarked) {
             return;
           }
 
@@ -216,9 +206,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           ? selectedOptions?.includes(option.label) || false
           : selectedOption === option.label;
 
-        // Check if this option is disabled (when elaborate is marked)
-        const isDisabled = isElaborateMarked;
-
         const selectionMark = multiSelect
           ? isSelected
             ? "[x]"
@@ -233,18 +220,14 @@ export const OptionsList: React.FC<OptionsListProps> = ({
             ? theme.components.options.selectedBg
             : undefined;
 
-        // Use muted color when disabled
-        const rowColor = isDisabled
-          ? theme.colors.textDim
-          : isFocusedOption
-            ? theme.components.options.focused
-            : isSelected
-              ? theme.components.options.selected
-              : theme.components.options.default;
+        const rowColor = isFocusedOption
+          ? theme.components.options.focused
+          : isSelected
+            ? theme.components.options.selected
+            : theme.components.options.default;
 
         const starSuffix = isRecommended ? " ★" : "";
-        const disabledSuffix = isDisabled ? " (disabled)" : "";
-        const mainLine = `${isFocusedOption ? ">" : " "} ${selectionMark} ${option.label}${starSuffix}${disabledSuffix}`;
+        const mainLine = `${isFocusedOption ? ">" : " "} ${selectionMark} ${option.label}${starSuffix}`;
 
         return (
           <Box key={index} flexDirection="column">
@@ -252,7 +235,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
               backgroundColor={rowBg}
               bold={isFocusedOption || isSelected}
               color={rowColor}
-              dimColor={isDisabled}
             >
               {fitRow(mainLine)}
             </Text>
@@ -264,7 +246,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                     : undefined
                 }
                 color={theme.components.options.description}
-                dimColor={!isFocusedOption || isDisabled}
+                dimColor={!isFocusedOption}
               >
                 {fitRow(`   ${option.description}`)}
               </Text>
