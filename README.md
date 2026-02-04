@@ -11,7 +11,9 @@ _`AskUserQuestion` pushed to the max_
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
 **A complete toolset that enables maximum level of human-(intention-)in-the-loop onto any long-running, multi-agentic AI workflows (like Ralph Loop!).**
+
 Single/multiple choice questions, custom options, multi-agent interoperability, question queueing, question rejection with explanation, elaboration requesting, quick recommendations auto-selection, themes, native OS notification, terminal progress bar, multi-language support, agent skills support... and more. You can customize them all too!
+
 **Can be used via MCP server / OpenCode plugin / Agent Skills.**
 
 [Setup](#-install-cli-tool) • [Usage](#-usage)
@@ -81,7 +83,7 @@ AUQ supports multiple AI environments. Choose between **OpenCode plugin** and **
 
 ### Option A: MCP Server
 
-> _Note: Due to differences in how some MCP clients are implemented, AUQ may be forcibly cancelled in tools that do not allow extending the global MCP timeout. If that's the case, consider using [Agent Skills](#option-c-agent-skills-experimental). Use [OpenCode plugin](#option-b-official-opencode-plugin) if you use OpenCode._
+> _Note: Due to differences in how some MCP clients are implemented, AUQ may be forcibly cancelled in tools that do not allow extending the global MCP timeout. If that's the case, consider using [Agent Skills](#option-c-agent-skills-experimental). Use [OpenCode plugin](#option-b-opencode-plugin) if you use OpenCode._
 
 <details>
 <summary><strong>Cursor</strong></summary>
@@ -208,8 +210,8 @@ Whenever you need clarification on what you are working on, never guess, and cal
 
 When the AI asks questions, you'll see them appear in the AUQ TUI. Answer them **at your convenience**.
 
-> _Note: AUQ is an unopinionated tool and doesn't include prompts on **HOW** AI should leverage it. It is expected that you do your own prompt engineering to make the most out of it in your own workflows. 
-I personally enjoy prompting it to ask at least 30 questions repeatedly before action!_
+> _Note: AUQ is an unopinionated tool and doesn't include prompts on **HOW** AI should leverage it. It is expected that you do your own prompt engineering to make the most out of it in your own workflows._
+> _I personally enjoy prompting it to ask at least 30 questions repeatedly before action!_
 
 ### Recommended Setups
 
