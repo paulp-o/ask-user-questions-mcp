@@ -25,7 +25,7 @@ AUQ lets your AI assistants **ask clarifying questions** consisting of multiple-
 This lets you put your **intent** to  long-running autonomous AI tasks, while you don't need to keep switching windows, babysitting AIs desperately waiting for your reponses. You can turn on the CLI at any time, even remotely via SSH!
 
 <details>
-<summary><i>A no fun background story</i></summary>
+<summary><i>A no no fun background story</i></summary>
 
 In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been widely recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code [1].
 
@@ -49,43 +49,46 @@ On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` t
 
 ## 🚀 Install CLI Tool
 
-First, install the AUQ CLI tool:
+First, install the **AUQ CLI**:
 
 ### Global Installation (Recommended)
 
 ```bash
 # Install globally
 bun add -g auq-mcp-server
-
 ```
 
-> **Note:** npm, pnpm, and yarn also work.
+_**Note:** Other package managers (npm, pnpm..) also work but not recommended._
 
-### Local Installation (Project-specific)
+<details><summary>Local (Project-specific) Installation</summary>
 
 ```bash
 # Install in your project
 bun add auq-mcp-server
-
 ```
 
-**Note:** Sessions are stored globally regardless of installation method. See [Troubleshooting](#troubleshooting) for session locations.
+Sessions are stored globally regardless of installation method. See [Troubleshooting](#troubleshooting) for session locations.
+</details>
 
 ---
 
-## 🔌 Choose Your Integration Method
+## 🔌 Integrate to your AI
 
-AUQ supports multiple AI coding environments. Choose the one that fits your workflow:
+AUQ supports multiple AI environments. Choose between **OpenCode plugin** and **MCP server**.
 
 ### Option A: MCP Server
 
-_Note: Due to the implementation differences between MCP clients, AUQ can be timed out in certain clients. If you're using OpenCode, use [OpenCode plugin](#option-b-official-opencode-plugin) instead._
+>_Note: As some MCP clients have global timeout for MCP servers, AUQ may time out. If you're using OpenCode, use [OpenCode plugin](#option-b-official-opencode-plugin) instead._
 
-### Cursor
+<details>
+<summary><strong>Cursor</strong></summary>
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-### Claude Code (CLI)
+</details>
+
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 **Method 1: Using CLI** (Recommended)
 
@@ -113,11 +116,14 @@ Add to `.mcp.json` in your project root (for team-wide sharing):
 
 Or add to `~/.claude.json` for global access across all projects.
 
-> **Note:** Replace `bunx` with `npx` if using npm.
+_**Note:** Replace `bunx` if you don't use bun._
 
 **Verify setup:** Type `/mcp` in Claude Code to check server status.
 
-### Codex CLI
+</details>
+
+<details>
+<summary><strong>Codex CLI</strong></summary>
 
 Add to `~/.codex/config.toml`:
 
@@ -125,9 +131,10 @@ Add to `~/.codex/config.toml`:
 [mcp_servers.ask-user-questions]
 command = "bunx"
 args = ["-y", "auq-mcp-server", "server"]
+tool_timeout_sec = 99999
 ```
 
-> **Note:** Replace `bunx` with `npx` if using npm.
+_Replace `bunx` with `npx` if using npm._
 
 **Full configuration example** (with optional settings):
 
@@ -135,7 +142,7 @@ args = ["-y", "auq-mcp-server", "server"]
 [mcp_servers.ask-user-questions]
 command = "bunx"
 args = ["-y", "auq-mcp-server", "server"]
-
+tool_timeout_sec = 99999
 # Optional: Additional environment variables
 # env = { "AUQ_SESSION_DIR" = "/custom/path" }
 
@@ -149,7 +156,10 @@ args = ["-y", "auq-mcp-server", "server"]
 
 Restart Codex CLI after saving the configuration.
 
-### Claude Desktop
+</details>
+
+<details>
+<summary><strong>Claude Desktop</strong></summary>
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
@@ -164,13 +174,15 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 }
 ```
 
-> **Note:** Replace `bunx` with `npx` if using npm.
+> _Replace `bunx` if you don't use bun._
 
 **Restart Claude Desktop** after saving.
 
-### Option B: Official OpenCode Plugin
+</details>
 
-**Direct integration** for OpenCode users. Bypasses MCP limitations by calling `auq ask` directly.
+### Option B: OpenCode Plugin
+
+**Direct integration** for OpenCode users. Adds working directory viewability.
 
 #### Configuration
 

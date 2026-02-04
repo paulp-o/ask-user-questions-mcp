@@ -3,9 +3,6 @@ import React, { useEffect, useState } from "react";
 
 import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
-import { gradientText } from "../utils/gradientText.js";
-import { padToVisualWidth } from "../utils/visualWidth.js";
-import { darkTheme } from "../themes/dark.js";
 import packageJson from "../../../package.json" with { type: "json" };
 
 interface HeaderProps {
@@ -36,8 +33,6 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
     return packageJson.version || "unknown";
   }, []);
 
-  // Brand colors are fixed (always use dark theme cyan gradient) for consistency
-  const wordmark = gradientText("AUQ", darkTheme);
   const tagline = t("header.title");
 
   return (
@@ -50,7 +45,9 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount }) => {
       paddingY={0}
     >
       <Box flexDirection="row" alignItems="center">
-        <Text bold>{wordmark}</Text>
+        <Text bold color={theme.colors.primary}>
+          AUQ
+        </Text>
         <Text color="#8A949E"> ⋆ {tagline}</Text>
       </Box>
 
