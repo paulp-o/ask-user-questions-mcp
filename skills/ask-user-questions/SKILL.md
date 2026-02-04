@@ -4,7 +4,7 @@ description: Ask clarifying questions to users via interactive TUI. Use when you
 license: MIT
 metadata:
   author: paulp-o
-  version: "1.6.0"
+  version: "2.0.0"
 ---
 
 # Ask User Questions

@@ -66,13 +66,12 @@ export const Footer: React.FC<FooterProps> = ({
       ];
     }
 
-    // Elaborate input focused
+    // Elaborate input focused (Enter skips, not newline)
     if (focusContext === "elaborate-input") {
       return [
         { key: "↑↓", action: t("footer.options") },
         { key: "←→", action: t("footer.cursor") },
-        { key: "Tab/S+Tab", action: t("footer.questions") },
-        { key: "Enter", action: t("footer.newline") },
+        { key: "Enter/Tab", action: t("footer.next") },
         { key: "Esc", action: t("footer.reject") },
       ];
     }

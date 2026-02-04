@@ -153,11 +153,16 @@ export class ResponseFormatter {
     customExplanation?: string,
     elaborateText?: string,
   ): string {
-    let result = `[ELABORATE_REQUEST] This means the user may have additional info, context or questions, or need more details to understand your qestion. You may exceed the normal length of questions and options only once exceptionally. `;
+    const hasElaborateText = elaborateText && elaborateText.trim() !== "";
+    // Only show verbose guidance when user didn't provide specific text
+    let result = `[ELABORATE_REQUEST] This means the user may have additional info, context or questions, or need more details to understand your question. You may exceed the normal length of questions and options only once exceptionally.`;
+    if (!hasElaborateText) {
+      result += ` Provide examples and larger context, use paragraph-style large content on question text.`;
+    }
     if (customExplanation) {
       result += `\nUser note: ${customExplanation}`;
     }
-    if (elaborateText && elaborateText.trim() !== "") {
+    if (hasElaborateText) {
       const escapedText = elaborateText.replace(/"/g, '\\"');
       result += `\nUser guidance: "${escapedText}"`;
     }

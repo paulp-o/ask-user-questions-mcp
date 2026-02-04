@@ -243,7 +243,9 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 color={theme.components.options.description}
                 dimColor={!isFocusedOption && !isSelected}
               >
-                {fitRow(`   ${option.description}`)}
+                {isFocusedOption
+                  ? `   ${option.description}`
+                  : fitRow(`   ${option.description}`)}
               </Text>
             )}
           </Box>
@@ -367,8 +369,12 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                   isFocused={true}
                   onChange={onElaborateTextChange}
                   onSubmit={() => {
-                    // Enter/Tab submits: mark for elaboration and advance
-                    onElaborateSelect?.();
+                    // Enter/Tab submits and advance
+                    // Only call onElaborateSelect if no text (to toggle mark on)
+                    // If text exists, mark is already set via onElaborateTextChange
+                    if (!elaborateText.trim()) {
+                      onElaborateSelect?.();
+                    }
                     onAdvance?.();
                   }}
                   placeholder={t("input.elaboratePlaceholder")}

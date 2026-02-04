@@ -156,25 +156,46 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                     <Text color={theme.colors.unansweredHighlight}>
                       {" "}
                       {t("review.unanswered")}
+                      {/* Show elaboration on same line if unanswered */}
+                      {elaborateMarks?.has(index) && (
+                        <Text color={theme.colors.warning}>
+                          {(() => {
+                            const text = elaborateMarks.get(index);
+                            if (text) {
+                              const displayText =
+                                text.length > 50
+                                  ? text.slice(0, 50) + "..."
+                                  : text;
+                              return `, ${t("review.markedForElaboration")}: "${displayText}"`;
+                            }
+                            return `, ${t("review.markedForElaboration")}`;
+                          })()}
+                        </Text>
+                      )}
                     </Text>
                   )}
 
-                {/* Elaborate request indicator */}
-                {elaborateMarks?.has(index) && (
-                  <Box marginTop={0.5}>
-                    <Text color={theme.colors.warning}>
-                      {(() => {
-                        const text = elaborateMarks.get(index);
-                        if (text) {
-                          const displayText =
-                            text.length > 50 ? text.slice(0, 50) + "..." : text;
-                          return `Marked for elaboration: "${displayText}"`;
-                        }
-                        return "Marked for elaboration";
-                      })()}
-                    </Text>
-                  </Box>
-                )}
+                {/* Elaborate request indicator (only show separately if answered) */}
+                {(answer?.selectedOption ||
+                  answer?.selectedOptions ||
+                  answer?.customText) &&
+                  elaborateMarks?.has(index) && (
+                    <Box marginTop={0.5}>
+                      <Text color={theme.colors.warning}>
+                        {(() => {
+                          const text = elaborateMarks.get(index);
+                          if (text) {
+                            const displayText =
+                              text.length > 50
+                                ? text.slice(0, 50) + "..."
+                                : text;
+                            return `${t("review.markedForElaboration")}: "${displayText}"`;
+                          }
+                          return t("review.markedForElaboration");
+                        })()}
+                      </Text>
+                    </Box>
+                  )}
               </Box>
             </Box>
           );
