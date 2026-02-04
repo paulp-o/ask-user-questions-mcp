@@ -123,9 +123,10 @@ export const StepperView: React.FC<StepperViewProps> = ({
       const existing = newAnswers.get(currentQuestionIndex) || {};
       const currentSelections = existing.selectedOptions || [];
 
-      const newSelections = currentSelections.includes(label)
-        ? currentSelections.filter((l) => l !== label) // Remove if already selected
-        : [...currentSelections, label]; // Add if not selected
+      const isAdding = !currentSelections.includes(label);
+      const newSelections = isAdding
+        ? [...currentSelections, label] // Add if not selected
+        : currentSelections.filter((l) => l !== label); // Remove if already selected
 
       newAnswers.set(currentQuestionIndex, {
         selectedOptions: newSelections,
@@ -134,6 +135,19 @@ export const StepperView: React.FC<StepperViewProps> = ({
       });
       return newAnswers;
     });
+
+    // Clear elaboration when selecting a regular option (they're mutually exclusive)
+    // Note: custom text can coexist with options, but elaboration cannot
+    const currentSelections =
+      answers.get(currentQuestionIndex)?.selectedOptions || [];
+    const isAdding = !currentSelections.includes(label);
+    if (isAdding && elaborateMarks.has(currentQuestionIndex)) {
+      setElaborateMarks((prev) => {
+        const newMarks = new Map(prev);
+        newMarks.delete(currentQuestionIndex);
+        return newMarks;
+      });
+    }
   };
 
   // Handle custom answer text
@@ -147,6 +161,15 @@ export const StepperView: React.FC<StepperViewProps> = ({
       });
       return newAnswers;
     });
+
+    // Clear elaboration when typing custom text (they're mutually exclusive)
+    if (text.trim().length > 0 && elaborateMarks.has(currentQuestionIndex)) {
+      setElaborateMarks((prev) => {
+        const newMarks = new Map(prev);
+        newMarks.delete(currentQuestionIndex);
+        return newMarks;
+      });
+    }
   };
 
   // Track which questions have been visited (for auto-select logic)
@@ -363,8 +386,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
       });
     }
 
-    // Auto-advance to next question
-    handleAdvanceToNext();
+    // Note: No auto-advance here - caller decides whether to advance
+    // This allows spacebar to toggle without advancing, while Enter/Tab advances
   };
 
   // Handle elaborate text change

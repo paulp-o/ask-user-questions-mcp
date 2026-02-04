@@ -10,6 +10,8 @@ interface MultiLineTextInputProps {
   onSubmit?: () => void;
   placeholder?: string;
   value: string;
+  /** When true, Enter also triggers onSubmit (for single-line-ish inputs like elaborate) */
+  enterSubmits?: boolean;
 }
 
 /**
@@ -23,6 +25,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   onSubmit,
   placeholder = t("input.multiLinePlaceholder"),
   value,
+  enterSubmits = false,
 }) => {
   const { theme } = useTheme();
   // Initialize cursor at end of text (using character count for CJK support)
@@ -70,8 +73,12 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         return;
       }
 
-      // Enter: Always add newline (portable behavior)
+      // Enter: Submit if enterSubmits mode, otherwise add newline
       if (input === "\r" || input === "\n" || key.return) {
+        if (enterSubmits) {
+          onSubmit?.();
+          return;
+        }
         const chars = [...currentValue];
         const before = chars.slice(0, currentCursor).join("");
         const after = chars.slice(currentCursor).join("");

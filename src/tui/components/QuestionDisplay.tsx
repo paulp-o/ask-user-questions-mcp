@@ -120,12 +120,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         elaborateMarks={elaborateMarks}
       />
 
-      {/* Question ID, prompt, and type indicator */}
+      {/* Question prompt and type indicator */}
       <Box>
         <Text>
-          <Text color={theme.components.questionDisplay.questionId}>
-            [Q{currentQuestionIndex}]
-          </Text>
           <Text bold> {currentQuestion.prompt} </Text>
           <Text color={theme.components.questionDisplay.typeIndicator}>
             [

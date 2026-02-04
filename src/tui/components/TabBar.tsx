@@ -89,7 +89,7 @@ export const TabBar: React.FC<TabBarProps> = ({
 
     const baseLabel = tabLabel || question.title || `Question ${index + 1}`;
     const label = truncate(baseLabel, maxLabelChars - 2);
-    const status = isElaborate ? "★" : isAnswered ? "✓" : "·";
+    const status = isElaborate ? "⟲" : isAnswered ? "✓" : "·";
 
     return { index, isActive, isAnswered, isElaborate, label, status };
   });

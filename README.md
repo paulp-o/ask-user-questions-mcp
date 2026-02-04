@@ -8,19 +8,19 @@ _`AskUserQuestion` pushed to the max_
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-**A complete toolset that enables maximum level of human-in-the-loop onto any general/coding task with LLM.**
-Single/multiple choice questions, custom options, multi-agent interoperability, question queueing, question rejection with explanation, elaboration requesting, automatic recommendation, themes, native OS notification, terminal progress bar, multi-language support... and many more. You can customize them all!
-**Can be used as MCP server or as OpenCode plugin.**
+**A complete toolset that enables maximum level of human-(intention-)in-the-loop onto any agentic AI workflows.**
+Single/multiple choice questions, custom options, multi-agent interoperability, question queueing, question rejection with explanation, elaboration requesting, quick recommendations auto-selection, themes, native OS notification, terminal progress bar, multi-language support, agent skills support... and more. You can customize them all too!
+**Can be used via MCP server / OpenCode plugin / Agent Skills.**
 
-[Setup](#setup-instructions) • [Features](#-features)
+[Installation](#-install-cli-tool) • [Usage](#-usage)
 
-> 🤔 [I already have question tool in CC/OC/Cursor. Why use this?](#-why-auq-vs-built-in-ask-tools)
+> 🤔 [I already have question tool in CC/OC/Cursor. Why use this?](#-why-auq-vs-built-in-questioning-tools)
 
 ---
 
 ## What does it do?
 
-AUQ lets your AI assistants **ask clarifying questions** consisting of multiple-choice/single-choice questions (with an "Other" option for custom input / rejection / ask for elaboration) while coding or working, and **wait** for your answers through a **separate CLI tool** without messing up your workflow.
+AUQ lets your AI assistants **ask clarifying questions** consisting of multiple-choice/single-choice questions (with an "Other" option for custom input / rejection / ask for elaboration) while coding or working, and **wait** for your answers through a **separate CLI tool window** without messing up your workflow.
 
 This lets you put your **intent** to long-running autonomous AI tasks, while you don't need to keep switching windows, babysitting AIs desperately waiting for your reponses. You can turn on the CLI at any time, even remotely via SSH!
 
@@ -79,7 +79,7 @@ AUQ supports multiple AI environments. Choose between **OpenCode plugin** and **
 
 ### Option A: MCP Server
 
-> _Note: As some MCP clients have global timeout for MCP servers, AUQ may time out. If you're using OpenCode, use [OpenCode plugin](#option-b-official-opencode-plugin) instead._
+> _Note: Due to differences in how some MCP clients are implemented, AUQ may be forcibly cancelled in tools that do not allow extending the global MCP timeout. If that's the case, consider using [Agent Skills](#option-c-agent-skills-experimental). Use [OpenCode plugin](#option-b-official-opencode-plugin) if you use OpenCode._
 
 <details>
 <summary><strong>Cursor</strong></summary>
@@ -132,30 +132,8 @@ Add to `~/.codex/config.toml`:
 [mcp_servers.ask-user-questions]
 command = "bunx"
 args = ["-y", "auq-mcp-server", "server"]
-tool_timeout_sec = 99999
+tool_timeout_sec = 99999  // Extend timeout for long sessions
 ```
-
-_Replace `bunx` with `npx` if using npm._
-
-**Full configuration example** (with optional settings):
-
-```toml
-[mcp_servers.ask-user-questions]
-command = "bunx"
-args = ["-y", "auq-mcp-server", "server"]
-tool_timeout_sec = 99999
-# Optional: Additional environment variables
-# env = { "AUQ_SESSION_DIR" = "/custom/path" }
-
-# Optional: Whitelist additional env vars
-# env_vars = ["AUQ_SESSION_DIR"]
-
-
-# Optional: Working directory
-# cwd = "/Users/<user>/projects"
-```
-
-Restart Codex CLI after saving the configuration.
 
 </details>
 
@@ -183,7 +161,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ### Option B: OpenCode Plugin
 
-**Direct integration** for OpenCode users. Adds working directory viewability.
+**Direct integration** for OpenCode users. Adds working directory viewability feature exclusively.
 
 #### Configuration
 
@@ -197,40 +175,17 @@ Add to `opencode.json`:
 
 ### Option C: Agent Skills (Experimental)
 
-AUQ provides an [Agent Skills](https://agentskills.io) compatible skill for standardized AI tool discovery.
-
-#### What are Agent Skills?
-
-Agent Skills follow the [agentskills.io](https://agentskills.io) specification, allowing AI agents to discover AUQ usage instructions in a standardized format—no more guessing how to use the tool.
-
-#### Skill Location
-
-```
-skills/ask-user-questions/
-├── SKILL.md              # Main skill definition
-└── references/API.md     # API reference documentation
-```
 
 #### Usage with Skills-Compatible Agents
 
-**Option 1: Copy to agent's skills directory**
+Copy the `skills/ask-user-questions/` folder to your agent's skills directory.
 
-```bash
-cp -r skills/ask-user-questions/ /path/to/agent/skills/
-```
+<details>
+<summary><strong>Limitations</strong></summary>
 
-**Option 2: Reference this repository**
-Point your agent's skill loader to the `skills/ask-user-questions/` directory in this repo.
+This skill guides the AI to use AUQ CLI's hidden command, `auq ask`. Unlike MCP or _proper_ tool harness systems, malformed JSON healing/schema validation aren't supported natively; therefore a less capable model could struggle to call with proper parameters.
 
-#### Development Commands
-
-```bash
-# Regenerate the skill from source
-bun run generate:skill
-
-# Validate skill structure and content
-bun run validate:skill
-```
+</details>
 
 ---
 
@@ -240,11 +195,15 @@ bun run validate:skill
 
 ```bash
 auq       # if installed globally (bun add -g)
-bunx auq  # works from anywhere
-npx auq   # also works with npm
+# bunx auq
+# npx auq
 ```
 
-Then just start working with your coding agent or AI assistant. You may prompt to ask questions with the tool the agent got; it will mostly just get what you mean.
+Start by defining your workflow to ask AUQ tool for clarifying questions, on `AGENTS.md` (or `CLAUDE.md`).
+
+When the AI asks questions, you'll see them appear in the AUQ TUI. Answer them at your convenience.
+
+> _Note: AUQ is an unopinionated tool and doesn't include prompts on **HOW** AI should leverage it. It is expected that you do your own prompt engineering to make the most out of it in your own workflows._
 
 ### Recommended Setups
 
@@ -252,11 +211,11 @@ It is recommended to disable the questioning tool already in your harness, like 
 
 ### Useful Keyboard Shortcuts
 
-| Key          | Action       | Description                                                            |
-| ------------ | ------------ | ---------------------------------------------------------------------- |
-| `Esc`          | Reject    | Reject the whole question set and optionally explain why to the AI |
-| `Ctrl+R` | Quick Submit | Auto-select recommended options for all questions and go to review     |
-| `Ctrl+T`     | Theme        | Cycle through available color themes                                   |
+| Key      | Action       | Description                                                        |
+| -------- | ------------ | ------------------------------------------------------------------ |
+| `Esc`    | Reject       | Reject the whole question set and optionally explain why to the AI |
+| `Ctrl+R` | Quick Submit | Auto-select recommended options for all questions and go to review |
+| `Ctrl+T` | Theme        | Cycle through available color themes                               |
 
 <details>
 <summary><strong>More Commands (advanced)</strong></summary>
@@ -276,7 +235,8 @@ auq --help       # Show help
 
 AUQ supports **16 built-in color themes** with automatic persistence. Press `Ctrl+T` to cycle through themes.
 
-#### Built-in Themes
+<details>
+<summary><strong>Built-in Themes</strong></summary>
 
 | Theme            | Style                    |
 | ---------------- | ------------------------ |
@@ -297,9 +257,12 @@ AUQ supports **16 built-in color themes** with automatic persistence. Press `Ctr
 | GitHub Light     | GitHub's light mode      |
 | Rosé Pine        | Warm, cozy pinks         |
 
+</details>
+
 Your selected theme is automatically saved to `~/.config/auq/config.json` and restored on next launch.
 
-#### Custom Themes
+<details>
+<summary><strong>Custom Themes</strong></summary>
 
 Create custom themes by placing `.theme.json` files in:
 
@@ -319,6 +282,8 @@ Example custom theme (`~/.config/auq/themes/my-theme.theme.json`):
 ```
 
 Custom themes inherit from the default dark theme—only override the colors you want to change. See the [JSON schema](schemas/theme.schema.json) for all available properties.
+
+</details>
 
 ---
 
@@ -363,8 +328,6 @@ bun run bin/auq.tsx ask '{"questions": [{"prompt": "Which language?", "title": "
 echo '{"questions": [{"prompt": "Which database?", "title": "DB", "options": [{"label": "PostgreSQL"}, {"label": "MongoDB"}], "multiSelect": false}]}' | bun run bin/auq.tsx ask
 ```
 
-> **Note:** `npx tsx` also works if you prefer npm.
-
 This will create a session and wait for the TUI to provide answers.
 
 ### 3. Answer with the TUI (Terminal 3)
@@ -373,8 +336,6 @@ This will create a session and wait for the TUI to provide answers.
 # Run the TUI to answer pending questions
 bun run bin/auq.tsx
 ```
-
-> **Note:** `npx tsx` also works if you prefer npm.
 
 ### Create Mock Sessions for TUI Testing
 
@@ -394,8 +355,6 @@ Then run the TUI to see and answer them:
 bun run bin/auq.tsx
 ```
 
-> **Note:** `npx tsx` also works if you prefer npm.
-
 ### Verify MCP and CLI Use Same Session Directory
 
 Both components should report the same session directory path. Check the logs:
@@ -404,6 +363,16 @@ Both components should report the same session directory path. Check the logs:
 - `auq ask` prints `[AUQ] Session directory: <path>` to stderr
 
 On macOS, both should use: `~/Library/Application Support/auq/sessions`
+
+### Development Commands
+
+```bash
+# Regenerate the skill from source
+bun run generate:skill
+
+# Validate skill structure and content
+bun run validate:skill
+```
 
 </details>
 
@@ -437,19 +406,19 @@ _Settings from local config override global config, which overrides defaults._
 
 ```json
 {
-  maxOptions: 5,
-  maxQuestions: 5,
-  recommendedOptions: 4,
-  recommendedQuestions: 4,
-  sessionTimeout: 0,
-  retentionPeriod: 604800000, // 7 days
-  language: "auto",
-  theme: "system",
-  autoSelectRecommended: true,
-  notifications: {
-    enabled: true,
-    sound: true,
-  },
+  "maxOptions": 5,
+  "maxQuestions": 5,
+  "recommendedOptions": 4,
+  "recommendedQuestions": 4,
+  "sessionTimeout": 0,
+  "retentionPeriod": 604800000, // 7 days
+  "language": "auto",
+  "theme": "system",
+  "autoSelectRecommended": true,
+  "notifications": {
+    "enabled": true,
+    "sound": true
+  }
 }
 ```
 
@@ -520,27 +489,61 @@ Set `notifications.enabled` to `false` to disable all notifications.
 
 ---
 
-## 🤔 Why AUQ vs. Built-in Ask Tools?
+## 🤔 Why AUQ vs. Built-in Questioning Tools?
 
-**Why should I use AUQ instead of the built-in "Question" tools in OpenCode, Claude Code, or other coding agents?**
+> **A clean decision inbox so you & AI stay in flow.**
 
-AUQ is designed for the era of parallel multi-agent workflows, with several key advantages:
+You're an AI power user, running multiple agents on multiple instances. Highly parallelized, the AIs ask questions to you simultaneously, on multiple threads—scattered across different windows. AUQ enables them ask to you anytime, collects everything in one inbox, and lets you respond on your terms—then elegantly routes answers back to each agent.
 
-### 🚀 Non-Blocking Parallel Operation
+```
+       Claude Code    Cursor    OpenCode
+            │           │           │
+            ▼           ▼           ▼
+          ┌─────────────────────────────┐
+          │        📥 AUQ Inbox         │
+          └─────────────────────────────┘
+                        │
+                        ▼
+                      🖥️ TUI
+                        │
+                        ▼
+          ┌─────────────────────────────┐
+          │       Your Answers          │
+          └─────────────────────────────┘
+            │           │           │
+            ▼           ▼           ▼
+       Claude Code    Cursor    OpenCode
+```
 
-Unlike built-in ask tools that halt the entire AI workflow until you respond, AUQ **doesn't block the AI from continuing work**. Questions are queued asynchronously, allowing your AI assistants to keep coding while you review and answer questions at your own pace.
+📥 **One Inbox for All Agents** — Multiple agents ask in one place. One queue, one source of truth.
 
-### 🎯 Multi-Agent Question Set Support
+🧠 **Teach the AI** — Skip bad questions and tell it why. Turn "no" into better follow-ups.
 
-AUQ can handle question sets from **multiple agents simultaneously**. In modern AI coding workflows, you often have several sub-agents working in parallel—each might need clarification on different aspects of your codebase. With AUQ:
+❓ **Fix the Question First** — Can't answer because it's vague? Ask the AI to elaborate before you guess.
 
-- **No more screen switching** between different agent conversations
-- **Unified queue** for all agent questions, regardless of which AI tool they're coming from
-- **Sequential processing** of questions from multiple sources in one interface
+⚡ **Blast Through the Obvious** — `Ctrl+R` accepts all recommended options. Spend attention on the hard decisions.
 
-### 🌐 Question Set Rejection Support
+🔔 **Pinged When It Matters** — Native notifications, batched so you're not interrupted 5 times.
 
-**Skip irrelevant question sets entirely** - reject whole question batches that don't apply to your current context, saving time and maintaining focus on relevant AI-agent questions.
+🌐 **Works Where You Work** — SSH into a remote server? AUQ runs there too.
+
+<details>
+<summary><strong>Nice Extras</strong></summary>
+
+- 🎨 16 built-in themes + custom theme support
+- 🌍 i18n (English, Korean) with auto-detection
+- 📊 Dock progress bar (iTerm2, WezTerm, Ghostty)
+- 🔤 Full CJK character support
+
+#### Power Moves
+
+| Shortcut | What it does                                       |
+| -------- | -------------------------------------------------- |
+| `Esc`    | Reject question set — optionally explain why       |
+| `Ctrl+R` | Quick submit — auto-fill recommended, go to review |
+| `Ctrl+T` | Cycle through 16 themes                            |
+
+</details>
 
 ---
 

@@ -153,7 +153,7 @@ export class ResponseFormatter {
     customExplanation?: string,
     elaborateText?: string,
   ): string {
-    let result = `[ELABORATE_REQUEST] Please elaborate on question '${title}' (${prompt}) with more detailed options\nQuestion index: ${questionIndex}`;
+    let result = `[ELABORATE_REQUEST] This means the user may have additional info, context or questions, or need more details to understand your qestion. You may exceed the normal length of questions and options only once exceptionally. `;
     if (customExplanation) {
       result += `\nUser note: ${customExplanation}`;
     }

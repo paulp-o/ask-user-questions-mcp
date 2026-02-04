@@ -158,38 +158,35 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         return;
       }
 
-      if (multiSelect) {
-        // Multi-select mode
-        if (input === " ") {
-          // Spacebar: Toggle selection WITHOUT advancing
-          if (!isCustomInputFocused && !isElaborateFocused) {
+      // Spacebar: Select/toggle WITHOUT advancing (works for both modes)
+      if (input === " ") {
+        if (!isCustomInputFocused && !isElaborateFocused) {
+          if (multiSelect) {
             onToggle?.(options[focusedIndex].label);
+          } else {
+            onSelect(options[focusedIndex].label);
           }
         }
+      }
 
-        if (key.return) {
-          // Enter: Advance to next question (don't toggle)
-          // Note: Tab is handled globally in StepperView for question navigation
-          if (!isCustomInputFocused && !isElaborateFocused && onAdvance) {
+      // Enter: Advance to next question
+      if (key.return) {
+        if (isCustomInputFocused || isElaborateFocused) {
+          return;
+        }
+
+        if (multiSelect) {
+          // Multi-select: Enter just advances (spacebar toggles)
+          if (onAdvance) {
             onAdvance();
           }
-        }
-      } else {
-        // Single-select mode
-        if (key.return) {
-          // Don't handle Return when custom input or elaborate is focused
-          if (isCustomInputFocused || isElaborateFocused) {
-            return;
-          }
-
-          // On regular option: select and advance
+        } else {
+          // Single-select: Enter selects AND advances
           onSelect(options[focusedIndex].label);
           if (onAdvance) {
             onAdvance();
           }
         }
-
-        // Tab is handled globally in StepperView for question navigation
       }
     },
     { isActive: isFocused },
@@ -206,14 +203,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           ? selectedOptions?.includes(option.label) || false
           : selectedOption === option.label;
 
-        const selectionMark = multiSelect
-          ? isSelected
-            ? "[x]"
-            : "[ ]"
-          : isSelected
-            ? "(*)"
-            : "( )";
-
         const rowBg = isFocusedOption
           ? theme.components.options.focusedBg
           : isSelected
@@ -227,7 +216,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
             : theme.components.options.default;
 
         const starSuffix = isRecommended ? " ★" : "";
-        const mainLine = `${isFocusedOption ? ">" : " "} ${selectionMark} ${option.label}${starSuffix}`;
+        // Single-select: check on right side, no box
+        // Multi-select: checkbox on left side
+        const mainLine = multiSelect
+          ? `${isFocusedOption ? ">" : " "} ${isSelected ? "[✓]" : "[ ]"} ${option.label}${starSuffix}`
+          : `${isFocusedOption ? ">" : " "} ${option.label}${isSelected ? " ✓" : ""}${starSuffix}`;
 
         return (
           <Box key={index} flexDirection="column">
@@ -243,10 +236,12 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 backgroundColor={
                   isFocusedOption
                     ? theme.components.options.focusedBg
-                    : undefined
+                    : isSelected
+                      ? theme.components.options.selectedBg
+                      : undefined
                 }
                 color={theme.components.options.description}
-                dimColor={!isFocusedOption}
+                dimColor={!isFocusedOption && !isSelected}
               >
                 {fitRow(`   ${option.description}`)}
               </Text>
@@ -261,13 +256,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
           <Box flexDirection="column">
             {(() => {
               const isSelected = customValue.trim().length > 0;
-              const selectionMark = multiSelect
-                ? isSelected
-                  ? "[x]"
-                  : "[ ]"
-                : isSelected
-                  ? "(*)"
-                  : "( )";
               const rowBg = isCustomInputFocused
                 ? theme.components.options.focusedBg
                 : isSelected
@@ -278,7 +266,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 : isSelected
                   ? theme.components.options.selected
                   : theme.components.options.default;
-              const mainLine = `${isCustomInputFocused ? ">" : " "} ${selectionMark} ${t("input.otherCustom")}`;
+              // Single-select: check on right side, no box
+              // Multi-select: checkbox on left side
+              const mainLine = multiSelect
+                ? `${isCustomInputFocused ? ">" : " "} ${isSelected ? "[✓]" : "[ ]"} ${t("input.otherCustom")}`
+                : `${isCustomInputFocused ? ">" : " "} ${t("input.otherCustom")}${isSelected ? " ✓" : ""}`;
 
               return (
                 <Text
@@ -333,7 +325,6 @@ export const OptionsList: React.FC<OptionsListProps> = ({
         <Box marginTop={0}>
           <Box flexDirection="column">
             {(() => {
-              const selectionMark = isElaborateMarked ? "(★)" : "( )";
               const rowBg = isElaborateFocused
                 ? theme.components.options.focusedBg
                 : isElaborateMarked
@@ -344,7 +335,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 : isElaborateMarked
                   ? theme.colors.warning
                   : theme.components.options.default;
-              const mainLine = `${isElaborateFocused ? ">" : " "} ${selectionMark} ${t("footer.elaborate")}`;
+              // Single-select: icon on right side, no box
+              // Multi-select: checkbox on left side
+              const mainLine = multiSelect
+                ? `${isElaborateFocused ? ">" : " "} ${isElaborateMarked ? "[★]" : "[ ]"} ${t("footer.elaborate")}`
+                : `${isElaborateFocused ? ">" : " "} ${t("footer.elaborate")}${isElaborateMarked ? " ★" : ""}`;
 
               return (
                 <Text
@@ -368,10 +363,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 paddingY={0}
               >
                 <MultiLineTextInput
+                  enterSubmits={true}
                   isFocused={true}
                   onChange={onElaborateTextChange}
                   onSubmit={() => {
-                    // Tab submits: mark for elaboration and advance
+                    // Enter/Tab submits: mark for elaboration and advance
                     onElaborateSelect?.();
                     onAdvance?.();
                   }}
