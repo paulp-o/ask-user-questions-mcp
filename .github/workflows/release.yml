@@ -36,6 +36,9 @@ jobs:
       - name: Build packages
         run: bun run build && bun run --cwd packages/opencode-plugin build
 
+      - name: Validate Agent Skill
+        run: bun run validate:skill
+
       - name: Release main package
         run: bun run release
         env:

@@ -22,7 +22,7 @@ Single/multiple choice questions, custom options, multi-agent interoperability, 
 
 AUQ lets your AI assistants **ask clarifying questions** consisting of multiple-choice/single-choice questions (with an "Other" option for custom input / rejection / ask for elaboration) while coding or working, and **wait** for your answers through a **separate CLI tool** without messing up your workflow.
 
-This lets you put your **intent** to  long-running autonomous AI tasks, while you don't need to keep switching windows, babysitting AIs desperately waiting for your reponses. You can turn on the CLI at any time, even remotely via SSH!
+This lets you put your **intent** to long-running autonomous AI tasks, while you don't need to keep switching windows, babysitting AIs desperately waiting for your reponses. You can turn on the CLI at any time, even remotely via SSH!
 
 <details>
 <summary><i>A no no fun background story</i></summary>
@@ -68,6 +68,7 @@ bun add auq-mcp-server
 ```
 
 Sessions are stored globally regardless of installation method. See [Troubleshooting](#troubleshooting) for session locations.
+
 </details>
 
 ---
@@ -78,7 +79,7 @@ AUQ supports multiple AI environments. Choose between **OpenCode plugin** and **
 
 ### Option A: MCP Server
 
->_Note: As some MCP clients have global timeout for MCP servers, AUQ may time out. If you're using OpenCode, use [OpenCode plugin](#option-b-official-opencode-plugin) instead._
+> _Note: As some MCP clients have global timeout for MCP servers, AUQ may time out. If you're using OpenCode, use [OpenCode plugin](#option-b-official-opencode-plugin) instead._
 
 <details>
 <summary><strong>Cursor</strong></summary>
@@ -194,6 +195,43 @@ Add to `opencode.json`:
 }
 ```
 
+### Option C: Agent Skills (Experimental)
+
+AUQ provides an [Agent Skills](https://agentskills.io) compatible skill for standardized AI tool discovery.
+
+#### What are Agent Skills?
+
+Agent Skills follow the [agentskills.io](https://agentskills.io) specification, allowing AI agents to discover AUQ usage instructions in a standardized format—no more guessing how to use the tool.
+
+#### Skill Location
+
+```
+skills/ask-user-questions/
+├── SKILL.md              # Main skill definition
+└── references/API.md     # API reference documentation
+```
+
+#### Usage with Skills-Compatible Agents
+
+**Option 1: Copy to agent's skills directory**
+
+```bash
+cp -r skills/ask-user-questions/ /path/to/agent/skills/
+```
+
+**Option 2: Reference this repository**
+Point your agent's skill loader to the `skills/ask-user-questions/` directory in this repo.
+
+#### Development Commands
+
+```bash
+# Regenerate the skill from source
+bun run generate:skill
+
+# Validate skill structure and content
+bun run validate:skill
+```
+
 ---
 
 ## 💻 Usage
@@ -208,7 +246,20 @@ npx auq   # also works with npm
 
 Then just start working with your coding agent or AI assistant. You may prompt to ask questions with the tool the agent got; it will mostly just get what you mean.
 
-### Commands
+### Recommended Setups
+
+It is recommended to disable the questioning tool already in your harness, like the `question` tool in OpenCode or `AskUserQuestion` in Claude Code, to avoid AI from mixing them up.
+
+### Useful Keyboard Shortcuts
+
+| Key          | Action       | Description                                                            |
+| ------------ | ------------ | ---------------------------------------------------------------------- |
+| `Esc`          | Reject    | Reject the whole question set and optionally explain why to the AI |
+| `Ctrl+R` | Quick Submit | Auto-select recommended options for all questions and go to review     |
+| `Ctrl+T`     | Theme        | Cycle through available color themes                                   |
+
+<details>
+<summary><strong>More Commands (advanced)</strong></summary>
 
 ```bash
 # you won't likely need these at all
@@ -217,24 +268,7 @@ auq --version    # Show version
 auq --help       # Show help
 ```
 
-### Keyboard Shortcuts
-
-| Key          | Action       | Description                                                            |
-| ------------ | ------------ | ---------------------------------------------------------------------- |
-| `E`          | Elaborate    | Request AI to elaborate on current question with more detailed options |
-| `Ctrl+Enter` | Quick Submit | Auto-select recommended options for all questions and go to review     |
-| `Ctrl+T`     | Theme        | Cycle through available color themes                                   |
-
-### Recommended Options
-
-AUQ automatically detects recommended options provided by the AI:
-
-- Options containing `(recommended)`, `[recommended]`, `(추천)`, or `[추천]` are detected.
-- **Visual Aid**: Recommended options are highlighted with a ★ star badge.
-- **Auto-selection**:
-  - **Single-select**: The first recommended option is pre-selected.
-  - **Multi-select**: All recommended options are pre-selected.
-- You can always change the selection before submitting.
+</details>
 
 ---
 
@@ -263,8 +297,6 @@ AUQ supports **16 built-in color themes** with automatic persistence. Press `Ctr
 | GitHub Light     | GitHub's light mode      |
 | Rosé Pine        | Warm, cozy pinks         |
 
-#### Theme Persistence
-
 Your selected theme is automatically saved to `~/.config/auq/config.json` and restored on next launch.
 
 #### Custom Themes
@@ -292,7 +324,7 @@ Custom themes inherit from the default dark theme—only override the colors you
 
 ### Manual session cleanup
 
-Sessions auto-clean after completion or timeout. However, you can manually clean them up if you want to.
+Sessions auto-clean after retention period. However, you can manually clean them up if you want to.
 
 ```bash
 rm -rf ~/Library/Application\ Support/auq/sessions/*  # macOS
@@ -302,7 +334,7 @@ rm -rf ~/.local/share/auq/sessions/*                  # Linux
 ---
 
 <details>
-<summary>Local Development & Testing</summary>
+<summary><strong>Local Development & Testing</strong></summary>
 
 To test the MCP server and CLI locally during development:
 
@@ -375,7 +407,8 @@ On macOS, both should use: `~/Library/Application Support/auq/sessions`
 
 </details>
 
-## Troubleshooting
+<details>
+<summary><strong>Troubleshooting</strong></summary>
 
 ### Session Storage
 
@@ -385,13 +418,12 @@ Sessions are stored in platform-specific global locations:
 - **Linux**: `~/.local/share/auq/sessions` (or `$XDG_DATA_HOME/auq/sessions`)
 - **Windows**: `%APPDATA%\auq\sessions`
 
-To override the default location, set the `AUQ_SESSION_DIR` environment variable:
+_Can be customized with `AUQ_SESSION_DIR` environment variable._
 
-```bash
-export AUQ_SESSION_DIR=/custom/path
-```
+</details>
 
-## ⚙️ Configuration
+<details>
+<summary><strong>Configuration</strong></summary>
 
 AUQ can be configured via a `.auqrc.json` file. Settings are loaded from (in priority order):
 
@@ -399,24 +431,30 @@ AUQ can be configured via a `.auqrc.json` file. Settings are loaded from (in pri
 2. **Global**: `~/.config/auq/.auqrc.json` (or `$XDG_CONFIG_HOME/auq/.auqrc.json`)
 3. **Defaults**: Built-in values
 
-Settings from local config override global config, which overrides defaults.
+_Settings from local config override global config, which overrides defaults._
 
-### Example Configuration
+### Default Configuration
 
 ```json
 {
-  "maxOptions": 5,
-  "maxQuestions": 5,
-  "recommendedOptions": 4,
-  "recommendedQuestions": 4,
-  "language": "auto",
-  "theme": "system",
-  "sessionTimeout": 0,
-  "retentionPeriod": 604800000
+  maxOptions: 5,
+  maxQuestions: 5,
+  recommendedOptions: 4,
+  recommendedQuestions: 4,
+  sessionTimeout: 0,
+  retentionPeriod: 604800000, // 7 days
+  language: "auto",
+  theme: "system",
+  autoSelectRecommended: true,
+  notifications: {
+    enabled: true,
+    sound: true,
+  },
 }
 ```
 
-### Available Settings
+<details>
+<summary><strong>Available Settings</strong></summary>
 
 | Setting                 | Type    | Default   | Range/Values                    | Description                                           |
 | ----------------------- | ------- | --------- | ------------------------------- | ----------------------------------------------------- |
@@ -430,6 +468,8 @@ Settings from local config override global config, which overrides defaults.
 | `retentionPeriod`       | number  | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
 | `notifications.enabled` | boolean | true      | true/false                      | Enable desktop notifications for new questions        |
 | `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications                         |
+
+</details>
 
 ### Language Support
 
@@ -476,6 +516,8 @@ Notifications can be disabled in configuration if needed.
 
 Set `notifications.enabled` to `false` to disable all notifications.
 
+</details>
+
 ---
 
 ## 🤔 Why AUQ vs. Built-in Ask Tools?
@@ -499,19 +541,6 @@ AUQ can handle question sets from **multiple agents simultaneously**. In modern 
 ### 🌐 Question Set Rejection Support
 
 **Skip irrelevant question sets entirely** - reject whole question batches that don't apply to your current context, saving time and maintaining focus on relevant AI-agent questions.
-
----
-
-## 🚀 Roadmap
-
-- [x] Light & dark mode themes
-- [x] Custom color themes (16 built-in + custom theme support)
-- [x] Multi-language support (English, Korean)
-- [x] Configuration file support (`.auqrc.json`)
-- [x] Native desktop notifications
-- [ ] MCP prompt mode switch (Anthropic style / minimal)
-- [ ] Simple option to prompt the LLM to/not ask more questions after answering.
-- [ ] Optional 'context' field provided by the LLM, that describes the context of the questions - will be useful for multi-agent coding
 
 ---
 
