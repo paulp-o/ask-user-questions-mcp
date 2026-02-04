@@ -4,7 +4,7 @@
  * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
  * Run "npm run sync-plugin-schemas" to regenerate.
  * 
- * Generated at: 2026-02-04T06:05:38.647Z
+ * Generated at: 2026-02-04T08:14:04.755Z
  */
 
 import { tool } from "@opencode-ai/plugin/tool";

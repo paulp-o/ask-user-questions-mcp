@@ -1,8 +1,11 @@
 # tui-application Specification
 
 ## Purpose
+
 TBD - created by archiving change add-question-enhancements. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Recommended Option Detection
 
 The system SHALL automatically detect and highlight options marked as recommended.
@@ -436,24 +439,6 @@ The system SHALL detect missing Linux notification dependencies at startup.
 
 ---
 
-### Requirement: Notification Icon
-
-The system SHALL support a custom notification icon.
-
-#### Scenario: Icon file exists
-
-- **WHEN** an icon file exists at `src/tui/notifications/assets/icon.png`
-- **THEN** the system SHALL use that icon in native notifications
-- **AND** the icon path SHALL be resolved as an absolute path
-
-#### Scenario: Icon file missing
-
-- **WHEN** no icon file exists at the expected path
-- **THEN** the system SHALL use the OS default notification icon
-- **AND** no error or warning SHALL be logged
-
----
-
 ### Requirement: R Key Recommended Selection
 
 The system SHALL provide keyboard shortcuts for quickly selecting recommended options.
@@ -689,4 +674,3 @@ The system SHALL maintain consistent brightness relationships between header and
 - **AND** users SHALL perceive a similar visual hierarchy regardless of theme choice
 
 ---
-
