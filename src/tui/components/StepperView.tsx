@@ -564,25 +564,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
     );
   }
 
-  // Show submitting message
-  if (submitting) {
-    return (
-      <Box flexDirection="column" padding={1}>
-        <Box
-          borderColor={theme.colors.pending}
-          borderStyle="single"
-          padding={1}
-        >
-          <Text color={theme.colors.pending}>{t("stepper.submitting")}</Text>
-        </Box>
-      </Box>
-    );
-  }
-
   // Show review screen
   if (showReview) {
     return (
       <ReviewScreen
+        isSubmitting={submitting}
         answers={answers}
         elapsedLabel={elapsedLabel}
         onConfirm={handleConfirm}

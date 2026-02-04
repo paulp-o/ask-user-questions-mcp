@@ -251,17 +251,18 @@ const App: React.FC<AppProps> = ({ config }) => {
       <ThemeProvider initialTheme={initialTheme}>
         <Box flexDirection="column" paddingX={1}>
           <Header pendingCount={sessionQueue.length} />
+          {mainContent}
           {toast && (
-            <Box marginBottom={1} marginTop={1} justifyContent="center">
+            <Box marginTop={1} justifyContent="center">
               <Toast
                 message={toast.message}
                 onDismiss={() => setToast(null)}
                 type={toast.type}
                 title={toast.title}
+                duration={5000}
               />
             </Box>
           )}
-          {mainContent}
           {showSessionLog && (
             <Box marginTop={1}>
               <Text dimColor>[AUQ] Session directory: {sessionDir}</Text>

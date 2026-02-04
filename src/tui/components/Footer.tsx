@@ -1,8 +1,10 @@
 import { Box, Text } from "ink";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
+
+const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 interface FooterProps {
   focusContext: "option" | "custom-input" | "elaborate-input";
@@ -13,6 +15,8 @@ interface FooterProps {
   hasRecommendedOptions?: boolean;
   /** True if ANY question in the session has recommended options (for Ctrl+R visibility) */
   hasAnyRecommendedInSession?: boolean;
+  /** True when submitting answers (shows spinner) */
+  isSubmitting?: boolean;
 }
 
 type Keybinding = { key: string; action: string };
@@ -28,8 +32,20 @@ export const Footer: React.FC<FooterProps> = ({
   customInputValue = "",
   hasRecommendedOptions = false,
   hasAnyRecommendedInSession = false,
+  isSubmitting = false,
 }) => {
   const { theme } = useTheme();
+  const [spinnerFrame, setSpinnerFrame] = useState(0);
+
+  // Animate spinner when submitting
+  useEffect(() => {
+    if (!isSubmitting) return;
+    const interval = setInterval(() => {
+      setSpinnerFrame((prev) => (prev + 1) % SPINNER_FRAMES.length);
+    }, 80);
+    return () => clearInterval(interval);
+  }, [isSubmitting]);
+
   const getKeybindings = (): Keybinding[] => {
     // Review screen mode
     if (isReviewScreen) {
@@ -105,18 +121,25 @@ export const Footer: React.FC<FooterProps> = ({
       flexWrap="wrap"
     >
       {keybindings.map((binding, idx) => (
-        <Box key={idx} paddingRight={2}>
-          <Text
-            backgroundColor={theme.components.footer.keyBg}
-            bold
-            color={theme.components.footer.keyFg}
-          >
-            {` ${binding.key} `}
-          </Text>
-          <Text color={theme.components.footer.action} dimColor>
-            {` ${binding.action}`}
-          </Text>
-        </Box>
+        <React.Fragment key={idx}>
+          <Box paddingRight={2}>
+            <Text
+              backgroundColor={theme.components.footer.keyBg}
+              bold
+              color={theme.components.footer.keyFg}
+            >
+              {` ${binding.key} `}
+            </Text>
+            <Text color={theme.components.footer.action} dimColor>
+              {` ${binding.action}`}
+            </Text>
+            {isSubmitting && binding.key === "Enter" && isReviewScreen && (
+              <Text color={theme.colors.pending} bold>
+                {` ${SPINNER_FRAMES[spinnerFrame]}`}
+              </Text>
+            )}
+          </Box>
+        </React.Fragment>
       ))}
     </Box>
   );

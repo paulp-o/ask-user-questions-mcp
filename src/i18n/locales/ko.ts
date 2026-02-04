@@ -13,6 +13,7 @@ export const ko = {
     newline: "줄바꿈",
     back: "뒤로",
     submit: "제출",
+    submitting: "제출 중...",
     confirm: "확인",
     cancel: "취소",
     cursor: "커서",

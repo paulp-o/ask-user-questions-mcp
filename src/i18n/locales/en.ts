@@ -13,6 +13,7 @@ export const en = {
     newline: "Newline",
     back: "Back",
     submit: "Submit",
+    submitting: "Submitting...",
     confirm: "Confirm",
     cancel: "Cancel",
     cursor: "Cursor",

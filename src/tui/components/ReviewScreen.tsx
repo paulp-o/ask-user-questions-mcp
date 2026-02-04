@@ -17,6 +17,7 @@ interface ReviewScreenProps {
   questions: Question[];
   sessionId: string;
   elaborateMarks?: Map<number, string>;
+  isSubmitting?: boolean;
 }
 
 /**
@@ -30,10 +31,14 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   onGoBack,
   questions,
   elaborateMarks,
+  isSubmitting = false,
 }) => {
   const { theme } = useTheme();
 
   useInput((input, key) => {
+    // Disable input while submitting
+    if (isSubmitting) return;
+
     if (key.return) {
       // Convert answers to UserAnswer format
       const userAnswers: UserAnswer[] = [];
@@ -177,7 +182,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
       </Box>
 
       {/* Footer with keybindings */}
-      <Footer focusContext="option" multiSelect={false} isReviewScreen={true} />
+      <Footer
+        focusContext="option"
+        multiSelect={false}
+        isReviewScreen={true}
+        isSubmitting={isSubmitting}
+      />
     </Box>
   );
 };
