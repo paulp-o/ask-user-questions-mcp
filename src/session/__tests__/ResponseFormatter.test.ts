@@ -877,57 +877,236 @@ describe("ResponseFormatter", () => {
         "What is your favorite programming language?",
       );
 
-      expect(result).toBe(
-        "[ELABORATE_REQUEST] Please elaborate on question 'Language' (What is your favorite programming language?) with more detailed options\n" +
-          "Question index: 0",
-      );
+      expect(result).toContain("[ELABORATE_REQUEST]");
+      expect(result).toContain("This means the user may have additional info");
+      expect(result).toContain("Provide examples and larger context");
     });
 
-    it("should format elaborate request with different question index", () => {
+    it("should format elaborate request with user note", () => {
       const result = ResponseFormatter.formatElaborateRequest(
-        2,
-        "Framework",
-        "Which framework do you prefer?",
+        0,
+        "Language",
+        "What is your favorite programming language?",
+        "I need more context about the options",
       );
 
-      expect(result).toBe(
-        "[ELABORATE_REQUEST] Please elaborate on question 'Framework' (Which framework do you prefer?) with more detailed options\n" +
-          "Question index: 2",
+      expect(result).toContain("[ELABORATE_REQUEST]");
+      expect(result).toContain(
+        "User note: I need more context about the options",
       );
     });
 
-    it("should format elaborate request with special characters in title", () => {
+    it("should format elaborate request with user guidance text", () => {
       const result = ResponseFormatter.formatElaborateRequest(
-        1,
-        "C++ & Rust",
-        "What's your system's language?",
+        0,
+        "Language",
+        "What is your favorite programming language?",
+        undefined,
+        "Please explain the differences between TypeScript and JavaScript",
       );
 
-      expect(result).toBe(
-        "[ELABORATE_REQUEST] Please elaborate on question 'C++ & Rust' (What's your system's language?) with more detailed options\n" +
-          "Question index: 1",
+      expect(result).toContain("[ELABORATE_REQUEST]");
+      expect(result).toContain(
+        'User guidance: "Please explain the differences between TypeScript and JavaScript"',
       );
+      // Should NOT include verbose guidance when user provides specific text
+      expect(result).not.toContain("Provide examples and larger context");
     });
 
-    it("should format elaborate request with special characters in prompt", () => {
+    it("should escape double quotes in user guidance", () => {
       const result = ResponseFormatter.formatElaborateRequest(
         0,
         "Config",
-        "Select your app's config (e.g., 'dev', 'test', 'prod')?",
+        "Select config",
+        undefined,
+        'What does "production" mode do?',
       );
 
-      expect(result).toBe(
-        "[ELABORATE_REQUEST] Please elaborate on question 'Config' (Select your app's config (e.g., 'dev', 'test', 'prod')?) with more detailed options\n" +
-          "Question index: 0",
+      expect(result).toContain(
+        'User guidance: "What does \\"production\\" mode do?"',
       );
     });
 
-    it("should format elaborate request with empty strings", () => {
-      const result = ResponseFormatter.formatElaborateRequest(0, "", "");
+    it("should handle both user note and user guidance", () => {
+      const result = ResponseFormatter.formatElaborateRequest(
+        0,
+        "Language",
+        "What is your favorite?",
+        "This is confusing",
+        "Need more examples",
+      );
 
-      expect(result).toBe(
-        "[ELABORATE_REQUEST] Please elaborate on question '' () with more detailed options\n" +
-          "Question index: 0",
+      expect(result).toContain("User note: This is confusing");
+      expect(result).toContain('User guidance: "Need more examples"');
+    });
+  });
+
+  describe("formatUserResponse - Elaboration Requests", () => {
+    it("should format elaboration request without Other: wrapper", () => {
+      const questions: Question[] = [
+        {
+          options: [{ label: "Option A" }, { label: "Option B" }],
+          prompt: "Select an option",
+          title: "Selection",
+        },
+      ];
+
+      const elaborateText =
+        "[ELABORATE_REQUEST] This means the user needs more info...";
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            customText: elaborateText,
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      // Should contain the elaborate request directly, not wrapped in "Other:"
+      expect(result).toContain(elaborateText);
+      expect(result).not.toContain("→ Other:");
+    });
+
+    it("should format rephrase request without Other: wrapper", () => {
+      const questions: Question[] = [
+        {
+          options: [{ label: "Option A" }, { label: "Option B" }],
+          prompt: "Select an option",
+          title: "Selection",
+        },
+      ];
+
+      const rephraseText =
+        "[REPHRASE_REQUEST] Please rephrase question 'Selection' in a different way";
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            customText: rephraseText,
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      // Should contain the rephrase request directly, not wrapped in "Other:"
+      expect(result).toContain(rephraseText);
+      expect(result).not.toContain("→ Other:");
+    });
+
+    it("should handle both regular answer and elaboration request for same question", () => {
+      const questions: Question[] = [
+        {
+          options: [
+            { label: "TypeScript", description: "Type-safe JavaScript" },
+            { label: "JavaScript", description: "Dynamic web language" },
+          ],
+          prompt: "What language do you prefer?",
+          title: "Language",
+        },
+      ];
+
+      const elaborateText =
+        "[ELABORATE_REQUEST] Need more details about the options";
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOption: "TypeScript",
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+          {
+            questionIndex: 0,
+            customText: elaborateText,
+            timestamp: "2025-01-01T00:00:01Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      // Should contain both the selected option AND the elaboration request
+      expect(result).toContain("→ TypeScript — Type-safe JavaScript");
+      expect(result).toContain(elaborateText);
+      expect(result).not.toContain("→ Other:");
+    });
+
+    it("should handle multi-select with no selections but has elaboration", () => {
+      const questions: Question[] = [
+        {
+          options: [{ label: "Feature A" }, { label: "Feature B" }],
+          prompt: "Select features",
+          title: "Features",
+          multiSelect: true,
+        },
+      ];
+
+      const elaborateText =
+        "[ELABORATE_REQUEST] Please explain what each feature does";
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            selectedOptions: [],
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+          {
+            questionIndex: 0,
+            customText: elaborateText,
+            timestamp: "2025-01-01T00:00:01Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      // Should NOT show "(No selection)" when there's an elaboration request
+      expect(result).not.toContain("(No selection)");
+      expect(result).toContain(elaborateText);
+    });
+
+    it("should still wrap regular custom text in Other:", () => {
+      const questions: Question[] = [
+        {
+          options: [{ label: "Option A" }],
+          prompt: "Select an option",
+          title: "Selection",
+        },
+      ];
+
+      const answers: SessionAnswer = {
+        answers: [
+          {
+            questionIndex: 0,
+            customText: "My custom answer that is not an elaborate request",
+            timestamp: "2025-01-01T00:00:00Z",
+          },
+        ],
+        sessionId: "test-123",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      const result = ResponseFormatter.formatUserResponse(answers, questions);
+
+      // Regular custom text should still be wrapped in "Other:"
+      expect(result).toContain(
+        "→ Other: 'My custom answer that is not an elaborate request'",
       );
     });
   });

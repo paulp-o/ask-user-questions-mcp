@@ -41,21 +41,25 @@ export class ResponseFormatter {
     // Start with header
     const lines: string[] = ["Here are the user's answers:", ""];
 
-    // Format each question and its answer
+    // Format each question and its answer(s)
+    // Note: A question can have multiple answers (e.g., regular answer + elaboration request)
     const formattedQuestions: string[] = [];
 
     for (let i = 0; i < questions.length; i++) {
       const question = questions[i];
-      const answer = answers.answers.find((a) => a.questionIndex === i);
+      // Get ALL answers for this question (there may be multiple, e.g., answer + elaboration)
+      const questionAnswers = answers.answers.filter(
+        (a) => a.questionIndex === i,
+      );
 
-      if (!answer) {
+      if (questionAnswers.length === 0) {
         // If no answer found for this question, skip it
         // (This shouldn't happen in normal operation, but handle gracefully)
         continue;
       }
 
-      // Format the question and answer
-      const formattedQA = this.formatQuestion(question, answer, i + 1);
+      // Format the question and all its answers
+      const formattedQA = this.formatQuestion(question, questionAnswers, i + 1);
       formattedQuestions.push(formattedQA);
     }
 
@@ -181,16 +185,16 @@ export class ResponseFormatter {
   }
 
   /**
-   * Format a single question and its answer
+   * Format a single question and its answer(s)
    *
    * @param question - The question data
-   * @param answer - The user's answer
+   * @param questionAnswers - The user's answer(s) for this question (may include elaboration request)
    * @param index - Question number (1-indexed for display)
    * @returns Formatted string for this question/answer pair
    */
   private static formatQuestion(
     question: Question,
-    answer: UserAnswer,
+    questionAnswers: UserAnswer[],
     index: number,
   ): string {
     const lines: string[] = [];
@@ -200,62 +204,78 @@ export class ResponseFormatter {
 
     // Track if any answer was provided
     let hasAnswer = false;
+    // Track if we have an elaboration request (to avoid showing "No selection" when elaborating)
+    let hasElaborationRequest = false;
 
-    // Format multi-select options (if present)
-    if (answer.selectedOptions && answer.selectedOptions.length > 0) {
-      hasAnswer = true;
-      for (const selectedLabel of answer.selectedOptions) {
+    // Process all answers for this question
+    for (const answer of questionAnswers) {
+      // Format multi-select options (if present)
+      if (answer.selectedOptions && answer.selectedOptions.length > 0) {
+        hasAnswer = true;
+        for (const selectedLabel of answer.selectedOptions) {
+          const option = question.options.find(
+            (opt) => opt.label === selectedLabel,
+          );
+          if (option) {
+            if (option.description) {
+              lines.push(`→ ${option.label} — ${option.description}`);
+            } else {
+              lines.push(`→ ${option.label}`);
+            }
+          }
+        }
+      }
+
+      // Format single-select option (if present and no multi-select)
+      if (answer.selectedOption && !answer.selectedOptions) {
+        hasAnswer = true;
         const option = question.options.find(
-          (opt) => opt.label === selectedLabel,
+          (opt) => opt.label === answer.selectedOption,
         );
+
         if (option) {
+          // Format with description if available
           if (option.description) {
             lines.push(`→ ${option.label} — ${option.description}`);
           } else {
             lines.push(`→ ${option.label}`);
           }
-        }
-      }
-    } else if (
-      answer.selectedOptions &&
-      answer.selectedOptions.length === 0 &&
-      !answer.customText
-    ) {
-      // Multi-select with no selections and no custom text
-      hasAnswer = true;
-      lines.push("→ (No selection)");
-    }
-
-    // Format single-select option (if present and no multi-select)
-    if (answer.selectedOption && !answer.selectedOptions) {
-      hasAnswer = true;
-      const option = question.options.find(
-        (opt) => opt.label === answer.selectedOption,
-      );
-
-      if (option) {
-        // Format with description if available
-        if (option.description) {
-          lines.push(`→ ${option.label} — ${option.description}`);
         } else {
-          lines.push(`→ ${option.label}`);
+          // Option not found - shouldn't happen, but handle gracefully
+          lines.push(`→ ${answer.selectedOption}`);
         }
-      } else {
-        // Option not found - shouldn't happen, but handle gracefully
-        lines.push(`→ ${answer.selectedOption}`);
+      }
+
+      // Format custom text (if present) - can coexist with selectedOptions in multi-select
+      if (answer.customText) {
+        hasAnswer = true;
+        // Check if this is a special request (elaboration or rephrase)
+        if (
+          answer.customText.startsWith("[ELABORATE_REQUEST]") ||
+          answer.customText.startsWith("[REPHRASE_REQUEST]")
+        ) {
+          // Format as special marker without "Other:" prefix
+          hasElaborationRequest = true;
+          lines.push(answer.customText);
+        } else {
+          // Format as regular custom text
+          const escapedText = answer.customText.replace(/'/g, "\\'");
+          lines.push(`→ Other: '${escapedText}'`);
+        }
       }
     }
 
-    // Format custom text (if present) - can coexist with selectedOptions in multi-select
-    if (answer.customText) {
-      hasAnswer = true;
-      const escapedText = answer.customText.replace(/'/g, "\\'");
-      lines.push(`→ Other: '${escapedText}'`);
-    }
-
-    // If no answer at all
-    if (!hasAnswer) {
-      lines.push("→ No answer provided");
+    // Handle multi-select with no selections (but NOT if there's an elaboration request)
+    if (!hasAnswer && !hasElaborationRequest) {
+      // Check if any answer has empty selectedOptions array
+      const hasEmptyMultiSelect = questionAnswers.some(
+        (a) => a.selectedOptions && a.selectedOptions.length === 0,
+      );
+      if (hasEmptyMultiSelect) {
+        lines.push("→ (No selection)");
+      } else {
+        lines.push("→ No answer provided");
+      }
     }
 
     return lines.join("\n");
