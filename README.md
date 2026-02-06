@@ -61,6 +61,7 @@ First, install the **AUQ CLI**:
 # Install globally
 bun add -g auq-mcp-server
 ```
+This serves as the 'answering interface' for you, the human.
 
 _**Note:** Other package managers (npm, pnpm..) also work but not recommended._
 
