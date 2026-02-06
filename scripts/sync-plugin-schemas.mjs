@@ -30,8 +30,10 @@ const sourceContent = readFileSync(SOURCE_FILE, "utf-8");
 const schemaContent = sourceContent
   // Remove the zod import - plugin uses tool.schema
   .replace(/import \{ z \} from "zod";\n?/, "")
-  // Remove export keywords (will re-export what we need)
+  // Remove export keywords from const (will re-export what we need)
   .replace(/export const /g, "const ")
+  // Remove export keywords from functions (internal use only, avoids TS2742 portability issues)
+  .replace(/export function /g, "function ")
   // Remove the type export at the end
   .replace(/export type QuestionInput[^;]+;/, "");
 

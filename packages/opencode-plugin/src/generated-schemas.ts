@@ -4,7 +4,7 @@
  * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
  * Run "npm run sync-plugin-schemas" to regenerate.
  * 
- * Generated at: 2026-02-05T07:23:17.782Z
+ * Generated at: 2026-02-06T03:15:53.856Z
  */
 
 import { tool } from "@opencode-ai/plugin/tool";
@@ -52,7 +52,7 @@ const OptionSchema = z.object({
  * Create a QuestionSchema with configurable option limits
  * @param maxOptions - Maximum number of options allowed (default: 4, max: 10)
  */
-export function createQuestionSchema(
+function createQuestionSchema(
   maxOptions: number = DEFAULT_LIMITS.maxOptions,
 ) {
   // Clamp to valid range
@@ -103,7 +103,7 @@ export function createQuestionSchema(
  * @param maxQuestions - Maximum number of questions allowed (default: 4, max: 10)
  * @param maxOptions - Maximum number of options per question (default: 4, max: 10)
  */
-export function createQuestionsSchema(
+function createQuestionsSchema(
   maxQuestions: number = DEFAULT_LIMITS.maxQuestions,
   maxOptions: number = DEFAULT_LIMITS.maxOptions,
 ) {
@@ -124,7 +124,7 @@ export function createQuestionsSchema(
  * @param maxQuestions - Maximum number of questions (default: 4, max: 10)
  * @param maxOptions - Maximum number of options per question (default: 4, max: 10)
  */
-export function createAskUserQuestionsParametersSchema(
+function createAskUserQuestionsParametersSchema(
   maxQuestions: number = DEFAULT_LIMITS.maxQuestions,
   maxOptions: number = DEFAULT_LIMITS.maxOptions,
 ) {
