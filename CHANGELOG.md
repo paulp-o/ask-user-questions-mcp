@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.0.0...v2.0.1) (2026-02-06)
+
+### Bug Fixes
+
+* configure semantic-release to use maintainer identity ([25d9fb9](https://github.com/paulp-o/ask-user-questions-mcp/commit/25d9fb9428e10f7eed7eb11e256770b0d417d5a5))
+
 ## [2.0.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v1.6.0...v2.0.0) (2026-02-06)
 
 ### ⚠ BREAKING CHANGES
