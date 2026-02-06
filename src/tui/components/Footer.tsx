@@ -86,8 +86,10 @@ export const Footer: React.FC<FooterProps> = ({
 
       if (multiSelect) {
         bindings.push({ key: "Space", action: t("footer.toggle") });
+        bindings.push({ key: "Enter", action: t("footer.next") });
       } else {
-        bindings.push({ key: "Enter", action: t("footer.select") });
+        bindings.push({ key: "Space", action: t("footer.select") });
+        bindings.push({ key: "Enter", action: t("footer.selectNext") });
       }
 
       if (hasRecommendedOptions) {

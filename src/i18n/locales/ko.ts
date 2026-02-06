@@ -3,6 +3,7 @@ export const ko = {
     options: "옵션",
     questions: "질문",
     select: "선택",
+    selectNext: "선택 후 다음",
     toggle: "토글",
     elaborate: "설명 요청",
     recommended: "추천",

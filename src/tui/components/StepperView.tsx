@@ -172,9 +172,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
   };
 
-  // Track which questions have been visited (for auto-select logic)
-  const visitedQuestionsRef = useRef<Set<number>>(new Set());
-
   // Track mount status to avoid state updates after unmount
   const isMountedRef = useRef(true);
   useEffect(() => {
@@ -194,75 +191,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setElapsedSeconds(0);
     setElaborateMarks(new Map());
 
-    // Reset visited questions tracking for new session
-    visitedQuestionsRef.current = new Set();
-
     // Compute session-level recommended flag: true if ANY question has recommended options
     const anyHasRecommended = sessionRequest.questions.some((question) =>
       question.options.some((opt) => isRecommendedOption(opt.label)),
     );
     setHasAnyRecommendedInSession(anyHasRecommended);
   }, [sessionId, sessionRequest.questions]);
-
-  // Auto-select recommended options on first visit to each question
-  useEffect(() => {
-    // Only run when currentQuestionIndex changes
-    // Check if question was already visited
-    if (visitedQuestionsRef.current.has(currentQuestionIndex)) return;
-
-    // Mark as visited
-    visitedQuestionsRef.current.add(currentQuestionIndex);
-
-    // Check if autoSelectRecommended is enabled
-    if (!config.autoSelectRecommended) return;
-
-    // Check if question is truly unanswered
-    const existing = answers.get(currentQuestionIndex);
-    if (
-      existing?.selectedOption ||
-      existing?.selectedOptions?.length ||
-      existing?.customText
-    ) {
-      return;
-    }
-
-    // Get current question
-    const question = sessionRequest.questions[currentQuestionIndex];
-    if (!question) return;
-
-    // Find recommended options
-    const recommendedOptions = question.options.filter((opt) =>
-      isRecommendedOption(opt.label),
-    );
-
-    if (recommendedOptions.length === 0) return;
-
-    // Auto-select recommended options
-    if (question.multiSelect) {
-      // Multi-select: select all recommended
-      setAnswers((prev) => {
-        const newAnswers = new Map(prev);
-        newAnswers.set(currentQuestionIndex, {
-          selectedOptions: recommendedOptions.map((opt) => opt.label),
-        });
-        return newAnswers;
-      });
-    } else {
-      // Single-select: select first recommended
-      setAnswers((prev) => {
-        const newAnswers = new Map(prev);
-        newAnswers.set(currentQuestionIndex, {
-          selectedOption: recommendedOptions[0].label,
-        });
-        return newAnswers;
-      });
-    }
-  }, [
-    currentQuestionIndex,
-    config.autoSelectRecommended,
-    sessionRequest.questions,
-    answers,
-  ]);
 
   // Update elapsed time since session creation
   useEffect(() => {
@@ -621,6 +555,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onFocusContextChange={setFocusContext}
       workingDirectory={sessionRequest.workingDirectory}
       onRecommendedDetected={setHasRecommendedOptions}
+      hasRecommendedOptions={hasRecommendedOptions}
       hasAnyRecommendedInSession={hasAnyRecommendedInSession}
       elaborateMarks={elaborateMarks}
       onElaborateSelect={handleElaborateSelect}

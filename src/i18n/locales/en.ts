@@ -3,6 +3,7 @@ export const en = {
     options: "Options",
     questions: "Questions",
     select: "Select",
+    selectNext: "Select & Next",
     toggle: "Toggle",
     elaborate: "Request Elaboration",
     recommended: "Recommended",

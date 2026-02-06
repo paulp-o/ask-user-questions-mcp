@@ -243,9 +243,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 color={theme.components.options.description}
                 dimColor={!isFocusedOption && !isSelected}
               >
-                {isFocusedOption
-                  ? `   ${option.description}`
-                  : fitRow(`   ${option.description}`)}
+                {fitRow(`   ${option.description}`)}
               </Text>
             )}
           </Box>

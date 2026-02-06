@@ -219,11 +219,14 @@ It is recommended to **disable** the built-in questioning tool in your harness (
 
 ### Useful Keyboard Shortcuts
 
-| Key      | Action       | Description                                                        |
-| -------- | ------------ | ------------------------------------------------------------------ |
-| `Esc`    | Reject       | Reject the whole question set and optionally explain why to the AI |
-| `Ctrl+R` | Quick Submit | Auto-select recommended options for all questions and go to review |
-| `Ctrl+T` | Theme        | Cycle through available color themes                               |
+| Key      | Action        | Description                                                        |
+| -------- | ------------- | ------------------------------------------------------------------ |
+| `Space`  | Select        | Select/toggle option without advancing                             |
+| `Enter`  | Select & Next | Select option and advance to next question                         |
+| `R`      | Recommended   | Select recommended option(s) for current question                  |
+| `Ctrl+R` | Quick Submit  | Auto-select recommended options for all questions and go to review |
+| `Esc`    | Reject        | Reject the whole question set and optionally explain why to the AI |
+| `Ctrl+T` | Theme         | Cycle through available color themes                               |
 
 <details>
 <summary><strong>More Commands (advanced)</strong></summary>
@@ -547,8 +550,11 @@ You're an AI power user, running multiple agents on multiple instances. Highly p
 
 | Shortcut | What it does                                       |
 | -------- | -------------------------------------------------- |
-| `Esc`    | Reject question set — optionally explain why       |
+| `Space`  | Select option without advancing                    |
+| `Enter`  | Select option and advance to next question         |
+| `R`      | Select recommended option(s) for current question  |
 | `Ctrl+R` | Quick submit — auto-fill recommended, go to review |
+| `Esc`    | Reject question set — optionally explain why       |
 | `Ctrl+T` | Cycle through 16 themes                            |
 
 </details>
