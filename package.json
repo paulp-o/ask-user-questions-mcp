@@ -190,7 +190,9 @@
             "package.json",
             "CHANGELOG.md"
           ],
-          "message": "chore(release): ${nextRelease.version} [skip ci]"
+          "message": "chore(release): ${nextRelease.version} [skip ci]",
+          "authorName": "Paul Park",
+          "authorEmail": "2000mageia@gmail.com"
         }
       ]
     ]
