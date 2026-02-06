@@ -1,4 +1,4 @@
-![AUQ Demo](media/demo.png)
+![AUQ Demo](media/demo2.png)
 
 # AUQ - Ask User Questions
 
@@ -33,7 +33,7 @@ This lets you inject your **intent** into long-running autonomous AI tasks—no 
 
 In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been widely recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code [1].
 
-On October 18th, Claude Code 2.0.21 introduced an internal `ask-user-question` tool. Inspired by it, I decided to build a similar tool that is:
+On October 18th, Claude Code 2.0.21 introduced an internal `AskUserQuestion` tool. Inspired by it, I decided to build a similar tool that is:
 
 - **Integration-flexible** - Works with MCP clients (Claude Desktop, Cursor, etc.) and has official OpenCode plugin support
 - **Non-invasive** - Doesn't heavily integrate with your coding CLI workflow or occupy UI space
