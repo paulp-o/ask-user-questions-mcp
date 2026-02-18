@@ -1,3 +1,10 @@
+## [2.1.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.0.1...v2.1.0) (2026-02-18)
+
+### Features
+
+* add markdown rendering to question prompts ([1471844](https://github.com/paulp-o/ask-user-questions-mcp/commit/1471844f24755603635daf329468a7f4d2c4baea))
+* implement markdown rendering with ink-markdown-es, add tests, archive spec ([eacbc30](https://github.com/paulp-o/ask-user-questions-mcp/commit/eacbc30555e1939d4b25632df86cc21e0d94e711))
+
 ## [2.0.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.0.0...v2.0.1) (2026-02-06)
 
 ### Bug Fixes
