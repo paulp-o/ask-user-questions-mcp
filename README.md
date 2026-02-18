@@ -61,6 +61,7 @@ First, install the **AUQ CLI**:
 # Install globally
 bun add -g auq-mcp-server
 ```
+
 This serves as the 'answering interface' for you, the human.
 
 _**Note:** Other package managers (npm, pnpm..) also work but not recommended._
@@ -210,6 +211,17 @@ Whenever you need clarification on what you are working on, never guess, and cal
 ```
 
 When the AI asks questions, you'll see them appear in the AUQ TUI. Answer them **at your convenience**.
+
+### Markdown rendering in question prompts
+
+Question prompts now support **Markdown formatting** in the `prompt` text.
+
+- Supported: **bold**, _italic_, ~~strikethrough~~, `inline code`, links, and fenced code blocks (with syntax highlighting)
+- Links render as `text (url)` for broad terminal compatibility
+- Code blocks use theme-aware colors (background/text/border)
+- Always enabled (no configuration needed)
+- Plain text prompts pass through unchanged
+- Graceful fallback: if Markdown parsing fails, the raw text is shown
 
 > _Note: AUQ is an unopinionated tool and doesn't include prompts on **HOW** AI should leverage it. It is expected that you do your own prompt engineering to make the most out of it in your own workflows._
 > _I personally enjoy prompting it to ask at least 30 questions repeatedly before action!_

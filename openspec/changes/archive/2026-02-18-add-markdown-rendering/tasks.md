@@ -9,7 +9,6 @@
 - [x] 1.5 Integrate `MarkdownPrompt` into `QuestionDisplay.tsx` (replace plain `<Text>` prompt rendering)
 - [x] 1.6 Integrate `MarkdownPrompt` into `ReviewScreen.tsx` for consistent prompt rendering
 - [x] 1.7 Add error handling / fallback path to render plain text on Markdown parse/render failure (no user-visible error)
-- [ ] 1.8 Write unit tests using Vitest + ink-testing-library for common Markdown cases and fallback behavior
-- [ ] 1.9 Manually test with various Markdown inputs (inline styles, links, fenced blocks, long lines, mixed content)
-- [ ] 1.10 Update any relevant documentation to reflect Markdown support in question prompts
-
+- [x] 1.8 Write unit tests using Vitest + ink-testing-library for common Markdown cases and fallback behavior
+- [x] 1.9 Manually test with various Markdown inputs (inline styles, links, fenced blocks, long lines, mixed content)
+- [x] 1.10 Update any relevant documentation to reflect Markdown support in question prompts
