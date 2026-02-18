@@ -101,5 +101,10 @@ export const tokyoNightTheme: Theme = {
       info: "#7aa2f7",
       border: "#24283b",
     },
+    markdown: {
+      codeBlockBg: "#1a1b26",
+      codeBlockText: "#c0caf5",
+      codeBlockBorder: "#24283b",
+    },
   },
 } as const;

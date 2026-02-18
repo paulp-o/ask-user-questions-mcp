@@ -101,5 +101,10 @@ export const lightTheme: Theme = {
       info: "#007EA7",
       border: "#D0D7DE",
     },
+    markdown: {
+      codeBlockBg: "#F6F8FA",
+      codeBlockText: "#24292F",
+      codeBlockBorder: "#D0D7DE",
+    },
   },
 } as const;

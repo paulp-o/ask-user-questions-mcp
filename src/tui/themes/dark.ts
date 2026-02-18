@@ -102,5 +102,10 @@ export const darkTheme: Theme = {
       info: "#46D9FF",
       border: "#2A3238",
     },
+    markdown: {
+      codeBlockBg: "#0F1419",
+      codeBlockText: "#E7EEF5",
+      codeBlockBorder: "#2A3238",
+    },
   },
 } as const;

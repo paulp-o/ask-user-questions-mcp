@@ -101,5 +101,10 @@ export const solarizedLightTheme: Theme = {
       info: "#268bd2",
       border: "#eee8d5",
     },
+    markdown: {
+      codeBlockBg: "#fdf6e3",
+      codeBlockText: "#657b83",
+      codeBlockBorder: "#eee8d5",
+    },
   },
 } as const;

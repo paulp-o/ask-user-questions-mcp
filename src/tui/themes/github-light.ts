@@ -100,5 +100,10 @@ export const githubLightTheme: Theme = {
       info: "#0969DA",
       border: "#D0D7DE",
     },
+    markdown: {
+      codeBlockBg: "#f6f8fa",
+      codeBlockText: "#24292F",
+      codeBlockBorder: "#D0D7DE",
+    },
   },
 } as const;

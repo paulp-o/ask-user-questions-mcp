@@ -5,6 +5,7 @@ import { t } from "../../i18n/index.js";
 import type { Question, UserAnswer } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
 import { Footer } from "./Footer.js";
+import { MarkdownPrompt } from "./MarkdownPrompt.js";
 
 interface ReviewScreenProps {
   answers: Map<
@@ -90,13 +91,16 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
           return (
             <Box flexDirection="column" key={index} marginBottom={1}>
               {/* Question ID, title and prompt */}
-              <Box>
-                <Text color={theme.components.review.questionId}>
-                  [{questionId}]{" "}
-                </Text>
-                <Text bold>
-                  {questionTitle}. {question.prompt}
-                </Text>
+              <Box flexDirection="column">
+                <Box>
+                  <Text color={theme.components.review.questionId}>
+                    [{questionId}]{" "}
+                  </Text>
+                  <Text bold>
+                    {questionTitle}.{" "}
+                  </Text>
+                </Box>
+                <MarkdownPrompt text={question.prompt} />
               </Box>
 
               {/* Answer */}

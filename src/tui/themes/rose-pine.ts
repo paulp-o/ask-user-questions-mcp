@@ -102,5 +102,10 @@ export const rosePineTheme: Theme = {
       info: "#9ccfd8",
       border: "#26233a",
     },
+    markdown: {
+      codeBlockBg: "#191724",
+      codeBlockText: "#e0def4",
+      codeBlockBorder: "#26233a",
+    },
   },
 } as const;

@@ -101,5 +101,10 @@ export const gruvboxDarkTheme: Theme = {
       info: "#458588",
       border: "#3c3836",
     },
+    markdown: {
+      codeBlockBg: "#282828",
+      codeBlockText: "#ebdbb2",
+      codeBlockBorder: "#3c3836",
+    },
   },
 } as const;

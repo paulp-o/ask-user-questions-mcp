@@ -101,5 +101,10 @@ export const nordTheme: Theme = {
       info: "#88c0d0", // nord8
       border: "#3b4252", // nord1
     },
+    markdown: {
+      codeBlockBg: "#2e3440",
+      codeBlockText: "#eceff4",
+      codeBlockBorder: "#3b4252",
+    },
   },
 } as const;

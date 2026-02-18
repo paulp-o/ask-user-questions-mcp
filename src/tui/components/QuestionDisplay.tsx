@@ -6,6 +6,7 @@ import type { Question } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
 
 import { Footer } from "./Footer.js";
+import { MarkdownPrompt } from "./MarkdownPrompt.js";
 import { OptionsList } from "./OptionsList.js";
 import { TabBar } from "./TabBar.js";
 
@@ -121,21 +122,23 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       />
 
       {/* Question prompt and type indicator */}
-      <Box>
-        <Text>
-          <Text bold> {currentQuestion.prompt} </Text>
+      <Box flexDirection="column">
+        <Box>
+          <MarkdownPrompt text={currentQuestion.prompt} />
           <Text color={theme.components.questionDisplay.typeIndicator}>
+            {" "}
             [
             {multiSelect
               ? t("question.multipleChoice")
               : t("question.singleChoice")}
             ]
           </Text>
-          <Text> </Text>
+        </Box>
+        <Box>
           <Text color={theme.components.questionDisplay.elapsed} dimColor>
             {elapsedLabel}
           </Text>
-        </Text>
+        </Box>
       </Box>
 
       {/* Options list with integrated custom input and elaborate option */}

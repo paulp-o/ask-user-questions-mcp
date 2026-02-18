@@ -101,5 +101,10 @@ export const oneDarkTheme: Theme = {
       info: "#61afef",
       border: "#3e4451",
     },
+    markdown: {
+      codeBlockBg: "#21252b",
+      codeBlockText: "#abb2bf",
+      codeBlockBorder: "#3e4451",
+    },
   },
 } as const;

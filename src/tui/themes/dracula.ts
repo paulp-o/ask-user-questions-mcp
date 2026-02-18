@@ -101,5 +101,10 @@ export const draculaTheme: Theme = {
       info: "#bd93f9",
       border: "#44475a",
     },
+    markdown: {
+      codeBlockBg: "#282a36",
+      codeBlockText: "#f8f8f2",
+      codeBlockBorder: "#44475a",
+    },
   },
 } as const;

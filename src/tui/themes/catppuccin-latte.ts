@@ -101,5 +101,10 @@ export const catppuccinLatteTheme: Theme = {
       info: "#1e66f5",
       border: "#ccd0da",
     },
+    markdown: {
+      codeBlockBg: "#eff1f5",
+      codeBlockText: "#4c4f69",
+      codeBlockBorder: "#ccd0da",
+    },
   },
 } as const;

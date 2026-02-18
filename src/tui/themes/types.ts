@@ -110,5 +110,10 @@ export interface Theme {
       info: string;
       border: string;
     };
+    markdown: {
+      codeBlockBg: string;
+      codeBlockText: string;
+      codeBlockBorder: string;
+    };
   };
 }

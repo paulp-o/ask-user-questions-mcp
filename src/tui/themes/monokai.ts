@@ -102,5 +102,10 @@ export const monokaiTheme: Theme = {
       info: "#66D9EF",
       border: "#49483E",
     },
+    markdown: {
+      codeBlockBg: "#272822",
+      codeBlockText: "#F8F8F2",
+      codeBlockBorder: "#49483E",
+    },
   },
 } as const;

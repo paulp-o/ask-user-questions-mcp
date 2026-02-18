@@ -101,5 +101,10 @@ export const catppuccinMochaTheme: Theme = {
       info: "#89b4fa",
       border: "#313244",
     },
+    markdown: {
+      codeBlockBg: "#1e1e2e",
+      codeBlockText: "#cdd6f4",
+      codeBlockBorder: "#313244",
+    },
   },
 } as const;

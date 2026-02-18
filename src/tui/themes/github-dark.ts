@@ -100,5 +100,10 @@ export const githubDarkTheme: Theme = {
       info: "#58a6ff",
       border: "#30363d",
     },
+    markdown: {
+      codeBlockBg: "#0d1117",
+      codeBlockText: "#c9d1d9",
+      codeBlockBorder: "#30363d",
+    },
   },
 } as const;
