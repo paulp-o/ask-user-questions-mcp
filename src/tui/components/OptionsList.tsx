@@ -7,7 +7,11 @@ import { t } from "../../i18n/index.js";
 import { useConfig } from "../ConfigContext.js";
 import { useTheme } from "../ThemeContext.js";
 import { isRecommendedOption } from "../utils/recommended.js";
-import { fitToVisualWidth } from "../utils/visualWidth.js";
+import {
+  fitToVisualWidth,
+  getVisualWidth,
+  padToVisualWidth,
+} from "../utils/visualWidth.js";
 import { MultiLineTextInput } from "./MultiLineTextInput.js";
 
 interface OptionsListProps {
@@ -82,6 +86,35 @@ export const OptionsList: React.FC<OptionsListProps> = ({
 
   const fitRow = (text: string) => {
     return fitToVisualWidth(text, rowWidth);
+  };
+
+  // Wrap text to multiple lines respecting visual width and explicit newlines
+  const wrapText = (text: string, width: number): string[] => {
+    // First split on explicit newlines, then wrap each segment by visual width
+    const segments = text.split("\n");
+    const lines: string[] = [];
+
+    for (const segment of segments) {
+      if (getVisualWidth(segment) <= width) {
+        lines.push(segment);
+        continue;
+      }
+      let currentLine = "";
+      let currentWidth = 0;
+      for (const char of segment) {
+        const charWidth = getVisualWidth(char);
+        if (currentWidth + charWidth > width && currentLine.length > 0) {
+          lines.push(currentLine);
+          currentLine = char;
+          currentWidth = charWidth;
+        } else {
+          currentLine += char;
+          currentWidth += charWidth;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+    }
+    return lines;
   };
 
   // Calculate max index: include custom input and elaborate options if enabled
@@ -231,21 +264,70 @@ export const OptionsList: React.FC<OptionsListProps> = ({
             >
               {fitRow(mainLine)}
             </Text>
-            {option.description && (
-              <Text
-                backgroundColor={
-                  isFocusedOption
-                    ? theme.components.options.focusedBg
-                    : isSelected
-                      ? theme.components.options.selectedBg
-                      : undefined
+            {option.description &&
+              (() => {
+                const descText = `   ${option.description}`;
+                const descBg = isFocusedOption
+                  ? theme.components.options.focusedBg
+                  : isSelected
+                    ? theme.components.options.selectedBg
+                    : undefined;
+                const wouldWrap =
+                  descText.includes("\n") ||
+                  getVisualWidth(descText) > rowWidth;
+
+                if (isFocusedOption && wouldWrap) {
+                  // Focused + multi-line: show full description wrapped across lines
+                  const wrappedLines = wrapText(descText, rowWidth);
+                  return (
+                    <Box flexDirection="column">
+                      {wrappedLines.map((line, lineIdx) => (
+                        <Text
+                          key={lineIdx}
+                          backgroundColor={descBg}
+                          color={theme.components.options.description}
+                          dimColor={false}
+                        >
+                          {padToVisualWidth(line, rowWidth)}
+                        </Text>
+                      ))}
+                    </Box>
+                  );
+                } else if (!isFocusedOption && wouldWrap) {
+                  // Not focused + would wrap: truncate to 1 line with "..."
+                  const maxWidth = rowWidth - 3; // Reserve 3 chars for "..."
+                  let result = "";
+                  let width = 0;
+                  for (const char of descText) {
+                    const charWidth = getVisualWidth(char);
+                    if (width + charWidth > maxWidth) break;
+                    result += char;
+                    width += charWidth;
+                  }
+                  const finalText = `${result}...`;
+
+                  return (
+                    <Text
+                      backgroundColor={descBg}
+                      color={theme.components.options.description}
+                      dimColor={true}
+                    >
+                      {padToVisualWidth(finalText, rowWidth)}
+                    </Text>
+                  );
+                } else {
+                  // Fits in 1 line (focused or not): show normally with padding
+                  return (
+                    <Text
+                      backgroundColor={descBg}
+                      color={theme.components.options.description}
+                      dimColor={!isFocusedOption && !isSelected}
+                    >
+                      {fitRow(descText)}
+                    </Text>
+                  );
                 }
-                color={theme.components.options.description}
-                dimColor={!isFocusedOption && !isSelected}
-              >
-                {fitRow(`   ${option.description}`)}
-              </Text>
-            )}
+              })()}
           </Box>
         );
       })}

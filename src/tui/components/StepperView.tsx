@@ -1,4 +1,4 @@
-import { Box, Text, useApp, useInput } from "ink";
+import { Box, Text, useApp, useInput, useStdout } from "ink";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import type { SessionRequest, UserAnswer } from "../../session/types.js";
@@ -77,6 +77,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
       .map((value) => value.toString().padStart(2, "0"))
       .join(":");
   }, [elapsedSeconds]);
+
+  // Detect if content overflows terminal height to pause periodic re-renders
+  const { stdout } = useStdout();
+  const terminalRows = stdout?.rows ?? 24;
+  const [isOverflowing, setIsOverflowing] = useState(false);
 
   // Report progress when question index changes
   useEffect(() => {
@@ -199,14 +204,28 @@ export const StepperView: React.FC<StepperViewProps> = ({
   }, [sessionId, sessionRequest.questions]);
 
   // Update elapsed time since session creation
+  // IMPORTANT: Pause when content overflows terminal to prevent scroll-snapping
   useEffect(() => {
+    if (isOverflowing) return;
+
     const timer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - sessionCreatedAt) / 1000);
       setElapsedSeconds(elapsed >= 0 ? elapsed : 0);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [sessionCreatedAt]);
+  }, [sessionCreatedAt, isOverflowing]);
+
+  // Detect overflow: estimate content height vs terminal rows
+  useEffect(() => {
+    const currentQ = sessionRequest.questions[safeIndex];
+    const optionCount = currentQ?.options?.length ?? 0;
+    // Conservative estimate: header(2) + tabbar(3) + prompt(3) + options(2 each)
+    // + footer(2) + custom/elaborate(6) + padding(2)
+    const estimatedContentHeight = 2 + 3 + 3 + optionCount * 2 + 2 + 6 + 2;
+    const nextOverflow = estimatedContentHeight > terminalRows;
+    setIsOverflowing((prev) => (prev === nextOverflow ? prev : nextOverflow));
+  }, [safeIndex, sessionRequest.questions, terminalRows]);
 
   // Handle answer confirmation
   const handleConfirm = async (userAnswers: UserAnswer[]) => {
