@@ -1,3 +1,9 @@
+## [2.1.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.1.0...v2.1.1) (2026-02-18)
+
+### Bug Fixes
+
+* prevent auto-scroll on terminal overflow and show full description on focused option ([2f857f8](https://github.com/paulp-o/ask-user-questions-mcp/commit/2f857f818725b61121d262b140d0bd36885ea5fc))
+
 ## [2.1.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.0.1...v2.1.0) (2026-02-18)
 
 ### Features
