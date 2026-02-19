@@ -1,3 +1,9 @@
+## [2.2.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.1...v2.2.2) (2026-02-19)
+
+### Bug Fixes
+
+* prevent shortcut keys from firing in text input and reset cursor on question switch ([10fd4b8](https://github.com/paulp-o/ask-user-questions-mcp/commit/10fd4b8702ace87517b531d918d525cb4ce23598))
+
 ## [2.2.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.0...v2.2.1) (2026-02-19)
 
 ### Bug Fixes
