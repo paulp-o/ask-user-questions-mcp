@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.0...v2.2.1) (2026-02-19)
+
+### Bug Fixes
+
+* resolve timer flicker and arrow key navigation bugs in StepperView ([5f5001e](https://github.com/paulp-o/ask-user-questions-mcp/commit/5f5001e50026f995602523e544794963de104bf0))
+
 ## [2.2.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.1.1...v2.2.0) (2026-02-19)
 
 ### Features
