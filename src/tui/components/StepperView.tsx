@@ -87,6 +87,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const { stdout } = useStdout();
   const terminalRows = stdout?.rows ?? 24;
   const [isOverflowing, setIsOverflowing] = useState(false);
+  const isOverflowingRef = useRef(isOverflowing);
+  isOverflowingRef.current = isOverflowing;
 
   // Report progress when question index changes
   useEffect(() => {
@@ -272,15 +274,14 @@ export const StepperView: React.FC<StepperViewProps> = ({
   // Update elapsed time since session creation
   // IMPORTANT: Pause when content overflows terminal to prevent scroll-snapping
   useEffect(() => {
-    if (isOverflowing) return;
-
     const timer = setInterval(() => {
+      if (isOverflowingRef.current) return;
       const elapsed = Math.floor((Date.now() - sessionCreatedAt) / 1000);
       setElapsedSeconds(elapsed >= 0 ? elapsed : 0);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [sessionCreatedAt, isOverflowing]);
+  }, [sessionCreatedAt]);
 
   // Detect overflow: estimate content height vs terminal rows
   useEffect(() => {
@@ -508,13 +509,15 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
+    // Derive text-input state from both focusContext and focusedOptionIndex
+    // focusContext may lag by one render cycle (set via useEffect in OptionsList)
+    // focusedOptionIndex is set directly and always up-to-date
+    const isInTextInput =
+      focusContext !== "option" ||
+      focusedOptionIndex >= currentQuestion.options.length;
+
     // Tab/Shift+Tab: Global question navigation
-    // Skip when in custom-input or elaborate-input mode - MultiLineTextInput handles Tab via onSubmit
-    if (
-      key.tab &&
-      focusContext !== "custom-input" &&
-      focusContext !== "elaborate-input"
-    ) {
+    if (key.tab && !isInTextInput) {
       if (key.shift) {
         setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
       } else {
@@ -525,13 +528,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
       return;
     }
 
-    const shouldNavigate =
-      focusContext !== "custom-input" && focusContext !== "elaborate-input";
-    if (shouldNavigate && key.leftArrow && currentQuestionIndex > 0) {
+    // Left/Right arrow: question navigation (only when NOT in text input)
+    if (!isInTextInput && key.leftArrow && currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
     if (
-      shouldNavigate &&
+      !isInTextInput &&
       key.rightArrow &&
       currentQuestionIndex < sessionRequest.questions.length - 1
     ) {
