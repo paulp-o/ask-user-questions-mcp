@@ -107,6 +107,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
     onProgress,
   ]);
 
+  // Reset focused option to first when switching between questions
+  useEffect(() => {
+    setFocusedOptionIndex(0);
+  }, [currentQuestionIndex]);
+
   // Handle option selection (single-select mode)
   const handleSelectOption = (label: string) => {
     setAnswers((prev) => {
@@ -424,6 +429,13 @@ export const StepperView: React.FC<StepperViewProps> = ({
     // Don't handle navigation when showing review, submitting, or confirming rejection
     if (showReview || submitting || showRejectionConfirm) return;
 
+    // Derive text-input state from both focusContext and focusedOptionIndex
+    // focusContext may lag by one render cycle (set via useEffect in OptionsList)
+    // focusedOptionIndex is set directly and always up-to-date
+    const isInTextInput =
+      focusContext !== "option" ||
+      focusedOptionIndex >= currentQuestion.options.length;
+
     // Esc key - show rejection confirmation
     if (key.escape) {
       setShowRejectionConfirm(true);
@@ -435,7 +447,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       input.toLowerCase() === "r" &&
       key.ctrl &&
       hasAnyRecommendedInSession &&
-      focusContext === "option"
+      !isInTextInput
     ) {
       // Auto-fill all unanswered questions with recommended options
       const newAnswers = new Map(answers);
@@ -482,7 +494,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     if (
       input.toLowerCase() === "r" &&
       !key.ctrl &&
-      focusContext === "option" &&
+      !isInTextInput &&
       hasRecommendedOptions
     ) {
       const question = currentQuestion;
@@ -508,13 +520,6 @@ export const StepperView: React.FC<StepperViewProps> = ({
       }
       return;
     }
-
-    // Derive text-input state from both focusContext and focusedOptionIndex
-    // focusContext may lag by one render cycle (set via useEffect in OptionsList)
-    // focusedOptionIndex is set directly and always up-to-date
-    const isInTextInput =
-      focusContext !== "option" ||
-      focusedOptionIndex >= currentQuestion.options.length;
 
     // Tab/Shift+Tab: Global question navigation
     if (key.tab && !isInTextInput) {
