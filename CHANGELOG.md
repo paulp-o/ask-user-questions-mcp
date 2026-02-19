@@ -1,3 +1,9 @@
+## [2.2.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.1.1...v2.2.0) (2026-02-19)
+
+### Features
+
+* add queued session switching with state preservation ([40fb49d](https://github.com/paulp-o/ask-user-questions-mcp/commit/40fb49d80a6ebcf11401afb2d9b822e01857be9d))
+
 ## [2.1.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.1.0...v2.1.1) (2026-02-18)
 
 ### Bug Fixes
