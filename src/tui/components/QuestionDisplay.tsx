@@ -1,9 +1,10 @@
 import { Box, Text } from "ink";
-import React, { useState } from "react";
+import React from "react";
 
 import { t } from "../../i18n/index.js";
 import type { Question } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
+import type { Answer, FocusContext } from "../types.js";
 
 import { Footer } from "./Footer.js";
 import { MarkdownPrompt } from "./MarkdownPrompt.js";
@@ -14,21 +15,20 @@ interface QuestionDisplayProps {
   currentQuestion: Question;
   currentQuestionIndex: number;
   customAnswer?: string;
+  showSessionSwitching?: boolean;
   elapsedLabel: string;
   onChangeCustomAnswer: (text: string) => void;
   onSelectOption: (label: string) => void;
   questions: Question[];
   selectedOption?: string;
   onAdvanceToNext?: () => void;
-  answers: Map<
-    number,
-    { customText?: string; selectedOption?: string; selectedOptions?: string[] }
-  >;
+  answers: Map<number, Answer>;
   onToggleOption?: (label: string) => void;
   multiSelect?: boolean;
-  onFocusContextChange?: (
-    context: "option" | "custom-input" | "elaborate-input",
-  ) => void;
+  focusContext: FocusContext;
+  onFocusContextChange?: (context: FocusContext) => void;
+  focusedOptionIndex: number;
+  onFocusedOptionIndexChange?: (index: number) => void;
   workingDirectory?: string;
   // Recommended option detection
   onRecommendedDetected?: (hasRecommended: boolean) => void;
@@ -52,6 +52,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   currentQuestion,
   currentQuestionIndex,
   customAnswer = "",
+  showSessionSwitching,
   elapsedLabel,
   onChangeCustomAnswer,
   onSelectOption,
@@ -61,7 +62,10 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   answers,
   onToggleOption,
   multiSelect,
+  focusContext,
   onFocusContextChange,
+  focusedOptionIndex,
+  onFocusedOptionIndexChange,
   workingDirectory,
   onRecommendedDetected,
   hasRecommendedOptions,
@@ -72,16 +76,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   onElaborateTextChange,
 }) => {
   const { theme } = useTheme();
-  const [focusContext, setFocusContext] = useState<
-    "option" | "custom-input" | "elaborate-input"
-  >("option");
-
-  const handleFocusContextChange = (
-    context: "option" | "custom-input" | "elaborate-input",
-  ) => {
-    setFocusContext(context);
-    onFocusContextChange?.(context);
-  };
+  const FooterWithSessionSwitching = Footer as React.ComponentType<
+    React.ComponentProps<typeof Footer> & { showSessionSwitching?: boolean }
+  >;
 
   // Handle option selection - clears custom answer only in single-select mode
   const handleSelectOption = (label: string) => {
@@ -154,7 +151,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         onToggle={onToggleOption}
         multiSelect={multiSelect}
         selectedOptions={answers.get(currentQuestionIndex)?.selectedOptions}
-        onFocusContextChange={handleFocusContextChange}
+        onFocusContextChange={onFocusContextChange}
+        focusedIndex={focusedOptionIndex}
+        onFocusedIndexChange={onFocusedOptionIndexChange}
         onRecommendedDetected={onRecommendedDetected}
         questionKey={currentQuestionIndex}
         isElaborateMarked={elaborateMarks?.has(currentQuestionIndex)}
@@ -164,12 +163,13 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       />
 
       {/* Footer with context-aware keybindings */}
-      <Footer
+      <FooterWithSessionSwitching
         focusContext={focusContext}
         multiSelect={multiSelect ?? false}
         customInputValue={customAnswer}
         hasRecommendedOptions={hasRecommendedOptions}
         hasAnyRecommendedInSession={hasAnyRecommendedInSession}
+        showSessionSwitching={showSessionSwitching}
       />
     </Box>
   );

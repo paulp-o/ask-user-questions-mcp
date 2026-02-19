@@ -106,5 +106,23 @@ export const catppuccinMochaTheme: Theme = {
       codeBlockText: "#cdd6f4",
       codeBlockBorder: "#313244",
     },
+    sessionDots: {
+      active: "#89b4fa",
+      answered: "#a6e3a1",
+      inProgress: "#f9e2af",
+      untouched: "#8688a0",
+      number: "#cdd6f4",
+      activeNumber: "#89b4fa",
+    },
+    sessionPicker: {
+      border: "#89b4fa",
+      title: "#89b4fa",
+      rowText: "#cdd6f4",
+      rowDim: "#8688a0",
+      highlightBg: "#313244",
+      highlightFg: "#a6e3a1",
+      activeMark: "#89b4fa",
+      progress: "#89dceb",
+    },
   },
 } as const;

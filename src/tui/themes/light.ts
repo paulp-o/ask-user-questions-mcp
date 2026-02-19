@@ -106,5 +106,23 @@ export const lightTheme: Theme = {
       codeBlockText: "#24292F",
       codeBlockBorder: "#D0D7DE",
     },
+    sessionDots: {
+      active: "#007EA7",
+      answered: "#2DA44E",
+      inProgress: "#B07D00",
+      untouched: "#6E7781",
+      number: "#24292F",
+      activeNumber: "#007EA7",
+    },
+    sessionPicker: {
+      border: "#007EA7",
+      title: "#007EA7",
+      rowText: "#24292F",
+      rowDim: "#6E7781",
+      highlightBg: "#E6F9EE",
+      highlightFg: "#2DA44E",
+      activeMark: "#007EA7",
+      progress: "#007EA7",
+    },
   },
 } as const;

@@ -106,5 +106,23 @@ export const tokyoNightTheme: Theme = {
       codeBlockText: "#c0caf5",
       codeBlockBorder: "#24283b",
     },
+    sessionDots: {
+      active: "#7aa2f7",
+      answered: "#9ece6a",
+      inProgress: "#e0af68",
+      untouched: "#7078A3",
+      number: "#c0caf5",
+      activeNumber: "#7aa2f7",
+    },
+    sessionPicker: {
+      border: "#7aa2f7",
+      title: "#7aa2f7",
+      rowText: "#c0caf5",
+      rowDim: "#7078A3",
+      highlightBg: "#24283b",
+      highlightFg: "#9ece6a",
+      activeMark: "#7aa2f7",
+      progress: "#7dcfff",
+    },
   },
 } as const;

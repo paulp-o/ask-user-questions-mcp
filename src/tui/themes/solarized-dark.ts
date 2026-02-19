@@ -106,5 +106,23 @@ export const solarizedDarkTheme: Theme = {
       codeBlockText: "#839496",
       codeBlockBorder: "#073642",
     },
+    sessionDots: {
+      active: "#268bd2",
+      answered: "#859900",
+      inProgress: "#b58900",
+      untouched: "#6c7c83",
+      number: "#839496",
+      activeNumber: "#268bd2",
+    },
+    sessionPicker: {
+      border: "#268bd2",
+      title: "#268bd2",
+      rowText: "#839496",
+      rowDim: "#6c7c83",
+      highlightBg: "#073642",
+      highlightFg: "#859900",
+      activeMark: "#268bd2",
+      progress: "#2aa198",
+    },
   },
 } as const;

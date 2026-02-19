@@ -107,5 +107,23 @@ export const rosePineTheme: Theme = {
       codeBlockText: "#e0def4",
       codeBlockBorder: "#26233a",
     },
+    sessionDots: {
+      active: "#ebbcba",
+      answered: "#31748f",
+      inProgress: "#f6c177",
+      untouched: "#8884a0",
+      number: "#e0def4",
+      activeNumber: "#ebbcba",
+    },
+    sessionPicker: {
+      border: "#ebbcba",
+      title: "#ebbcba",
+      rowText: "#e0def4",
+      rowDim: "#8884a0",
+      highlightBg: "#191724",
+      highlightFg: "#31748f",
+      activeMark: "#ebbcba",
+      progress: "#9ccfd8",
+    },
   },
 } as const;

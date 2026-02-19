@@ -10,6 +10,7 @@ interface FooterProps {
   focusContext: "option" | "custom-input" | "elaborate-input";
   multiSelect: boolean;
   isReviewScreen?: boolean;
+  showSessionSwitching?: boolean;
   customInputValue?: string;
   /** True if CURRENT question has recommended options (for R key visibility) */
   hasRecommendedOptions?: boolean;
@@ -29,6 +30,7 @@ export const Footer: React.FC<FooterProps> = ({
   focusContext,
   multiSelect,
   isReviewScreen = false,
+  showSessionSwitching = false,
   customInputValue = "",
   hasRecommendedOptions = false,
   hasAnyRecommendedInSession = false,
@@ -99,6 +101,12 @@ export const Footer: React.FC<FooterProps> = ({
       // Ctrl+R shows when ANY question in session has recommended (not just current)
       if (hasAnyRecommendedInSession) {
         bindings.push({ key: "Ctrl+R", action: t("footer.quickSubmit") });
+      }
+
+      if (showSessionSwitching) {
+        bindings.push({ key: "Ctrl+]/[", action: t("footer.sessions") });
+        bindings.push({ key: "1-9", action: t("footer.jump") });
+        bindings.push({ key: "Ctrl+S", action: t("footer.list") });
       }
 
       bindings.push({ key: "Ctrl+T", action: t("footer.theme") });

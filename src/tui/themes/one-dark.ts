@@ -106,5 +106,23 @@ export const oneDarkTheme: Theme = {
       codeBlockText: "#abb2bf",
       codeBlockBorder: "#3e4451",
     },
+    sessionDots: {
+      active: "#61afef",
+      answered: "#98c379",
+      inProgress: "#d19a66",
+      untouched: "#767D8A",
+      number: "#abb2bf",
+      activeNumber: "#61afef",
+    },
+    sessionPicker: {
+      border: "#61afef",
+      title: "#61afef",
+      rowText: "#abb2bf",
+      rowDim: "#767D8A",
+      highlightBg: "#3e4451",
+      highlightFg: "#98c379",
+      activeMark: "#61afef",
+      progress: "#56b6c2",
+    },
   },
 } as const;

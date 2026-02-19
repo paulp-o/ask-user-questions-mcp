@@ -9,21 +9,23 @@ import { SessionManager } from "../../session/SessionManager.js";
 import { getSessionDirectory } from "../../session/utils.js";
 import { useTheme } from "../ThemeContext.js";
 import { useConfig } from "../ConfigContext.js";
+import type { Answer, FocusContext, SessionUIState } from "../types.js";
 import { isRecommendedOption } from "../utils/recommended.js";
 import { ConfirmationDialog } from "./ConfirmationDialog.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
 import { ReviewScreen } from "./ReviewScreen.js";
 
-interface Answer {
-  customText?: string;
-  selectedOption?: string; // For single-select
-  selectedOptions?: string[]; // For multi-select
-}
-
 interface StepperViewProps {
   onComplete?: (wasRejected?: boolean, rejectionReason?: string | null) => void;
   /** Called when progress changes (for progress bar support) */
   onProgress?: (answered: number, total: number) => void;
+  hasMultipleSessions?: boolean;
+  initialState?: SessionUIState;
+  onStateSnapshot?: (sessionId: string, state: SessionUIState) => void;
+  onFlowStateChange?: (state: {
+    showReview: boolean;
+    showRejectionConfirm: boolean;
+  }) => void;
   sessionId: string;
   sessionRequest: SessionRequest;
 }
@@ -35,6 +37,10 @@ interface StepperViewProps {
 export const StepperView: React.FC<StepperViewProps> = ({
   onComplete,
   onProgress,
+  hasMultipleSessions,
+  initialState,
+  onStateSnapshot,
+  onFlowStateChange,
   sessionId,
   sessionRequest,
 }) => {
@@ -47,9 +53,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [showRejectionConfirm, setShowRejectionConfirm] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [focusContext, setFocusContext] = useState<
-    "option" | "custom-input" | "elaborate-input"
-  >("option");
+  const [focusContext, setFocusContext] = useState<FocusContext>("option");
+  const [focusedOptionIndex, setFocusedOptionIndex] = useState(0);
   const [hasRecommendedOptions, setHasRecommendedOptions] = useState(false);
   // Session-level flag: true if ANY question in the session has recommended options
   const [hasAnyRecommendedInSession, setHasAnyRecommendedInSession] =
@@ -179,6 +184,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
   // Track mount status to avoid state updates after unmount
   const isMountedRef = useRef(true);
+  const skipSnapshotRef = useRef(true);
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -188,20 +194,80 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
   // Reset internal stepper state when the session changes (safety in case component isn't remounted)
   useEffect(() => {
-    setCurrentQuestionIndex(0);
-    setAnswers(new Map());
-    setShowReview(false);
+    const maxQuestionIndex = Math.max(0, sessionRequest.questions.length - 1);
+
+    if (initialState) {
+      const hydratedQuestionIndex = Math.min(
+        Math.max(initialState.currentQuestionIndex, 0),
+        maxQuestionIndex,
+      );
+      const hydratedQuestion = sessionRequest.questions[hydratedQuestionIndex];
+      const maxFocusedOptionIndex = (hydratedQuestion?.options.length ?? 0) + 1;
+
+      setCurrentQuestionIndex(hydratedQuestionIndex);
+      setAnswers(new Map(initialState.answers));
+      setElaborateMarks(new Map(initialState.elaborateMarks));
+      setFocusContext(initialState.focusContext);
+      setFocusedOptionIndex(
+        Math.min(
+          Math.max(initialState.focusedOptionIndex, 0),
+          Math.max(0, maxFocusedOptionIndex),
+        ),
+      );
+      setShowReview(initialState.showReview);
+    } else {
+      setCurrentQuestionIndex(0);
+      setAnswers(new Map());
+      setElaborateMarks(new Map());
+      setFocusContext("option");
+      setFocusedOptionIndex(0);
+      setShowReview(false);
+    }
+
     setSubmitting(false);
     setShowRejectionConfirm(false);
     setElapsedSeconds(0);
-    setElaborateMarks(new Map());
+    skipSnapshotRef.current = true;
 
     // Compute session-level recommended flag: true if ANY question has recommended options
     const anyHasRecommended = sessionRequest.questions.some((question) =>
       question.options.some((opt) => isRecommendedOption(opt.label)),
     );
     setHasAnyRecommendedInSession(anyHasRecommended);
-  }, [sessionId, sessionRequest.questions]);
+  }, [initialState, sessionId, sessionRequest.questions]);
+
+  useEffect(() => {
+    if (!onStateSnapshot) {
+      return;
+    }
+
+    if (skipSnapshotRef.current) {
+      skipSnapshotRef.current = false;
+      return;
+    }
+
+    onStateSnapshot(sessionId, {
+      currentQuestionIndex,
+      answers: new Map(answers),
+      elaborateMarks: new Map(elaborateMarks),
+      focusContext,
+      focusedOptionIndex,
+      showReview,
+    });
+  }, [
+    answers,
+    currentQuestionIndex,
+    elaborateMarks,
+    focusContext,
+    focusedOptionIndex,
+    onStateSnapshot,
+    sessionId,
+    showReview,
+  ]);
+
+  useEffect(() => {
+    onFlowStateChange?.({ showReview, showRejectionConfirm });
+  }, [onFlowStateChange, showRejectionConfirm, showReview]);
 
   // Update elapsed time since session creation
   // IMPORTANT: Pause when content overflows terminal to prevent scroll-snapping
@@ -571,7 +637,10 @@ export const StepperView: React.FC<StepperViewProps> = ({
       questions={sessionRequest.questions}
       selectedOption={currentAnswer?.selectedOption}
       answers={answers}
+      focusContext={focusContext}
       onFocusContextChange={setFocusContext}
+      focusedOptionIndex={focusedOptionIndex}
+      onFocusedOptionIndexChange={setFocusedOptionIndex}
       workingDirectory={sessionRequest.workingDirectory}
       onRecommendedDetected={setHasRecommendedOptions}
       hasRecommendedOptions={hasRecommendedOptions}
@@ -580,6 +649,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onElaborateSelect={handleElaborateSelect}
       elaborateText={elaborateMarks.get(currentQuestionIndex) || ""}
       onElaborateTextChange={handleElaborateTextChange}
+      showSessionSwitching={
+        hasMultipleSessions && !showReview && !showRejectionConfirm
+      }
     />
   );
 };

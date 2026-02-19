@@ -106,5 +106,23 @@ export const draculaTheme: Theme = {
       codeBlockText: "#f8f8f2",
       codeBlockBorder: "#44475a",
     },
+    sessionDots: {
+      active: "#bd93f9",
+      answered: "#50fa7b",
+      inProgress: "#f1fa8c",
+      untouched: "#7C8BBE",
+      number: "#f8f8f2",
+      activeNumber: "#bd93f9",
+    },
+    sessionPicker: {
+      border: "#bd93f9",
+      title: "#bd93f9",
+      rowText: "#f8f8f2",
+      rowDim: "#7C8BBE",
+      highlightBg: "#44475a",
+      highlightFg: "#50fa7b",
+      activeMark: "#bd93f9",
+      progress: "#8be9fd",
+    },
   },
 } as const;

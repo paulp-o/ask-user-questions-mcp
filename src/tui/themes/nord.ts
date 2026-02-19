@@ -106,5 +106,23 @@ export const nordTheme: Theme = {
       codeBlockText: "#eceff4",
       codeBlockBorder: "#3b4252",
     },
+    sessionDots: {
+      active: "#88c0d0",
+      answered: "#a3be8c",
+      inProgress: "#ebcb8b",
+      untouched: "#616E88",
+      number: "#eceff4",
+      activeNumber: "#88c0d0",
+    },
+    sessionPicker: {
+      border: "#88c0d0",
+      title: "#88c0d0",
+      rowText: "#eceff4",
+      rowDim: "#616E88",
+      highlightBg: "#3b4252",
+      highlightFg: "#a3be8c",
+      activeMark: "#88c0d0",
+      progress: "#81a1c1",
+    },
   },
 } as const;

@@ -106,5 +106,23 @@ export const gruvboxLightTheme: Theme = {
       codeBlockText: "#3c3836",
       codeBlockBorder: "#d5c4a1",
     },
+    sessionDots: {
+      active: "#076678",
+      answered: "#79740e",
+      inProgress: "#b57614",
+      untouched: "#a89984",
+      number: "#3c3836",
+      activeNumber: "#076678",
+    },
+    sessionPicker: {
+      border: "#076678",
+      title: "#076678",
+      rowText: "#3c3836",
+      rowDim: "#a89984",
+      highlightBg: "#ebdbb2",
+      highlightFg: "#79740e",
+      activeMark: "#076678",
+      progress: "#076678",
+    },
   },
 } as const;

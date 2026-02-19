@@ -2,6 +2,9 @@ export const en = {
   footer: {
     options: "Options",
     questions: "Questions",
+    sessions: "Sessions",
+    jump: "Jump",
+    list: "List",
     select: "Select",
     selectNext: "Select & Next",
     toggle: "Toggle",

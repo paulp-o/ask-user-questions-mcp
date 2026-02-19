@@ -115,5 +115,23 @@ export interface Theme {
       codeBlockText: string;
       codeBlockBorder: string;
     };
+    sessionDots: {
+      active: string; // Filled dot for active session
+      answered: string; // Green for sessions with answers
+      inProgress: string; // Yellow for touched but no answers
+      untouched: string; // Dim for untouched sessions
+      number: string; // Color for the session number text
+      activeNumber: string; // Color for active session number (bold)
+    };
+    sessionPicker: {
+      border: string; // Modal border color
+      title: string; // Modal title color
+      rowText: string; // Normal row text
+      rowDim: string; // Dim text (workdir, age)
+      highlightBg: string; // Background for highlighted/cursor row
+      highlightFg: string; // Foreground for highlighted row
+      activeMark: string; // Color for the active session marker
+      progress: string; // Color for progress info [2/4]
+    };
   };
 }

@@ -106,5 +106,23 @@ export const catppuccinLatteTheme: Theme = {
       codeBlockText: "#4c4f69",
       codeBlockBorder: "#ccd0da",
     },
+    sessionDots: {
+      active: "#1e66f5",
+      answered: "#40a02b",
+      inProgress: "#df8e1d",
+      untouched: "#acb0c0",
+      number: "#4c4f69",
+      activeNumber: "#1e66f5",
+    },
+    sessionPicker: {
+      border: "#1e66f5",
+      title: "#1e66f5",
+      rowText: "#4c4f69",
+      rowDim: "#acb0c0",
+      highlightBg: "#ccd0da",
+      highlightFg: "#40a02b",
+      activeMark: "#1e66f5",
+      progress: "#04a5e5",
+    },
   },
 } as const;

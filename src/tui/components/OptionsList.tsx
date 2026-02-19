@@ -6,6 +6,7 @@ import type { Option } from "../../session/types.js";
 import { t } from "../../i18n/index.js";
 import { useConfig } from "../ConfigContext.js";
 import { useTheme } from "../ThemeContext.js";
+import type { FocusContext } from "../types.js";
 import { isRecommendedOption } from "../utils/recommended.js";
 import {
   fitToVisualWidth,
@@ -29,10 +30,10 @@ interface OptionsListProps {
   multiSelect?: boolean;
   onToggle?: (label: string) => void;
   selectedOptions?: string[];
+  focusedIndex?: number;
+  onFocusedIndexChange?: (index: number) => void;
   // Focus context tracking
-  onFocusContextChange?: (
-    context: "option" | "custom-input" | "elaborate-input",
-  ) => void;
+  onFocusContextChange?: (context: FocusContext) => void;
   // Recommended option detection callback
   onRecommendedDetected?: (hasRecommended: boolean) => void;
   // Focus reset support
@@ -65,6 +66,8 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   multiSelect = false,
   onToggle,
   selectedOptions = [],
+  focusedIndex: focusedIndexProp,
+  onFocusedIndexChange,
   onFocusContextChange,
   onRecommendedDetected,
   questionKey,
@@ -79,7 +82,20 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   // Use prop if provided, otherwise use config value
   const autoSelectRecommended =
     autoSelectRecommendedProp ?? config.autoSelectRecommended;
-  const [focusedIndex, setFocusedIndex] = useState(0);
+  const [internalFocusedIndex, setInternalFocusedIndex] = useState(0);
+  const focusedIndex = focusedIndexProp ?? internalFocusedIndex;
+
+  const setFocusedIndex = (
+    nextIndex: number | ((prevIndex: number) => number),
+  ) => {
+    const resolvedIndex =
+      typeof nextIndex === "function" ? nextIndex(focusedIndex) : nextIndex;
+
+    if (focusedIndexProp === undefined) {
+      setInternalFocusedIndex(resolvedIndex);
+    }
+    onFocusedIndexChange?.(resolvedIndex);
+  };
   const { stdout } = useStdout();
   const columns = stdout?.columns ?? 80;
   const rowWidth = Math.max(20, columns - 2);
@@ -130,12 +146,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({
 
   // Track and emit focus context changes
   useEffect(() => {
-    const newContext: "option" | "custom-input" | "elaborate-input" =
-      isElaborateFocused
-        ? "elaborate-input"
-        : isCustomInputFocused
-          ? "custom-input"
-          : "option";
+    const newContext: FocusContext = isElaborateFocused
+      ? "elaborate-input"
+      : isCustomInputFocused
+        ? "custom-input"
+        : "option";
     onFocusContextChange?.(newContext);
   }, [
     focusedIndex,
@@ -148,6 +163,12 @@ export const OptionsList: React.FC<OptionsListProps> = ({
   useEffect(() => {
     setFocusedIndex(0);
   }, [questionKey]);
+
+  useEffect(() => {
+    if (focusedIndex > maxIndex) {
+      setFocusedIndex(maxIndex);
+    }
+  }, [focusedIndex, maxIndex]);
 
   // Detect recommended options and notify parent
   useEffect(() => {
@@ -177,7 +198,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
       if (isCustomInputFocused) {
         if (key.escape) {
           // Escape: Exit custom input mode and go back to option navigation
-          setFocusedIndex(options.length - 1); // Focus on last option
+          setFocusedIndex(Math.max(0, options.length - 1)); // Focus on last option
         }
         return;
       }

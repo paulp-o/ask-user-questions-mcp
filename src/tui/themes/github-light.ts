@@ -105,5 +105,23 @@ export const githubLightTheme: Theme = {
       codeBlockText: "#24292F",
       codeBlockBorder: "#D0D7DE",
     },
+    sessionDots: {
+      active: "#0969DA",
+      answered: "#1A7F37",
+      inProgress: "#9A6700",
+      untouched: "#6E7781",
+      number: "#24292F",
+      activeNumber: "#0969DA",
+    },
+    sessionPicker: {
+      border: "#0969DA",
+      title: "#0969DA",
+      rowText: "#24292F",
+      rowDim: "#6E7781",
+      highlightBg: "#DAFBE1",
+      highlightFg: "#1A7F37",
+      activeMark: "#0969DA",
+      progress: "#0969DA",
+    },
   },
 } as const;

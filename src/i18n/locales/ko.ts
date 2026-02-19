@@ -2,6 +2,9 @@ export const ko = {
   footer: {
     options: "옵션",
     questions: "질문",
+    sessions: "세션",
+    jump: "이동",
+    list: "목록",
     select: "선택",
     selectNext: "선택 후 다음",
     toggle: "토글",

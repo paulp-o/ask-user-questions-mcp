@@ -107,5 +107,23 @@ export const darkTheme: Theme = {
       codeBlockText: "#E7EEF5",
       codeBlockBorder: "#2A3238",
     },
+    sessionDots: {
+      active: "#46D9FF",
+      answered: "#5AF78E",
+      inProgress: "#FFD36A",
+      untouched: "#A0AAB4",
+      number: "#E7EEF5",
+      activeNumber: "#46D9FF",
+    },
+    sessionPicker: {
+      border: "#46D9FF",
+      title: "#46D9FF",
+      rowText: "#E7EEF5",
+      rowDim: "#A0AAB4",
+      highlightBg: "#0F2417",
+      highlightFg: "#5AF78E",
+      activeMark: "#46D9FF",
+      progress: "#46D9FF",
+    },
   },
 } as const;

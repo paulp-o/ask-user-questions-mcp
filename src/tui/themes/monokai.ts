@@ -107,5 +107,23 @@ export const monokaiTheme: Theme = {
       codeBlockText: "#F8F8F2",
       codeBlockBorder: "#49483E",
     },
+    sessionDots: {
+      active: "#66D9EF",
+      answered: "#A6E22E",
+      inProgress: "#E6DB74",
+      untouched: "#908B78",
+      number: "#F8F8F2",
+      activeNumber: "#66D9EF",
+    },
+    sessionPicker: {
+      border: "#66D9EF",
+      title: "#66D9EF",
+      rowText: "#F8F8F2",
+      rowDim: "#908B78",
+      highlightBg: "#383830",
+      highlightFg: "#A6E22E",
+      activeMark: "#66D9EF",
+      progress: "#66D9EF",
+    },
   },
 } as const;

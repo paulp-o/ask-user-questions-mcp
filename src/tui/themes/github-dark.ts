@@ -105,5 +105,23 @@ export const githubDarkTheme: Theme = {
       codeBlockText: "#c9d1d9",
       codeBlockBorder: "#30363d",
     },
+    sessionDots: {
+      active: "#58a6ff",
+      answered: "#3fb950",
+      inProgress: "#d29922",
+      untouched: "#a0a8b4",
+      number: "#c9d1d9",
+      activeNumber: "#58a6ff",
+    },
+    sessionPicker: {
+      border: "#58a6ff",
+      title: "#58a6ff",
+      rowText: "#c9d1d9",
+      rowDim: "#a0a8b4",
+      highlightBg: "#0d1117",
+      highlightFg: "#3fb950",
+      activeMark: "#58a6ff",
+      progress: "#58a6ff",
+    },
   },
 } as const;

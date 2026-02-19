@@ -3,6 +3,9 @@
 export interface FooterTranslations {
   options: string;
   questions: string;
+  sessions: string;
+  jump: string;
+  list: string;
   select: string;
   toggle: string;
   elaborate: string;
