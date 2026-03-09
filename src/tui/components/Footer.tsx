@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import { t } from "../../i18n/index.js";
 import { useTheme } from "../ThemeContext.js";
+import { KEY_LABELS } from "../constants/keybindings.js";
 
 const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
@@ -52,65 +53,65 @@ export const Footer: React.FC<FooterProps> = ({
     // Review screen mode
     if (isReviewScreen) {
       return [
-        { key: "Enter", action: t("footer.submit") },
-        { key: "n", action: t("footer.back") },
+        { key: KEY_LABELS.SUBMIT, action: t("footer.submit") },
+        { key: KEY_LABELS.BACK, action: t("footer.back") },
       ];
     }
 
     // Custom input focused
     if (focusContext === "custom-input") {
       return [
-        { key: "↑↓", action: t("footer.options") },
-        { key: "←→", action: t("footer.cursor") },
-        { key: "Tab/S+Tab", action: t("footer.questions") },
-        { key: "Enter", action: t("footer.newline") },
-        { key: "Esc", action: t("footer.reject") },
+        { key: KEY_LABELS.NAVIGATE_OPTIONS, action: t("footer.options") },
+        { key: KEY_LABELS.CURSOR, action: t("footer.cursor") },
+        { key: KEY_LABELS.NAVIGATE_QUESTIONS_TAB, action: t("footer.questions") },
+        { key: KEY_LABELS.NEWLINE, action: t("footer.newline") },
+        { key: KEY_LABELS.REJECT, action: t("footer.reject") },
       ];
     }
 
     // Elaborate input focused (Enter skips, not newline)
     if (focusContext === "elaborate-input") {
       return [
-        { key: "↑↓", action: t("footer.options") },
-        { key: "←→", action: t("footer.cursor") },
+        { key: KEY_LABELS.NAVIGATE_OPTIONS, action: t("footer.options") },
+        { key: KEY_LABELS.CURSOR, action: t("footer.cursor") },
         { key: "Enter/Tab", action: t("footer.next") },
-        { key: "Esc", action: t("footer.reject") },
+        { key: KEY_LABELS.REJECT, action: t("footer.reject") },
       ];
     }
 
     // Option focused
     if (focusContext === "option") {
       const bindings: Keybinding[] = [
-        { key: "↑↓", action: t("footer.options") },
-        { key: "←→", action: t("footer.questions") },
-        { key: "Tab/S+Tab", action: t("footer.questions") },
+        { key: KEY_LABELS.NAVIGATE_OPTIONS, action: t("footer.options") },
+        { key: KEY_LABELS.NAVIGATE_QUESTIONS, action: t("footer.questions") },
+        { key: KEY_LABELS.NAVIGATE_QUESTIONS_TAB, action: t("footer.questions") },
       ];
 
       if (multiSelect) {
-        bindings.push({ key: "Space", action: t("footer.toggle") });
-        bindings.push({ key: "Enter", action: t("footer.next") });
+        bindings.push({ key: KEY_LABELS.SELECT, action: t("footer.toggle") });
+        bindings.push({ key: KEY_LABELS.NEXT, action: t("footer.next") });
       } else {
-        bindings.push({ key: "Space", action: t("footer.select") });
-        bindings.push({ key: "Enter", action: t("footer.selectNext") });
+        bindings.push({ key: KEY_LABELS.SELECT, action: t("footer.select") });
+        bindings.push({ key: KEY_LABELS.SELECT_NEXT, action: t("footer.selectNext") });
       }
 
       if (hasRecommendedOptions) {
-        bindings.push({ key: "R", action: t("footer.recommended") });
+        bindings.push({ key: KEY_LABELS.RECOMMEND, action: t("footer.recommended") });
       }
 
       // Ctrl+R shows when ANY question in session has recommended (not just current)
       if (hasAnyRecommendedInSession) {
-        bindings.push({ key: "Ctrl+R", action: t("footer.quickSubmit") });
+        bindings.push({ key: KEY_LABELS.QUICK_SUBMIT, action: t("footer.quickSubmit") });
       }
 
       if (showSessionSwitching) {
-        bindings.push({ key: "Ctrl+]/[", action: t("footer.sessions") });
+        bindings.push({ key: KEY_LABELS.SESSION_SWITCH, action: t("footer.sessions") });
         bindings.push({ key: "1-9", action: t("footer.jump") });
-        bindings.push({ key: "Ctrl+S", action: t("footer.list") });
+        bindings.push({ key: KEY_LABELS.SESSION_LIST, action: t("footer.list") });
       }
 
-      bindings.push({ key: "Ctrl+T", action: t("footer.theme") });
-      bindings.push({ key: "Esc", action: t("footer.reject") });
+      bindings.push({ key: KEY_LABELS.THEME, action: t("footer.theme") });
+      bindings.push({ key: KEY_LABELS.REJECT, action: t("footer.reject") });
 
       return bindings;
     }

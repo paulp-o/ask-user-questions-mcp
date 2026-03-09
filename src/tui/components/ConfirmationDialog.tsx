@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useTheme } from "../ThemeContext.js";
 import { SingleLineTextInput } from "./SingleLineTextInput.js";
 import { t } from "../../i18n/index.js";
+import { KEYS } from "../constants/keybindings.js";
 
 interface ConfirmationDialogProps {
   message: string;
@@ -56,10 +57,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
     // Arrow key navigation
     if (key.upArrow) {
-      setFocusedIndex((prev) => (prev > 0 ? prev - 1 : options.length - 1));
+      setFocusedIndex((prev) => Math.max(0, prev - 1));
     }
     if (key.downArrow) {
-      setFocusedIndex((prev) => (prev < options.length - 1 ? prev + 1 : 0));
+      setFocusedIndex((prev) => Math.min(options.length - 1, prev + 1));
     }
 
     // Enter key - select focused option
@@ -68,10 +69,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     }
 
     // Letter shortcuts
-    if (input === "y" || input === "Y") {
+    if (KEYS.CONFIRM_YES.test(input)) {
       setShowReasonInput(true);
     }
-    if (input === "n" || input === "N") {
+    if (KEYS.CONFIRM_NO.test(input)) {
       onCancel();
     }
 

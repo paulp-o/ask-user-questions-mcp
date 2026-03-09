@@ -26,15 +26,15 @@ Before this skill is invoked, the agent must verify that the discussion history 
 [ ] Whether an OpenSpec spec is involved, and if so, which specific spec it is
 
 ##2. Knowledge Base Collection — Parallel Exploration & Research
-The agent **must run at least 3 Explore agents and 3 Researcher agents in parallel** as an initial knowledge base collection and **WAIT** for completion.
+The agent **must run at least 3 Explorer agents and 3 Researcher agents in parallel** as an initial knowledge base collection and **WAIT** for completion.
 
 The analysis must cover:
 
-**Explore agents:**
+**Explorer agents:**
 * the existing codebase,
 * git commit history.
 
-**Note:** Existing OpenSpec documents must be read directly by the agent, not delegated to explore agents.
+**Note:** Existing OpenSpec documents must be read directly by the agent, not delegated to explorer agents.
 
 **Researcher agents:**
 * relevant web resources that may be helpful,
@@ -49,16 +49,16 @@ The analysis must include **all** of the following topics:
 
 Agents may be recursively resumed for additional research if needed.
 
-##2.5. Question Strategy Planning — Plan Agent Analysis
-After exploration completes, the agent **must spawn a Plan agent** to analyze information gaps and design the question strategy:
+##2.5. Question Strategy Planning — Planner Agent Analysis
+After exploration completes, the agent **must spawn a Planner agent** to analyze information gaps and design the question strategy:
 
 ```
-asyncagents_task(agent="plan", fork=true, prompt="
+asyncagents_task(agent="planner", fork=true, prompt="
   PLAN SCENARIO: PLAN_QUESTION_STRATEGY
   
   CONTEXT:
   - User's original request: [summary]
-  - Explore findings: [key discoveries]
+  - Explorer findings: [key discoveries]
   - Researcher findings: [external references]
   
   TASK:
@@ -74,8 +74,8 @@ asyncagents_task(agent="plan", fork=true, prompt="
 ")
 ```
 
-The agent **must wait** for the Plan agent to complete before proceeding to AUQ.
-Use the Plan agent's output to structure and prioritize questions in Step 3.
+The agent **must wait** for the Planner agent to complete before proceeding to AUQ.
+Use the Planner agent's output to structure and prioritize questions in Step 3.
 
 ##3. Ambiguity Resolution — AUQ-Driven Clarification
 Using the question strategy from Step 2.5, clarify all ambiguous points using the AUQ tool.

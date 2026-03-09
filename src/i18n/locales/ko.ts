@@ -45,7 +45,7 @@ export const ko = {
   },
   input: {
     customAnswerLabel: "직접 입력",
-    customAnswerHint: "(Tab을 눌러 직접 입력)",
+    customAnswerHint: "(Tab으로 제출)",
     otherCustom: "기타 (직접 입력)",
     placeholder: "답변을 입력하세요 (Enter = 줄바꿈, Tab = 완료)",
     singleLinePlaceholder: "여기에 입력...",

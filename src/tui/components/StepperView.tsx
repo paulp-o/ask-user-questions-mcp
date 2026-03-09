@@ -11,6 +11,7 @@ import { useTheme } from "../ThemeContext.js";
 import { useConfig } from "../ConfigContext.js";
 import type { Answer, FocusContext, SessionUIState } from "../types.js";
 import { isRecommendedOption } from "../utils/recommended.js";
+import { KEYS } from "../constants/keybindings.js";
 import { ConfirmationDialog } from "./ConfirmationDialog.js";
 import { QuestionDisplay } from "./QuestionDisplay.js";
 import { ReviewScreen } from "./ReviewScreen.js";
@@ -444,7 +445,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
     // Ctrl+R: Quick submit with recommended options (select all recommended and go to review)
     if (
-      input.toLowerCase() === "r" &&
+      input.toLowerCase() === KEYS.QUICK_SUBMIT &&
       key.ctrl &&
       hasAnyRecommendedInSession &&
       !isInTextInput
@@ -492,7 +493,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
     // R key: Select recommended options for current question
     if (
-      input.toLowerCase() === "r" &&
+      input.toLowerCase() === KEYS.RECOMMEND &&
       !key.ctrl &&
       !isInTextInput &&
       hasRecommendedOptions

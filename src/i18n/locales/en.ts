@@ -45,7 +45,7 @@ export const en = {
   },
   input: {
     customAnswerLabel: "Custom answer",
-    customAnswerHint: "(Press Tab to enter custom answer)",
+    customAnswerHint: "(Tab to submit)",
     otherCustom: "Other (custom)",
     placeholder: "Type your answer (Enter = newline, Tab = done)",
     singleLinePlaceholder: "Type here...",

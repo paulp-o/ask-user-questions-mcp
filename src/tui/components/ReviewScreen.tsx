@@ -6,6 +6,7 @@ import type { Question, UserAnswer } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
 import { Footer } from "./Footer.js";
 import { MarkdownPrompt } from "./MarkdownPrompt.js";
+import { KEYS } from "../constants/keybindings.js";
 
 interface ReviewScreenProps {
   answers: Map<
@@ -60,7 +61,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
       });
       onConfirm(userAnswers);
     }
-    if (input === "n") {
+    if (KEYS.GO_BACK.test(input)) {
       onGoBack();
     }
   });

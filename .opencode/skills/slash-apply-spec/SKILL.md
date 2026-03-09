@@ -18,25 +18,25 @@ By default, the agent should **favor aggressive yet safe parallelization where i
 First, as a guide for applying specs using OpenSpec, the agent calls `opsx-apply`. The agent should read this skill, but must continue with the remaining steps without losing focus.
 
 ##1. Delegate planning
-First, the agent triggers (1+n) plan agents in the following structure. (2<n<4) 
+First, the agent triggers (1+n) planner agents in the following structure. (2<n<4) 
  
 1: parallelization strategy  
-n(2..4): implementation strategies. Split tasks into large chunks by similar size and theme, and distribute them across the plan agents.
+n(2..4): implementation strategies. Split tasks into large chunks by similar size and theme, and distribute them across the planner agents.
 
 ```
-asyncagents_task(agent="plan", prompt="PLAN SCENARIO: PLAN_PARALLELIZATION_STRATEGY.
+asyncagents_task(agent="planner", prompt="PLAN SCENARIO: PLAN_PARALLELIZATION_STRATEGY.
 RELATED_OPENSPEC_DOCS: "openspec/changes/an-openspec-change, openspec/specs/an-openspec-spec, ..."
 Design an agent delegation strategy that distributes the above tasks as efficiently as possible.", fork=true)
 
-asyncagents_task(agent="plan", prompt="PLAN SCENARIO: PLAN_IMPLEMENTATION_STRATEGY.
+asyncagents_task(agent="planner", prompt="PLAN SCENARIO: PLAN_IMPLEMENTATION_STRATEGY.
 RELATED_OPENSPEC_TASKS: "openspec/changes/an-openspec-change/tasks.md:50-85, ..."
 Brainstorm implementation approaches for the above tasks and derive the optimal solution.", fork=true)
 ```
 
-Wait while these plan agents are running.
+Wait while these planner agents are running.
 
 ##2. Write TODOs
-Insert the parallelization strategy plans proposed by the first plan agent directly into the TODO LIST. 
+Insert the parallelization strategy plans proposed by the first planner agent directly into the TODO LIST. 
 Then, add `plan testing` to the TODO LIST.
 
 ##3. Parallel coding & test planning
@@ -45,22 +45,22 @@ Execute 3A and 3B simultaneously. First, start 3A) the initial parallel executio
 ###3A. Multi-agent parallel coding
 Run programmer agents in parallel according to the plan. 
 
-Carefully consider the sub-agent dependencies provided by the plan agents, and execute them across multiple rounds as needed. Here, you can note your findings found from the implementation planner agents.
+Carefully consider the sub-agent dependencies provided by the planner agents, and execute them across multiple rounds as needed. Here, you can note your findings found from the implementation planner agents.
 Programmer agents may occasionally request clarification during their work. In such cases, respond with an answer using `resume=id`.
 
 ###3B. Testing plan
-Spawn plan agents in the following manner.  
-First, trigger n plan agents (1<n<3).  
-Split test scenarios into large chunks by similar size and theme, and distribute them across plan agents. Prefer using a single agent where possible, but if overlap is minimal (e.g., backend vs frontend, admin vs non-admin features), multiple plan agents may be spawned.
+Spawn planner agents in the following manner.  
+First, trigger n planner agents (1<n<3).  
+Split test scenarios into large chunks by similar size and theme, and distribute them across planner agents. Prefer using a single agent where possible, but if overlap is minimal (e.g., backend vs frontend, admin vs non-admin features), multiple planner agents may be spawned.
 
 ```
-asyncagents_task(agent="plan", prompt="PLAN SCENARIO: PLAN_TESTING_STRATEGY.
+asyncagents_task(agent="planner", prompt="PLAN SCENARIO: PLAN_TESTING_STRATEGY.
 RELATED_OPENSPEC_CHANGES: "openspec/changes/an-openspec-change/*, ..."
 The implementation of this OpenSpec spec is now complete. Prepare scenarios that can test whether all implemented tasks and features function correctly.", fork=true)
 ```
 
 ##4. Run tests
-Spawn tester agents according to the testing plan completed by the plan agents. Tester agents must be run with `fork=false`, and the following 7-Section structure should be used as the prompt (in most cases, it can be filled almost entirely based on what the plan agent provided):
+Spawn tester agents according to the testing plan completed by the planner agents. Tester agents must be run with `fork=false`, and the following 7-Section structure should be used as the prompt (in most cases, it can be filled almost entirely based on what the planner agent provided):
 
 ```
 CONTEXT:

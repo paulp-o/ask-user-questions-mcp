@@ -5,6 +5,7 @@ import type { SessionRequest } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
 import type { Answer, SessionUIState } from "../types.js";
 import { formatRelativeTime } from "../utils/relativeTime.js";
+import { KEYS } from "../constants/keybindings.js";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */
@@ -104,7 +105,7 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
       } else {
         // Direct number jump (1-9)
         const num = parseInt(input, 10);
-        if (num >= 1 && num <= sessions.length) {
+        if (num >= KEYS.SESSION_JUMP_MIN && num <= Math.min(KEYS.SESSION_JUMP_MAX, sessions.length)) {
           onSelectIndex(num - 1);
           onClose();
         }

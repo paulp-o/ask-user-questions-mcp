@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { AnimatedGradient } from "./AnimatedGradient.js";
 import { useTheme } from "../ThemeContext.js";
 import { t } from "../../i18n/index.js";
+import { KEYS } from "../constants/keybindings.js";
 
 interface WaitingScreenProps {
   queueCount: number;
@@ -31,7 +32,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
 
   // Handle 'q' key to quit
   useInput((input, key) => {
-    if (input === "q") {
+    if (KEYS.QUIT.test(input)) {
       process.exit(0);
     }
   });

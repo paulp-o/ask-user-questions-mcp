@@ -40,6 +40,7 @@ import {
   getNextSessionIndex,
   getPrevSessionIndex,
 } from "../src/tui/utils/sessionSwitching.js";
+import { KEYS } from "../src/tui/constants/keybindings.js";
 
 type AppState = { mode: "PROCESSING" } | { mode: "WAITING" };
 
@@ -404,7 +405,10 @@ const App: React.FC<AppProps> = ({ config }) => {
         return;
       }
 
-      if (key.ctrl && input === "]") {
+      if (!key.ctrl && !key.meta && input === KEYS.SESSION_NEXT) {
+        if (!canUseDirectJump) {
+          return;
+        }
         const nextIndex = getNextSessionIndex(
           activeSessionIndex,
           sessionQueue.length,
@@ -413,7 +417,10 @@ const App: React.FC<AppProps> = ({ config }) => {
         return;
       }
 
-      if (key.ctrl && input === "[") {
+      if (!key.ctrl && !key.meta && input === KEYS.SESSION_PREV) {
+        if (!canUseDirectJump) {
+          return;
+        }
         const prevIndex = getPrevSessionIndex(
           activeSessionIndex,
           sessionQueue.length,

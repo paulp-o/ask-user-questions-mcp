@@ -5,6 +5,7 @@ import type { Theme } from "./themes/types.js";
 import { getTheme, listThemes, darkTheme, hasTheme } from "./themes/index.js";
 import { detectSystemTheme } from "./utils/detectTheme.js";
 import { getSavedTheme, saveTheme } from "./utils/config.js";
+import { KEYS } from "./constants/keybindings.js";
 
 interface ThemeProviderProps {
   initialTheme?: ThemeMode;
@@ -60,7 +61,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
   // Ctrl+T to cycle theme
   useInput((input, key) => {
-    if (key.ctrl && input === "t") {
+    if (key.ctrl && input === KEYS.THEME_CYCLE) {
       cycleTheme();
     }
   });

@@ -49,11 +49,11 @@ For requests with error messages, stacktraces, or explicit bug reports.
 
 ### Step 1: Parallel Investigation
 
-Fire **5+ Explore agents** AND **Researcher** in parallel:
+Fire **5+ Explorer agents** AND **Researcher** in parallel:
 
 ```typescript
-// Explore agents - investigate codebase
-asyncagents_task(agent="explore", prompt="
+// Explorer agents - investigate codebase
+asyncagents_task(agent="explorer", prompt="
   TASK: Investigate bug - [error description]
   FIND: Related code, call paths, recent changes
   ASSESS COMPLEXITY (include this line in response):
@@ -77,15 +77,15 @@ asyncagents_task(agent="researcher", prompt="
 
 ### Step 2: Complexity Check
 
-Parse Explore responses for `complexity:` line:
-- If ANY Explore reports `complexity: HIGH` → Fire **Genius** immediately
+Parse Explorer responses for `complexity:` line:
+- If ANY Explorer reports `complexity: HIGH` → Fire **Genius** immediately
 - If ALL report `complexity: LOW` → Consider downgrading to Simple Fix Flow
 
 ```typescript
 // If complex
 asyncagents_task(agent="genius", fork=true, prompt="
   TASK: Analyze complex bug
-  CONTEXT: [Explore findings]
+  CONTEXT: [Explorer findings]
   PROVIDE: Root cause analysis, fix strategy, verification plan
 ")
 ```
@@ -122,10 +122,10 @@ For typos, config changes, dependency updates, small refactoring.
 
 ### Step 1: Light Investigation
 
-Fire **2+ Explore agents** in parallel:
+Fire **2+ Explorer agents** in parallel:
 
 ```
-asyncagents_task(agent="explore", prompt="
+asyncagents_task(agent="explorer", prompt="
   TASK: Find location for [change description]
   FIND: Relevant files, current implementation
 ")
@@ -145,7 +145,7 @@ asyncagents_task(agent="genius", prompt="...
 
 ### Step 2: Plan implementation & parallelization (skippable)
 
-Spawn a **Plan agent** to design both implementation and parallelization strategy.
+Spawn a **Planner agent** to design both implementation and parallelization strategy.
 This step is optional; for very simple changes (typos, small config tweaks), you may skip directly to Step 3.
 
 ### Step 3: Delegate to Programmer
@@ -160,7 +160,7 @@ asyncagents_task(agent="programmer", fork=true, prompt="...")  // Follow 8-secti
 
 If Programmer reports unexpected complexity or repeated failures:
 - Upgrade to Bug Flow
-- Fire additional Explore agents
+- Fire additional Explorer agents
 - Consider Genius consultation
 
 
