@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.2...v2.3.0) (2026-03-09)
+
+### Features
+
+* improve keyboard shortcuts, centralize keybindings, and enhance CLI help ([e3e92ee](https://github.com/paulp-o/ask-user-questions-mcp/commit/e3e92ee9318f4c130975e44877872d64834937d3))
+
 ## [2.3.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.2...v2.3.0) (2026-03-10)
 
 ### Features
