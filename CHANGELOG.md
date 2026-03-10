@@ -1,3 +1,9 @@
+## [2.6.3](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.2...v2.6.3) (2026-03-10)
+
+### Bug Fixes
+
+* invalidate stale update cache when current version exceeds cached latest ([a529d3d](https://github.com/paulp-o/ask-user-questions-mcp/commit/a529d3d29fa0a9276c797103dc5d21089c27f879))
+
 ## [2.6.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.1...v2.6.2) (2026-03-10)
 
 ### Bug Fixes
