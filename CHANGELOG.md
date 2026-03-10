@@ -1,3 +1,9 @@
+## [2.6.4](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.3...v2.6.4) (2026-03-10)
+
+### Bug Fixes
+
+* move agent hint back to stderr write before Ink render to guarantee output ([322d077](https://github.com/paulp-o/ask-user-questions-mcp/commit/322d077d9d514b15855d3e0214ec30e44b91d8c9))
+
 ## [2.6.3](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.2...v2.6.3) (2026-03-10)
 
 ### Bug Fixes
