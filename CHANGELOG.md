@@ -1,3 +1,9 @@
+## [2.6.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.1...v2.6.2) (2026-03-10)
+
+### Bug Fixes
+
+* make AI agent hint message 1-tick invisible using Ink rendering engine ([98055bb](https://github.com/paulp-o/ask-user-questions-mcp/commit/98055bbb5d9762fa948c3dc20acdeab08acdf96a))
+
 ## [2.6.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.0...v2.6.1) (2026-03-10)
 
 ### Bug Fixes
