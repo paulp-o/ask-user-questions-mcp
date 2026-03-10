@@ -19,6 +19,8 @@ interface FooterProps {
   hasAnyRecommendedInSession?: boolean;
   /** True when submitting answers (shows spinner) */
   isSubmitting?: boolean;
+  /** True when an update is available */
+  hasUpdate?: boolean;
 }
 
 type Keybinding = { key: string; action: string };
@@ -36,6 +38,7 @@ export const Footer: React.FC<FooterProps> = ({
   hasRecommendedOptions = false,
   hasAnyRecommendedInSession = false,
   isSubmitting = false,
+  hasUpdate = false,
 }) => {
   const { theme } = useTheme();
   const [spinnerFrame, setSpinnerFrame] = useState(0);
@@ -111,6 +114,10 @@ export const Footer: React.FC<FooterProps> = ({
       }
 
       bindings.push({ key: KEY_LABELS.THEME, action: t("footer.theme") });
+
+      if (hasUpdate) {
+        bindings.push({ key: KEY_LABELS.UPDATE, action: "Update" });
+      }
       bindings.push({ key: KEY_LABELS.REJECT, action: t("footer.reject") });
 
       return bindings;

@@ -15,6 +15,9 @@ export const KEYS = {
   // Theme
   THEME_CYCLE: "t", // used with key.ctrl
 
+  // Update overlay
+  UPDATE: "u",
+
   // Confirmation shortcuts
   CONFIRM_YES: /^[yY]$/,
   CONFIRM_NO: /^[nN]$/,
@@ -44,4 +47,5 @@ export const KEY_LABELS = {
   REJECT: "Esc",
   BACK: "n",
   SUBMIT: "Enter",
+  UPDATE: "U",
 } as const;

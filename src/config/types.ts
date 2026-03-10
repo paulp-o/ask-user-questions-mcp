@@ -38,6 +38,9 @@ export const AUQConfigSchema = z.object({
     enabled: true,
     sound: true,
   }),
+
+  // Update
+  updateCheck: z.boolean().default(true),
 });
 
 export type AUQConfig = z.infer<typeof AUQConfigSchema>;

@@ -25,6 +25,7 @@ Commands:
   answer <id> [flags]    Answer or reject a session
   sessions <sub> [flags] List/dismiss sessions
   config <sub> [flags]   Get/set configuration
+  update                 Check for and install updates
 
 Answer:
   auq answer <id> --answers '<json>'    Submit answers
@@ -33,6 +34,7 @@ Answer:
 
 Sessions:
   auq sessions list [--pending|--stale|--all] [--json]
+  auq sessions show <id> [--json]
   auq sessions dismiss <id> [--force] [--json]
 
 Config:
@@ -90,6 +92,47 @@ if (command === "server") {
   // The server will start and handle stdio communication
   // Keep process alive
   await new Promise(() => {});
+}
+
+// Handle 'update' command
+if (command === "update") {
+  const { runUpdateCommand } = await import("../src/cli/commands/update.js");
+  await runUpdateCommand(args.slice(1));
+  process.exit(0);
+}
+
+// ── Fire-and-forget update notification ────────────────────────────
+// Start a non-blocking update check for non-TUI CLI commands.
+// The result is awaited briefly after the main command finishes.
+let updateNotification: Promise<void> | null = null;
+if (
+  command &&
+  !["server", "--help", "-h", "--version", "-v", "update"].includes(command)
+) {
+  updateNotification = (async () => {
+    try {
+      if (
+        process.env.NO_UPDATE_NOTIFIER === "1" ||
+        process.env.CI === "true" ||
+        process.env.CI === "1" ||
+        process.env.NODE_ENV === "test"
+      )
+        return;
+      const { UpdateChecker } = await import("../src/update/index.js");
+      const checker = new UpdateChecker();
+      const result = await Promise.race([
+        checker.check(),
+        new Promise<null>((r) => setTimeout(() => r(null), 5000)),
+      ]);
+      if (result) {
+        process.stderr.write(
+          `Update available: ${result.currentVersion} \u2192 ${result.latestVersion}. Run \`auq update\` to upgrade.\n`,
+        );
+      }
+    } catch {
+      // Silently ignore — update checks must never break the main command
+    }
+  })();
 }
 
 // Handle 'ask' command
@@ -175,6 +218,7 @@ if (command === "ask") {
 
     console.log(formattedResponse);
 
+    await updateNotification;
     process.exit(0);
   } catch (error) {
     if (error instanceof SyntaxError) {
@@ -194,6 +238,7 @@ if (command === "ask") {
 if (command === "answer") {
   const { runAnswerCommand } = await import("../src/cli/commands/answer.js");
   await runAnswerCommand(args.slice(1));
+  await updateNotification;
   process.exit(0);
 }
 
@@ -201,6 +246,7 @@ if (command === "answer") {
 if (command === "sessions") {
   const { runSessionsCommand } = await import("../src/cli/commands/sessions.js");
   await runSessionsCommand(args.slice(1));
+  await updateNotification;
   process.exit(0);
 }
 
@@ -208,6 +254,7 @@ if (command === "sessions") {
 if (command === "config") {
   const { runConfigCommand } = await import("../src/cli/commands/config.js");
   await runConfigCommand(args.slice(1));
+  await updateNotification;
   process.exit(0);
 }
 

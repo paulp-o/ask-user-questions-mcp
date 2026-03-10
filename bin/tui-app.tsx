@@ -46,6 +46,16 @@ import {
   getNextSessionIndex,
   getPrevSessionIndex,
 } from "../src/tui/utils/sessionSwitching.js";
+import {
+  UpdateChecker,
+  fetchChangelog,
+  installUpdate,
+  detectPackageManager,
+  readCache,
+  writeCache,
+} from "../src/update/index.js";
+import type { UpdateInfo } from "../src/update/types.js";
+import { UpdateOverlay } from "../src/tui/components/UpdateOverlay.js";
 import { KEYS } from "../src/tui/constants/keybindings.js";
 
 type AppState = { mode: "PROCESSING" } | { mode: "WAITING" };
@@ -81,6 +91,12 @@ const App: React.FC<AppProps> = ({ config }) => {
   const [sessionMeta, setSessionMeta] = useState<Map<string, { status: string; createdAt: string }>>(new Map());
   const [lastInteractions, setLastInteractions] = useState<Map<string, number>>(new Map());
   const [staleToastShown, setStaleToastShown] = useState<Set<string>>(new Set());
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [showUpdateOverlay, setShowUpdateOverlay] = useState(false);
+  const [isInstallingUpdate, setIsInstallingUpdate] = useState(false);
+  const [installError, setInstallError] = useState<string | null>(null);
+  const [changelogContent, setChangelogContent] = useState<string | null>(null);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
 
   // Get session directory for logging
   const sessionDir = getSessionDirectory();
@@ -197,6 +213,44 @@ const App: React.FC<AppProps> = ({ config }) => {
       clearProgress(notificationConfig);
     };
   }, [notificationConfig]);
+
+  // ── Auto-update checker ─────────────────────────────────────
+  useEffect(() => {
+    // Skip update checks if disabled
+    if (config?.updateCheck === false) return;
+    if (process.env.NO_UPDATE_NOTIFIER === "1") return;
+    if (process.env.CI === "true" || process.env.CI === "1") return;
+    if (process.env.NODE_ENV === "test") return;
+    if (!process.stdout.isTTY) return;
+
+    const checker = new UpdateChecker();
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    const runCheck = async () => {
+      try {
+        const result = await checker.check();
+        if (result) {
+          setUpdateInfo(result);
+
+          // Fetch changelog for the overlay
+          const changelog = await fetchChangelog(result.latestVersion);
+          setChangelogContent(changelog.content);
+        }
+      } catch {
+        // Silently fail — update checks should never break the TUI
+      }
+    };
+
+    runCheck();
+    intervalId = setInterval(() => {
+      checker.clearCache();
+      runCheck();
+    }, 3600000); // 1 hour
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [config?.updateCheck]);
 
   // Auto-transition: WAITING → PROCESSING when queue has items
   useEffect(() => {
@@ -426,6 +480,53 @@ const App: React.FC<AppProps> = ({ config }) => {
     [],
   );
 
+  // ── Auto-update handlers ────────────────────────────────────
+  const handleUpdateInstall = async () => {
+    try {
+      setIsInstallingUpdate(true);
+      setInstallError(null);
+      const pm = detectPackageManager();
+      const success = await installUpdate(pm);
+      if (success) {
+        setShowUpdateOverlay(false);
+        setToast({
+          message: `Updated to v${updateInfo!.latestVersion}. Please restart auq.`,
+          type: "success",
+        });
+        // Exit after short delay so user sees the message
+        setTimeout(() => process.exit(0), 2000);
+      } else {
+        setInstallError("Installation failed. Please try manually.");
+      }
+      setIsInstallingUpdate(false);
+    } catch (err) {
+      setIsInstallingUpdate(false);
+      setInstallError(
+        err instanceof Error ? err.message : "Installation failed",
+      );
+    }
+  };
+
+  const handleSkipVersion = async () => {
+    if (updateInfo) {
+      try {
+        const cache = await readCache();
+        if (cache) {
+          await writeCache({ ...cache, skippedVersion: updateInfo.latestVersion });
+        }
+      } catch {
+        // Non-critical — skip-version simply won't persist
+      }
+    }
+    setShowUpdateOverlay(false);
+    setUpdateInfo(null);
+  };
+
+  const handleRemindLater = () => {
+    setShowUpdateOverlay(false);
+    setUpdateDismissed(true);
+  };
+
   const switchToSession = useCallback(
     (targetIndex: number) => {
       if (state.mode !== "PROCESSING" || sessionQueue.length <= 1) {
@@ -520,7 +621,27 @@ const App: React.FC<AppProps> = ({ config }) => {
         state.mode === "PROCESSING" &&
         !isInReviewOrRejection &&
         !showSessionPicker &&
+        !showUpdateOverlay &&
         sessionQueue.length >= 2,
+    },
+  );
+
+  // Update overlay keyboard shortcut (independent of session count)
+  useInput(
+    (input, key) => {
+      if (!key.ctrl && !key.meta && input === KEYS.UPDATE) {
+        if (updateInfo && !showUpdateOverlay) {
+          setShowUpdateOverlay(true);
+        }
+      }
+    },
+    {
+      isActive:
+        state.mode === "PROCESSING" &&
+        !isInReviewOrRejection &&
+        !showSessionPicker &&
+        !showUpdateOverlay &&
+        !!updateInfo,
     },
   );
 
@@ -623,6 +744,15 @@ const App: React.FC<AppProps> = ({ config }) => {
                 ? Math.max(0, sessionQueue.length - 1)
                 : sessionQueue.length
             }
+            updateInfo={
+              !showUpdateOverlay && updateInfo
+                ? {
+                    updateType: updateInfo.updateType,
+                    latestVersion: updateInfo.latestVersion,
+                  }
+                : null
+            }
+            onUpdateBadgeActivate={() => setShowUpdateOverlay(true)}
           />
           {mainContent}
           {state.mode === "PROCESSING" && sessionQueue.length >= 2 && (
@@ -667,6 +797,21 @@ const App: React.FC<AppProps> = ({ config }) => {
                 setShowSessionPicker(false);
               }}
               onClose={() => setShowSessionPicker(false)}
+            />
+          )}
+          {showUpdateOverlay && updateInfo && (
+            <UpdateOverlay
+              isOpen={showUpdateOverlay}
+              currentVersion={updateInfo.currentVersion}
+              latestVersion={updateInfo.latestVersion}
+              updateType={updateInfo.updateType}
+              changelog={changelogContent}
+              changelogUrl={updateInfo.changelogUrl}
+              isInstalling={isInstallingUpdate}
+              installError={installError}
+              onInstall={handleUpdateInstall}
+              onSkipVersion={handleSkipVersion}
+              onRemindLater={handleRemindLater}
             />
           )}
           <ThemeIndicator />

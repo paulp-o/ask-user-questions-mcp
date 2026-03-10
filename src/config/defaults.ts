@@ -17,4 +17,7 @@ export const DEFAULT_CONFIG: AUQConfig = {
     enabled: true,
     sound: true,
   },
+
+  // Update
+  updateCheck: true,
 };

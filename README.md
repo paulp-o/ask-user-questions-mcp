@@ -248,6 +248,7 @@ It is recommended to **disable** the built-in questioning tool in your harness (
 # you won't likely need these at all
 auq server       # Start MCP server
 auq --version    # Show version
+auq update       # Check for and install updates
 auq --help       # Show help
 ```
 
@@ -333,6 +334,43 @@ When an AI client disconnects, associated sessions are marked as "abandoned". Th
 - Are detectable via `auq sessions list --all`
 
 ---
+
+### Auto-Update
+
+AUQ automatically checks for updates and keeps itself up to date.
+
+#### How it works
+
+- **Patch updates** (e.g., 2.4.0 → 2.4.1): Automatically installed when the TUI starts. These are bug fixes and minor improvements.
+- **Minor/Major updates** (e.g., 2.4.0 → 2.5.0 or 3.0.0): A fullscreen prompt is shown with changelog and options to update, skip, or defer.
+- **CLI notification**: When running non-TUI commands, a one-line update notification is shown if a newer version is available.
+
+#### Manual update
+
+Run `auq update` to manually check for and install updates:
+
+```bash
+auq update        # Interactive update check
+auq update -y     # Skip confirmation prompt
+```
+
+#### Disabling update checks
+
+Disable automatic update checks via config:
+
+```bash
+auq config set updateCheck false
+```
+
+Or set the environment variable:
+
+```bash
+NO_UPDATE_NOTIFIER=1 auq ask "question"
+```
+
+Update checks are automatically disabled in CI environments (`CI=true`).
+
+The `auq update` command always works regardless of these settings.
 
 ### 🎨 Themes
 
@@ -518,6 +556,7 @@ _Settings from local config override global config, which overrides defaults._
   "language": "auto",
   "theme": "system",
   "autoSelectRecommended": true,
+  "updateCheck": true,
   "notifications": {
     "enabled": true,
     "sound": true
@@ -543,6 +582,7 @@ _Settings from local config override global config, which overrides defaults._
 | `staleThreshold`        | number  | 7200000   | 0+ (milliseconds)               | Time before a session is considered stale (2 hours)   |
 | `notifyOnStale`         | boolean | true      | true/false                      | Show toast notification when sessions become stale    |
 | `staleAction`           | string  | "warn"    | "warn", "remove", "archive"     | Action for stale sessions                             |
+| `updateCheck`           | boolean | true      | true/false                      | Enable automatic update checks on startup             |
 
 </details>
 
