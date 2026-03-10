@@ -1,3 +1,9 @@
+## [2.6.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.5.0...v2.6.0) (2026-03-10)
+
+### Features
+
+* add sessions show command, AI agent hint, and fix pending session crash ([689667a](https://github.com/paulp-o/ask-user-questions-mcp/commit/689667a4f35c2cddbee348e5e0574b19b2c766f8))
+
 ## [2.5.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.4.0...v2.5.0) (2026-03-10)
 
 ### Features
