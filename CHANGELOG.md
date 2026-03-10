@@ -1,3 +1,9 @@
+## [2.5.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.4.0...v2.5.0) (2026-03-10)
+
+### Features
+
+* add auto-update system with CLI command, TUI overlay, and background checker ([1aef4f1](https://github.com/paulp-o/ask-user-questions-mcp/commit/1aef4f1ca3ad7d53155088073041401b09cb0370))
+
 ## [2.3.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.2...v2.3.0) (2026-03-09)
 
 ### Features
