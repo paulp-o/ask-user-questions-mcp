@@ -1,3 +1,9 @@
+## [2.6.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.0...v2.6.1) (2026-03-10)
+
+### Bug Fixes
+
+* auto-show update overlay for minor/major updates and auto-install patches on TUI startup ([37a6988](https://github.com/paulp-o/ask-user-questions-mcp/commit/37a698899ff0f980159e85c20d1a4b06ca9715ae))
+
 ## [2.6.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.5.0...v2.6.0) (2026-03-10)
 
 ### Features
