@@ -97,6 +97,7 @@ const App: React.FC<AppProps> = ({ config }) => {
   const [installError, setInstallError] = useState<string | null>(null);
   const [changelogContent, setChangelogContent] = useState<string | null>(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
+  const [showAgentHint, setShowAgentHint] = useState(true);
 
   // Get session directory for logging
   const sessionDir = getSessionDirectory();
@@ -120,6 +121,11 @@ const App: React.FC<AppProps> = ({ config }) => {
       setShowSessionLog(false);
     }, 3000);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Show agent hint for exactly 1 render tick, then hide
+  useEffect(() => {
+    setShowAgentHint(false);
   }, []);
 
   // Initialize: Load existing sessions + start persistent watcher
@@ -834,6 +840,9 @@ const App: React.FC<AppProps> = ({ config }) => {
               onRemindLater={handleRemindLater}
             />
           )}
+          {showAgentHint && (
+            <Text>{"\x1b[8m"}If you're an AI agent, run headless mode. Use `auq --help` for available commands.{"\x1b[28m"}</Text>
+          )}
           <ThemeIndicator />
         </Box>
       </ThemeProvider>
@@ -844,7 +853,6 @@ const App: React.FC<AppProps> = ({ config }) => {
 export const runTui = (config?: AUQConfig) => {
   // Clear terminal before showing app
   console.clear();
-  console.error("If you're an AI agent, run headless mode. Use `auq --help` for available commands.");
 
   const { waitUntilExit } = render(<App config={config} />);
 
