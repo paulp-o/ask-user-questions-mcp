@@ -74,7 +74,9 @@ export class UpdateChecker {
     try {
       // 1. Check cache first
       const cache = await readCache();
-      if (cache && isCacheFresh(cache)) {
+      // Only trust cache if fresh AND cached latest >= current version.
+      // If current > cached latest (user upgraded), cache is stale — must refetch from npm.
+      if (cache && isCacheFresh(cache) && !isNewer(cache.latestVersion, this.currentVersion)) {
         if (!isNewer(this.currentVersion, cache.latestVersion)) return null;
         if (shouldSkipVersion(cache, cache.latestVersion)) return null;
         return {
