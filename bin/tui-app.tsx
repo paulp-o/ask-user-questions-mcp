@@ -824,6 +824,7 @@ const App: React.FC<AppProps> = ({ config }) => {
 export const runTui = (config?: AUQConfig) => {
   // Clear terminal before showing app
   console.clear();
+  console.error("If you're an AI agent, run headless mode. Use `auq --help` for available commands.");
 
   const { waitUntilExit } = render(<App config={config} />);
 

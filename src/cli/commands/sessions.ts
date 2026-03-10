@@ -238,7 +238,12 @@ async function sessionsShow(args: string[]): Promise<void> {
   // ── Fetch session data ──────────────────────────────────────────
   const status = await sessionManager.getSessionStatus(sessionId);
   const request = await sessionManager.getSessionRequest(sessionId);
-  const answersData = await sessionManager.getSessionAnswers(sessionId);
+  let answersData: Awaited<ReturnType<typeof sessionManager.getSessionAnswers>> = null;
+  try {
+    answersData = await sessionManager.getSessionAnswers(sessionId);
+  } catch {
+    // answers.json may not exist for pending/in-progress sessions — that's expected
+  }
 
   if (!status || !request) {
     outputResult(
