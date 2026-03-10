@@ -41,6 +41,20 @@ export interface TUIWatcherConfig {
 }
 
 /**
+ * Metadata for a pending or abandoned session, including its status.
+ * Used by TUI components that need richer session information
+ * (e.g. stale detection, visual indicators).
+ */
+export interface PendingSessionMeta {
+  /** Session ID (directory name) */
+  sessionId: string;
+  /** Current session status from status.json */
+  status: string;
+  /** ISO-8601 creation timestamp from status.json */
+  createdAt: string;
+}
+
+/**
  * Enhanced TUI Session Watcher with session data loading
  */
 export class EnhancedTUISessionWatcher extends TUISessionWatcher {
@@ -113,6 +127,65 @@ export class EnhancedTUISessionWatcher extends TUISessionWatcher {
       return pendingSessions.sort(); // Sort for consistent ordering
     } catch (error) {
       console.warn("Failed to scan for pending sessions:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Get pending and abandoned sessions with full status metadata.
+   * Unlike getPendingSessions(), this includes abandoned sessions
+   * and returns status + createdAt for stale detection.
+   */
+  async getPendingSessionsWithStatus(): Promise<PendingSessionMeta[]> {
+    const fs = await import("fs/promises");
+    const { join } = await import("path");
+
+    try {
+      const sessionDir = this.watchedPath;
+      const entries = await fs.readdir(sessionDir, { withFileTypes: true });
+
+      const results: PendingSessionMeta[] = [];
+
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+
+        const sessionPath = join(sessionDir, entry.name);
+        const answersPath = join(sessionPath, SESSION_FILES.ANSWERS);
+        const statusPath = join(sessionPath, SESSION_FILES.STATUS);
+
+        try {
+          // Skip sessions that already have answers
+          await fs.access(answersPath);
+        } catch {
+          // No answers file — read status.json
+          try {
+            const statusContent = await fs.readFile(statusPath, "utf-8");
+            const status = JSON.parse(statusContent) as SessionStatus;
+
+            // Include pending, in-progress, AND abandoned sessions
+            if (
+              status.status === "pending" ||
+              status.status === "in-progress" ||
+              status.status === "abandoned"
+            ) {
+              results.push({
+                createdAt: status.createdAt,
+                sessionId: entry.name,
+                status: status.status,
+              });
+            }
+          } catch {
+            // No valid status file — skip
+          }
+        }
+      }
+
+      return results.sort((a, b) => a.sessionId.localeCompare(b.sessionId));
+    } catch (error) {
+      console.warn(
+        "Failed to scan for pending sessions with status:",
+        error,
+      );
       return [];
     }
   }

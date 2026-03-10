@@ -99,6 +99,7 @@ export const lightTheme: Theme = {
       successPillBg: "#E6F9EE",
       error: "#CF222E",
       info: "#007EA7",
+      warning: "#B07D00",
       border: "#D0D7DE",
     },
     markdown: {
@@ -113,6 +114,8 @@ export const lightTheme: Theme = {
       untouched: "#6E7781",
       number: "#24292F",
       activeNumber: "#007EA7",
+      stale: "#B07D00",
+      abandoned: "#CF222E",
     },
     sessionPicker: {
       border: "#007EA7",
@@ -123,6 +126,10 @@ export const lightTheme: Theme = {
       highlightFg: "#2DA44E",
       activeMark: "#007EA7",
       progress: "#007EA7",
+      staleIcon: "#B07D00",
+      staleText: "#B07D00",
+      staleAge: "#B07D00",
+      staleSubtitle: "#6E7781",
     },
   },
 } as const;

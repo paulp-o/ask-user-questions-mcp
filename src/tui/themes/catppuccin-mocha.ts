@@ -99,6 +99,7 @@ export const catppuccinMochaTheme: Theme = {
       successPillBg: "#313244",
       error: "#f38ba8",
       info: "#89b4fa",
+      warning: "#f9e2af",
       border: "#313244",
     },
     markdown: {
@@ -113,6 +114,8 @@ export const catppuccinMochaTheme: Theme = {
       untouched: "#8688a0",
       number: "#cdd6f4",
       activeNumber: "#89b4fa",
+      stale: "#f9e2af",
+      abandoned: "#f38ba8",
     },
     sessionPicker: {
       border: "#89b4fa",
@@ -123,6 +126,10 @@ export const catppuccinMochaTheme: Theme = {
       highlightFg: "#a6e3a1",
       activeMark: "#89b4fa",
       progress: "#89dceb",
+      staleIcon: "#f9e2af",
+      staleText: "#f9e2af",
+      staleAge: "#f9e2af",
+      staleSubtitle: "#8688a0",
     },
   },
 } as const;

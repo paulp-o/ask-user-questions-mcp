@@ -132,6 +132,7 @@ describe("StepperView SessionUIState boundary", () => {
     expect(onFlowStateChange).toHaveBeenCalledWith({
       showReview: false,
       showRejectionConfirm: false,
+      showAbandonedConfirm: false,
     });
   });
 });

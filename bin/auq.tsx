@@ -14,106 +14,42 @@ const args = process.argv.slice(2);
 const command = args[0];
 
 if (command === "--help" || command === "-h") {
-  console.log(`
-AUQ - Ask User Questions
+  console.log(`auq - Ask User Questions (MCP server + TUI)
 
-An MCP server and TUI for AI assistants to ask users structured questions.
-
-Usage:
-  auq [command] [options]
+Usage: auq [command] [options]
 
 Commands:
-  (default)     Start the interactive TUI (Terminal User Interface)
-  server        Start the MCP server (for use with AI assistants)
-  ask <json>    Ask questions via CLI (pipe or argument)
+  (default)              Start interactive TUI
+  server                 Start MCP server (stdio)
+  ask <json>             Ask questions via CLI
+  answer <id> [flags]    Answer or reject a session
+  sessions <sub> [flags] List/dismiss sessions
+  config <sub> [flags]   Get/set configuration
+
+Answer:
+  auq answer <id> --answers '<json>'    Submit answers
+  auq answer <id> --reject [--reason]   Reject session
+  Flags: --force  --json
+
+Sessions:
+  auq sessions list [--pending|--stale|--all] [--json]
+  auq sessions dismiss <id> [--force] [--json]
+
+Config:
+  auq config get [key] [--json]
+  auq config set <key> <value> [--global] [--json]
 
 Options:
-  --help, -h    Show this help message
-  --version, -v Show version information
+  -h, --help      Show this help
+  -v, --version   Show version
 
-TUI Keyboard Shortcuts:
-  Navigation:
-    ↑/↓           Navigate options
-    ←/→           Navigate questions
-    Tab/Shift+Tab Navigate questions
+Keys (TUI):
+  ↑↓ navigate  ←→/Tab questions  Space toggle  Enter select
+  R recommend  Ctrl+R quick-submit  Esc reject
+  [/] sessions  1-9 jump  Ctrl+S picker  Ctrl+T theme
 
-  Selection:
-    Space         Select/toggle option (multi-select)
-    Enter         Select option & advance to next question
-    R             Select recommended option(s)
-    Ctrl+R        Quick submit (auto-select all recommended)
-
-  Session Management:
-    ]             Next session
-    [             Previous session
-    1-9           Jump to session by number
-    Ctrl+S        Open session picker
-
-  Other:
-    E             Request elaboration on current question
-    Ctrl+T        Cycle color theme
-    Esc           Reject question set
-
-Ask Command:
-  Use 'auq ask' when you need to ask the user questions during
-  execution. This allows you to:
-    1. Gather user preferences or requirements
-    2. Clarify ambiguous instructions
-    3. Get decisions on implementation choices as you work
-    4. Offer choices to the user about what direction to take
-
-  Features:
-    - Ask 1-5 structured questions via an interactive terminal UI
-    - Each question includes 2-5 multiple-choice options
-    - Users can always provide custom free-text input
-    - Single-select mode (default): pick ONE option or custom text
-    - Multi-select mode (multiSelect: true): select MULTIPLE options
-
-  Usage Notes:
-    - Provide a descriptive 'title' field (max 12 chars) per question
-    - Use multiSelect: true when choices are not mutually exclusive
-    - Option labels should be concise (1-5 words)
-    - To mark recommended, append '(recommended)' to option label
-    - Don't include an 'Other' option — it's provided automatically
-
-  Returns a formatted summary of all questions and answers.
-
-Configuration:
-  Config file locations (searched in order, merged):
-    ./.auqrc.json                  Project-level (highest priority)
-    ~/.config/auq/.auqrc.json      User-level (global)
-
-  Available options (with defaults):
-    maxOptions             Max options per question (2-10, default: 5)
-    maxQuestions           Max questions per session (1-10, default: 5)
-    recommendedOptions     Recommended option count hint (default: 4)
-    recommendedQuestions   Recommended question count hint (default: 4)
-    sessionTimeout         Session timeout in ms (0 = infinite, default: 0)
-    retentionPeriod        Session retention in ms (default: 604800000 / 7d)
-    language               UI language ("auto" | "en" | "ko", default: "auto")
-    theme                  Color theme ("system" | "dark" | "light" | custom,
-                           default: "system")
-    autoSelectRecommended  Pre-select recommended options (default: true)
-    notifications.enabled  Enable desktop notifications (default: true)
-    notifications.sound    Enable notification sounds (default: true)
-
-  Custom themes: place .theme.json files in ~/.config/auq/themes/
-
-Environment Variables:
-  AUQ_SESSION_DIR    Override session storage directory
-  XDG_CONFIG_HOME    Override config base directory (default: ~/.config)
-
-Examples:
-  auq                    # Start TUI (wait for questions from AI)
-  auq server             # Start MCP server (for Claude Desktop, etc.)
-  auq ask '{"questions": [{"prompt": "Which language?", "title": "Lang",
-    "options": [{"label": "TypeScript (recommended)"}, {"label": "Python"}],
-    "multiSelect": false}]}'
-  echo '{"questions": [...]}' | auq ask   # Pipe JSON to ask command
-
-For more information, visit:
-  https://github.com/paulp-o/ask-user-questions-mcp
-`);
+Config: ./.auqrc.json (local) > ~/.config/auq/.auqrc.json (global)
+Env:    AUQ_SESSION_DIR  XDG_CONFIG_HOME`);
   process.exit(0);
 }
 
@@ -252,6 +188,27 @@ if (command === "ask") {
     }
     process.exit(1);
   }
+}
+
+// Handle 'answer' command
+if (command === "answer") {
+  const { runAnswerCommand } = await import("../src/cli/commands/answer.js");
+  await runAnswerCommand(args.slice(1));
+  process.exit(0);
+}
+
+// Handle 'sessions' command
+if (command === "sessions") {
+  const { runSessionsCommand } = await import("../src/cli/commands/sessions.js");
+  await runSessionsCommand(args.slice(1));
+  process.exit(0);
+}
+
+// Handle 'config' command
+if (command === "config") {
+  const { runConfigCommand } = await import("../src/cli/commands/config.js");
+  await runConfigCommand(args.slice(1));
+  process.exit(0);
 }
 
 // Default: Start TUI

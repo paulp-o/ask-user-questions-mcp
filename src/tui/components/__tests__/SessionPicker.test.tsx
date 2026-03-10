@@ -47,7 +47,7 @@ function getOutput(frame: string | undefined): string {
   return (frame ?? "").replace(/\x1b\[[0-9;]*m/g, "").replace(/\r/g, "");
 }
 
-function createSession(id: number): SessionPickerSessionData {
+function createSession(id: number, overrides?: { isStale?: boolean; isAbandoned?: boolean }): SessionPickerSessionData {
   return {
     sessionId: `picker-id-${id}`,
     sessionRequest: {
@@ -65,6 +65,7 @@ function createSession(id: number): SessionPickerSessionData {
       ],
     },
     timestamp: new Date("2026-01-01T00:00:00.000Z"),
+    ...overrides,
   };
 }
 
@@ -215,5 +216,107 @@ describe("SessionPicker", () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onSelectIndex).not.toHaveBeenCalled();
+  });
+
+  describe("stale/abandoned session indicators", () => {
+    it("shows ⚠ icon for stale sessions", () => {
+      const sessions = [createSession(1), createSession(2, { isStale: true })];
+
+      const instance = renderWithTheme(
+        <SessionPicker
+          isOpen
+          sessions={sessions}
+          activeIndex={0}
+          sessionUIStates={{}}
+          onSelectIndex={() => {}}
+          onClose={() => {}}
+        />,
+      );
+
+      const output = getOutput(instance.lastFrame());
+      expect(output).toContain("⚠");
+      expect(output).toContain("Title 2");
+    });
+
+    it("shows 'may be orphaned' subtitle for stale sessions", () => {
+      const sessions = [createSession(1, { isStale: true })];
+
+      const instance = renderWithTheme(
+        <SessionPicker
+          isOpen
+          sessions={sessions}
+          activeIndex={0}
+          sessionUIStates={{}}
+          onSelectIndex={() => {}}
+          onClose={() => {}}
+        />,
+      );
+
+      const output = getOutput(instance.lastFrame());
+      expect(output).toContain("may be orphaned");
+    });
+
+    it("shows 'session abandoned' subtitle for abandoned sessions", () => {
+      const sessions = [createSession(1, { isAbandoned: true })];
+
+      const instance = renderWithTheme(
+        <SessionPicker
+          isOpen
+          sessions={sessions}
+          activeIndex={0}
+          sessionUIStates={{}}
+          onSelectIndex={() => {}}
+          onClose={() => {}}
+        />,
+      );
+
+      const output = getOutput(instance.lastFrame());
+      expect(output).toContain("⚠");
+      expect(output).toContain("session abandoned");
+    });
+
+    it("stale sessions remain selectable via Enter", async () => {
+      const sessions = [createSession(1, { isStale: true }), createSession(2)];
+      const onSelectIndex = vi.fn();
+      const onClose = vi.fn();
+
+      renderWithTheme(
+        <SessionPicker
+          isOpen
+          sessions={sessions}
+          activeIndex={0}
+          sessionUIStates={{}}
+          onSelectIndex={onSelectIndex}
+          onClose={onClose}
+        />,
+      );
+
+      expect(inputState.handler).not.toBeNull();
+      inputState.handler!("", { return: true });
+      await Promise.resolve();
+
+      expect(onSelectIndex).toHaveBeenCalledWith(0);
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it("non-stale sessions render normally without ⚠ or subtitles", () => {
+      const sessions = [createSession(1), createSession(2)];
+
+      const instance = renderWithTheme(
+        <SessionPicker
+          isOpen
+          sessions={sessions}
+          activeIndex={0}
+          sessionUIStates={{}}
+          onSelectIndex={() => {}}
+          onClose={() => {}}
+        />,
+      );
+
+      const output = getOutput(instance.lastFrame());
+      expect(output).not.toContain("⚠");
+      expect(output).not.toContain("may be orphaned");
+      expect(output).not.toContain("session abandoned");
+    });
   });
 });

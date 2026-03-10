@@ -99,6 +99,7 @@ export const draculaTheme: Theme = {
       successPillBg: "#44475a", // current line
       error: "#ff5555",
       info: "#bd93f9",
+      warning: "#f1fa8c",
       border: "#44475a",
     },
     markdown: {
@@ -113,6 +114,8 @@ export const draculaTheme: Theme = {
       untouched: "#7C8BBE",
       number: "#f8f8f2",
       activeNumber: "#bd93f9",
+      stale: "#f1fa8c",
+      abandoned: "#ff5555",
     },
     sessionPicker: {
       border: "#bd93f9",
@@ -123,6 +126,10 @@ export const draculaTheme: Theme = {
       highlightFg: "#50fa7b",
       activeMark: "#bd93f9",
       progress: "#8be9fd",
+      staleIcon: "#f1fa8c",
+      staleText: "#f1fa8c",
+      staleAge: "#f1fa8c",
+      staleSubtitle: "#7C8BBE",
     },
   },
 } as const;

@@ -14,5 +14,10 @@
   "// UI": "User interface settings",
   "language": "auto",
   "theme": "system",
-  "autoSelectRecommended": true
+  "autoSelectRecommended": true,
+
+  "// Stale/Orphan Detection": "Configure stale session detection behavior",
+  "staleThreshold": 7200000,
+  "notifyOnStale": true,
+  "staleAction": "warn"
 }

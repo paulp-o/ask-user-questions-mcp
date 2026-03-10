@@ -57,6 +57,7 @@ export interface ToastTranslations {
   copied: string;
   saved: string;
   error: string;
+  staleSession: string;
 }
 
 export interface StepperTranslations {
@@ -84,6 +85,13 @@ export interface UiTranslations {
   themeLabel: string;
 }
 
+export interface AbandonedTranslations {
+  title: string;
+  message: string;
+  continue: string;
+  cancel: string;
+}
+
 export interface Translations {
   footer: FooterTranslations;
   header: HeaderTranslations;
@@ -95,6 +103,7 @@ export interface Translations {
   input: InputTranslations;
   question: QuestionTranslations;
   ui: UiTranslations;
+  abandoned: AbandonedTranslations;
 }
 
 export type TranslationKey =
@@ -107,6 +116,7 @@ export type TranslationKey =
   | `stepper.${keyof StepperTranslations}`
   | `input.${keyof InputTranslations}`
   | `question.${keyof QuestionTranslations}`
-  | `ui.${keyof UiTranslations}`;
+  | `ui.${keyof UiTranslations}`
+  | `abandoned.${keyof AbandonedTranslations}`;
 
 export type SupportedLanguage = "en" | "ko" | "auto";

@@ -26,9 +26,14 @@ interface StepperViewProps {
   onFlowStateChange?: (state: {
     showReview: boolean;
     showRejectionConfirm: boolean;
+    showAbandonedConfirm: boolean;
   }) => void;
   sessionId: string;
   sessionRequest: SessionRequest;
+  /** Whether this session is abandoned (AI disconnected) */
+  isAbandoned?: boolean;
+  /** Called when user cancels an abandoned session */
+  onAbandonedCancel?: () => void;
 }
 
 /**
@@ -44,6 +49,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
   onFlowStateChange,
   sessionId,
   sessionRequest,
+  isAbandoned,
+  onAbandonedCancel,
 }) => {
   const { theme } = useTheme();
   const config = useConfig();
@@ -53,6 +60,9 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [showReview, setShowReview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showRejectionConfirm, setShowRejectionConfirm] = useState(false);
+  const [showAbandonedConfirm, setShowAbandonedConfirm] = useState(false);
+  const [abandonedConfirmed, setAbandonedConfirmed] = useState(false);
+  const [abandonedFocusedIndex, setAbandonedFocusedIndex] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [focusContext, setFocusContext] = useState<FocusContext>("option");
   const [focusedOptionIndex, setFocusedOptionIndex] = useState(0);
@@ -244,6 +254,16 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setHasAnyRecommendedInSession(anyHasRecommended);
   }, [initialState, sessionId, sessionRequest.questions]);
 
+  // Show abandoned confirmation when entering an abandoned session
+  useEffect(() => {
+    if (isAbandoned && !abandonedConfirmed) {
+      setShowAbandonedConfirm(true);
+      setAbandonedFocusedIndex(0);
+    } else {
+      setShowAbandonedConfirm(false);
+    }
+  }, [sessionId, isAbandoned, abandonedConfirmed]);
+
   useEffect(() => {
     if (!onStateSnapshot) {
       return;
@@ -274,8 +294,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
   ]);
 
   useEffect(() => {
-    onFlowStateChange?.({ showReview, showRejectionConfirm });
-  }, [onFlowStateChange, showRejectionConfirm, showReview]);
+    onFlowStateChange?.({ showReview, showRejectionConfirm, showAbandonedConfirm });
+  }, [onFlowStateChange, showRejectionConfirm, showReview, showAbandonedConfirm]);
 
   // Update elapsed time since session creation
   // IMPORTANT: Pause when content overflows terminal to prevent scroll-snapping
@@ -425,10 +445,35 @@ export const StepperView: React.FC<StepperViewProps> = ({
     });
   };
 
+  // Keyboard handling for abandoned confirmation dialog
+  useInput((input, key) => {
+    if (!showAbandonedConfirm) return;
+
+    if (key.upArrow) {
+      setAbandonedFocusedIndex((prev) => Math.max(0, prev - 1));
+    }
+    if (key.downArrow) {
+      setAbandonedFocusedIndex((prev) => Math.min(1, prev + 1));
+    }
+    if (key.return) {
+      if (abandonedFocusedIndex === 0) {
+        // "Answer anyway"
+        setAbandonedConfirmed(true);
+        setShowAbandonedConfirm(false);
+      } else {
+        // "Cancel"
+        onAbandonedCancel?.();
+      }
+    }
+    if (key.escape) {
+      onAbandonedCancel?.();
+    }
+  });
+
   // Global keyboard shortcuts and navigation
   useInput((input, key) => {
     // Don't handle navigation when showing review, submitting, or confirming rejection
-    if (showReview || submitting || showRejectionConfirm) return;
+    if (showReview || submitting || showRejectionConfirm || showAbandonedConfirm) return;
 
     // Derive text-input state from both focusContext and focusedOptionIndex
     // focusContext may lag by one render cycle (set via useEffect in OptionsList)
@@ -599,6 +644,55 @@ export const StepperView: React.FC<StepperViewProps> = ({
       }
     }
   };
+
+  // Show abandoned session confirmation
+  if (showAbandonedConfirm) {
+    const abandonedOptions = [
+      { label: t("abandoned.continue"), action: () => { setAbandonedConfirmed(true); setShowAbandonedConfirm(false); } },
+      { label: t("abandoned.cancel"), action: () => { onAbandonedCancel?.(); } },
+    ];
+
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Box
+          borderColor={theme.borders.warning}
+          borderStyle="round"
+          flexDirection="column"
+          padding={1}
+        >
+          <Box marginBottom={1}>
+            <Text bold color={theme.colors.warning}>
+              {t("abandoned.title")}
+            </Text>
+          </Box>
+          <Box marginBottom={1}>
+            <Text>{t("abandoned.message")}</Text>
+          </Box>
+          {abandonedOptions.map((option, index) => {
+            const isFocused = index === abandonedFocusedIndex;
+            const rowBg = isFocused
+              ? theme.components.options.focusedBg
+              : undefined;
+            return (
+              <Box key={index} marginTop={index > 0 ? 0.5 : 0}>
+                <Text
+                  backgroundColor={rowBg}
+                  bold={isFocused}
+                  color={isFocused ? theme.colors.focused : theme.colors.text}
+                >
+                  {isFocused ? "> " : "  "}
+                  {option.label}
+                </Text>
+              </Box>
+            );
+          })}
+          <Box marginTop={1}>
+            <Text dimColor>{"↑↓ Navigate | Enter Select"}</Text>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   // Show rejection confirmation
   if (showRejectionConfirm) {

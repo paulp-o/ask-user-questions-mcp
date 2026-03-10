@@ -100,6 +100,7 @@ export const darkTheme: Theme = {
       successPillBg: "#0F2417",
       error: "#FF5C57",
       info: "#46D9FF",
+      warning: "#FFD36A",
       border: "#2A3238",
     },
     markdown: {
@@ -114,6 +115,8 @@ export const darkTheme: Theme = {
       untouched: "#A0AAB4",
       number: "#E7EEF5",
       activeNumber: "#46D9FF",
+      stale: "#FFD36A",
+      abandoned: "#FF5C57",
     },
     sessionPicker: {
       border: "#46D9FF",
@@ -124,6 +127,10 @@ export const darkTheme: Theme = {
       highlightFg: "#5AF78E",
       activeMark: "#46D9FF",
       progress: "#46D9FF",
+      staleIcon: "#FFD36A",
+      staleText: "#FFD36A",
+      staleAge: "#FFD36A",
+      staleSubtitle: "#A0AAB4",
     },
   },
 } as const;

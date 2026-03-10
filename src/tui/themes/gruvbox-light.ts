@@ -99,6 +99,7 @@ export const gruvboxLightTheme: Theme = {
       successPillBg: "#ebdbb2", // light1 - light bg
       error: "#9d0006",
       info: "#076678",
+      warning: "#b57614",
       border: "#d5c4a1",
     },
     markdown: {
@@ -113,6 +114,8 @@ export const gruvboxLightTheme: Theme = {
       untouched: "#a89984",
       number: "#3c3836",
       activeNumber: "#076678",
+      stale: "#b57614",
+      abandoned: "#9d0006",
     },
     sessionPicker: {
       border: "#076678",
@@ -123,6 +126,10 @@ export const gruvboxLightTheme: Theme = {
       highlightFg: "#79740e",
       activeMark: "#076678",
       progress: "#076678",
+      staleIcon: "#b57614",
+      staleText: "#b57614",
+      staleAge: "#b57614",
+      staleSubtitle: "#a89984",
     },
   },
 } as const;

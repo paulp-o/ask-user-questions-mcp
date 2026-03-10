@@ -739,4 +739,88 @@ describe("SessionManager", () => {
       expect(result2.formattedResponse).toContain("Option 2");
     });
   });
+
+  describe("abandoned status support", () => {
+    const sampleQuestions: Question[] = [
+      { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+    ];
+
+    it("should transition a session to abandoned status via updateSessionStatus", async () => {
+      const sessionId = await sessionManager.createSession(sampleQuestions);
+
+      await sessionManager.updateSessionStatus(sessionId, "abandoned");
+
+      const status = await sessionManager.getSessionStatus(sessionId);
+      expect(status?.status).toBe("abandoned");
+    });
+
+    it("should return true from isAbandoned() for abandoned session", async () => {
+      const sessionId = await sessionManager.createSession(sampleQuestions);
+      await sessionManager.updateSessionStatus(sessionId, "abandoned");
+
+      const result = await sessionManager.isAbandoned(sessionId);
+      expect(result).toBe(true);
+    });
+
+    it("should return false from isAbandoned() for pending session", async () => {
+      const sessionId = await sessionManager.createSession(sampleQuestions);
+
+      const result = await sessionManager.isAbandoned(sessionId);
+      expect(result).toBe(false);
+    });
+
+    it("should return false from isAbandoned() for non-existent session", async () => {
+      const result = await sessionManager.isAbandoned("non-existent-session-id");
+      expect(result).toBe(false);
+    });
+
+    it("should exclude abandoned sessions from getPendingSessions() by default", async () => {
+      const pendingId = await sessionManager.createSession(sampleQuestions);
+      const abandonedId = await sessionManager.createSession(sampleQuestions);
+      await sessionManager.updateSessionStatus(abandonedId, "abandoned");
+
+      const pending = await sessionManager.getPendingSessions();
+      expect(pending).toContain(pendingId);
+      expect(pending).not.toContain(abandonedId);
+    });
+
+    it("should include abandoned sessions in getPendingSessions() when includeAbandoned is true", async () => {
+      const pendingId = await sessionManager.createSession(sampleQuestions);
+      const abandonedId = await sessionManager.createSession(sampleQuestions);
+      await sessionManager.updateSessionStatus(abandonedId, "abandoned");
+
+      const pending = await sessionManager.getPendingSessions({ includeAbandoned: true });
+      expect(pending).toContain(pendingId);
+      expect(pending).toContain(abandonedId);
+    });
+
+    it("should exclude completed sessions from getPendingSessions() even with includeAbandoned", async () => {
+      const pendingId = await sessionManager.createSession(sampleQuestions);
+      const completedId = await sessionManager.createSession(sampleQuestions);
+      const abandonedId = await sessionManager.createSession(sampleQuestions);
+      await sessionManager.updateSessionStatus(completedId, "completed");
+      await sessionManager.updateSessionStatus(abandonedId, "abandoned");
+
+      const pending = await sessionManager.getPendingSessions({ includeAbandoned: true });
+      expect(pending).toContain(pendingId);
+      expect(pending).toContain(abandonedId);
+      expect(pending).not.toContain(completedId);
+    });
+
+    it("should include in-progress sessions in getPendingSessions()", async () => {
+      const inProgressId = await sessionManager.createSession(sampleQuestions);
+      await sessionManager.updateSessionStatus(inProgressId, "in-progress");
+
+      const pending = await sessionManager.getPendingSessions();
+      expect(pending).toContain(inProgressId);
+    });
+
+    it("should return empty array from getPendingSessions() when no pending sessions exist", async () => {
+      const completedId = await sessionManager.createSession(sampleQuestions);
+      await sessionManager.updateSessionStatus(completedId, "completed");
+
+      const pending = await sessionManager.getPendingSessions();
+      expect(pending).toEqual([]);
+    });
+  });
 });

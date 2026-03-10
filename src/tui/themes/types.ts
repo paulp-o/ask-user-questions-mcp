@@ -108,6 +108,7 @@ export interface Theme {
       successPillBg: string; // Background color for success pill/badge style
       error: string;
       info: string;
+      warning: string;        // Warning toast color
       border: string;
     };
     markdown: {
@@ -121,6 +122,8 @@ export interface Theme {
       inProgress: string; // Yellow for touched but no answers
       untouched: string; // Dim for untouched sessions
       number: string; // Color for the session number text
+      stale: string;          // Yellow/warning for stale sessions
+      abandoned: string;      // Red/danger for abandoned sessions
       activeNumber: string; // Color for active session number (bold)
     };
     sessionPicker: {
@@ -132,6 +135,10 @@ export interface Theme {
       highlightFg: string; // Foreground for highlighted row
       activeMark: string; // Color for the active session marker
       progress: string; // Color for progress info [2/4]
+      staleIcon: string;      // Warning icon color (yellow/warning)
+      staleText: string;      // Stale session text color
+      staleAge: string;       // Highlighted age color for stale
+      staleSubtitle: string;  // "may be orphaned" subtitle color
     };
   };
 }

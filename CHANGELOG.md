@@ -2,7 +2,7 @@
 
 ### Features
 
-* improve keyboard shortcuts, centralize keybindings, and enhance CLI help ([e3e92ee](https://github.com/paulp-o/ask-user-questions-mcp/commit/e3e92ee9318f4c130975e44877872d64834937d3))
+- improve keyboard shortcuts, centralize keybindings, and enhance CLI help ([e3e92ee](https://github.com/paulp-o/ask-user-questions-mcp/commit/e3e92ee9318f4c130975e44877872d64834937d3))
 
 ## [2.3.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.2...v2.3.0) (2026-03-10)
 
@@ -25,7 +25,7 @@
 
 ### Bug Fixes
 
-* prevent shortcut keys from firing in text input and reset cursor on question switch ([10fd4b8](https://github.com/paulp-o/ask-user-questions-mcp/commit/10fd4b8702ace87517b531d918d525cb4ce23598))
+- prevent shortcut keys from firing in text input and reset cursor on question switch ([10fd4b8](https://github.com/paulp-o/ask-user-questions-mcp/commit/10fd4b8702ace87517b531d918d525cb4ce23598))
 
 ## [2.2.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.0...v2.2.1) (2026-02-19)
 
@@ -132,6 +132,16 @@
 # Changelog
 
 ## [Unreleased]
+
+### Added
+
+- Stale session detection with configurable threshold and visual indicators
+- Abandoned session handling with AI disconnect detection
+- CLI commands: `auq answer`, `auq sessions list/dismiss`, `auq config get/set`
+- Configuration options: `staleThreshold`, `notifyOnStale`, `staleAction`
+- Confirmation dialog when answering abandoned sessions
+- Toast notifications for stale sessions
+- AbortSignal support for session lifecycle management
 
 ### Changed
 

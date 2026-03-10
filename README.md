@@ -255,6 +255,85 @@ auq --help       # Show help
 
 ---
 
+### CLI Commands
+
+AUQ provides headless CLI commands for managing sessions and configuration without the TUI.
+
+#### Answer Sessions
+
+```bash
+# Answer a session with JSON answers
+auq answer <sessionId> --answers '{"0": {"selectedOption": "option1"}}'
+
+# Reject a session
+auq answer <sessionId> --reject --reason "Not applicable"
+
+# Force answer an abandoned session
+auq answer <sessionId> --answers '...' --force
+
+# JSON output
+auq answer <sessionId> --answers '...' --json
+```
+
+#### Manage Sessions
+
+```bash
+# List pending sessions
+auq sessions list
+
+# List stale sessions only
+auq sessions list --stale
+
+# List all sessions (including completed, abandoned)
+auq sessions list --all
+
+# Dismiss/archive a session
+auq sessions dismiss <sessionId>
+
+# JSON output
+auq sessions list --json
+```
+
+#### Configuration
+
+```bash
+# View all configuration
+auq config get
+
+# View specific setting
+auq config get staleThreshold
+
+# Set a value (local .auqrc.json)
+auq config set staleThreshold 3600000
+
+# Set globally
+auq config set staleThreshold 3600000 --global
+```
+
+---
+
+### Stale Session Detection
+
+Sessions that remain unanswered longer than the configured threshold are marked as "stale" (potentially orphaned). This helps identify sessions where the AI may have disconnected or timed out.
+
+- **Visual indicators**: Stale sessions show a ⚠ warning icon and yellow highlighting in the TUI
+- **Toast notifications**: A notification appears when a session becomes stale (configurable)
+- **Grace period**: Interacting with a stale session provides a 30-minute grace period
+- **Configurable threshold**: Default is 2 hours (7,200,000ms)
+
+---
+
+### Abandoned Session Handling
+
+When an AI client disconnects, associated sessions are marked as "abandoned". These sessions:
+
+- Remain visible in the TUI with a red indicator
+- Show a confirmation dialog before answering ("AI가 disconnect되었습니다")
+- Can still be answered via CLI with the `--force` flag
+- Are detectable via `auq sessions list --all`
+
+---
+
 ### 🎨 Themes
 
 AUQ supports **16 built-in color themes** with automatic persistence. Press `Ctrl+T` to cycle through themes.
@@ -461,6 +540,9 @@ _Settings from local config override global config, which overrides defaults._
 | `retentionPeriod`       | number  | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
 | `notifications.enabled` | boolean | true      | true/false                      | Enable desktop notifications for new questions        |
 | `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications                         |
+| `staleThreshold`        | number  | 7200000   | 0+ (milliseconds)               | Time before a session is considered stale (2 hours)   |
+| `notifyOnStale`         | boolean | true      | true/false                      | Show toast notification when sessions become stale    |
+| `staleAction`           | string  | "warn"    | "warn", "remove", "archive"     | Action for stale sessions                             |
 
 </details>
 

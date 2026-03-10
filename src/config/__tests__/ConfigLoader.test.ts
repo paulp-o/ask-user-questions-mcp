@@ -134,4 +134,73 @@ describe("ConfigLoader", () => {
       expect(paths.globalExists).toBe(true);
     });
   });
+
+  describe("stale/orphan session config options", () => {
+    it("should include stale config defaults when no config files exist", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+
+      const config = loadConfig();
+
+      expect(config.staleThreshold).toBe(7200000);
+      expect(config.notifyOnStale).toBe(true);
+      expect(config.staleAction).toBe("warn");
+    });
+
+    it("should load staleThreshold from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ staleThreshold: 3600000 }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.staleThreshold).toBe(3600000);
+    });
+
+    it("should load staleAction from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ staleAction: "archive" }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.staleAction).toBe("archive");
+    });
+
+    it("should load notifyOnStale from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ notifyOnStale: false }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.notifyOnStale).toBe(false);
+    });
+
+    it("should fall back to default for invalid staleAction value", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ staleAction: "invalid_action" }),
+      );
+
+      const config = loadConfig();
+
+      // Invalid enum value should be ignored, default used
+      expect(config.staleAction).toBe(DEFAULT_CONFIG.staleAction);
+    });
+
+    it("should reject negative staleThreshold value", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ staleThreshold: -1000 }),
+      );
+
+      const config = loadConfig();
+
+      // Negative value should be rejected by min(0), default used
+      expect(config.staleThreshold).toBe(DEFAULT_CONFIG.staleThreshold);
+    });
+  });
 });

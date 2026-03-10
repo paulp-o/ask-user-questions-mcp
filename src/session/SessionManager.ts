@@ -200,6 +200,26 @@ export class SessionManager {
   }
 
   /**
+   * Get all pending sessions, optionally including abandoned ones
+   */
+  async getPendingSessions(options?: { includeAbandoned?: boolean }): Promise<string[]> {
+    const sessionIds = await this.getAllSessionIds();
+    const pendingSessions: string[] = [];
+    for (const sessionId of sessionIds) {
+      try {
+        const status = await this.getSessionStatus(sessionId);
+        if (!status) continue;
+        const isPending = status.status === "pending" || status.status === "in-progress";
+        const isAbandoned = status.status === "abandoned";
+        if (isPending || (options?.includeAbandoned && isAbandoned)) {
+          pendingSessions.push(sessionId);
+        }
+      } catch { continue; }
+    }
+    return pendingSessions;
+  }
+
+  /**
    * Get session count
    */
   async getSessionCount(): Promise<number> {
@@ -222,6 +242,14 @@ export class SessionManager {
    */
   async getSessionStatus(sessionId: string): Promise<null | SessionStatus> {
     return this.readSessionFile<SessionStatus>(sessionId, SESSION_FILES.STATUS);
+  }
+
+  /**
+   * Check if a session has been abandoned
+   */
+  async isAbandoned(sessionId: string): Promise<boolean> {
+    const status = await this.getSessionStatus(sessionId);
+    return status?.status === "abandoned";
   }
 
   /**
@@ -324,12 +352,26 @@ export class SessionManager {
     questions: Question[],
     callId?: string,
     workingDirectory?: string,
+    signal?: AbortSignal,
   ): Promise<{
     formattedResponse: string;
     sessionId: string;
   }> {
     // Step 1: Create the session
     const sessionId = await this.createSession(questions, workingDirectory);
+
+    // Step 1.5: Register abort handler if signal provided
+    let abortHandler: (() => void) | undefined;
+    if (signal) {
+      if (signal.aborted) {
+        await this.updateSessionStatus(sessionId, "abandoned");
+        throw new Error("ABORTED");
+      }
+      abortHandler = () => {
+        this.updateSessionStatus(sessionId, "abandoned").catch(() => {});
+      };
+      signal.addEventListener("abort", abortHandler, { once: true });
+    }
 
     // Optionally attach callId and workingDirectory metadata to request and status
     if (callId || workingDirectory) {
@@ -366,10 +408,24 @@ export class SessionManager {
 
       // Step 3: Wait for answers with timeout
       try {
-        await this.waitForAnswers(sessionId, watcherTimeout, callId);
+        await this.waitForAnswers(sessionId, watcherTimeout, callId, signal);
       } catch (error) {
+        // Check if session was aborted (AI disconnected)
+        if (error instanceof Error && error.message === "ABORTED") {
+          // Clean up abort handler
+          if (abortHandler && signal) {
+            signal.removeEventListener("abort", abortHandler);
+          }
+          throw error;
+        }
+
         // Check if session was rejected by user
         if (error instanceof Error && error.message === "SESSION_REJECTED") {
+          // Clean up abort handler
+          if (abortHandler && signal) {
+            signal.removeEventListener("abort", abortHandler);
+          }
+
           // Get session status to retrieve rejection reason
           const status = await this.getSessionStatus(sessionId);
           const reason = status?.rejectionReason;
@@ -381,7 +437,6 @@ export class SessionManager {
           } else {
             formattedResponse += "No reason provided.\n\n";
           }
-          // formattedResponse += "The user chose not to answer these questions at this time.";
 
           return {
             formattedResponse,
@@ -438,12 +493,21 @@ export class SessionManager {
       // Step 7: Update final status
       await this.updateSessionStatus(sessionId, "completed");
 
+      // Clean up abort handler after successful completion
+      if (abortHandler && signal) {
+        signal.removeEventListener("abort", abortHandler);
+      }
+
       // Step 8: Return results
       return {
         formattedResponse,
         sessionId,
       };
     } catch (error) {
+      // Clean up abort handler on error
+      if (abortHandler && signal) {
+        signal.removeEventListener("abort", abortHandler);
+      }
       // Ensure any errors are properly propagated with session context
       if (error instanceof Error) {
         throw error;
@@ -547,6 +611,7 @@ export class SessionManager {
     sessionId: string,
     timeoutMs?: number,
     expectedCallId?: string,
+    signal?: AbortSignal,
   ): Promise<string> {
     const sessionDir = this.getSessionDir(sessionId);
     const answersPath = join(sessionDir, SESSION_FILES.ANSWERS);
@@ -578,6 +643,11 @@ export class SessionManager {
       const status = await this.getSessionStatus(sessionId);
       if (status && status.status === "rejected") {
         throw new Error("SESSION_REJECTED");
+      }
+
+      // Check for abort signal
+      if (signal?.aborted) {
+        throw new Error("ABORTED");
       }
 
       // Check for timeout

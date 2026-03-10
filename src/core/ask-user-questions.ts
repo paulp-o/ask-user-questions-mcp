@@ -17,9 +17,11 @@ export type AskUserQuestionsCore = {
     questions: QuestionInput[],
     callId?: string,
     workingDirectory?: string,
+    signal?: AbortSignal,
   ) => Promise<{ formattedResponse: string; sessionId: string }>;
   cleanupExpiredSessions: () => Promise<number>;
   ensureInitialized: () => Promise<void>;
+  markAbandoned: (sessionId: string) => Promise<void>;
 };
 
 export type AskUserQuestionsCoreOptions = {
@@ -56,6 +58,7 @@ export const createAskUserQuestionsCore = (
     questions: QuestionInput[],
     callId?: string,
     workingDirectory?: string,
+    signal?: AbortSignal,
   ) => {
     await ensureInitialized();
     const parsedQuestions = QuestionsSchema.parse(questions);
@@ -63,6 +66,7 @@ export const createAskUserQuestionsCore = (
       normalizeQuestions(parsedQuestions),
       callId,
       workingDirectory,
+      signal,
     );
   };
 
@@ -70,5 +74,7 @@ export const createAskUserQuestionsCore = (
     ask,
     cleanupExpiredSessions: () => sessionManager.cleanupExpiredSessions(),
     ensureInitialized,
+    markAbandoned: (sessionId: string) =>
+      sessionManager.updateSessionStatus(sessionId, "abandoned"),
   };
 };

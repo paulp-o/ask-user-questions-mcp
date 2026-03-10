@@ -28,6 +28,11 @@ export const AUQConfigSchema = z.object({
   theme: z.string().default("system"),
   autoSelectRecommended: z.boolean().default(true),
 
+  // Stale/Orphan Session Detection
+  staleThreshold: z.number().min(0).default(7200000), // 2 hours in ms
+  notifyOnStale: z.boolean().default(true),
+  staleAction: z.enum(["warn", "remove", "archive"]).default("warn"),
+
   // Notifications (OSC 9/99)
   notifications: NotificationConfigSchema.default({
     enabled: true,

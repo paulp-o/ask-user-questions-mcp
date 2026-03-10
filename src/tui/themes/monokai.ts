@@ -100,6 +100,7 @@ export const monokaiTheme: Theme = {
       successPillBg: "#272822",
       error: "#F92672",
       info: "#66D9EF",
+      warning: "#E6DB74",
       border: "#49483E",
     },
     markdown: {
@@ -114,6 +115,8 @@ export const monokaiTheme: Theme = {
       untouched: "#908B78",
       number: "#F8F8F2",
       activeNumber: "#66D9EF",
+      stale: "#E6DB74",
+      abandoned: "#F92672",
     },
     sessionPicker: {
       border: "#66D9EF",
@@ -124,6 +127,10 @@ export const monokaiTheme: Theme = {
       highlightFg: "#A6E22E",
       activeMark: "#66D9EF",
       progress: "#66D9EF",
+      staleIcon: "#E6DB74",
+      staleText: "#E6DB74",
+      staleAge: "#E6DB74",
+      staleSubtitle: "#908B78",
     },
   },
 } as const;

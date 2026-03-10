@@ -99,6 +99,7 @@ export const nordTheme: Theme = {
       successPillBg: "#3b4252", // nord1
       error: "#bf616a", // nord11
       info: "#88c0d0", // nord8
+      warning: "#ebcb8b",
       border: "#3b4252", // nord1
     },
     markdown: {
@@ -113,6 +114,8 @@ export const nordTheme: Theme = {
       untouched: "#616E88",
       number: "#eceff4",
       activeNumber: "#88c0d0",
+      stale: "#ebcb8b",
+      abandoned: "#bf616a",
     },
     sessionPicker: {
       border: "#88c0d0",
@@ -123,6 +126,10 @@ export const nordTheme: Theme = {
       highlightFg: "#a3be8c",
       activeMark: "#88c0d0",
       progress: "#81a1c1",
+      staleIcon: "#ebcb8b",
+      staleText: "#ebcb8b",
+      staleAge: "#ebcb8b",
+      staleSubtitle: "#616E88",
     },
   },
 } as const;

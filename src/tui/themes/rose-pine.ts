@@ -100,6 +100,7 @@ export const rosePineTheme: Theme = {
       successPillBg: "#191724",
       error: "#eb6f92",
       info: "#9ccfd8",
+      warning: "#f6c177",
       border: "#26233a",
     },
     markdown: {
@@ -114,6 +115,8 @@ export const rosePineTheme: Theme = {
       untouched: "#8884a0",
       number: "#e0def4",
       activeNumber: "#ebbcba",
+      stale: "#f6c177",
+      abandoned: "#eb6f92",
     },
     sessionPicker: {
       border: "#ebbcba",
@@ -124,6 +127,10 @@ export const rosePineTheme: Theme = {
       highlightFg: "#31748f",
       activeMark: "#ebbcba",
       progress: "#9ccfd8",
+      staleIcon: "#f6c177",
+      staleText: "#f6c177",
+      staleAge: "#f6c177",
+      staleSubtitle: "#8884a0",
     },
   },
 } as const;

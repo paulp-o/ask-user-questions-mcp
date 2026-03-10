@@ -32,6 +32,12 @@ import {
   type NotificationBatcher,
 } from "../src/tui/notifications/index.js";
 import { createTUIWatcher } from "../src/tui/session-watcher.js";
+import type { PendingSessionMeta } from "../src/tui/session-watcher.js";
+import {
+  isSessionStale,
+  isSessionAbandoned,
+  formatStaleToastMessage,
+} from "../src/tui/utils/staleDetection.js";
 import { ThemeProvider } from "../src/tui/ThemeProvider.js";
 import { ConfigProvider } from "../src/tui/ConfigContext.js";
 import {
@@ -72,6 +78,9 @@ const App: React.FC<AppProps> = ({ config }) => {
   const [showSessionLog, setShowSessionLog] = useState(true);
   const [showSessionPicker, setShowSessionPicker] = useState(false);
   const [isInReviewOrRejection, setIsInReviewOrRejection] = useState(false);
+  const [sessionMeta, setSessionMeta] = useState<Map<string, { status: string; createdAt: string }>>(new Map());
+  const [lastInteractions, setLastInteractions] = useState<Map<string, number>>(new Map());
+  const [staleToastShown, setStaleToastShown] = useState<Set<string>>(new Set());
 
   // Get session directory for logging
   const sessionDir = getSessionDirectory();
@@ -112,6 +121,7 @@ const App: React.FC<AppProps> = ({ config }) => {
         // Step 1: Load existing pending sessions
         const watcher = createTUIWatcher();
         const sessionIds = await watcher.getPendingSessions();
+        const sessionsWithStatus = await watcher.getPendingSessionsWithStatus();
 
         const sessionData = await Promise.all(
           sessionIds.map(async (sessionId) => {
@@ -132,6 +142,13 @@ const App: React.FC<AppProps> = ({ config }) => {
           .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
         setSessionQueue(validSessions);
+
+        // Build initial sessionMeta from status data
+        const initialMeta = new Map<string, { status: string; createdAt: string }>();
+        for (const meta of sessionsWithStatus) {
+          initialMeta.set(meta.sessionId, { status: meta.status, createdAt: meta.createdAt });
+        }
+        setSessionMeta(initialMeta);
         setIsInitialized(true);
 
         // Step 2: Start persistent watcher for new sessions
@@ -239,8 +256,7 @@ const App: React.FC<AppProps> = ({ config }) => {
               if (
                 parsed.status === "timed_out" ||
                 parsed.status === "completed" ||
-                parsed.status === "rejected" ||
-                parsed.status === "abandoned"
+                parsed.status === "rejected"
               ) {
                 return {
                   notifyAsTimedOut: parsed.status === "timed_out",
@@ -333,11 +349,55 @@ const App: React.FC<AppProps> = ({ config }) => {
       void checkPausedSessionStatuses();
     }, 2000);
 
+    // --- Stale detection (runs alongside status polling) ---
+    const staleThreshold = config?.staleThreshold ?? 7200000;
+    const notifyOnStale = config?.notifyOnStale ?? true;
+
+    const runStaleDetection = async () => {
+      // Refresh session metadata from disk
+      const watcher = createTUIWatcher();
+      let freshMeta: PendingSessionMeta[] = [];
+      try {
+        freshMeta = await watcher.getPendingSessionsWithStatus();
+      } catch {
+        // Non-critical — stale detection simply skips this cycle
+      }
+
+      if (freshMeta.length > 0) {
+        setSessionMeta((prev) => {
+          const next = new Map(prev);
+          for (const meta of freshMeta) {
+            next.set(meta.sessionId, { status: meta.status, createdAt: meta.createdAt });
+          }
+          return next;
+        });
+      }
+
+      // Show toast for newly stale sessions
+      for (const session of sessionQueue) {
+        const stale = isSessionStale(
+          session.timestamp.getTime(),
+          staleThreshold,
+          lastInteractions.get(session.sessionId),
+        );
+        if (stale && notifyOnStale && !staleToastShown.has(session.sessionId)) {
+          const title = session.sessionRequest.questions[0]?.title ?? session.sessionId.slice(0, 8);
+          showToast(formatStaleToastMessage(title, session.timestamp.getTime()), "info");
+          setStaleToastShown((prev) => new Set(prev).add(session.sessionId));
+        }
+      }
+    };
+
+    const staleInterval = setInterval(() => {
+      void runStaleDetection();
+    }, 2000);
+
     return () => {
       isCancelled = true;
       clearInterval(interval);
+      clearInterval(staleInterval);
     };
-  }, [activeSessionIndex, sessionDir, sessionQueue, state.mode]);
+  }, [activeSessionIndex, sessionDir, sessionQueue, state.mode, config?.staleThreshold, config?.notifyOnStale, lastInteractions, staleToastShown]);
 
   // Handle progress updates from StepperView
   const handleProgressUpdate = (answered: number, total: number) => {
@@ -351,6 +411,8 @@ const App: React.FC<AppProps> = ({ config }) => {
         ...prev,
         [sessionId]: ui,
       }));
+      // Track interaction for stale grace time
+      setLastInteractions((prev) => new Map(prev).set(sessionId, Date.now()));
     },
     [],
   );
@@ -386,6 +448,13 @@ const App: React.FC<AppProps> = ({ config }) => {
 
       setActiveSessionIndex(clampedIndex);
       setShowSessionPicker(false);
+
+      // Track interaction for stale grace time
+      setLastInteractions((prev) => {
+        const targetSession = sessionQueue[clampedIndex];
+        if (!targetSession) return prev;
+        return new Map(prev).set(targetSession.sessionId, Date.now());
+      });
     },
     [activeSessionIndex, sessionQueue, state.mode],
   );
@@ -534,6 +603,7 @@ const App: React.FC<AppProps> = ({ config }) => {
           hasMultipleSessions={sessionQueue.length >= 2}
           sessionId={session.sessionId}
           sessionRequest={session.sessionRequest}
+          isAbandoned={isSessionAbandoned(sessionMeta.get(session.sessionId)?.status ?? "")}
         />
       );
     }
@@ -557,7 +627,11 @@ const App: React.FC<AppProps> = ({ config }) => {
           {mainContent}
           {state.mode === "PROCESSING" && sessionQueue.length >= 2 && (
             <SessionDots
-              sessions={sessionQueue}
+              sessions={sessionQueue.map((s) => ({
+                ...s,
+                isStale: isSessionStale(s.timestamp.getTime(), config?.staleThreshold ?? 7200000, lastInteractions.get(s.sessionId)),
+                isAbandoned: isSessionAbandoned(sessionMeta.get(s.sessionId)?.status ?? ""),
+              }))}
               activeIndex={activeSessionIndex}
               sessionUIStates={sessionUIStates}
             />
@@ -581,7 +655,11 @@ const App: React.FC<AppProps> = ({ config }) => {
           {state.mode === "PROCESSING" && (
             <SessionPicker
               isOpen={showSessionPicker}
-              sessions={sessionQueue}
+              sessions={sessionQueue.map((s) => ({
+                ...s,
+                isStale: isSessionStale(s.timestamp.getTime(), config?.staleThreshold ?? 7200000, lastInteractions.get(s.sessionId)),
+                isAbandoned: isSessionAbandoned(sessionMeta.get(s.sessionId)?.status ?? ""),
+              }))}
               activeIndex={activeSessionIndex}
               sessionUIStates={sessionUIStates}
               onSelectIndex={(idx) => {

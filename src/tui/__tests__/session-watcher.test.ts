@@ -11,6 +11,7 @@ import {
   createTUIWatcher,
   EnhancedTUISessionWatcher,
   getNextPendingSession,
+  type PendingSessionMeta,
   TUISessionEvent,
 } from "../session-watcher.js";
 
@@ -382,6 +383,164 @@ describe("TUI Session Watcher", () => {
         expect(await watcher.isSessionPending("session-3")).toBe(true);
         expect(await watcher.isSessionPending("non-existent")).toBe(false);
 
+        watcher.stop();
+      });
+    });
+
+    describe("getPendingSessionsWithStatus", () => {
+      beforeEach(async () => {
+        // Create test sessions with various statuses
+        const sessions = [
+          { id: "session-1", status: "pending", completed: false },
+          { id: "session-2", status: "completed", completed: true },
+          { id: "session-3", status: "pending", completed: false },
+        ];
+
+        for (const session of sessions) {
+          const dir = join(sessionDir, session.id);
+          await fs.mkdir(dir, { recursive: true });
+
+          const requestFile = join(dir, SESSION_FILES.REQUEST);
+          await fs.writeFile(
+            requestFile,
+            JSON.stringify({
+              ...mockSessionRequest,
+              sessionId: session.id,
+            }),
+          );
+
+          const statusFile = join(dir, SESSION_FILES.STATUS);
+          await fs.writeFile(
+            statusFile,
+            JSON.stringify({
+              createdAt: new Date().toISOString(),
+              lastModified: new Date().toISOString(),
+              sessionId: session.id,
+              status: session.status,
+              totalQuestions: 1,
+            }),
+          );
+
+          if (session.completed) {
+            const answersFile = join(dir, SESSION_FILES.ANSWERS);
+            await fs.writeFile(
+              answersFile,
+              JSON.stringify({
+                answers: [
+                  {
+                    questionIndex: 0,
+                    selectedOption: "JavaScript",
+                    timestamp: new Date().toISOString(),
+                  },
+                ],
+                sessionId: session.id,
+                timestamp: new Date().toISOString(),
+              }),
+            );
+          }
+        }
+      });
+
+      it("should return pending and in-progress sessions with metadata", async () => {
+        const watcher = new EnhancedTUISessionWatcher({ sessionDir });
+
+        const sessions = await watcher.getPendingSessionsWithStatus();
+
+        expect(sessions).toHaveLength(2);
+        expect(sessions[0].sessionId).toBe("session-1");
+        expect(sessions[0].status).toBe("pending");
+        expect(sessions[0].createdAt).toBeDefined();
+        expect(sessions[1].sessionId).toBe("session-3");
+        expect(sessions[1].status).toBe("pending");
+
+        watcher.stop();
+      });
+
+      it("should include abandoned sessions", async () => {
+        // Create an abandoned session
+        const abandonedDir = join(sessionDir, "session-4-abandoned");
+        await fs.mkdir(abandonedDir, { recursive: true });
+        const requestFile = join(abandonedDir, SESSION_FILES.REQUEST);
+        const statusFile = join(abandonedDir, SESSION_FILES.STATUS);
+
+        await Promise.all([
+          fs.writeFile(
+            requestFile,
+            JSON.stringify({
+              ...mockSessionRequest,
+              sessionId: "session-4-abandoned",
+            }),
+          ),
+          fs.writeFile(
+            statusFile,
+            JSON.stringify({
+              createdAt: new Date().toISOString(),
+              lastModified: new Date().toISOString(),
+              sessionId: "session-4-abandoned",
+              status: "abandoned",
+              totalQuestions: 1,
+            }),
+          ),
+        ]);
+
+        const watcher = new EnhancedTUISessionWatcher({ sessionDir });
+        const sessions = await watcher.getPendingSessionsWithStatus();
+
+        // Should have session-1 (pending), session-3 (pending), session-4-abandoned (abandoned)
+        expect(sessions).toHaveLength(3);
+        const abandoned = sessions.find(
+          (s) => s.sessionId === "session-4-abandoned",
+        );
+        expect(abandoned).toBeDefined();
+        expect(abandoned!.status).toBe("abandoned");
+
+        watcher.stop();
+      });
+
+      it("should exclude completed, rejected, and timed_out sessions", async () => {
+        const watcher = new EnhancedTUISessionWatcher({ sessionDir });
+        const sessions = await watcher.getPendingSessionsWithStatus();
+
+        // session-2 is completed and has answers — should be excluded
+        const completed = sessions.find(
+          (s) => s.sessionId === "session-2",
+        );
+        expect(completed).toBeUndefined();
+
+        watcher.stop();
+      });
+
+      it("should return sorted results by sessionId", async () => {
+        const watcher = new EnhancedTUISessionWatcher({ sessionDir });
+        const sessions = await watcher.getPendingSessionsWithStatus();
+
+        const ids = sessions.map((s) => s.sessionId);
+        const sorted = [...ids].sort();
+        expect(ids).toEqual(sorted);
+
+        watcher.stop();
+      });
+
+      it("should handle directory access errors gracefully", async () => {
+        const watcher = new EnhancedTUISessionWatcher({
+          sessionDir: "/invalid/directory/path",
+        });
+
+        const consoleSpy = vi
+          .spyOn(console, "warn")
+          .mockImplementation(() => {});
+
+        const sessions = await watcher.getPendingSessionsWithStatus();
+
+        expect(sessions).toEqual([]);
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining(
+            "Failed to scan for pending sessions with status",
+          ),
+          expect.any(Error),
+        );
+
+        consoleSpy.mockRestore();
         watcher.stop();
       });
     });

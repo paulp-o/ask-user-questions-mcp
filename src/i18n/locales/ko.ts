@@ -39,6 +39,7 @@ export const ko = {
     copied: "클립보드에 복사됨",
     saved: "저장됨",
     error: "오류",
+    staleSession: "세션 \"{title}\"이 고아 상태일 수 있습니다 ({hours}시간 전 생성)",
   },
   stepper: {
     submitting: "답변 제출 중...",
@@ -72,6 +73,12 @@ export const ko = {
   },
   ui: {
     themeLabel: "테마:",
+  },
+  abandoned: {
+    title: "AI 연결 끊김",
+    message: "AI가 disconnect되었습니다. 그래도 답변하시겠습니까?",
+    continue: "답변하기",
+    cancel: "취소",
   },
 } as const;
 

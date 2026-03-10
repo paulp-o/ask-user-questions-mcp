@@ -5,5 +5,11 @@
     "jsx": "react",
     "resolveJsonModule": true
   },
-  "include": ["src", "bin"]
+  "include": [
+    "src",
+    "bin"
+  ],
+  "exclude": [
+    "opensrc"
+  ]
 }

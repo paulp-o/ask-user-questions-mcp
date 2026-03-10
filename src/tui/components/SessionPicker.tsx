@@ -19,6 +19,8 @@ export interface SessionPickerSessionData {
   sessionId: string;
   sessionRequest: SessionRequest;
   timestamp: Date;
+  isStale?: boolean;
+  isAbandoned?: boolean;
 }
 
 export interface SessionPickerProps {
@@ -212,33 +214,60 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
                 : theme.components.sessionPicker.rowDim;
 
           return (
-            <Box key={session.sessionId}>
-              <Text
-                backgroundColor={rowBg}
-                bold={isHighlighted}
-                color={textColor}
-              >
-                {isActive ? "►" : " "} {realIdx + 1}. {title}
-              </Text>
-              <Text
-                backgroundColor={rowBg}
-                color={theme.components.sessionPicker.rowDim}
-              >
-                {" — "}
-                {dir}
-              </Text>
-              <Text backgroundColor={rowBg} color={progressColor}>
-                {"  ["}
-                {answered}/{total}
-                {"]"}
-              </Text>
-              <Text
-                backgroundColor={rowBg}
-                color={theme.components.sessionPicker.rowDim}
-                dimColor
-              >
-                {age}
-              </Text>
+            <Box key={session.sessionId} flexDirection="column">
+              <Box>
+                {/* Stale/abandoned warning icon */}
+                {(session.isStale || session.isAbandoned) && (
+                  <Text
+                    backgroundColor={rowBg}
+                    color={theme.components.sessionPicker.staleIcon}
+                  >
+                    ⚠{" "}
+                  </Text>
+                )}
+                <Text
+                  backgroundColor={rowBg}
+                  bold={isHighlighted}
+                  color={session.isStale || session.isAbandoned ? theme.components.sessionPicker.staleText : textColor}
+                >
+                  {isActive ? "►" : " "} {realIdx + 1}. {title}
+                </Text>
+                <Text
+                  backgroundColor={rowBg}
+                  color={theme.components.sessionPicker.rowDim}
+                >
+                  {" — "}
+                  {dir}
+                </Text>
+                <Text backgroundColor={rowBg} color={progressColor}>
+                  {"  ["}
+                  {answered}/{total}
+                  {"]"}
+                </Text>
+                <Text
+                  backgroundColor={rowBg}
+                  color={session.isStale || session.isAbandoned ? theme.components.sessionPicker.staleAge : theme.components.sessionPicker.rowDim}
+                  dimColor={!(session.isStale || session.isAbandoned)}
+                >
+                  {age}
+                </Text>
+              </Box>
+              {/* "may be orphaned" subtitle for stale sessions */}
+              {session.isStale && !session.isAbandoned && (
+                <Box marginLeft={session.isStale ? 4 : 2}>
+                  <Text color={theme.components.sessionPicker.staleSubtitle} dimColor>
+                    may be orphaned
+                  </Text>
+                </Box>
+              )}
+              {/* "abandoned" subtitle for abandoned sessions */}
+              {session.isAbandoned && (
+                <Box marginLeft={4}>
+                  <Text color={theme.components.sessionPicker.staleSubtitle} bold>
+                    session abandoned
+                  </Text>
+                </Box>
+              )}
             </Box>
           );
         })}

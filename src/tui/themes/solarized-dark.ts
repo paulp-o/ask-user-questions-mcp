@@ -99,6 +99,7 @@ export const solarizedDarkTheme: Theme = {
       successPillBg: "#073642",
       error: "#dc322f",
       info: "#268bd2",
+      warning: "#b58900",
       border: "#073642",
     },
     markdown: {
@@ -113,6 +114,8 @@ export const solarizedDarkTheme: Theme = {
       untouched: "#6c7c83",
       number: "#839496",
       activeNumber: "#268bd2",
+      stale: "#b58900",
+      abandoned: "#dc322f",
     },
     sessionPicker: {
       border: "#268bd2",
@@ -123,6 +126,10 @@ export const solarizedDarkTheme: Theme = {
       highlightFg: "#859900",
       activeMark: "#268bd2",
       progress: "#2aa198",
+      staleIcon: "#b58900",
+      staleText: "#b58900",
+      staleAge: "#b58900",
+      staleSubtitle: "#6c7c83",
     },
   },
 } as const;

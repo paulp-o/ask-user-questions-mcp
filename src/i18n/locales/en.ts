@@ -39,6 +39,7 @@ export const en = {
     copied: "Copied to clipboard",
     saved: "Saved",
     error: "Error",
+    staleSession: "Session \"{title}\" may be orphaned (created {hours}h ago)",
   },
   stepper: {
     submitting: "Submitting answers...",
@@ -72,6 +73,12 @@ export const en = {
   },
   ui: {
     themeLabel: "theme:",
+  },
+  abandoned: {
+    title: "AI Disconnected",
+    message: "The AI has disconnected. Do you still want to answer?",
+    continue: "Answer anyway",
+    cancel: "Cancel",
   },
 } as const;
 

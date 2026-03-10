@@ -14,6 +14,8 @@ export interface SessionDotsSessionData {
   sessionId: string;
   sessionRequest: SessionRequest;
   timestamp: Date;
+  isStale?: boolean;
+  isAbandoned?: boolean;
 }
 
 export interface SessionDotsProps {
@@ -44,9 +46,11 @@ function hasAnswers(answers: Map<number, Answer> | undefined): boolean {
  * SessionDots — a compact row of numbered dots rendered below the footer.
  *
  * Visual language:
- *   ● 1  ○ 2  ○ 3
+ *   ● 1  ○ 2  ✕ 3  ○ 4
  *
  * • Active session:   filled ● + bold number in theme primary
+ * • Abandoned:        red ✕ + "(AI disconnected)" when active
+ * • Stale:            yellow ○ + "(stale)" when active
  * • Has answers:      green (theme.success)
  * • Touched/no answers: yellow (theme.warning)
  * • Untouched:        dim   (theme.textDim)
@@ -67,9 +71,21 @@ export const SessionDots: React.FC<SessionDotsProps> = ({
         const isActive = idx === activeIndex;
         const uiState = sessionUIStates[session.sessionId];
 
+        const isStale = session.isStale ?? false;
+        const isAbandoned = session.isAbandoned ?? false;
+
         // Determine the progress color for this session's dot
+        // Abandoned/stale take priority over normal state colors
         let dotColor: string;
-        if (isActive) {
+        if (isAbandoned) {
+          dotColor =
+            (theme.components.sessionDots as Record<string, string>)
+              .abandoned ?? theme.colors.error;
+        } else if (isStale) {
+          dotColor =
+            (theme.components.sessionDots as Record<string, string>)
+              .stale ?? theme.colors.warning;
+        } else if (isActive) {
           dotColor = theme.components.sessionDots.active;
         } else if (uiState && hasAnswers(uiState.answers)) {
           dotColor = theme.components.sessionDots.answered;
@@ -79,10 +95,23 @@ export const SessionDots: React.FC<SessionDotsProps> = ({
           dotColor = theme.components.sessionDots.untouched;
         }
 
-        const dot = isActive ? "●" : "○";
+        // Abandoned inactive sessions use ✕ to signal a problem
+        const dot = isAbandoned && !isActive
+          ? "✕"
+          : isActive
+            ? "●"
+            : "○";
+
         const numberColor = isActive
           ? theme.components.sessionDots.activeNumber
           : theme.components.sessionDots.number;
+
+        // Status label shown next to active abandoned/stale sessions
+        const statusLabel = isActive && isAbandoned
+          ? "(AI disconnected)"
+          : isActive && isStale
+            ? "(stale)"
+            : null;
 
         return (
           <Box
@@ -96,6 +125,11 @@ export const SessionDots: React.FC<SessionDotsProps> = ({
               {" "}
               {idx + 1}
             </Text>
+            {statusLabel && (
+              <Text color={dotColor} dimColor>
+                {" "}{statusLabel}
+              </Text>
+            )}
           </Box>
         );
       })}

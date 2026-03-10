@@ -99,6 +99,7 @@ export const tokyoNightTheme: Theme = {
       successPillBg: "#1a1b26",
       error: "#f7768e",
       info: "#7aa2f7",
+      warning: "#e0af68",
       border: "#24283b",
     },
     markdown: {
@@ -113,6 +114,8 @@ export const tokyoNightTheme: Theme = {
       untouched: "#7078A3",
       number: "#c0caf5",
       activeNumber: "#7aa2f7",
+      stale: "#e0af68",
+      abandoned: "#f7768e",
     },
     sessionPicker: {
       border: "#7aa2f7",
@@ -123,6 +126,10 @@ export const tokyoNightTheme: Theme = {
       highlightFg: "#9ece6a",
       activeMark: "#7aa2f7",
       progress: "#7dcfff",
+      staleIcon: "#e0af68",
+      staleText: "#e0af68",
+      staleAge: "#e0af68",
+      staleSubtitle: "#7078A3",
     },
   },
 } as const;

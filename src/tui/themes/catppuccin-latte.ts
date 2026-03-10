@@ -99,6 +99,7 @@ export const catppuccinLatteTheme: Theme = {
       successPillBg: "#dce0e8",
       error: "#d20f39",
       info: "#1e66f5",
+      warning: "#df8e1d",
       border: "#ccd0da",
     },
     markdown: {
@@ -113,6 +114,8 @@ export const catppuccinLatteTheme: Theme = {
       untouched: "#acb0c0",
       number: "#4c4f69",
       activeNumber: "#1e66f5",
+      stale: "#df8e1d",
+      abandoned: "#d20f39",
     },
     sessionPicker: {
       border: "#1e66f5",
@@ -123,6 +126,10 @@ export const catppuccinLatteTheme: Theme = {
       highlightFg: "#40a02b",
       activeMark: "#1e66f5",
       progress: "#04a5e5",
+      staleIcon: "#df8e1d",
+      staleText: "#df8e1d",
+      staleAge: "#df8e1d",
+      staleSubtitle: "#acb0c0",
     },
   },
 } as const;

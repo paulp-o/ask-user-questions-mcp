@@ -98,6 +98,7 @@ export const githubLightTheme: Theme = {
       successPillBg: "#f6f8fa",
       error: "#CF222E",
       info: "#0969DA",
+      warning: "#9A6700",
       border: "#D0D7DE",
     },
     markdown: {
@@ -112,6 +113,8 @@ export const githubLightTheme: Theme = {
       untouched: "#6E7781",
       number: "#24292F",
       activeNumber: "#0969DA",
+      stale: "#9A6700",
+      abandoned: "#CF222E",
     },
     sessionPicker: {
       border: "#0969DA",
@@ -122,6 +125,10 @@ export const githubLightTheme: Theme = {
       highlightFg: "#1A7F37",
       activeMark: "#0969DA",
       progress: "#0969DA",
+      staleIcon: "#9A6700",
+      staleText: "#9A6700",
+      staleAge: "#9A6700",
+      staleSubtitle: "#6E7781",
     },
   },
 } as const;
