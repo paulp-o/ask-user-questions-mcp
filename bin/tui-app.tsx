@@ -235,6 +235,26 @@ const App: React.FC<AppProps> = ({ config }) => {
           // Fetch changelog for the overlay
           const changelog = await fetchChangelog(result.latestVersion);
           setChangelogContent(changelog.content);
+
+          // Auto-action based on update type
+          if (result.updateType === "patch" && !updateDismissed) {
+            // Auto-install patch silently
+            try {
+              const pm = detectPackageManager();
+              const success = await installUpdate(pm);
+              if (success) {
+                setToast({
+                  message: `Updated to v${result.latestVersion}. Please restart auq.`,
+                  type: "success",
+                });
+              }
+            } catch {
+              // Silent — patch auto-install is best-effort
+            }
+          } else if (!updateDismissed) {
+            // Show overlay for minor/major updates
+            setShowUpdateOverlay(true);
+          }
         }
       } catch {
         // Silently fail — update checks should never break the TUI
