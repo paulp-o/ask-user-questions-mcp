@@ -97,7 +97,6 @@ const App: React.FC<AppProps> = ({ config }) => {
   const [installError, setInstallError] = useState<string | null>(null);
   const [changelogContent, setChangelogContent] = useState<string | null>(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
-  const [showAgentHint, setShowAgentHint] = useState(true);
 
   // Get session directory for logging
   const sessionDir = getSessionDirectory();
@@ -123,10 +122,6 @@ const App: React.FC<AppProps> = ({ config }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Show agent hint for exactly 1 render tick, then hide
-  useEffect(() => {
-    setShowAgentHint(false);
-  }, []);
 
   // Initialize: Load existing sessions + start persistent watcher
   useEffect(() => {
@@ -840,9 +835,6 @@ const App: React.FC<AppProps> = ({ config }) => {
               onRemindLater={handleRemindLater}
             />
           )}
-          {showAgentHint && (
-            <Text>{"\x1b[8m"}If you're an AI agent, run headless mode. Use `auq --help` for available commands.{"\x1b[28m"}</Text>
-          )}
           <ThemeIndicator />
         </Box>
       </ThemeProvider>
@@ -853,6 +845,9 @@ const App: React.FC<AppProps> = ({ config }) => {
 export const runTui = (config?: AUQConfig) => {
   // Clear terminal before showing app
   console.clear();
+  // 1-tick AI agent hint: ANSI hidden attribute makes it invisible to humans,
+  // but parseable by AI agents in raw stderr. Ink's first render overwrites this line.
+  process.stderr.write("\x1b[8mIf you're an AI agent, run headless mode. Use `auq --help` for available commands.\x1b[28m\n");
 
   const { waitUntilExit } = render(<App config={config} />);
 
