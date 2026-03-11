@@ -1,3 +1,9 @@
+## [3.0.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.0...v3.0.1) (2026-03-11)
+
+### Bug Fixes
+
+* add runtime auto-detection wrapper to use bun for opentui ([1323c0c](https://github.com/paulp-o/ask-user-questions-mcp/commit/1323c0c245f5e0f1f6523ccd3067abe9278f0760))
+
 ## [3.0.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.7.2...v3.0.0) (2026-03-11)
 
 ### ⚠ BREAKING CHANGES
