@@ -1,3 +1,9 @@
+## [3.0.3](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.2...v3.0.3) (2026-03-11)
+
+### Bug Fixes
+
+* replace sine-wave shimmer with ChatGPT-style left-to-right sweep animation ([a9f26d3](https://github.com/paulp-o/ask-user-questions-mcp/commit/a9f26d33c73947624789ff3e6c38ce5452b3eefa))
+
 ## [3.0.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.1...v3.0.2) (2026-03-11)
 
 ### Bug Fixes
