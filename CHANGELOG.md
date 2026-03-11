@@ -1,3 +1,9 @@
+## [3.2.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.1...v3.2.2) (2026-03-11)
+
+### Bug Fixes
+
+* restore ink fallback on opentui failure, restore engaging README sections ([8ccaab6](https://github.com/paulp-o/ask-user-questions-mcp/commit/8ccaab6365d2b065c68a799cb425ff7250254e8b))
+
 ## [3.2.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.0...v3.2.1) (2026-03-11)
 
 ### Bug Fixes
