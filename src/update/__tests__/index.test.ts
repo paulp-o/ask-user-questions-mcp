@@ -19,8 +19,8 @@ describe("update module exports", () => {
     expect(typeof updateModule.getCachePath).toBe("function");
   });
 
-  it("exports CACHE_TTL as 3600000", () => {
-    expect(updateModule.CACHE_TTL).toBe(3600000);
+  it("exports CACHE_TTL as 0", () => {
+    expect(updateModule.CACHE_TTL).toBe(0);
   });
 
   it("exports installer functions", () => {

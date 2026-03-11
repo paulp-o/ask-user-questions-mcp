@@ -42,8 +42,8 @@ describe("cache management", () => {
   });
 
   describe("CACHE_TTL", () => {
-    it("should be 1 hour in milliseconds", () => {
-      expect(CACHE_TTL).toBe(3600000);
+    it("should be 0 (always fresh-check on every launch)", () => {
+      expect(CACHE_TTL).toBe(0);
     });
   });
 
@@ -124,12 +124,12 @@ describe("cache management", () => {
   });
 
   describe("isCacheFresh", () => {
-    it("should return true for a recent cache (30 min ago)", () => {
+    it("should return false when TTL is 0 (always fresh-check)", () => {
       const cache: UpdateCheckCache = {
-        lastCheck: Date.now() - 30 * 60 * 1000, // 30 minutes ago
+        lastCheck: Date.now() - 1000, // 1 second ago
         latestVersion: "2.5.0",
       };
-      expect(isCacheFresh(cache)).toBe(true);
+      expect(isCacheFresh(cache)).toBe(false);
     });
 
     it("should return false for an old cache (2 hours ago)", () => {
