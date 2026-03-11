@@ -218,8 +218,11 @@ export const OptionsList = ({
 
   // \u2500\u2500 Helper: Truncate text to fit row width \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   const fitRow = (text: string): string => {
-    if (text.length <= rowWidth) return text;
-    return text.slice(0, rowWidth - 1) + "\u2026";
+    if (text.length > rowWidth) {
+      return text.slice(0, rowWidth - 1) + "\u2026";
+    }
+    // Pad with spaces to fill the full row width so bg color covers the entire row
+    return text + " ".repeat(Math.max(0, rowWidth - text.length));
   };
 
   return (
