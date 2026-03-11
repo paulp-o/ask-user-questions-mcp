@@ -1,3 +1,13 @@
+## [3.0.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.7.2...v3.0.0) (2026-03-11)
+
+### ⚠ BREAKING CHANGES
+
+* remove silent ink fallback — require explicit flag for ink renderer
+
+### Bug Fixes
+
+* remove silent ink fallback — require explicit flag for ink renderer ([6c58c41](https://github.com/paulp-o/ask-user-questions-mcp/commit/6c58c41b5ab035ca155ae841e52c88200b4e401a))
+
 ## [2.7.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.7.1...v2.7.2) (2026-03-11)
 
 ### Bug Fixes
