@@ -11,8 +11,8 @@ import { dirname, join } from "node:path";
 
 import type { UpdateCheckCache } from "./types.js";
 
-/** Cache time-to-live: 1 hour in milliseconds */
-export const CACHE_TTL = 3600000;
+/** Cache time-to-live: skip cache on every launch (0 = always fresh-check) */
+export const CACHE_TTL = 0;
 
 /**
  * Resolve the cache file path using XDG-compliant directory.

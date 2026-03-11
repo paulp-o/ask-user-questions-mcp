@@ -201,17 +201,7 @@ function AppInner({ config }: { config: AUQConfig }) {
           const changelog = await fetchChangelog(result.latestVersion);
           setChangelogContent(changelog.content);
 
-          if (result.updateType === "patch" && !updateDismissed) {
-            try {
-              const pm = detectPackageManager();
-              const success = await installUpdate(pm);
-              if (success) {
-                showToast(`Updated to v${result.latestVersion}. Please restart auq.`, "success");
-              }
-            } catch {
-              // Silent — patch auto-install is best-effort
-            }
-          } else if (!updateDismissed) {
+          if (!updateDismissed) {
             setShowUpdateOverlay(true);
           }
         }
@@ -225,7 +215,7 @@ function AppInner({ config }: { config: AUQConfig }) {
     intervalId = setInterval(() => {
       checker.clearCache();
       void runCheck();
-    }, 3600000); // 1 hour
+    }, 600000); // 10 minutes
 
     return () => {
       if (intervalId) clearInterval(intervalId);
