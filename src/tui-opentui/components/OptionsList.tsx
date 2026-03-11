@@ -247,14 +247,18 @@ export const OptionsList = ({
           : `${isFocusedOption ? ">" : " "} ${option.label}${isSelected ? " \u2713" : ""}${starSuffix}`;
 
         return (
-          <box key={index} style={{ flexDirection: "column" }} onMouseDown={() => {
-            setFocusedIndex(index);
-            if (multiSelect) {
-              onToggle?.(option.label);
-            } else {
-              onSelect(option.label);
-            }
-          }}>
+          <box
+            key={index}
+            style={{ flexDirection: "column" }}
+            onMouseDown={() => {
+              setFocusedIndex(index);
+              if (multiSelect) {
+                onToggle?.(option.label);
+              } else {
+                onSelect(option.label);
+              }
+            }}
+          >
             <box style={{ backgroundColor: rowBg }}>
               <text
                 style={{
@@ -340,9 +344,6 @@ export const OptionsList = ({
                       .replace(/\[?[OI]/g, '');
                     if (sanitized !== val && sanitized.length === 0) return;
                     onCustomChange?.(sanitized);
-                    if (!multiSelect && sanitized.length > 0) {
-                      onSelect(t("input.otherCustom"));
-                    }
                   }}
                   onSubmit={() => onAdvance?.()}
                 />
@@ -423,9 +424,6 @@ export const OptionsList = ({
                       .replace(/\[?[OI]/g, '');
                     if (sanitized !== val && sanitized.length === 0) return;
                     onElaborateTextChange?.(sanitized);
-                    if (!multiSelect && sanitized.length > 0 && !isElaborateMarked) {
-                      onElaborateSelect?.();
-                    }
                   }}
                   onSubmit={() => {
                     // Enter submits and advance

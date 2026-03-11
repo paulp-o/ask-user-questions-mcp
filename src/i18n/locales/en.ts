@@ -48,10 +48,10 @@ export const en = {
     customAnswerLabel: "Custom answer",
     customAnswerHint: "(Tab to submit)",
     otherCustom: "Other (custom)",
-    placeholder: "Type your answer (Enter = newline, Tab = done)",
+    placeholder: "Type your answer...",
     singleLinePlaceholder: "Type here...",
     multiLinePlaceholder: "Type your answer...",
-    elaboratePlaceholder: "Tell the AI what you need (Enter/Tab = Skip)",
+    elaboratePlaceholder: "Tell the AI what you need...",
   },
   question: {
     multipleChoice: "Multiple Choice",

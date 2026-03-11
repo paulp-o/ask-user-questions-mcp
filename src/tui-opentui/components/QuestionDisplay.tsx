@@ -73,20 +73,14 @@ export const QuestionDisplay = ({
 }: QuestionDisplayProps): React.ReactNode => {
   const { theme } = useTheme();
 
-  // Handle option selection — clears custom answer only in single-select mode
+  // Handle option selection
   const handleSelectOption = (label: string) => {
     onSelectOption(label);
-    if (customAnswer && !multiSelect) {
-      onChangeCustomAnswer("");
-    }
   };
 
-  // Handle custom answer change — clears option selection only in single-select mode
+  // Handle custom answer change
   const handleCustomAnswerChange = (text: string) => {
     onChangeCustomAnswer(text);
-    if (selectedOption && text && !multiSelect) {
-      onSelectOption("");
-    }
   };
 
   return (
