@@ -1,3 +1,20 @@
+## [2.7.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.4...v2.7.0) (2026-03-11)
+
+### Features
+
+* add non-blocking question mode, get_answered_questions tool, fetch-answers and history CLI commands ([8447983](https://github.com/paulp-o/ask-user-questions-mcp/commit/844798386b0fb1bf461b0a8a86ff6511c6fa2214))
+* **spec: migrate-tui-to-opentui:** default renderer to opentui, fix plugin build TS2742 ([ffe2d02](https://github.com/paulp-o/ask-user-questions-mcp/commit/ffe2d0219cda58bb085e07f653b3aa7aa65fffdd))
+* **spec: migrate-tui-to-opentui:** wip add OpenSpec change for ink-to-OpenTUI TUI migration ([11a878c](https://github.com/paulp-o/ask-user-questions-mcp/commit/11a878c32a4d55bbfc56782c81041af6fa886173))
+* update themes and UI components for improved styling and accessibility ([f93155f](https://github.com/paulp-o/ask-user-questions-mcp/commit/f93155f70991ca84d69ee30ee7ff2692738e9918))
+
+### Bug Fixes
+
+* OpenTUI renderer bug fixes and CLI improvements ([032128d](https://github.com/paulp-o/ask-user-questions-mcp/commit/032128db82ef6eaf8d35aafde7d41794c093c058))
+* option row background color fills full terminal width ([aec252c](https://github.com/paulp-o/ask-user-questions-mcp/commit/aec252ceece7949c2ca15c353fa4d84e1f075f24))
+* SessionDots and SessionPicker horizontal layout (flexDirection row) ([24ca0b5](https://github.com/paulp-o/ask-user-questions-mcp/commit/24ca0b5a2e8960147f0e659b4917d60e151a2649))
+* SessionPicker page navigation, option row full-width bg via box, Ctrl+C exit ([e9c8d98](https://github.com/paulp-o/ask-user-questions-mcp/commit/e9c8d98598546b8c70191825bfde6b4d46b6eff4))
+* **spec: migrate-tui-to-opentui:** wip fix custom input erasure, submission validation, simplify placeholders, remove hover effects ([e6f4ecf](https://github.com/paulp-o/ask-user-questions-mcp/commit/e6f4ecf96af7941d6bb9e9d213e544b8c2b742dc))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
