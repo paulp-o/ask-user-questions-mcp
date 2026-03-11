@@ -1,3 +1,9 @@
+## [3.2.3](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.2...v3.2.3) (2026-03-11)
+
+### Bug Fixes
+
+* restore old README style with collapsible additions, restore ink fallback ([7d5aad3](https://github.com/paulp-o/ask-user-questions-mcp/commit/7d5aad357d3eb8bb0026c7dbfd84d6247610b5b7))
+
 ## [3.2.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.1...v3.2.2) (2026-03-11)
 
 ### Bug Fixes
