@@ -67,7 +67,7 @@ export const SessionDots: React.FC<SessionDotsProps> = ({
   if (sessions.length < 2) return null;
 
   return (
-    <box style={{ justifyContent: "center", paddingLeft: 1, paddingRight: 1 }}>
+    <box style={{ flexDirection: "row", justifyContent: "center", paddingLeft: 1, paddingRight: 1 }}>
       {sessions.map((session, idx) => {
         const isActive = idx === activeIndex;
         const uiState = sessionUIStates[session.sessionId];
@@ -117,7 +117,7 @@ export const SessionDots: React.FC<SessionDotsProps> = ({
         return (
           <box
             key={session.sessionId}
-            style={{ paddingRight: idx < sessions.length - 1 ? 1 : 0 }}
+            style={{ flexDirection: "row", paddingRight: idx < sessions.length - 1 ? 1 : 0 }}
             onMouseDown={() => onSelectIndex?.(idx)}
           >
             <text style={{ fg: dotColor, bold: isActive }}>

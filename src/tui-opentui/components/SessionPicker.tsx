@@ -169,7 +169,7 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
         }}
       >
         {/* Title bar */}
-        <box style={{ justifyContent: "center", marginBottom: 1 }}>
+        <box style={{ flexDirection: "row", justifyContent: "center", marginBottom: 1 }}>
           <text style={{ attributes: TextAttributes.BOLD, fg: theme.components.sessionPicker.title }}>
             Switch Session
           </text>
@@ -231,7 +231,7 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
 
           return (
             <box key={session.sessionId} style={{ flexDirection: "column" }} onMouseDown={() => { onSelectIndex(realIdx); onClose(); }}>
-              <box>
+              <box style={{ flexDirection: "row" }}>
                 {/* Stale/abandoned warning icon */}
                 {isStaleOrAbandoned && (
                   <text
