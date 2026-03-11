@@ -10,7 +10,7 @@ import { readCache, writeCache } from "./cache.js";
 import type { ChangelogResult } from "./types.js";
 
 const GITHUB_API_URL =
-  "https://api.github.com/repos/AlpacaLOS/auq/releases/tags";
+  "https://api.github.com/repos/paulp-o/ask-user-questions-mcp/releases/tags";
 
 /**
  * Fetch changelog content from GitHub Releases API for a specific version.
@@ -25,7 +25,7 @@ const GITHUB_API_URL =
 export async function fetchChangelog(
   version: string,
 ): Promise<ChangelogResult> {
-  const fallbackUrl = `https://github.com/AlpacaLOS/auq/releases/tag/v${version}`;
+  const fallbackUrl = `https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v${version}`;
 
   try {
     // Check cache first to avoid unnecessary API calls

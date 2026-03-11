@@ -18,7 +18,7 @@ import {
 import type { UpdateCheckCache, UpdateInfo } from "./types.js";
 
 const NPM_REGISTRY_URL = "https://registry.npmjs.org/auq-mcp-server";
-const GITHUB_RELEASES_URL = "https://github.com/AlpacaLOS/auq/releases/tag";
+const GITHUB_RELEASES_URL = "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag";
 
 export class UpdateChecker {
   private checkPromise: Promise<UpdateInfo | null> | null = null;

@@ -35,7 +35,7 @@ describe("changelog fetcher", () => {
 
     expect(result.content).toBe("## Changes\n- Fix bug");
     expect(result.fallbackUrl).toBe(
-      "https://github.com/AlpacaLOS/auq/releases/tag/v2.5.0",
+      "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v2.5.0",
     );
   });
 
@@ -53,7 +53,7 @@ describe("changelog fetcher", () => {
 
     expect(result.content).toBe("## Cached changelog");
     expect(result.fallbackUrl).toBe(
-      "https://github.com/AlpacaLOS/auq/releases/tag/v2.5.0",
+      "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v2.5.0",
     );
     expect(globalThis.fetch).not.toHaveBeenCalled();
   });
@@ -68,7 +68,7 @@ describe("changelog fetcher", () => {
 
     expect(result.content).toBeNull();
     expect(result.fallbackUrl).toBe(
-      "https://github.com/AlpacaLOS/auq/releases/tag/v2.5.0",
+      "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v2.5.0",
     );
   });
 
@@ -82,7 +82,7 @@ describe("changelog fetcher", () => {
 
     expect(result.content).toBeNull();
     expect(result.fallbackUrl).toBe(
-      "https://github.com/AlpacaLOS/auq/releases/tag/v2.5.0",
+      "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v2.5.0",
     );
   });
 
@@ -93,7 +93,7 @@ describe("changelog fetcher", () => {
 
     expect(result.content).toBeNull();
     expect(result.fallbackUrl).toBe(
-      "https://github.com/AlpacaLOS/auq/releases/tag/v2.5.0",
+      "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v2.5.0",
     );
   });
 
@@ -107,7 +107,7 @@ describe("changelog fetcher", () => {
 
     expect(result.content).toBeNull();
     expect(result.fallbackUrl).toBe(
-      "https://github.com/AlpacaLOS/auq/releases/tag/v2.5.0",
+      "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v2.5.0",
     );
   });
 
@@ -121,7 +121,7 @@ describe("changelog fetcher", () => {
     const result = await fetchChangelog("3.1.0");
 
     expect(result.fallbackUrl).toBe(
-      "https://github.com/AlpacaLOS/auq/releases/tag/v3.1.0",
+      "https://github.com/paulp-o/ask-user-questions-mcp/releases/tag/v3.1.0",
     );
   });
 });
