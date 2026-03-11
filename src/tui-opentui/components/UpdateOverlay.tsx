@@ -28,8 +28,8 @@ interface UpdateOverlayProps {
  * action buttons. Major updates show a breaking-change warning badge.
  *
  * Navigation:
- *   Tab / \u2192  : next button
- *   Shift+Tab / \u2190 : previous button
+ *   Tab / ↓  : next button
+ *   Shift+Tab / ↑ : previous button
  *   Enter    : trigger focused action
  *   Esc      : same as \"Remind me later\"
  */
@@ -70,22 +70,22 @@ export const UpdateOverlay: React.FC<UpdateOverlayProps> = ({
       return;
     }
 
-    // Tab / Right arrow: next button
+    // Tab / Down arrow: next button
     if (key.name === "tab" && !key.shift) {
       setFocusedButton((prev) => (prev + 1) % buttonCount);
       return;
     }
-    if (key.name === "right") {
+    if (key.name === "down") {
       setFocusedButton((prev) => (prev + 1) % buttonCount);
       return;
     }
 
-    // Shift+Tab / Left arrow: previous button
+    // Shift+Tab / Up arrow: previous button
     if (key.name === "tab" && key.shift) {
       setFocusedButton((prev) => (prev - 1 + buttonCount) % buttonCount);
       return;
     }
-    if (key.name === "left") {
+    if (key.name === "up") {
       setFocusedButton((prev) => (prev - 1 + buttonCount) % buttonCount);
       return;
     }
@@ -224,7 +224,7 @@ export const UpdateOverlay: React.FC<UpdateOverlayProps> = ({
       style={{
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "flex-start",
       }}
     >
       <box
@@ -309,7 +309,7 @@ export const UpdateOverlay: React.FC<UpdateOverlayProps> = ({
         </box>
 
         {/* Action buttons */}
-        <box style={{ justifyContent: "center", gap: 1 }}>
+        <box style={{ flexDirection: "column", alignItems: "center", gap: 1 }}>
           {buttonLabels.map((label, index) => {
             const isFocused = index === focusedButton;
             return (
@@ -335,7 +335,7 @@ export const UpdateOverlay: React.FC<UpdateOverlayProps> = ({
         {/* Footer hint */}
         <box style={{ justifyContent: "center", marginTop: 1 }}>
           <text style={{ attributes: TextAttributes.DIM }}>
-            ←→/Tab navigate · Enter select · Esc dismiss · click button
+            ↑↓/Tab navigate · Enter select · Esc dismiss · click button
           </text>
         </box>
       </box>

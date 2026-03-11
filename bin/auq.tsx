@@ -14,63 +14,129 @@ const args = process.argv.slice(2);
 const command = args[0];
 
 if (command === "--help" || command === "-h") {
-  console.log(`auq - Ask User Questions (MCP server + TUI)
+  // Read version dynamically (same as --version block)
+  const __filenameH = fileURLToPath(import.meta.url);
+  const __dirnameH = dirname(__filenameH);
+  let _helpVersion = "unknown";
+  for (const _p of [join(__dirnameH, "..", "package.json"), join(__dirnameH, "..", "..", "package.json")]) {
+    try { _helpVersion = JSON.parse(readFileSync(_p, "utf-8")).version; break; } catch { /* try next */ }
+  }
+  console.log(`auq - Ask User Questions (MCP Server + Interactive TUI)
+Version: ${_helpVersion}
 
-Usage: auq [command] [options]
+USAGE
+  auq                          Start interactive TUI (default)
+  auq <command> [options]      Run a specific command
 
-Commands:
-  (default)              Start interactive TUI
-  server                 Start MCP server (stdio)
-  ask <json>             Ask questions via CLI
-  answer <id> [flags]    Answer or reject a session
-  sessions <sub> [flags] List/dismiss sessions
-  config <sub> [flags]   Get/set configuration
-  update                 Check for and install updates
-  fetch-answers [flags]  Fetch answers for non-blocking sessions
-  history [sub] [flags]  Browse session history
+COMMANDS
+  server                       Start MCP server over stdio
+  ask <json|->                 Create a question session (json arg or stdin)
+  answer <sessionId> [flags]   Submit answers or reject a session
+  sessions <subcommand>        Manage sessions (list/show/dismiss)
+  fetch-answers [sessionId]    Fetch answered sessions or poll for answers
+  history [subcommand]         Browse past session history
+  config <subcommand>          Get or set configuration values
+  update                       Check for and install updates
 
-Ask:
-  auq ask '<json>'
-  auq ask -                              (read JSON from stdin)
-  Format: {"questions":[{"prompt":"...","title":"...","options":[{"label":"..."}]}]}
+SUBCOMMANDS
 
-Answer:
-  auq answer <id> --answers '<json>'         Submit answers
-  auq answer <id> --reject [--reason "text"]  Reject session
-  Format: --answers '{"0":{"selectedOption":"Label"}}'
-          Keys = question indices (0,1,2…); values: selectedOption, selectedOptions[], customText
-  Flags: --force  --json
+  sessions list [flags]        List sessions
+    --pending                  Show only pending sessions (default)
+    --stale                    Show only stale sessions
+    --all                      Show all sessions regardless of status
+    --limit <N>                Max items per page (default: 20)
+    --page <N>                 Page number (default: 1)
+    --json                     Output as JSON
 
-Sessions:
-  auq sessions list [--pending|--stale|--all] [--json]
-  auq sessions show <id> [--json]
-  auq sessions dismiss <id> [--force] [--json]
+  sessions show <sessionId>    Show session details
+    --json                     Output as JSON
 
-Fetch Answers:
-  auq fetch-answers [session-id] [--blocking] [--json]
-  auq fetch-answers --unread [--json]
+  sessions dismiss <sessionId> Dismiss a stale session
+    --force                    Force dismiss even if not stale
+    --json                     Output as JSON
 
-History:
-  auq history [--all] [--json] [--limit N] [--unread] [--search TEXT]
-  auq history show <id> [--json]
+  history [flags]              List session history
+    --all                      Include abandoned sessions
+    --unread                   Show only unread sessions
+    --search <text>            Search in prompts and answers
+    --session <id>             Filter to specific session
+    --limit <N>                Max items per page (default: 20)
+    --page <N>                 Page number (default: 1)
+    --json                     Output as JSON
 
-Config:
-  auq config get [key] [--json]
-  auq config set <key> <value> [--global] [--json]
-  Keys: maxOptions (2-10)  maxQuestions (1-10)  sessionTimeout (ms)
-        theme  language  renderer (ink|opentui)  staleAction (warn|remove|archive)
+  history show <sessionId>     Show full session Q&A detail
+    --json                     Output as JSON
 
-Options:
-  -h, --help      Show this help
-  -v, --version   Show version
+  config get [key]             Get config value(s)
+    --json                     Output as JSON
 
-Keys (TUI):
-  ↑↓ navigate  ←→/Tab questions  Space toggle  Enter select
-  R recommend  Ctrl+R quick-submit  Esc reject
-  [/] sessions  1-9 jump  Ctrl+S picker  Ctrl+T theme
+  config set <key> <value>     Set a config value
+    --global                   Write to global config (~/.config/auq/.auqrc.json)
+    --json                     Output as JSON
 
-Config: ./.auqrc.json (local) > ~/.config/auq/.auqrc.json (global)
-Env:    AUQ_SESSION_DIR  XDG_CONFIG_HOME  AUQ_RENDERER`);
+COMMAND FLAGS
+
+  ask <json|->
+    Accepts JSON string as argument or "-" to read from stdin.
+    JSON format: {\"questions\":[{\"prompt\":\"...\",\"title\":\"...\",\"options\":[{\"label\":\"...\",\"description\":\"...\"}]}]}
+
+  answer <sessionId>
+    --answers '<json>'         Submit answers as JSON
+    --reject                   Reject the session instead of answering
+    --reason \"<text>\"          Reason for rejection (used with --reject)
+    --force                    Force answer even if session is abandoned
+    --json                     Output as JSON
+    Answer JSON format: {\"0\":{\"selectedOption\":\"Label\"}}
+    Keys = question indices (0,1,2...); values can include:
+      selectedOption: \"Label\"         single-select answer
+      selectedOptions: [\"A\",\"B\"]      multi-select answer
+      customText: \"free text\"          custom/other input
+
+  fetch-answers [sessionId]
+    --blocking                 Wait until session is answered (requires sessionId)
+    --unread                   List unread answered sessions
+    --limit <N>                Max items per page (default: 20)
+    --page <N>                 Page number (default: 1)
+    --json                     Output as JSON
+
+  update
+    -y, --yes                  Skip confirmation prompt
+    --json                     Output as JSON
+
+GLOBAL FLAGS
+  -h, --help                   Show this help
+  -v, --version                Show version number
+  --json                       Output as machine-readable JSON (supported by most commands)
+
+CONFIG KEYS (for 'config get/set')
+  maxOptions      number (2-10)              Max options per question
+  maxQuestions    number (1-10)              Max questions per session
+  sessionTimeout  number (ms)                Session timeout in milliseconds
+  theme           string                     UI theme name
+  language        string                     UI language
+  renderer        \"ink\" | \"opentui\"          TUI renderer engine
+  staleAction     \"warn\"|\"remove\"|\"archive\"  Action for stale sessions
+  updateCheck     boolean                    Enable/disable auto-update checks
+
+ENVIRONMENT VARIABLES
+  AUQ_RENDERER         Override renderer (\"ink\" or \"opentui\")
+  AUQ_SESSION_DIR      Custom session storage directory
+  XDG_CONFIG_HOME      Custom config directory (default: ~/.config)
+  NO_UPDATE_NOTIFIER   Set to \"1\" to disable update checks
+
+CONFIG FILES
+  ./.auqrc.json                Local config (highest priority)
+  ~/.config/auq/.auqrc.json    Global config (fallback)
+
+EXAMPLES
+  auq                                            Launch TUI
+  auq ask '{\"questions\":[{\"prompt\":\"Continue?\",\"options\":[{\"label\":\"Yes\"},{\"label\":\"No\"}]}]}'
+  auq answer abc123 --answers '{\"0\":{\"selectedOption\":\"Yes\"}}'
+  auq sessions list --all --json
+  auq history --search \"deploy\" --limit 10
+  auq config set renderer opentui
+  auq fetch-answers abc123 --blocking
+  auq update -y`);
   process.exit(0);
 }
 
