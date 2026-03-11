@@ -1,3 +1,9 @@
+## [3.2.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.1.0...v3.2.0) (2026-03-11)
+
+### Features
+
+* pin update overlay to top with vertical nav, redesign --help for AI agents ([0c64819](https://github.com/paulp-o/ask-user-questions-mcp/commit/0c64819e5b4c1ad655ed509eb29436fbf5894a12))
+
 ## [3.1.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.5...v3.1.0) (2026-03-11)
 
 ### Features
