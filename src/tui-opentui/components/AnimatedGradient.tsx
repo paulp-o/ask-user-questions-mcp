@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 
+import { useTheme } from "../ThemeProvider.js";
+
 interface AnimatedGradientProps {
   text: string;
   /** Speed of gradient sweep (higher = faster). Default 0.12 */
@@ -42,6 +44,7 @@ export const AnimatedGradient = ({
   flowSpeed = 0.12,
   fps = 30,
 }: AnimatedGradientProps): React.ReactNode => {
+  const { theme } = useTheme();
   const [frame, setFrame] = useState(0);
 
   useEffect(() => {
@@ -61,8 +64,8 @@ export const AnimatedGradient = ({
   // Sweep position moves continuously left to right, wraps around
   const sweepPos = ((frame * flowSpeed) % totalRange) - sweepWidth;
 
-  const baseColor = "#AFAFAF";
-  const highlightColor = "#FFFFFF";
+  const baseColor = theme.colors.textDim;
+  const highlightColor = theme.colors.text;
 
   const elements = chars.map((char, i) => {
     const dist = Math.abs(i - sweepPos);

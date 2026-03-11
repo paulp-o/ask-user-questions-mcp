@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Left: logo + tagline */}
       <box style={{ flexDirection: "row", alignItems: "center" }}>
         <text style={{ bold: true, fg: theme.colors.primary }}>AUQ</text>
-        <text style={{ fg: "#8A949E" }}>{` ⋆ ${tagline}`}</text>
+        <text style={{ fg: theme.colors.textDim }}>{` ⋆ ${tagline}`}</text>
       </box>
 
       {/* Right: version + update badge + queue pill */}
