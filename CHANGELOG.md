@@ -1,3 +1,9 @@
+## [3.0.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.1...v3.0.2) (2026-03-11)
+
+### Bug Fixes
+
+* correct GitHub repo URL from AlpacaLOS/auq to paulp-o/ask-user-questions-mcp ([d4111ae](https://github.com/paulp-o/ask-user-questions-mcp/commit/d4111ae9178b88b7df5e2cdce54a4c807901ec18))
+
 ## [3.0.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.0...v3.0.1) (2026-03-11)
 
 ### Bug Fixes
