@@ -4,7 +4,7 @@
  * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
  * Run "npm run sync-plugin-schemas" to regenerate.
  * 
- * Generated at: 2026-03-11T07:09:04.731Z
+ * Generated at: 2026-03-11T08:31:20.040Z
  */
 
 import { tool } from "@opencode-ai/plugin/tool";
@@ -177,7 +177,7 @@ const GetAnsweredQuestionsArgsSchema = z.object({
   ),
 });
 
-export type GetAnsweredQuestionsArgs = z.infer<typeof GetAnsweredQuestionsArgsSchema>;
+export type GetAnsweredQuestionsArgs = { session_id: string; blocking: boolean };
 
 const GET_ANSWERED_QUESTIONS_DESCRIPTION =
   "Fetch answers for a previously submitted non-blocking question set. " +

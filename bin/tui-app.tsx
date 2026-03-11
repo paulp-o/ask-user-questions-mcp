@@ -869,7 +869,7 @@ async function runInkTui(config: AUQConfig): Promise<void> {
 
 export const runTui = async (config?: AUQConfig): Promise<void> => {
   const mergedConfig: AUQConfig = { ...DEFAULT_CONFIG, ...config };
-  const rendererType = process.env.AUQ_RENDERER || mergedConfig.renderer || "ink";
+  const rendererType = process.env.AUQ_RENDERER || mergedConfig.renderer || "opentui";
 
   if (rendererType === "opentui") {
     try {

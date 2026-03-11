@@ -35,7 +35,9 @@ const schemaContent = sourceContent
   // Remove export keywords from functions (internal use only, avoids TS2742 portability issues)
   .replace(/export function /g, "function ")
   // Remove the type export at the end
-  .replace(/export type QuestionInput[^;]+;/, "");
+  .replace(/export type QuestionInput[^;]+;/, "")
+  // Replace z.infer type exports with explicit types to avoid TS2742 portability issues
+  .replace(/export type GetAnsweredQuestionsArgs = z\.infer<typeof GetAnsweredQuestionsArgsSchema>;/, "export type GetAnsweredQuestionsArgs = { session_id: string; blocking: boolean };");
 
 // Generate the target file content
 const generatedContent = `/**
