@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 
-import { useTheme } from "../ThemeProvider.js";
-
 interface AnimatedGradientProps {
   text: string;
-  /** Speed of gradient flow (higher = faster). Default 0.5 */
+  /** Speed of gradient sweep (higher = faster). Default 0.12 */
   flowSpeed?: number;
   /** Frames per second for animation. Default 30 */
   fps?: number;
@@ -34,22 +32,16 @@ function lerpColor(a: string, b: string, t: number): string {
 }
 
 /**
- * AnimatedGradient – flowing gradient text for OpenTUI.
+ * AnimatedGradient – ChatGPT-style shimmer sweep for OpenTUI.
  *
- * Renders each character in its own <text> element with a per-character
- * foreground colour derived from the theme gradient palette, animated
- * with a sine-wave shimmer at `fps` frames/sec.
- *
- * IMPORTANT: We do NOT use gradient-string here because that library
- * produces ANSI escape sequences which OpenTUI renders as literal text.
- * Instead each character gets its own <text style={{ fg: hexColor }}> leaf.
+ * Renders each character with a white-to-gray gradient highlight that
+ * sweeps slowly from left to right, creating a large flowing shimmer effect.
  */
 export const AnimatedGradient = ({
   text,
-  flowSpeed = 0.5,
+  flowSpeed = 0.12,
   fps = 30,
 }: AnimatedGradientProps): React.ReactNode => {
-  const { theme } = useTheme();
   const [frame, setFrame] = useState(0);
 
   useEffect(() => {
@@ -62,15 +54,23 @@ export const AnimatedGradient = ({
   const chars = text.split("");
   const total = chars.length || 1;
 
+  // Sweep width: covers ~40% of text for a large, smooth highlight
+  const sweepWidth = Math.max(8, Math.floor(total * 0.4));
+  const totalRange = total + sweepWidth * 2;
+
+  // Sweep position moves continuously left to right, wraps around
+  const sweepPos = ((frame * flowSpeed) % totalRange) - sweepWidth;
+
+  const baseColor = "#AFAFAF";
+  const highlightColor = "#FFFFFF";
+
   const elements = chars.map((char, i) => {
-    // Sine-wave phase: each char has a different phase offset, frame advances it
-    const phase = (i / total) * Math.PI * 2 + frame * flowSpeed * 0.1;
-    const t = (Math.sin(phase) + 1) / 2; // 0..1
-    // Interpolate start→middle in first half, middle→end in second half
-    const color =
-      t < 0.5
-        ? lerpColor(theme.gradient.start, theme.gradient.middle, t * 2)
-        : lerpColor(theme.gradient.middle, theme.gradient.end, (t - 0.5) * 2);
+    const dist = Math.abs(i - sweepPos);
+    const brightness = Math.max(0, 1 - dist / sweepWidth);
+    // Smooth cosine falloff for natural-looking sweep
+    const smooth = brightness > 0 ? (Math.cos((1 - brightness) * Math.PI) + 1) / 2 : 0;
+    const color = lerpColor(baseColor, highlightColor, smooth);
+
     return (
       <text key={i} style={{ fg: color }}>
         {char}
@@ -78,6 +78,5 @@ export const AnimatedGradient = ({
     );
   });
 
-  // <box flexDirection="row"> arranges the per-character <text> nodes side by side
   return <box style={{ flexDirection: "row" }}>{elements}</box>;
 };
