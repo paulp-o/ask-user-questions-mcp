@@ -152,14 +152,10 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
   return (
     <box
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        flexGrow: 1,
       }}
     >
       <box

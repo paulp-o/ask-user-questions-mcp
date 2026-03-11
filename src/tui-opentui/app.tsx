@@ -646,7 +646,19 @@ function AppInner({ config }: { config: AUQConfig }) {
         onUpdateBadgeActivate={() => setShowUpdateOverlay(true)}
         isCheckingUpdate={isCheckingUpdate}
       />
-      {mainContent}
+      {showSessionPicker && state.mode === "PROCESSING" ? (
+        <SessionPicker
+          isOpen={showSessionPicker}
+          sessions={sessionsWithMeta}
+          activeIndex={activeSessionIndex}
+          sessionUIStates={sessionUIStates}
+          onSelectIndex={(idx) => {
+            switchToSession(idx);
+            setShowSessionPicker(false);
+          }}
+          onClose={() => setShowSessionPicker(false)}
+        />
+      ) : mainContent}
       {state.mode === "PROCESSING" && sessionQueue.length >= 2 && (
         <SessionDots
           sessions={sessionsWithMeta}
@@ -682,19 +694,6 @@ function AppInner({ config }: { config: AUQConfig }) {
       )}
       <ThemeIndicator />
       </box>
-      {state.mode === "PROCESSING" && (
-        <SessionPicker
-          isOpen={showSessionPicker}
-          sessions={sessionsWithMeta}
-          activeIndex={activeSessionIndex}
-          sessionUIStates={sessionUIStates}
-          onSelectIndex={(idx) => {
-            switchToSession(idx);
-            setShowSessionPicker(false);
-          }}
-          onClose={() => setShowSessionPicker(false)}
-        />
-      )}
     </box>
   );
 }

@@ -216,13 +216,12 @@ export const OptionsList = ({
     }
   });
 
-  // \u2500\u2500 Helper: Truncate text to fit row width \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  // ── Helper: Truncate text to fit row width ─────────────────────────────────────────
   const fitRow = (text: string): string => {
     if (text.length > rowWidth) {
       return text.slice(0, rowWidth - 1) + "\u2026";
     }
-    // Pad with spaces to fill the full row width so bg color covers the entire row
-    return text + " ".repeat(Math.max(0, rowWidth - text.length));
+    return text; // Background is filled by parent <box>, no manual padding needed
   };
 
   return (
@@ -262,29 +261,27 @@ export const OptionsList = ({
               onSelect(option.label);
             }
           }}>
-            <text
-              style={{
-                bg: rowBg,
-                attributes: (isFocusedOption || isSelected) ? TextAttributes.BOLD : TextAttributes.NONE,
-                fg: rowColor,
-              }}
-            >
-              {fitRow(mainLine)}
-            </text>
-            {option.description && (
+            <box style={{ backgroundColor: rowBg }}>
               <text
                 style={{
-                  bg: isFocusedOption
-                    ? theme.components.options.focusedBg
-                    : isSelected
-                      ? theme.components.options.selectedBg
-                      : undefined,
-                  fg: theme.components.options.description,
-                  attributes: (!isFocusedOption && !isSelected) ? TextAttributes.DIM : TextAttributes.NONE,
+                  attributes: (isFocusedOption || isSelected) ? TextAttributes.BOLD : TextAttributes.NONE,
+                  fg: rowColor,
                 }}
               >
-                {fitRow(`   ${option.description}`)}
+                {fitRow(mainLine)}
               </text>
+            </box>
+            {option.description && (
+              <box style={{ backgroundColor: isFocusedOption ? theme.components.options.focusedBg : isSelected ? theme.components.options.selectedBg : undefined }}>
+                <text
+                  style={{
+                    fg: theme.components.options.description,
+                    attributes: (!isFocusedOption && !isSelected) ? TextAttributes.DIM : TextAttributes.NONE,
+                  }}
+                >
+                  {fitRow(`   ${option.description}`)}
+                </text>
+              </box>
             )}
           </box>
         );
@@ -311,16 +308,19 @@ export const OptionsList = ({
                 : `${isCustomInputFocused ? ">" : " "} ${t("input.otherCustom")}${isSelected ? " \u2713" : ""}`;
 
               return (
-                <text
-                  style={{
-                    bg: rowBg,
-                    attributes: (isCustomInputFocused || isSelected) ? TextAttributes.BOLD : TextAttributes.NONE,
-                    fg: rowColor,
-                  }}
+                <box
+                  style={{ backgroundColor: rowBg }}
                   onMouseDown={() => { setFocusedIndex(customInputIndex); }}
                 >
-                  {fitRow(mainLine)}
-                </text>
+                  <text
+                    style={{
+                      attributes: (isCustomInputFocused || isSelected) ? TextAttributes.BOLD : TextAttributes.NONE,
+                      fg: rowColor,
+                    }}
+                  >
+                    {fitRow(mainLine)}
+                  </text>
+                </box>
               );
             })()}
             {isCustomInputFocused && onCustomChange && (
@@ -382,19 +382,22 @@ export const OptionsList = ({
                 : `${isElaborateFocused ? ">" : " "} ${t("footer.elaborate")}${isElaborateMarked ? " \u2605" : ""}`;
 
               return (
-                <text
-                  style={{
-                    bg: rowBg,
-                    attributes: (isElaborateFocused || isElaborateMarked) ? TextAttributes.BOLD : TextAttributes.NONE,
-                    fg: rowColor,
-                  }}
+                <box
+                  style={{ backgroundColor: rowBg }}
                   onMouseDown={() => {
                     setFocusedIndex(elaborateIndex);
                     onElaborateSelect?.();
                   }}
                 >
-                  {fitRow(mainLine)}
-                </text>
+                  <text
+                    style={{
+                      attributes: (isElaborateFocused || isElaborateMarked) ? TextAttributes.BOLD : TextAttributes.NONE,
+                      fg: rowColor,
+                    }}
+                  >
+                    {fitRow(mainLine)}
+                  </text>
+                </box>
               );
             })()}
             {/* Elaborate input box - shown when elaborate option is focused */}
