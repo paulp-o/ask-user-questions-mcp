@@ -1,18 +1,24 @@
+![AUQ Demo](media/demo2.png)
+
 # AUQ - Ask User Questions
 
-_**A complete toolset that enables maximum level of human-(intention-)in-the-loop onto any long-running, multi-agentic AI workflows.**_
+_`AskUserQuestion` pushed to the max_
+
+<img src="media/icon.png" alt="AUQ Logo" width="120" />
 
 [![npm version](https://img.shields.io/npm/v/auq-mcp-server.svg)](https://www.npmjs.com/package/auq-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-Single/multiple choice questions, custom options, multi-agent interoperability, question queueing, question rejection with explanation, elaboration requesting, quick recommendations auto-selection, themes, native OS notification, terminal progress bar, multi-language support, agent skills support... and more.
+**A complete toolset that enables maximum level of human-(intention-)in-the-loop onto any long-running, multi-agentic AI workflows (like Ralph Loop!).**
 
-**Works via MCP server / OpenCode plugin / Agent Skills.**
+Single/multiple choice questions, custom options, multi-agent interoperability, question queueing, question rejection with explanation, elaboration requesting, quick recommendations auto-selection, themes, native OS notification, terminal progress bar, multi-language support, agent skills support... and more. You can customize them all too!
 
-> AUQ is an **unopinionated** tool—it doesn't impose any specific workflow. It's a simple, flexible bridge between AI agents and human decision-making.
+**Can be used via MCP server / OpenCode plugin / Agent Skills.**
 
-[Setup](#-setup) • [Usage](#-usage) • [CLI Reference](#-cli-reference)
+[Setup](#-install-cli-tool) • [Usage](#-usage)
+
+> 🤔 [I already have question tool in CC/OC/Cursor. Why use this?](#-why-auq-vs-built-in-questioning-tools)
 
 ---
 
@@ -23,7 +29,7 @@ AUQ lets your AI assistants **ask clarifying questions** consisting of multiple-
 This lets you inject your **intent** into long-running autonomous AI tasks—no more switching windows or babysitting AIs. Turn on the CLI **anytime**, even **remotely via SSH**!
 
 <details>
-<summary><i>A fun background story</i></summary>
+<summary><i>A no no fun background story</i></summary>
 
 In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been widely recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code [1].
 
@@ -39,15 +45,17 @@ On October 18th, Claude Code 2.0.21 introduced an internal `AskUserQuestion` too
 
 ## ✨ Demo
 
-![AUQ Demo](media/demo2.png)
-
-https://github.com/user-attachments/assets/3a135a13-fcb1-4795-9a6b-f426fa079674
+<https://github.com/user-attachments/assets/3a135a13-fcb1-4795-9a6b-f426fa079674>
 
 ---
 
-## 🚀 Setup
+# Setup Instructions
 
-### Install CLI
+## 🚀 Install CLI Tool
+
+First, install the **AUQ CLI**:
+
+### Global Installation (Recommended)
 
 **Bun (recommended — required for default OpenTUI renderer)**
 
@@ -56,57 +64,64 @@ bun add -g auq-mcp-server
 ```
 
 **npm**
-
 ```bash
 npm install -g auq-mcp-server
 ```
 
 **pnpm**
-
 ```bash
 pnpm add -g auq-mcp-server
 ```
 
 **yarn**
-
 ```bash
 yarn global add auq-mcp-server
 ```
 
 > **Note:** Bun is recommended for the default OpenTUI renderer. When installed via npm/pnpm/yarn, the shell wrapper auto-detects Bun at runtime. If Bun is not available, it falls back to Node.js with the legacy Ink renderer.
 
-### Integrate with Your AI
+<details><summary>Local (Project-specific) Installation</summary>
 
-**Option A: MCP Server** (Cursor, Claude Code, Codex CLI, Claude Desktop)
+```bash
+# Install in your project
+bun add auq-mcp-server
+```
+
+Sessions are stored **globally** regardless of installation method. See [Troubleshooting](#troubleshooting) for session locations.
+
+</details>
+
+---
+
+## 🔌 Integrate to your AI
+
+AUQ supports multiple AI environments. Choose between **OpenCode plugin** and **MCP server**.
+
+### Option A: MCP Server
+
+> _Note: Due to differences in how some MCP clients are implemented, AUQ may be forcibly cancelled in tools that do not allow extending the global MCP timeout. If that's the case, consider using [Agent Skills](#option-c-agent-skills-experimental). Use [OpenCode plugin](#option-b-opencode-plugin) if you use OpenCode._
 
 <details>
 <summary><strong>Cursor</strong></summary>
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
 
-Or manually add to MCP settings:
-
-```json
-{
-  "mcpServers": {
-    "ask-user-questions": {
-      "command": "bunx",
-      "args": ["-y", "auq-mcp-server", "server"]
-    }
-  }
-}
-```
-
 </details>
 
 <details>
 <summary><strong>Claude Code</strong></summary>
 
+**Method 1: Using CLI** (Recommended)
+
 ```bash
 claude mcp add --transport stdio ask-user-questions -- bunx -y auq-mcp-server server
 ```
 
-Or add to `.mcp.json`:
+> **Note:** `npx` also works if you prefer npm.
+
+**Method 2: Manual Configuration**
+
+Add to `.mcp.json` in your project root (for team-wide sharing):
 
 ```json
 {
@@ -120,6 +135,12 @@ Or add to `.mcp.json`:
 }
 ```
 
+Or add to `~/.claude.json` for global access across all projects.
+
+_**Note:** Replace `bunx` if you don't use bun._
+
+**Verify setup:** Type `/mcp` in Claude Code to check server status.
+
 </details>
 
 <details>
@@ -131,7 +152,7 @@ Add to `~/.codex/config.toml`:
 [mcp_servers.ask-user-questions]
 command = "bunx"
 args = ["-y", "auq-mcp-server", "server"]
-tool_timeout_sec = 99999
+tool_timeout_sec = 99999  // Extend timeout for long sessions
 ```
 
 </details>
@@ -152,13 +173,17 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 }
 ```
 
+> _Replace `bunx` if you don't use bun._
+
+**Restart Claude Desktop** after saving.
+
 </details>
 
-> **Note:** Some MCP clients have default timeouts that may interrupt AUQ if you take too long to answer. Configure longer timeouts for better experience.
+### Option B: OpenCode Plugin
 
----
+**Direct integration** for OpenCode users. Adds working directory viewability feature exclusively.
 
-**Option B: OpenCode Plugin**
+#### Configuration
 
 Add to `opencode.json`:
 
@@ -168,241 +193,314 @@ Add to `opencode.json`:
 }
 ```
 
----
+### Option C: Agent Skills (Experimental)
 
-**Option C: Agent Skills (Experimental)**
+#### Usage with Skills-Compatible Agents
 
 Copy the `skills/ask-user-questions/` folder to your agent's skills directory.
 
-> ⚠️ **Limitations:** Skills don't support features like status polling, fetching answers, or rejected question handling. MCP or plugin is recommended.
+<details>
+<summary><strong>Limitations</strong></summary>
+
+This skill guides the AI to use AUQ CLI's hidden command, `auq ask` with raw JSON as parameters. Unlike MCP or _proper_ tool harness systems, malformed JSON healing/schema enforcement aren't supported natively; therefore a less capable model could struggle to call properly.
+
+</details>
 
 ---
 
 ## 💻 Usage
 
-### Start the TUI
+### Starting the CLI tool
 
 ```bash
-auq              # Launch interactive TUI (default)
+auq       # if installed globally (bun add -g)
+# bunx auq
+# npx auq
 ```
 
-The TUI displays pending questions from all connected AI agents. Answer them **at your convenience**.
-
-### In Your AI Workflow
-
-Add to your `AGENTS.md` or prompt:
+Start by defining your workflow to use AUQ tool for clarifying questions, on `AGENTS.md` (or `CLAUDE.md`), like:
 
 ```markdown
-Whenever you need clarification, call AUQ(ask-user-questions) instead of guessing.
+Whenever you need clarification on what you are working on, never guess, and call AUQ(ask-user-questions).
 ```
+
+When the AI asks questions, you'll see them appear in the AUQ TUI. Answer them **at your convenience**.
+
+### Renderer Selection
+
+AUQ supports two terminal rendering engines:
+
+| Renderer              | Description                                         | Status              |
+| --------------------- | --------------------------------------------------- | ------------------- |
+| **OpenTUI** (default) | Native Zig-based renderer with improved performance | Stable (requires Bun) |
+| **ink**               | React-based terminal renderer                       | Fallback (Node.js)  |
+
+OpenTUI is the default renderer and requires **Bun** runtime. When Bun is unavailable, AUQ automatically falls back to the Ink renderer.
+
+**To force a specific renderer**, set one of the following (in priority order):
+
+1. **Environment variable** (highest priority):
+
+   ```bash
+   AUQ_RENDERER=ink auq    # force ink
+   AUQ_RENDERER=opentui auq  # force opentui
+   ```
+
+2. **Config file** (`.auqrc.json`):
+
+   ```json
+   {
+     "renderer": "ink"
+   }
+   ```
+
+3. **CLI command**:
+   ```bash
+   auq config set renderer ink
+   ```
+
+> **Note:** OpenTUI provides native CJK character support, built-in markdown rendering with syntax highlighting, and mouse support. The shell wrapper (`bin/auq`) auto-detects Bun at runtime.
+
+### Markdown rendering in question prompts
+
+Question prompts now support **Markdown formatting** in the `prompt` text.
+
+- Supported: **bold**, _italic_, ~~strikethrough~~, `inline code`, links, and fenced code blocks (with syntax highlighting)
+- Links render as `text (url)` for broad terminal compatibility
+- Code blocks use theme-aware colors (background/text/border)
+- Always enabled (no configuration needed)
+- Plain text prompts pass through unchanged
+- Graceful fallback: if Markdown parsing fails, the raw text is shown
+
+> _Note: AUQ is an unopinionated tool and doesn't include prompts on **HOW** AI should leverage it. It is expected that you do your own prompt engineering to make the most out of it in your own workflows._
+> _I personally enjoy prompting it to ask at least 30 questions repeatedly before action!_
+
+### Recommended Setups
+
+It is recommended to **disable** the built-in questioning tool in your harness (like the `question` tool in OpenCode or `AskUserQuestion` in Claude Code) to avoid AI from mixing them up.
+
+### Useful Keyboard Shortcuts
+
+| Key      | Action        | Description                                                        |
+| -------- | ------------- | ------------------------------------------------------------------ |
+| `Space`  | Select        | Select/toggle option without advancing                             |
+| `Enter`  | Select & Next | Select option and advance to next question                         |
+| `R`      | Recommended   | Select recommended option(s) for current question                  |
+| `Ctrl+R` | Quick Submit  | Auto-select recommended options for all questions and go to review |
+| `Esc`    | Reject        | Reject the whole question set and optionally explain why to the AI |
+| `Ctrl+T` | Theme         | Cycle through available color themes                               |
+| `[`/`]`  | Sessions      | Switch to previous/next session (OpenTUI: also click session dots) |
+
+**Mouse Support (OpenTUI renderer only):**
+
+| Action            | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| Click option      | Select/toggle option                            |
+| Scroll            | Scroll through session picker or update overlay |
+| Click session dot | Switch to that session                          |
+
+
+<details>
+<summary><strong>⌨️ All Keyboard Shortcuts</strong></summary>
+
+| Key      | Action                                                             |
+| -------- | ------------------------------------------------------------------ |
+| `↑↓`     | Navigate options                                                   |
+| `←→/Tab` | Switch between questions                                           |
+| `Space`  | Select/toggle option without advancing                             |
+| `Enter`  | Select option and advance to next question                         |
+| `R`      | Select recommended option(s) for current question                  |
+| `Ctrl+R` | Quick submit — auto-fill recommended, go to review                 |
+| `Esc`    | Reject the whole question set and optionally explain why            |
+| `Ctrl+T` | Cycle through available color themes                               |
+| `Ctrl+S` | Open session picker                                                |
+| `1-9`    | Jump directly to session by number                                 |
+| `[/]`    | Navigate between sessions                                          |
+| `U`      | Open update overlay (when update available)                        |
+
+</details>
+<details>
+<summary><strong>More Commands (advanced)</strong></summary>
+
+```bash
+# you won't likely need these at all
+auq server       # Start MCP server
+auq --version    # Show version
+auq update       # Check for and install updates
+auq --help       # Show help
+```
+
+</details>
 
 ---
 
-## 🎨 Features
-
-| Feature             | Description                                         |
-| ------------------- | --------------------------------------------------- |
-| **One Inbox**       | Collect questions from multiple agents in one place |
-| **Smart Queuing**   | Questions queue up; answer on your terms            |
-| **Rich Formatting** | Markdown support with syntax highlighting           |
-| **Bulk Actions**    | `Ctrl+R` auto-selects recommended options           |
-| **Multi-Renderer**  | OpenTUI (default, Bun) or Ink (fallback, Node)      |
-| **Themes**          | 16 built-in themes + custom theme support           |
-| **Notifications**   | Native OS notifications for new questions           |
-| **i18n**            | English, Korean (auto-detected)                     |
-
----
-
-## 📋 CLI Reference
-
 <details>
-<summary><strong>Commands Overview</strong></summary>
+<summary><strong>📋 Full CLI Reference</strong></summary>
 
-```
-auq                          Start interactive TUI (default)
-auq server                   Start MCP server over stdio
-auq ask <json|->             Create a question session
-auq answer <sessionId>       Submit answers or reject
-auq sessions <subcommand>    Manage sessions
-auq fetch-answers [id]       Fetch/poll answered sessions
-auq history [subcommand]     Browse session history
-auq config <subcommand>      Get/set configuration
-auq update                   Check for and install updates
-```
+### CLI Commands
 
-</details>
+AUQ provides headless CLI commands for managing sessions and configuration without the TUI.
+Run `auq --help` for the complete reference.
 
-<details>
-<summary><strong>🔍 Sessions</strong></summary>
+#### Answer Sessions
 
 ```bash
-# List sessions (paginated)
-auq sessions list
-auq sessions list --all                    # Include completed
-auq sessions list --stale                  # Only stale sessions
-auq sessions list --limit 20 --page 1      # Pagination
-auq sessions list --json
-
-# Show session details
-auq sessions show <sessionId>
-auq sessions show <sessionId> --json
-
-# Dismiss/archive a session
-auq sessions dismiss <sessionId>
-auq sessions dismiss <sessionId> --force
-```
-
-</details>
-
-<details>
-<summary><strong>📝 History</strong></summary>
-
-```bash
-# List history (paginated)
-auq history
-auq history --all                    # Include abandoned
-auq history --unread                 # Only unread
-auq history --search "deploy"        # Search text
-auq history --session <id>           # Filter by session
-auq history --limit 20 --page 1      # Pagination
-auq history --json
-
-# Show full Q&A detail
-auq history show <sessionId>
-auq history show <sessionId> --json
-```
-
-</details>
-
-<details>
-<summary><strong>💬 Fetch Answers</strong></summary>
-
-```bash
-# List answered sessions
-auq fetch-answers
-auq fetch-answers --unread
-auq fetch-answers --limit 20 --page 1
-auq fetch-answers --json
-
-# Poll for a specific session (blocking)
-auq fetch-answers <sessionId> --blocking
-```
-
-</details>
-
-<details>
-<summary><strong>⚡ Answer & Ask</strong></summary>
-
-```bash
-# Answer a session
-auq answer <sessionId> --answers '{"0":{"selectedOption":"Yes"}}'
+auq answer <sessionId> --answers '{"0": {"selectedOption": "option1"}}'
+auq answer <sessionId> --answers '{"0": {"selectedOptions": ["A", "B"]}}'  # multi-select
+auq answer <sessionId> --answers '{"0": {"customText": "free text"}}'  # custom text
 auq answer <sessionId> --reject --reason "Not applicable"
-auq answer <sessionId> --answers '...' --force  # Force abandoned
-
-# Create a session (stdin)
-echo '{"questions":[...]}' | auq ask -
-auq ask '{"questions":[{"prompt":"Continue?","options":[{"label":"Yes"}]}]}'
+auq answer <sessionId> --answers '...' --force  # abandoned session
+auq answer <sessionId> --answers '...' --json
 ```
 
-**Answer JSON format:**
-
-```json
-{
-  "0": {
-    "selectedOption": "Label",
-    "selectedOptions": ["A", "B"],
-    "customText": "free text"
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><strong>⚙️ Configuration</strong></summary>
+#### Manage Sessions
 
 ```bash
-# View config
-auq config get
-auq config get <key>
-auq config get --json
-
-# Set config (local or global)
-auq config set <key> <value>
-auq config set <key> <value> --global
+auq sessions list                    # pending sessions (default)
+auq sessions list --stale             # stale sessions only
+auq sessions list --all               # all sessions
+auq sessions show <sessionId>         # session details
+auq sessions dismiss <sessionId>      # dismiss stale session
+auq sessions dismiss <sessionId> --force
+auq sessions list --limit 10 --page 2 # pagination
+auq sessions list --json
 ```
 
-**Config keys:**
+#### Session History
 
-| Key              | Type                        | Default   | Description                   |
-| ---------------- | --------------------------- | --------- | ----------------------------- |
-| `maxOptions`     | number (2-10)               | 5         | Maximum options per question  |
-| `maxQuestions`   | number (1-10)               | 5         | Maximum questions per session |
-| `sessionTimeout` | number (ms)                 | 0         | Session timeout (0 = none)    |
-| `theme`          | string                      | "system"  | UI theme name                 |
-| `language`       | string                      | "auto"    | UI language (auto/en/ko)      |
-| `renderer`       | "ink" \| "opentui"          | "opentui" | TUI renderer engine           |
-| `staleAction`    | "warn"\|"remove"\|"archive" | "warn"    | Action for stale sessions     |
-| `updateCheck`    | boolean                     | true      | Enable auto-update checks     |
+```bash
+auq history                           # list session history
+auq history --all                     # include abandoned
+auq history --unread                  # unread only
+auq history --search "deploy"          # search
+auq history --limit 10 --page 2       # pagination
+auq history show <sessionId>          # full Q&A detail
+auq history --json
+```
 
-**Config files:**
+#### Fetch Answers (Programmatic)
 
-- Local: `./.auqrc.json`
-- Global: `~/.config/auq/.auqrc.json`
+```bash
+auq fetch-answers --unread            # list unread answered sessions
+auq fetch-answers <sessionId>         # fetch specific session
+auq fetch-answers <sessionId> --blocking  # wait until answered
+auq fetch-answers --limit 10 --page 2
+auq fetch-answers --json
+```
 
-</details>
+#### Configuration
 
-<details>
-<summary><strong>⌨️ Keyboard Shortcuts</strong></summary>
+```bash
+auq config get                        # view all
+auq config get staleThreshold         # view specific
+auq config set staleThreshold 3600000 # set local
+auq config set staleThreshold 3600000 --global  # set global
+```
 
-**Answering:**
-| Key | Action |
-|-----|--------|
-| `Space` | Select/toggle option (without advancing) |
-| `Enter` | Select option and advance to next question |
-| `R` | Select recommended option(s) for current question |
-| `Ctrl+R` | Auto-select all recommended + go to review |
-| `Esc` | Reject the question set (with optional reason) |
+#### Update
 
-**Navigation:**
-| Key | Action |
-|-----|--------|
-| `Ctrl+S` | Open session picker |
-| `1-9` | Jump directly to session N |
-| `[` / `]` | Previous/next session |
-| `U` | Open update overlay |
+```bash
+auq update        # interactive update check
+auq update -y     # skip confirmation
+```
 
-**UI:**
-| Key | Action |
-|-----|--------|
-| `Ctrl+T` | Cycle through themes |
-| `Ctrl+Q` | Quit |
+#### Pagination
 
-**Mouse (OpenTUI only):**
-
-- Click option: Select/toggle
-- Click session dot: Switch session
-- Scroll: Navigate lists/overlays
+List commands (`sessions list`, `history`, `fetch-answers`) support:
+- `--limit <N>` — Max items per page (default: 20)
+- `--page <N>` — Page number (default: 1)
 
 </details>
 
 <details>
 <summary><strong>🌍 Environment Variables</strong></summary>
 
-| Variable             | Description                                    |
-| -------------------- | ---------------------------------------------- |
-| `AUQ_RENDERER`       | Override renderer: `"ink"` or `"opentui"`      |
-| `AUQ_SESSION_DIR`    | Custom session storage directory               |
-| `XDG_CONFIG_HOME`    | Custom config directory (default: `~/.config`) |
-| `NO_UPDATE_NOTIFIER` | Set to `"1"` to disable update checks          |
-| `CI`                 | Automatically disables notifications if set    |
+| Variable             | Description                                      |
+| -------------------- | ------------------------------------------------ |
+| `AUQ_RENDERER`       | Override renderer (`"ink"` or `"opentui"`)          |
+| `AUQ_SESSION_DIR`    | Custom session storage directory                 |
+| `XDG_CONFIG_HOME`    | Custom config directory (default: `~/.config`)   |
+| `NO_UPDATE_NOTIFIER` | Set to `"1"` to disable update checks             |
 
 </details>
 
-<details>
-<summary><strong>🎨 Themes</strong></summary>
 
-16 built-in themes with automatic persistence. Press `Ctrl+T` to cycle.
+### Stale Session Detection
+
+Sessions that remain unanswered longer than the configured threshold are marked as "stale" (potentially orphaned). This helps identify sessions where the AI may have disconnected or timed out.
+
+- **Visual indicators**: Stale sessions show a ⚠ warning icon and yellow highlighting in the TUI
+- **Toast notifications**: A notification appears when a session becomes stale (configurable)
+- **Grace period**: Interacting with a stale session provides a 30-minute grace period
+- **Configurable threshold**: Default is 2 hours (7,200,000ms)
+
+---
+
+### Abandoned Session Handling
+
+When an AI client disconnects, associated sessions are marked as "abandoned". These sessions:
+
+- Remain visible in the TUI with a red indicator
+- Show a confirmation dialog before answering ("AI가 disconnect되었습니다")
+- Can still be answered via CLI with the `--force` flag
+- Are detectable via `auq sessions list --all`
+
+---
+
+### Auto-Update
+
+AUQ automatically checks for updates and keeps itself up to date.
+
+#### How it works
+
+- **All updates** (patch, minor, major): A fullscreen overlay is shown with changelog and options to update, skip, or defer.
+- **Update checks**: Run on every TUI launch (no delay/cache).
+- **CLI notification**: When running non-TUI commands, a one-line update notification is shown if a newer version is available.
+
+#### Manual update
+
+Run `auq update` to manually check for and install updates:
+
+```bash
+auq update        # Interactive update check
+auq update -y     # Skip confirmation prompt
+```
+
+#### Disabling update checks
+
+Disable automatic update checks via config:
+
+```bash
+auq config set updateCheck false
+```
+
+Or set the environment variable:
+
+```bash
+NO_UPDATE_NOTIFIER=1 auq ask "question"
+```
+
+Update checks are automatically disabled in CI environments (`CI=true`).
+
+The `auq update` command always works regardless of these settings.
+
+### Theme System
+
+AUQ supports **16 built-in color themes** with automatic persistence. Press `Ctrl+T` to cycle through themes.
+
+#### Theme Differences by Renderer
+
+| Feature          | ink                | OpenTUI                                   |
+| ---------------- | ------------------ | ----------------------------------------- |
+| Header text      | Gradient animation | Solid accent color                        |
+| Toast animations | `setTimeout` based | `useTimeline` based                       |
+| Markdown syntax  | Basic highlighting | Tree-sitter powered                       |
+| Mouse support    | No                 | Yes (click options, scroll, session dots) |
+
+> Both renderers support all 16 built-in themes and custom themes. Colors are consistent; only implementation details differ.
+
+<details>
+<summary><strong>Built-in Themes</strong></summary>
 
 | Theme            | Style                    |
 | ---------------- | ------------------------ |
@@ -423,155 +521,240 @@ auq config set <key> <value> --global
 | GitHub Light     | GitHub's light mode      |
 | Rosé Pine        | Warm, cozy pinks         |
 
-**Custom themes:** Place `.theme.json` files in `~/.config/auq/themes/`
+</details>
+
+Your selected theme is **automatically saved** to `~/.config/auq/config.json` and restored on next launch.
+
+<details>
+<summary><strong>Custom Themes</strong></summary>
+
+Create custom themes by placing `.theme.json` files in:
+
+- **macOS/Linux**: `~/.config/auq/themes/`
+
+Example custom theme (`~/.config/auq/themes/my-theme.theme.json`):
+
+```json
+{
+  "name": "my-theme",
+  "colors": {
+    "primary": "#ff6b6b",
+    "success": "#51cf66",
+    "text": "#f8f9fa"
+  }
+}
+```
+
+Custom themes inherit from the default dark theme—only override the colors you want to change. See the [JSON schema](schemas/theme.schema.json) for all available properties.
 
 </details>
 
 ---
 
-## ⚙️ Advanced Topics
+### Manual session cleanup
 
-<details>
-<summary><strong>Renderer Selection</strong></summary>
-
-AUQ supports two terminal rendering engines:
-
-| Renderer              | Runtime | Status              |
-| --------------------- | ------- | ------------------- |
-| **OpenTUI** (default) | Bun     | Stable, recommended |
-| **Ink**               | Node.js | Legacy fallback     |
-
-**Automatic selection:** The `bin/auq` shell wrapper detects your runtime:
-
-- Prefers Bun → OpenTUI renderer
-- Falls back to Node.js → Ink renderer
-
-**Manual override:**
+Sessions auto-clean after retention period. However, you can manually clean them up if you want to.
 
 ```bash
-AUQ_RENDERER=ink auq      # Force Ink
-AUQ_RENDERER=opentui auq  # Force OpenTUI
+rm -rf ~/Library/Application\ Support/auq/sessions/*  # macOS
+rm -rf ~/.local/share/auq/sessions/*                  # Linux
 ```
 
-Or set in `.auqrc.json`:
-
-```json
-{ "renderer": "ink" }
-```
-
-</details>
+---
 
 <details>
-<summary><strong>Auto-Update</strong></summary>
+<summary><strong>Local Development & Testing</strong></summary>
 
-AUQ checks for updates **on every launch** (no cache delay).
+To test the MCP server and CLI locally during development:
 
-- **Patch/Minor/Major**: All version types show the update overlay
-- **Silent install**: Disabled — user must confirm or defer
-- **Update overlay**: Top-pinned, vertical buttons, ↑↓ navigation
-
-**Disable updates:**
+### 1. Start the MCP Server (Terminal 1)
 
 ```bash
-auq config set updateCheck false
-# or
-NO_UPDATE_NOTIFIER=1 auq
-```
+# Option A: Run with tsx (recommended for development)
+bun run start
 
-**Manual update:**
-
-```bash
-auq update      # Interactive
-auq update -y   # Skip confirmation
-```
-
-</details>
-
-<details>
-<summary><strong>Stale & Abandoned Sessions</strong></summary>
-
-**Stale sessions** (unanswered longer than threshold):
-
-- Show ⚠️ warning icon in TUI
-- Configurable action: `warn`, `remove`, or `archive`
-- Default threshold: 2 hours
-
-**Abandoned sessions** (AI disconnected):
-
-- Show red indicator in TUI
-- Require `--force` to answer via CLI
-- Visible with `auq sessions list --all`
-
-</details>
-
-<details>
-<summary><strong>Markdown Support</strong></summary>
-
-Question prompts support Markdown formatting:
-
-- **Bold**, _italic_, ~~strikethrough~~
-- `inline code`
-- Links (rendered as `text (url)`)
-- Fenced code blocks with syntax highlighting
-
-Always enabled. Falls back to plain text if parsing fails.
-
-</details>
-
-<details>
-<summary><strong>Development</strong></summary>
-
-```bash
-# Start MCP server (dev)
+# Option B: Run with fastmcp dev mode (includes web inspector at http://localhost:6274)
 bun run dev
 
-# Build
-bun run build
-
-# Test
-bun run test
-
-# Create mock sessions for TUI testing
-bun run scripts/create-mock-session.ts 5
-
-# Regenerate skill
-bun run generate:skill
+# Option C: Run the built version
+bun run build && bun run server
 ```
 
-**Session storage locations:**
+### 2. Create a Test Session (Terminal 2)
 
-- macOS: `~/Library/Application Support/auq/sessions`
-- Linux: `~/.local/share/auq/sessions`
-- Windows: `%APPDATA%\auq\sessions`
+Use the `auq ask` command to create a session and wait for answers:
+
+```bash
+# Run directly with bun during development
+bun run bin/auq.tsx ask '{"questions": [{"prompt": "Which language?", "title": "Lang", "options": [{"label": "TypeScript"}, {"label": "Python"}], "multiSelect": false}]}'
+
+# Or pipe JSON to stdin
+echo '{"questions": [{"prompt": "Which database?", "title": "DB", "options": [{"label": "PostgreSQL"}, {"label": "MongoDB"}], "multiSelect": false}]}' | bun run bin/auq.tsx ask
+```
+
+This will create a session and wait for the TUI to provide answers.
+
+### 3. Answer with the TUI (Terminal 3)
+
+```bash
+# Run the TUI to answer pending questions
+bun run bin/auq.tsx
+```
+
+### Create Mock Sessions for TUI Testing
+
+To test the TUI with multiple pending sessions:
+
+```bash
+# Create 3 mock sessions (default)
+bun run scripts/create-mock-session.ts
+
+# Create a specific number of sessions
+bun run scripts/create-mock-session.ts 5
+```
+
+Then run the TUI to see and answer them:
+
+```bash
+bun run bin/auq.tsx
+```
+
+### Verify MCP and CLI Use Same Session Directory
+
+Both components should report the same session directory path. Check the logs:
+
+- MCP server logs session directory on startup
+- `auq ask` prints `[AUQ] Session directory: <path>` to stderr
+
+On macOS, both should use: `~/Library/Application Support/auq/sessions`
+
+### Development Commands
+
+```bash
+# Regenerate the skill from source
+bun run generate:skill
+
+# Validate skill structure and content
+bun run validate:skill
+```
 
 </details>
 
 <details>
 <summary><strong>Troubleshooting</strong></summary>
 
-**OpenTUI fails to initialize:**
+### Session Storage
 
-- Ensure Bun is installed: `bun --version`
-- Check `AUQ_RENDERER` isn't forcing Ink
-- The shell wrapper should auto-detect; verify with `which auq`
+Sessions are stored in platform-specific global locations:
 
-**Sessions not appearing:**
+- **macOS**: `~/Library/Application Support/auq/sessions`
+- **Linux**: `~/.local/share/auq/sessions` (or `$XDG_DATA_HOME/auq/sessions`)
+- **Windows**: `%APPDATA%\auq\sessions`
 
-- Check both MCP server and CLI use same session directory
-- Look for `[AUQ] Session directory: <path>` in logs
+_Can be customized with `AUQ_SESSION_DIR` environment variable._
 
-**Update overlay not appearing:**
+</details>
 
-- Check `auq config get updateCheck` is `true`
-- Verify `NO_UPDATE_NOTIFIER` is not set
-- CI environments auto-disable checks
+<details>
+<summary><strong>Configuration</strong></summary>
 
-**Manual session cleanup:**
+AUQ can be configured via a `.auqrc.json` file. Settings are loaded from (in priority order):
 
-```bash
-rm -rf ~/Library/Application\ Support/auq/sessions/*  # macOS
-rm -rf ~/.local/share/auq/sessions/*                  # Linux
+1. **Local**: `./.auqrc.json` (project directory)
+2. **Global**: `~/.config/auq/.auqrc.json` (or `$XDG_CONFIG_HOME/auq/.auqrc.json`)
+3. **Defaults**: Built-in values
+
+_Settings from local config override global config, which overrides defaults._
+
+### Default Configuration
+
+```json
+{
+  "renderer": "opentui",
+  "maxOptions": 5,
+  "maxQuestions": 5,
+  "recommendedOptions": 4,
+  "recommendedQuestions": 4,
+  "sessionTimeout": 0,
+  "retentionPeriod": 604800000,
+  "language": "auto",
+  "theme": "system",
+  "autoSelectRecommended": true,
+  "updateCheck": true,
+  "notifications": {
+    "enabled": true,
+    "sound": true
+  }
+}
 ```
+
+<details>
+<summary><strong>Available Settings</strong></summary>
+
+| Setting                 | Type    | Default   | Range/Values                    | Description                                           |
+| ----------------------- | ------- | --------- | ------------------------------- | ----------------------------------------------------- |
+| `renderer`              | string  | "opentui" | "ink", "opentui"                | Terminal rendering engine (OpenTUI default, ink fallback) |
+| `maxOptions`            | number  | 5         | 2-10                            | Maximum options per question                          |
+| `maxQuestions`          | number  | 5         | 1-10                            | Maximum questions per session                         |
+| `recommendedOptions`    | number  | 4         | 1-10                            | Suggested number of options (for AI guidance)         |
+| `recommendedQuestions`  | number  | 4         | 1-10                            | Suggested number of questions (for AI guidance)       |
+| `language`              | string  | "auto"    | "auto", "en", "ko"              | UI language (auto-detects from system if "auto")      |
+| `theme`                 | string  | "system"  | "system", "dark", "light", etc. | Color theme for TUI                                   |
+| `sessionTimeout`        | number  | 0         | 0+ (milliseconds)               | Session timeout (0 = no timeout)                      |
+| `retentionPeriod`       | number  | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
+| `notifications.enabled` | boolean | true      | true/false                      | Enable desktop notifications for new questions        |
+| `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications                         |
+| `staleThreshold`        | number  | 7200000   | 0+ (milliseconds)               | Time before a session is considered stale (2 hours)   |
+| `notifyOnStale`         | boolean | true      | true/false                      | Show toast notification when sessions become stale    |
+| `staleAction`           | string  | "warn"    | "warn", "remove", "archive"     | Action for stale sessions                             |
+| `updateCheck`           | boolean | true      | true/false                      | Enable automatic update checks on startup             |
+
+</details>
+
+### Language Support
+
+AUQ supports multiple languages for the TUI interface:
+
+- **English** (`en`) - Default
+- **Korean** (`ko`) - 한국어
+
+Language is auto-detected from system locale (`LANG`, `LC_ALL`, `LC_MESSAGES` environment variables) when set to `"auto"`.
+
+### Desktop Notifications
+
+AUQ uses native desktop notifications to alert you when new questions arrive.
+
+#### Platform Requirements
+
+| Platform | Status                  | Notes                                         |
+| -------- | ----------------------- | --------------------------------------------- |
+| macOS    | ✅ Works out of the box | Uses Notification Center                      |
+| Windows  | ✅ Works out of the box | Uses Action Center                            |
+| Linux    | ⚠️ Requires libnotify   | Install: `sudo apt-get install libnotify-bin` |
+
+Notifications can be disabled in configuration if needed.
+
+**Features:**
+
+- **Batched Notifications**: Rapid session arrivals are batched into a single notification
+- **Progress Bar**: Shows question completion progress in terminal dock icon (supported terminals like iTerm2 and WezTerm)
+- **Native Integration**: Uses system-native notification centers
+
+**Configuration:**
+
+```json
+{
+  "notifications": {
+    "enabled": true,
+    "sound": true
+  }
+}
+```
+
+- `notifications.enabled` (default: `true`): Enable desktop notifications
+- `notifications.sound` (default: `true`): Play sound with notifications
+
+Set `notifications.enabled` to `false` to disable all notifications.
 
 </details>
 
@@ -584,23 +767,23 @@ rm -rf ~/.local/share/auq/sessions/*                  # Linux
 You're an AI power user, running multiple agents on multiple instances. Highly parallelized, the AIs ask questions to you simultaneously, on multiple threads—scattered across different windows. AUQ enables them to ask **anytime**, collects everything in **one inbox**, and lets you respond **on your terms**—then elegantly routes answers back to each agent.
 
 ```
-   Claude Code    Cursor    OpenCode
-        │           │           │
-        ▼           ▼           ▼
-      ┌─────────────────────────────┐
-      │        📥 AUQ Inbox         │
-      └─────────────────────────────┘
-                    │
-                    ▼
-                  🖥️ TUI
-                    │
-                    ▼
-      ┌─────────────────────────────┐
-      │       Your Answers          │
-      └─────────────────────────────┘
-        │           │           │
-        ▼           ▼           ▼
-   Claude Code    Cursor    OpenCode
+       Claude Code    Cursor    OpenCode
+            │           │           │
+            ▼           ▼           ▼
+          ┌─────────────────────────────┐
+          │        📥 AUQ Inbox         │
+          └─────────────────────────────┘
+                        │
+                        ▼
+                      🖥️ TUI
+                        │
+                        ▼
+          ┌─────────────────────────────┐
+          │       Your Answers          │
+          └─────────────────────────────┘
+            │           │           │
+            ▼           ▼           ▼
+       Claude Code    Cursor    OpenCode
 ```
 
 📥 **One Inbox for All Agents** — Multiple agents ask in one place. One queue, one source of truth.
@@ -644,6 +827,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**References**
-
-[1] Prompt engineering techniques for LLM code generation, including clarifying questions as a method to reduce hallucination and improve contextually appropriate outputs.
+[1] arXiv:2308.13507 <https://arxiv.org/abs/2308.13507>
