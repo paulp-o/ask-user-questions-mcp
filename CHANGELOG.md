@@ -1,3 +1,10 @@
+## [3.0.4](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.3...v3.0.4) (2026-03-11)
+
+### Bug Fixes
+
+* check for updates on every launch and show overlay for all version types ([8b13966](https://github.com/paulp-o/ask-user-questions-mcp/commit/8b139662e40dcacdee044668d329c02dbcfa3b73))
+* update tests for CACHE_TTL=0 and always-show overlay behavior ([0d03521](https://github.com/paulp-o/ask-user-questions-mcp/commit/0d03521e2333febac0d2ef148f02c647d06181f4))
+
 ## [3.0.3](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.2...v3.0.3) (2026-03-11)
 
 ### Bug Fixes
