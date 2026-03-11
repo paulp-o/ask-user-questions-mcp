@@ -162,7 +162,7 @@ async function listHistory(
           searchTextParts.push(a.selectedOption.toLowerCase());
         if (a.selectedOptions) {
           for (const opt of a.selectedOptions)
-            searchTextParts.push(opt.toLowerCase());
+            searchTextParts.push(String(opt).toLowerCase());
         }
         if (a.customText) searchTextParts.push(a.customText.toLowerCase());
       }
@@ -373,7 +373,7 @@ async function showHistory(
         const selectedLabels = new Set<string>();
         if (answer?.selectedOption) selectedLabels.add(answer.selectedOption);
         if (answer?.selectedOptions) {
-          for (const opt of answer.selectedOptions) selectedLabels.add(opt);
+          for (const opt of answer.selectedOptions) selectedLabels.add(String(opt));
         }
         return {
           index: i,
@@ -426,7 +426,7 @@ async function showHistory(
     const selectedLabels = new Set<string>();
     if (answer?.selectedOption) selectedLabels.add(answer.selectedOption);
     if (answer?.selectedOptions) {
-      for (const opt of answer.selectedOptions) selectedLabels.add(opt);
+      for (const opt of answer.selectedOptions) selectedLabels.add(String(opt));
     }
 
     console.log(`${i + 1}. ${q.title}`);
