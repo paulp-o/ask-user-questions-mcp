@@ -1,3 +1,9 @@
+## [3.0.5](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.4...v3.0.5) (2026-03-11)
+
+### Bug Fixes
+
+* handle non-string selectedOptions in history command ([189e68e](https://github.com/paulp-o/ask-user-questions-mcp/commit/189e68e7bd030d0657fe1b889c1c7ed1000a5075))
+
 ## [3.0.4](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.3...v3.0.4) (2026-03-11)
 
 ### Bug Fixes
