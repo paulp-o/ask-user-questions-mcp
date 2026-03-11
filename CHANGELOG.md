@@ -1,3 +1,9 @@
+## [2.7.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.7.1...v2.7.2) (2026-03-11)
+
+### Bug Fixes
+
+* include opentui in build pipeline so default renderer actually works ([1be8280](https://github.com/paulp-o/ask-user-questions-mcp/commit/1be8280b035ff99fde4a116fc9a5e5cefe200a07))
+
 ## [2.7.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.7.0...v2.7.1) (2026-03-11)
 
 ### Bug Fixes
