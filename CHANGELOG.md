@@ -1,3 +1,10 @@
+## [2.7.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.7.0...v2.7.1) (2026-03-11)
+
+### Bug Fixes
+
+* default renderer to opentui in config defaults and schema ([0d4bf88](https://github.com/paulp-o/ask-user-questions-mcp/commit/0d4bf88ff3fa0712afd6240c45f804daa36480a4))
+* update renderer default tests to opentui, gitignore .auqrc.json ([3614c30](https://github.com/paulp-o/ask-user-questions-mcp/commit/3614c30c322d6127b7745eae092358611b046156))
+
 ## [2.7.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.4...v2.7.0) (2026-03-11)
 
 ### Features
