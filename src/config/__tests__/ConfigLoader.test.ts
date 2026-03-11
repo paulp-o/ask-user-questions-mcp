@@ -205,16 +205,16 @@ describe("ConfigLoader", () => {
   });
 
   describe("renderer config options", () => {
-    it("should have 'ink' as default renderer when no config files exist", () => {
+    it("should have 'opentui' as default renderer when no config files exist", () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
 
       const config = loadConfig();
 
-      expect(config.renderer).toBe("ink");
+      expect(config.renderer).toBe("opentui");
     });
 
-    it("should include renderer in DEFAULT_CONFIG as 'ink'", () => {
-      expect(DEFAULT_CONFIG.renderer).toBe("ink");
+    it("should include renderer in DEFAULT_CONFIG as 'opentui'", () => {
+      expect(DEFAULT_CONFIG.renderer).toBe("opentui");
     });
 
     it("should load renderer: 'opentui' from config file", () => {
@@ -239,7 +239,7 @@ describe("ConfigLoader", () => {
       expect(config.renderer).toBe("ink");
     });
 
-    it("should fall back to 'ink' for invalid renderer value", () => {
+    it("should fall back to 'opentui' for invalid renderer value", () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue(
         JSON.stringify({ renderer: "chrome" }),
@@ -247,9 +247,9 @@ describe("ConfigLoader", () => {
 
       const config = loadConfig();
 
-      // Invalid enum value should be ignored, default ('ink') used
+      // Invalid enum value should be ignored, default ('opentui') used
       expect(config.renderer).toBe(DEFAULT_CONFIG.renderer);
-      expect(config.renderer).toBe("ink");
+      expect(config.renderer).toBe("opentui");
     });
 
     it("should preserve other config values alongside renderer setting", () => {
