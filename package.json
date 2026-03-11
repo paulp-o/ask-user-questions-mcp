@@ -15,7 +15,7 @@
     "packages/opencode-plugin"
   ],
   "scripts": {
-    "build": "bun run sync-plugin-schemas && bun run generate:skill && tsc",
+    "build": "bun run sync-plugin-schemas && bun run generate:skill && tsc && tsc -p tsconfig.opentui.json",
     "prepare": "bun run build",
     "postinstall": "node scripts/postinstall.cjs",
     "release": "semantic-release",
@@ -29,7 +29,7 @@
     "validate:skill": "bunx skills-ref validate skills/ask-user-questions",
     "test": "vitest run",
     "format": "prettier --write . && eslint --fix .",
-    "build:opentui": "tsc -p tsconfig.opentui.json --noEmit",
+    "build:opentui": "tsc -p tsconfig.opentui.json",
     "test:opentui": "bun test src/tui-opentui",
     "typecheck:all": "tsc --noEmit && tsc -p tsconfig.opentui.json --noEmit"
   },
