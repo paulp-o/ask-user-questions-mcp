@@ -1,38 +1,60 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [Unreleased]
+
+### Added
+
+- OpenTUI renderer as opt-in alternative to ink (`AUQ_RENDERER=opentui`)
+- `renderer` configuration option in `.auqrc.json`
+- `auq config set renderer opentui` CLI command
+- Mouse support (click options, scroll overlays, click session dots) with OpenTUI
+- Native markdown rendering with Tree-Sitter syntax highlighting in OpenTUI
+- SyntaxStyle auto-generation from theme color tokens
+
+### Changed
+
+- Theme definitions extracted to `src/tui/shared/themes/` for renderer-agnostic access
+- Utility functions extracted to `src/tui/shared/utils/` for cross-renderer use
+- Session watcher event interface extracted for adapter pattern
+- Header uses solid accent color instead of gradient in OpenTUI renderer
+
 ## [2.6.4](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.3...v2.6.4) (2026-03-10)
 
 ### Bug Fixes
 
-* move agent hint back to stderr write before Ink render to guarantee output ([322d077](https://github.com/paulp-o/ask-user-questions-mcp/commit/322d077d9d514b15855d3e0214ec30e44b91d8c9))
+- move agent hint back to stderr write before Ink render to guarantee output ([322d077](https://github.com/paulp-o/ask-user-questions-mcp/commit/322d077d9d514b15855d3e0214ec30e44b91d8c9))
 
 ## [2.6.3](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.2...v2.6.3) (2026-03-10)
 
 ### Bug Fixes
 
-* invalidate stale update cache when current version exceeds cached latest ([a529d3d](https://github.com/paulp-o/ask-user-questions-mcp/commit/a529d3d29fa0a9276c797103dc5d21089c27f879))
+- invalidate stale update cache when current version exceeds cached latest ([a529d3d](https://github.com/paulp-o/ask-user-questions-mcp/commit/a529d3d29fa0a9276c797103dc5d21089c27f879))
 
 ## [2.6.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.1...v2.6.2) (2026-03-10)
 
 ### Bug Fixes
 
-* make AI agent hint message 1-tick invisible using Ink rendering engine ([98055bb](https://github.com/paulp-o/ask-user-questions-mcp/commit/98055bbb5d9762fa948c3dc20acdeab08acdf96a))
+- make AI agent hint message 1-tick invisible using Ink rendering engine ([98055bb](https://github.com/paulp-o/ask-user-questions-mcp/commit/98055bbb5d9762fa948c3dc20acdeab08acdf96a))
 
 ## [2.6.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.6.0...v2.6.1) (2026-03-10)
 
 ### Bug Fixes
 
-* auto-show update overlay for minor/major updates and auto-install patches on TUI startup ([37a6988](https://github.com/paulp-o/ask-user-questions-mcp/commit/37a698899ff0f980159e85c20d1a4b06ca9715ae))
+- auto-show update overlay for minor/major updates and auto-install patches on TUI startup ([37a6988](https://github.com/paulp-o/ask-user-questions-mcp/commit/37a698899ff0f980159e85c20d1a4b06ca9715ae))
 
 ## [2.6.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.5.0...v2.6.0) (2026-03-10)
 
 ### Features
 
-* add sessions show command, AI agent hint, and fix pending session crash ([689667a](https://github.com/paulp-o/ask-user-questions-mcp/commit/689667a4f35c2cddbee348e5e0574b19b2c766f8))
+- add sessions show command, AI agent hint, and fix pending session crash ([689667a](https://github.com/paulp-o/ask-user-questions-mcp/commit/689667a4f35c2cddbee348e5e0574b19b2c766f8))
 
 ## [2.5.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.4.0...v2.5.0) (2026-03-10)
 
 ### Features
 
-* add auto-update system with CLI command, TUI overlay, and background checker ([1aef4f1](https://github.com/paulp-o/ask-user-questions-mcp/commit/1aef4f1ca3ad7d53155088073041401b09cb0370))
+- add auto-update system with CLI command, TUI overlay, and background checker ([1aef4f1](https://github.com/paulp-o/ask-user-questions-mcp/commit/1aef4f1ca3ad7d53155088073041401b09cb0370))
 
 ## [2.3.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v2.2.2...v2.3.0) (2026-03-09)
 
@@ -164,30 +186,3 @@
 ### Features
 
 - v2.0.0 - Complete UI redesign with enhanced UX ([4112120](https://github.com/paulp-o/ask-user-questions-mcp/commit/4112120fc869c6de1d5e865a9474f2bee9dbaf32))
-
-# Changelog
-
-## [Unreleased]
-
-### Added
-
-- Stale session detection with configurable threshold and visual indicators
-- Abandoned session handling with AI disconnect detection
-- CLI commands: `auq answer`, `auq sessions list/dismiss`, `auq config get/set`
-- Configuration options: `staleThreshold`, `notifyOnStale`, `staleAction`
-- Confirmation dialog when answering abandoned sessions
-- Toast notifications for stale sessions
-- AbortSignal support for session lifecycle management
-
-### Changed
-
-- Session directory now always uses global XDG-compliant paths
-- Sessions are now stored in one predictable location per platform
-
-### Removed
-
-- `detectInstallMode()` function and local `.auq/sessions` support
-
-### Migration
-
-- Existing local `.auq/` directories can be safely deleted

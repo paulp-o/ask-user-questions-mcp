@@ -4,7 +4,7 @@ import {
   getDirectJumpIndex,
   getNextSessionIndex,
   getPrevSessionIndex,
-} from "../sessionSwitching.js";
+} from "../../shared/utils/sessionSwitching.js";
 
 describe("getNextSessionIndex", () => {
   it("returns current index when queue length is 0", () => {

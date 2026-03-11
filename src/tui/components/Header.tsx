@@ -8,6 +8,7 @@ import { UpdateBadge } from "./UpdateBadge.js";
 
 interface HeaderProps {
   pendingCount: number;
+  isCheckingUpdate?: boolean;
   updateInfo?: { updateType: "patch" | "minor" | "major"; latestVersion: string } | null;
   onUpdateBadgeActivate?: () => void;
 }
@@ -16,7 +17,7 @@ interface HeaderProps {
  * Header component - displays app logo and status
  * Shows at the top of the TUI with gradient branding and live-updating pending queue count
  */
-export const Header: React.FC<HeaderProps> = ({ pendingCount, updateInfo, onUpdateBadgeActivate }) => {
+export const Header: React.FC<HeaderProps> = ({ pendingCount, isCheckingUpdate, updateInfo, onUpdateBadgeActivate }) => {
   const { theme } = useTheme();
   const [flash, setFlash] = useState(false);
   const [prevCount, setPrevCount] = useState(pendingCount);
@@ -63,6 +64,9 @@ export const Header: React.FC<HeaderProps> = ({ pendingCount, updateInfo, onUpda
           />
         )}
         <Text dimColor> </Text>
+        {isCheckingUpdate && (
+          <Text dimColor> checking... </Text>
+        )}
         <Text
           backgroundColor={theme.components.header.pillBg}
           bold={flash}

@@ -3,7 +3,7 @@ import React from "react";
 
 import type { SessionRequest } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
-import type { Answer, SessionUIState } from "../types.js";
+import type { Answer, SessionUIState } from "../shared/types.js";
 
 /**
  * Lightweight session data shape used by the dots bar.

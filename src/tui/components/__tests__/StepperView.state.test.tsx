@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SessionRequest } from "../../../session/types.js";
 import { ConfigProvider } from "../../ConfigContext.js";
 import { ThemeContext } from "../../ThemeContext.js";
-import type { SessionUIState } from "../../types.js";
-import { darkTheme } from "../../themes/dark.js";
+import type { SessionUIState } from "../../shared/types.js";
+import { darkTheme } from "../../shared/themes/dark.js";
 import { StepperView } from "../StepperView.js";
 
 const mockThemeValue = {

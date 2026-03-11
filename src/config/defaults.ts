@@ -10,6 +10,7 @@ export const DEFAULT_CONFIG: AUQConfig = {
   language: "auto",
   theme: "system",
   autoSelectRecommended: true,
+  renderer: "ink" as const,
   staleThreshold: 7200000, // 2 hours in ms
   notifyOnStale: true,
   staleAction: "warn" as const,

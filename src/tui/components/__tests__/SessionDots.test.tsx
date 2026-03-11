@@ -3,8 +3,8 @@ import { cleanup, render } from "ink-testing-library";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ThemeContext } from "../../ThemeContext.js";
-import { darkTheme } from "../../themes/dark.js";
-import type { SessionUIState } from "../../types.js";
+import { darkTheme } from "../../shared/themes/dark.js";
+import type { SessionUIState } from "../../shared/types.js";
 import { SessionDots, type SessionDotsSessionData } from "../SessionDots.js";
 
 const mockThemeValue = {

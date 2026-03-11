@@ -115,6 +115,19 @@ export async function runAnswerCommand(args: string[]): Promise<void> {
       throw new Error("Answers must be a JSON object with numeric keys.");
     }
   } catch (err) {
+    if (!jsonMode) {
+      process.stderr.write(
+        `Error: Invalid --answers JSON format.\n\n` +
+        `Expected format:\n` +
+        `  auq answer <sessionId> --answers '{"0": {"selectedOption": "Label Name"}}'\n\n` +
+        `Answer object keys are question indices (0, 1, 2, ...). Each value can have:\n` +
+        `  \u2022 selectedOption: "Label"      \u2014 for single-select questions\n` +
+        `  \u2022 selectedOptions: ["A", "B"]  \u2014 for multi-select questions\n` +
+        `  \u2022 customText: "free text"       \u2014 for custom/other input\n\n` +
+        `Example (multi-question):\n` +
+        `  auq answer abc123 --answers '{"0": {"selectedOption": "Yes"}, "1": {"customText": "my input"}}'\n\n`
+      );
+    }
     outputResult(
       {
         success: false,

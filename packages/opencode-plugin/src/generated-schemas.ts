@@ -4,7 +4,7 @@
  * This file is generated from src/shared/schemas.ts by scripts/sync-plugin-schemas.mjs
  * Run "npm run sync-plugin-schemas" to regenerate.
  * 
- * Generated at: 2026-03-10T09:42:31.656Z
+ * Generated at: 2026-03-11T06:38:08.098Z
  */
 
 import { tool } from "@opencode-ai/plugin/tool";
@@ -136,6 +136,9 @@ function createAskUserQuestionsParametersSchema(
         `Each question must include: prompt (full question text), title (short label, max 12 chars), ` +
         `options (2-${maxOptions} choices with labels and descriptions), and multiSelect (boolean).`,
     ),
+    nonBlocking: z.boolean().default(false).describe(
+      "Set to true to submit questions without waiting for answers. The tool will return immediately with a session ID that can be used with get_answered_questions to fetch answers later. Default: false (blocking mode).",
+    ),
   });
 }
 
@@ -161,6 +164,25 @@ const TOOL_DESCRIPTION =
   'Recommend an option unless absolutely necessary, make it the first option in the list and add "(Recommended)" at the end of the label\n' +
   'For multiSelect questions, you MAY mark multiple options as "(Recommended)" if several choices are advisable\n' +
   'Do NOT use this tool to ask "Is my plan ready?" or "Should I proceed?"';
+
+
+
+
+const GetAnsweredQuestionsArgsSchema = z.object({
+  session_id: z.string().describe(
+    "The session ID returned from a non-blocking ask_user_questions call. Accepts both full UUID and short (first 8 chars) ID.",
+  ),
+  blocking: z.boolean().default(false).describe(
+    "If true, wait until the user answers before returning. If false (default), return immediately with current status.",
+  ),
+});
+
+export type GetAnsweredQuestionsArgs = z.infer<typeof GetAnsweredQuestionsArgsSchema>;
+
+const GET_ANSWERED_QUESTIONS_DESCRIPTION =
+  "Fetch answers for a previously submitted non-blocking question set. " +
+  "Use this after calling ask_user_questions with nonBlocking: true. " +
+  "Returns the user's answers if available, or current session status if still pending.";
 
 // Only export what the plugin needs
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

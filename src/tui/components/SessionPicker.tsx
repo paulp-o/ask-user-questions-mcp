@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 
 import type { SessionRequest } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
-import type { Answer, SessionUIState } from "../types.js";
-import { formatRelativeTime } from "../utils/relativeTime.js";
+import type { Answer, SessionUIState } from "../shared/types.js";
+import { formatRelativeTime } from "../shared/utils/relativeTime.js";
 import { KEYS } from "../constants/keybindings.js";
 
 /* ------------------------------------------------------------------ */

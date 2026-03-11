@@ -9,8 +9,9 @@ import React, {
 } from "react";
 
 import type { AUQConfig } from "../src/config/types.js";
+import { DEFAULT_CONFIG } from "../src/config/defaults.js";
 import type { SessionRequest } from "../src/session/types.js";
-import type { SessionUIState } from "../src/tui/types.js";
+import type { SessionUIState } from "../src/tui/shared/types.js";
 
 import {
   ensureDirectoryExists,
@@ -37,7 +38,7 @@ import {
   isSessionStale,
   isSessionAbandoned,
   formatStaleToastMessage,
-} from "../src/tui/utils/staleDetection.js";
+} from "../src/tui/shared/utils/staleDetection.js";
 import { ThemeProvider } from "../src/tui/ThemeProvider.js";
 import { ConfigProvider } from "../src/tui/ConfigContext.js";
 import {
@@ -45,7 +46,7 @@ import {
   getDirectJumpIndex,
   getNextSessionIndex,
   getPrevSessionIndex,
-} from "../src/tui/utils/sessionSwitching.js";
+} from "../src/tui/shared/utils/sessionSwitching.js";
 import {
   UpdateChecker,
   fetchChangelog,
@@ -97,6 +98,7 @@ const App: React.FC<AppProps> = ({ config }) => {
   const [installError, setInstallError] = useState<string | null>(null);
   const [changelogContent, setChangelogContent] = useState<string | null>(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
 
   // Get session directory for logging
   const sessionDir = getSessionDirectory();
@@ -262,7 +264,8 @@ const App: React.FC<AppProps> = ({ config }) => {
       }
     };
 
-    runCheck();
+    setIsCheckingUpdate(true);
+    void runCheck().finally(() => { setIsCheckingUpdate(false); });
     intervalId = setInterval(() => {
       checker.clearCache();
       runCheck();
@@ -774,6 +777,7 @@ const App: React.FC<AppProps> = ({ config }) => {
                 : null
             }
             onUpdateBadgeActivate={() => setShowUpdateOverlay(true)}
+            isCheckingUpdate={isCheckingUpdate}
           />
           {mainContent}
           {state.mode === "PROCESSING" && sessionQueue.length >= 2 && (
@@ -842,7 +846,7 @@ const App: React.FC<AppProps> = ({ config }) => {
   );
 };
 
-export const runTui = (config?: AUQConfig) => {
+async function runInkTui(config: AUQConfig): Promise<void> {
   // Clear terminal before showing app
   console.clear();
   // 1-tick AI agent hint: ANSI hidden attribute makes it invisible to humans,
@@ -857,8 +861,28 @@ export const runTui = (config?: AUQConfig) => {
   });
 
   // Show goodbye after Ink unmounts
-  waitUntilExit().then(() => {
+  await waitUntilExit().then(() => {
     process.stdout.write("\n");
     console.log("👋 Goodbye! See you next time.");
   });
+}
+
+export const runTui = async (config?: AUQConfig): Promise<void> => {
+  const mergedConfig: AUQConfig = { ...DEFAULT_CONFIG, ...config };
+  const rendererType = process.env.AUQ_RENDERER || mergedConfig.renderer || "ink";
+
+  if (rendererType === "opentui") {
+    try {
+      const opentuiPath = "../src/tui-opentui/app.js";
+      const { runTui: runOpenTui } = (await import(opentuiPath)) as { runTui: (config: AUQConfig) => Promise<void> };
+      await runOpenTui(mergedConfig);
+    } catch (err) {
+      console.warn(
+        `⚠️ OpenTUI failed to initialize: ${err instanceof Error ? err.message : String(err)}. Falling back to ink renderer.`
+      );
+      await runInkTui(mergedConfig);
+    }
+  } else {
+    await runInkTui(mergedConfig);
+  }
 };

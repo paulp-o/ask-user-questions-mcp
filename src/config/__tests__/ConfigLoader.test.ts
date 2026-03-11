@@ -203,4 +203,66 @@ describe("ConfigLoader", () => {
       expect(config.staleThreshold).toBe(DEFAULT_CONFIG.staleThreshold);
     });
   });
+
+  describe("renderer config options", () => {
+    it("should have 'ink' as default renderer when no config files exist", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+
+      const config = loadConfig();
+
+      expect(config.renderer).toBe("ink");
+    });
+
+    it("should include renderer in DEFAULT_CONFIG as 'ink'", () => {
+      expect(DEFAULT_CONFIG.renderer).toBe("ink");
+    });
+
+    it("should load renderer: 'opentui' from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ renderer: "opentui" }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.renderer).toBe("opentui");
+    });
+
+    it("should load renderer: 'ink' from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ renderer: "ink" }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.renderer).toBe("ink");
+    });
+
+    it("should fall back to 'ink' for invalid renderer value", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ renderer: "chrome" }),
+      );
+
+      const config = loadConfig();
+
+      // Invalid enum value should be ignored, default ('ink') used
+      expect(config.renderer).toBe(DEFAULT_CONFIG.renderer);
+      expect(config.renderer).toBe("ink");
+    });
+
+    it("should preserve other config values alongside renderer setting", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ renderer: "opentui", theme: "dark" }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.renderer).toBe("opentui");
+      expect(config.theme).toBe("dark");
+      expect(config.maxOptions).toBe(DEFAULT_CONFIG.maxOptions);
+    });
+  });
 });

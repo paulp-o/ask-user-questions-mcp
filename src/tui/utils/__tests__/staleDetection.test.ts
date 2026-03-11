@@ -5,7 +5,7 @@ import {
   formatStaleToastMessage,
   isSessionAbandoned,
   isSessionStale,
-} from "../staleDetection.js";
+} from "../../shared/utils/staleDetection.js";
 
 describe("staleDetection", () => {
   const now = new Date("2026-01-01T12:00:00.000Z");

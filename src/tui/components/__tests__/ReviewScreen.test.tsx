@@ -25,7 +25,7 @@ vi.mock("ink", async () => {
 });
 
 import { ThemeContext } from "../../ThemeContext.js";
-import { darkTheme } from "../../themes/dark.js";
+import { darkTheme } from "../../shared/themes/dark.js";
 import { ReviewScreen } from "../ReviewScreen.js";
 import type { Question } from "../../../session/types.js";
 

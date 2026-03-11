@@ -27,6 +27,7 @@ export const AUQConfigSchema = z.object({
   language: z.string().default("auto"),
   theme: z.string().default("system"),
   autoSelectRecommended: z.boolean().default(true),
+  renderer: z.enum(["ink", "opentui"]).default("ink"),
 
   // Stale/Orphan Session Detection
   staleThreshold: z.number().min(0).default(7200000), // 2 hours in ms

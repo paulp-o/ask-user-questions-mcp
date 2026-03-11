@@ -3,7 +3,7 @@ import { cleanup, render } from "ink-testing-library";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ThemeContext } from "../../ThemeContext.js";
-import { darkTheme } from "../../themes/dark.js";
+import { darkTheme } from "../../shared/themes/dark.js";
 import { MarkdownPrompt } from "../MarkdownPrompt.js";
 
 const mockThemeValue = {

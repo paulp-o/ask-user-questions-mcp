@@ -189,6 +189,41 @@ async function configGet(args: string[]): Promise<void> {
       key,
     );
 
+    // Special handling for renderer key: show env var override and source
+    if (key === "renderer") {
+      const envRenderer = process.env.AUQ_RENDERER;
+      let displayValue: string;
+      let source: "AUQ_RENDERER" | "config" | "default";
+
+      if (envRenderer) {
+        displayValue = envRenderer;
+        source = "AUQ_RENDERER";
+      } else {
+        const paths = getConfigPaths();
+        const localConfig = readConfigFileForWrite(paths.local);
+        const globalConfig = readConfigFileForWrite(paths.global);
+        const explicitlySet =
+          localConfig.renderer !== undefined || globalConfig.renderer !== undefined;
+        displayValue = String(value);
+        source = explicitlySet ? "config" : "default";
+      }
+
+      if (jsonMode) {
+        console.log(
+          JSON.stringify({ success: true, key, value: displayValue, source }, null, 2),
+        );
+      } else {
+        const suffix =
+          source === "AUQ_RENDERER"
+            ? " (from AUQ_RENDERER)"
+            : source === "default"
+              ? " (default)"
+              : "";
+        console.log(`${key} = ${displayValue}${suffix}`);
+      }
+      return;
+    }
+
     if (jsonMode) {
       console.log(JSON.stringify({ success: true, key, value }, null, 2));
     } else {
@@ -262,6 +297,26 @@ async function configSet(args: string[]): Promise<void> {
     const issues = validation.error.issues
       .map((i) => `${i.path.join(".")}: ${i.message}`)
       .join("; ");
+
+    // Build key-specific hint for human-readable mode
+    if (!jsonMode) {
+      const hints: Record<string, string> = {
+        maxOptions:     "Expected: number between 2 and 10",
+        maxQuestions:   "Expected: number between 1 and 10",
+        sessionTimeout: "Expected: number (milliseconds, e.g. 300000 for 5 minutes)",
+        renderer:       'Expected: \"ink\" or \"opentui\"',
+        staleAction:    'Expected: \"warn\", \"remove\", or \"archive\"',
+        theme:          "Expected: a valid theme name (see auq config get theme)",
+        language:       "Expected: a language code (e.g. \"en\", \"ko\")",
+      };
+      const hint = hints[key];
+      process.stderr.write(
+        `Error: Invalid value "${rawValue}" for key "${key}".\n\n` +
+        (hint ? `${hint}\n\n` : "") +
+        `Usage: auq config set ${key} <value> [--global]\n\n`
+      );
+    }
+
     outputResult(
       {
         success: false,
@@ -323,6 +378,8 @@ export async function runConfigCommand(args: string[]): Promise<void> {
       console.log("  auq config get staleThreshold --json");
       console.log("  auq config set staleThreshold 3600000");
       console.log("  auq config set notifyOnStale false --global");
+      console.log("  auq config get renderer");
+      console.log("  auq config set renderer opentui");
       if (subcommand !== undefined) {
         process.exitCode = 1;
       }

@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import type { Theme } from "./themes/types.js";
+import type { Theme } from "./shared/themes/types.js";
 
 /**
  * ThemeMode can be:

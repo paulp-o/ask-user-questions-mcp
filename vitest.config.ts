@@ -8,6 +8,7 @@ export default defineConfig({
       "dist/**",
       "oc-docs-for-references/**",
       ".opencode/**/node_modules/**",
+      "src/tui-opentui/**",
     ],
   },
 });

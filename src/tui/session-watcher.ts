@@ -7,26 +7,25 @@
 
 import type { SessionRequest, SessionStatus } from "../session/types.js";
 
+import type {
+  PendingSessionMeta,
+  SessionEventHandler,
+  TUISessionEvent,
+} from "./shared/session-events.js";
+
 import { atomicReadFile } from "../session/atomic-operations.js";
 import { TUISessionWatcher } from "../session/file-watcher.js";
 import { SESSION_FILES } from "../session/types.js";
 import { getSessionDirectory } from "../session/utils.js";
 
-/**
- * Interface for TUI session events
- */
-export interface TUISessionEvent {
-  /** Session ID */
-  sessionId: string;
-  /** Session directory path */
-  sessionPath: string;
-  /** Session request data (for session-created events) */
-  sessionRequest?: SessionRequest;
-  /** Timestamp of the event */
-  timestamp: number;
-  /** Type of event */
-  type: "session-completed" | "session-created" | "session-updated";
-}
+// Re-export shared types for backward compatibility
+export type {
+  PendingSessionMeta,
+  SessionEventHandler,
+  SessionEventEmitter,
+  SessionWatcherAPI,
+  TUISessionEvent,
+} from "./shared/session-events.js";
 
 /**
  * Configuration for TUI session watcher
@@ -38,20 +37,6 @@ export interface TUIWatcherConfig {
   debounceMs?: number;
   /** Custom session directory path (optional) */
   sessionDir?: string;
-}
-
-/**
- * Metadata for a pending or abandoned session, including its status.
- * Used by TUI components that need richer session information
- * (e.g. stale detection, visual indicators).
- */
-export interface PendingSessionMeta {
-  /** Session ID (directory name) */
-  sessionId: string;
-  /** Current session status from status.json */
-  status: string;
-  /** ISO-8601 creation timestamp from status.json */
-  createdAt: string;
 }
 
 /**

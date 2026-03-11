@@ -6,8 +6,8 @@ import type { Option } from "../../session/types.js";
 import { t } from "../../i18n/index.js";
 import { useConfig } from "../ConfigContext.js";
 import { useTheme } from "../ThemeContext.js";
-import type { FocusContext } from "../types.js";
-import { isRecommendedOption } from "../utils/recommended.js";
+import type { FocusContext } from "../shared/types.js";
+import { isRecommendedOption } from "../shared/utils/recommended.js";
 import {
   fitToVisualWidth,
   getVisualWidth,

@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@opentui/react",
+    "rootDir": ".",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true
+  },
+  "include": ["src/tui-opentui", "src/tui/shared"],
+  "exclude": ["src/tui-opentui/**/__tests__", "src/tui-opentui/**/*.test.ts", "src/tui-opentui/**/*.test.tsx"]
+}

@@ -37,7 +37,7 @@ export async function runFetchAnswersCommand(args: string[]): Promise<void> {
     // Guard: if --blocking was passed without a session ID, that's an error
     if (blockingMode && !sessionIdArg) {
       outputResult(
-        { success: false, error: "Session ID required for blocking mode" },
+        { success: false, error: "--blocking requires a session ID.\n\nUsage:\n  auq fetch-answers <session-id> [--blocking] [--json]\n  auq fetch-answers --unread [--json]" },
         jsonMode,
       );
       process.exitCode = 1;

@@ -28,7 +28,10 @@
     "generate:skill": "bun run scripts/generate-skill.ts",
     "validate:skill": "bunx skills-ref validate skills/ask-user-questions",
     "test": "vitest run",
-    "format": "prettier --write . && eslint --fix ."
+    "format": "prettier --write . && eslint --fix .",
+    "build:opentui": "tsc -p tsconfig.opentui.json --noEmit",
+    "test:opentui": "bun test src/tui-opentui",
+    "typecheck:all": "tsc --noEmit && tsc -p tsconfig.opentui.json --noEmit"
   },
   "keywords": [
     "fastmcp",
@@ -50,6 +53,8 @@
   "description": "An MCP server that provides a tool to ask a user questions via the terminal",
   "dependencies": {
     "@inkjs/ui": "^2.0.0",
+    "@opentui/core": "0.1.87",
+    "@opentui/react": "0.1.87",
     "@modelcontextprotocol/sdk": "1.17.2",
     "@types/uuid": "^10.0.0",
     "chalk": "^5.6.2",

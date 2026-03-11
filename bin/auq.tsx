@@ -26,12 +26,19 @@ Commands:
   sessions <sub> [flags] List/dismiss sessions
   config <sub> [flags]   Get/set configuration
   update                 Check for and install updates
-  fetch-answers [flags]    Fetch answers for non-blocking sessions
-  history [sub] [flags]    Browse session history
+  fetch-answers [flags]  Fetch answers for non-blocking sessions
+  history [sub] [flags]  Browse session history
+
+Ask:
+  auq ask '<json>'
+  auq ask -                              (read JSON from stdin)
+  Format: {"questions":[{"prompt":"...","title":"...","options":[{"label":"..."}]}]}
 
 Answer:
-  auq answer <id> --answers '<json>'    Submit answers
-  auq answer <id> --reject [--reason]   Reject session
+  auq answer <id> --answers '<json>'         Submit answers
+  auq answer <id> --reject [--reason "text"]  Reject session
+  Format: --answers '{"0":{"selectedOption":"Label"}}'
+          Keys = question indices (0,1,2…); values: selectedOption, selectedOptions[], customText
   Flags: --force  --json
 
 Sessions:
@@ -50,6 +57,8 @@ History:
 Config:
   auq config get [key] [--json]
   auq config set <key> <value> [--global] [--json]
+  Keys: maxOptions (2-10)  maxQuestions (1-10)  sessionTimeout (ms)
+        theme  language  renderer (ink|opentui)  staleAction (warn|remove|archive)
 
 Options:
   -h, --help      Show this help
@@ -61,7 +70,7 @@ Keys (TUI):
   [/] sessions  1-9 jump  Ctrl+S picker  Ctrl+T theme
 
 Config: ./.auqrc.json (local) > ~/.config/auq/.auqrc.json (global)
-Env:    AUQ_SESSION_DIR  XDG_CONFIG_HOME`);
+Env:    AUQ_SESSION_DIR  XDG_CONFIG_HOME  AUQ_RENDERER`);
   process.exit(0);
 }
 

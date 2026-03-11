@@ -24,8 +24,8 @@ vi.mock("ink", async () => {
 });
 
 import { ThemeContext } from "../../ThemeContext.js";
-import { darkTheme } from "../../themes/dark.js";
-import type { SessionUIState } from "../../types.js";
+import { darkTheme } from "../../shared/themes/dark.js";
+import type { SessionUIState } from "../../shared/types.js";
 import {
   SessionPicker,
   type SessionPickerSessionData,

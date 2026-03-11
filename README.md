@@ -212,6 +212,38 @@ Whenever you need clarification on what you are working on, never guess, and cal
 
 When the AI asks questions, you'll see them appear in the AUQ TUI. Answer them **at your convenience**.
 
+### Renderer Selection
+
+AUQ supports two terminal rendering engines:
+
+| Renderer          | Description                                         | Status              |
+| ----------------- | --------------------------------------------------- | ------------------- |
+| **ink** (default) | React-based terminal renderer                       | Stable              |
+| **OpenTUI**       | Native Zig-based renderer with improved performance | Opt-in/Experimental |
+
+**To use OpenTUI**, set one of the following (in priority order):
+
+1. **Environment variable** (highest priority):
+
+   ```bash
+   AUQ_RENDERER=opentui auq
+   ```
+
+2. **Config file** (`.auqrc.json`):
+
+   ```json
+   {
+     "renderer": "opentui"
+   }
+   ```
+
+3. **CLI command**:
+   ```bash
+   auq config set renderer opentui
+   ```
+
+> **Note:** OpenTUI is currently opt-in and experimental. It provides native CJK character support, built-in markdown rendering with syntax highlighting, and mouse support. The environment variable overrides any config setting.
+
 ### Markdown rendering in question prompts
 
 Question prompts now support **Markdown formatting** in the `prompt` text.
@@ -240,6 +272,15 @@ It is recommended to **disable** the built-in questioning tool in your harness (
 | `Ctrl+R` | Quick Submit  | Auto-select recommended options for all questions and go to review |
 | `Esc`    | Reject        | Reject the whole question set and optionally explain why to the AI |
 | `Ctrl+T` | Theme         | Cycle through available color themes                               |
+| `[`/`]`  | Sessions      | Switch to previous/next session (OpenTUI: also click session dots) |
+
+**Mouse Support (OpenTUI renderer only):**
+
+| Action            | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| Click option      | Select/toggle option                            |
+| Scroll            | Scroll through session picker or update overlay |
+| Click session dot | Switch to that session                          |
 
 <details>
 <summary><strong>More Commands (advanced)</strong></summary>
@@ -372,9 +413,20 @@ Update checks are automatically disabled in CI environments (`CI=true`).
 
 The `auq update` command always works regardless of these settings.
 
-### 🎨 Themes
+### Theme System
 
 AUQ supports **16 built-in color themes** with automatic persistence. Press `Ctrl+T` to cycle through themes.
+
+#### Theme Differences by Renderer
+
+| Feature          | ink                | OpenTUI                                   |
+| ---------------- | ------------------ | ----------------------------------------- |
+| Header text      | Gradient animation | Solid accent color                        |
+| Toast animations | `setTimeout` based | `useTimeline` based                       |
+| Markdown syntax  | Basic highlighting | Tree-sitter powered                       |
+| Mouse support    | No                 | Yes (click options, scroll, session dots) |
+
+> Both renderers support all 16 built-in themes and custom themes. Colors are consistent; only implementation details differ.
 
 <details>
 <summary><strong>Built-in Themes</strong></summary>
@@ -547,12 +599,13 @@ _Settings from local config override global config, which overrides defaults._
 
 ```json
 {
+  "renderer": "ink",
   "maxOptions": 5,
   "maxQuestions": 5,
   "recommendedOptions": 4,
   "recommendedQuestions": 4,
   "sessionTimeout": 0,
-  "retentionPeriod": 604800000, // 7 days
+  "retentionPeriod": 604800000,
   "language": "auto",
   "theme": "system",
   "autoSelectRecommended": true,
@@ -569,6 +622,7 @@ _Settings from local config override global config, which overrides defaults._
 
 | Setting                 | Type    | Default   | Range/Values                    | Description                                           |
 | ----------------------- | ------- | --------- | ------------------------------- | ----------------------------------------------------- |
+| `renderer`              | string  | "ink"     | "ink", "opentui"                | Terminal rendering engine (ink or OpenTUI)            |
 | `maxOptions`            | number  | 5         | 2-10                            | Maximum options per question                          |
 | `maxQuestions`          | number  | 5         | 1-10                            | Maximum questions per session                         |
 | `recommendedOptions`    | number  | 4         | 1-10                            | Suggested number of options (for AI guidance)         |

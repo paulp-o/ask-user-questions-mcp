@@ -4,7 +4,7 @@ import React from "react";
 import { t } from "../../i18n/index.js";
 import type { Question } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
-import type { Answer, FocusContext } from "../types.js";
+import type { Answer, FocusContext } from "../shared/types.js";
 
 import { Footer } from "./Footer.js";
 import { MarkdownPrompt } from "./MarkdownPrompt.js";

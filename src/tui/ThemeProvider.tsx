@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useInput } from "ink";
 import { ThemeContext, ThemeMode, ThemeContextValue } from "./ThemeContext.js";
-import type { Theme } from "./themes/types.js";
-import { getTheme, listThemes, darkTheme, hasTheme } from "./themes/index.js";
-import { detectSystemTheme } from "./utils/detectTheme.js";
-import { getSavedTheme, saveTheme } from "./utils/config.js";
+import type { Theme } from "./shared/themes/types.js";
+import { getTheme, listThemes, darkTheme, hasTheme } from "./shared/themes/index.js";
+import { detectSystemTheme } from "./shared/utils/detectTheme.js";
+import { getSavedTheme, saveTheme } from "./shared/utils/config.js";
 import { KEYS } from "./constants/keybindings.js";
 
 interface ThemeProviderProps {

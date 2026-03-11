@@ -31,7 +31,7 @@ vi.mock("../AnimatedGradient.js", () => ({
 }));
 
 import { ThemeContext } from "../../ThemeContext.js";
-import { darkTheme } from "../../themes/dark.js";
+import { darkTheme } from "../../shared/themes/dark.js";
 import { WaitingScreen } from "../WaitingScreen.js";
 
 const mockThemeValue = {

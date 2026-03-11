@@ -3,7 +3,7 @@ import {
   isRecommendedOption,
   extractCleanLabel,
   RECOMMENDED_PATTERNS,
-} from "../recommended.js";
+} from "../../shared/utils/recommended.js";
 
 describe("isRecommendedOption", () => {
   describe("English patterns", () => {
