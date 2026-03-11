@@ -823,4 +823,157 @@ describe("SessionManager", () => {
       expect(pending).toEqual([]);
     });
   });
+
+  describe("read tracking", () => {
+    const testQuestions: Question[] = [
+      {
+        options: [
+          { description: "Dynamic web language", label: "JavaScript" },
+          { description: "Typed superset of JavaScript", label: "TypeScript" },
+        ],
+        prompt: "Which programming language do you prefer?",
+        title: "Language",
+      },
+    ];
+
+    it("should mark session as read and persist lastReadAt", async () => {
+      const sessionId = await sessionManager.createSession(testQuestions);
+      await sessionManager.saveSessionAnswers(sessionId, {
+        sessionId,
+        timestamp: new Date().toISOString(),
+        answers: [
+          {
+            questionIndex: 0,
+            timestamp: new Date().toISOString(),
+            selectedOption: testQuestions[0].options[0].label,
+          },
+        ],
+      });
+
+      const result = await sessionManager.markSessionAsRead(sessionId);
+      expect(result.lastReadAt).toBeDefined();
+      expect(new Date(result.lastReadAt!).getTime()).toBeGreaterThan(0);
+
+      // Verify persistence
+      const answers = await sessionManager.getSessionAnswers(sessionId);
+      expect(answers?.lastReadAt).toBe(result.lastReadAt);
+    });
+
+    it("should update lastReadAt on repeated calls", async () => {
+      const sessionId = await sessionManager.createSession(testQuestions);
+      await sessionManager.saveSessionAnswers(sessionId, {
+        sessionId,
+        timestamp: new Date().toISOString(),
+        answers: [
+          {
+            questionIndex: 0,
+            timestamp: new Date().toISOString(),
+            selectedOption: testQuestions[0].options[0].label,
+          },
+        ],
+      });
+
+      const first = await sessionManager.markSessionAsRead(sessionId);
+      await new Promise((r) => setTimeout(r, 10));
+      const second = await sessionManager.markSessionAsRead(sessionId);
+
+      expect(second.lastReadAt).toBeDefined();
+      expect(first.lastReadAt).not.toBe(second.lastReadAt);
+    });
+
+    it("should throw when marking session without answers", async () => {
+      const sessionId = await sessionManager.createSession(testQuestions);
+      await expect(sessionManager.markSessionAsRead(sessionId)).rejects.toThrow(
+        "answers.json",
+      );
+    });
+  });
+
+  describe("getUnreadSessions", () => {
+    const testQuestions: Question[] = [
+      {
+        options: [
+          { description: "Dynamic web language", label: "JavaScript" },
+          { description: "Typed superset of JavaScript", label: "TypeScript" },
+        ],
+        prompt: "Which programming language do you prefer?",
+        title: "Language",
+      },
+    ];
+
+    async function createCompletedSession(manager: SessionManager): Promise<string> {
+      const sessionId = await manager.createSession(testQuestions);
+      await manager.saveSessionAnswers(sessionId, {
+        sessionId,
+        timestamp: new Date().toISOString(),
+        answers: [
+          {
+            questionIndex: 0,
+            timestamp: new Date().toISOString(),
+            selectedOption: testQuestions[0].options[0].label,
+          },
+        ],
+      });
+      await manager.updateSessionStatus(sessionId, "completed");
+      return sessionId;
+    }
+
+    it("should return completed unread sessions", async () => {
+      const sessionId = await createCompletedSession(sessionManager);
+
+      const unread = await sessionManager.getUnreadSessions();
+      expect(unread).toContain(sessionId);
+    });
+
+    it("should exclude read sessions", async () => {
+      const sessionId = await createCompletedSession(sessionManager);
+      await sessionManager.markSessionAsRead(sessionId);
+
+      const unread = await sessionManager.getUnreadSessions();
+      expect(unread).not.toContain(sessionId);
+    });
+
+    it("should exclude pending sessions", async () => {
+      const sessionId = await sessionManager.createSession(testQuestions);
+      const unread = await sessionManager.getUnreadSessions();
+      expect(unread).not.toContain(sessionId);
+    });
+
+    it("should exclude rejected sessions", async () => {
+      const sessionId = await sessionManager.createSession(testQuestions);
+      await sessionManager.rejectSession(sessionId, "test");
+      const unread = await sessionManager.getUnreadSessions();
+      expect(unread).not.toContain(sessionId);
+    });
+
+    it("should sort newest first", async () => {
+      const id1 = await createCompletedSession(sessionManager);
+
+      await new Promise((r) => setTimeout(r, 10));
+
+      const id2 = await createCompletedSession(sessionManager);
+
+      const unread = await sessionManager.getUnreadSessions();
+      expect(unread[0]).toBe(id2); // newest first
+      expect(unread[1]).toBe(id1);
+    });
+
+    it("should not mark as read when saving answers", async () => {
+      const sessionId = await sessionManager.createSession(testQuestions);
+      await sessionManager.saveSessionAnswers(sessionId, {
+        sessionId,
+        timestamp: new Date().toISOString(),
+        answers: [
+          {
+            questionIndex: 0,
+            timestamp: new Date().toISOString(),
+            selectedOption: testQuestions[0].options[0].label,
+          },
+        ],
+      });
+
+      const answers = await sessionManager.getSessionAnswers(sessionId);
+      expect(answers?.lastReadAt).toBeUndefined();
+    });
+  });
 });

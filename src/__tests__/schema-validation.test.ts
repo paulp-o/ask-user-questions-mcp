@@ -4,7 +4,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { QuestionSchema, QuestionsSchema } from "../core/ask-user-questions.js";
+import { QuestionSchema, QuestionsSchema, AskUserQuestionsParametersSchema } from "../core/ask-user-questions.js";
+import { GetAnsweredQuestionsArgsSchema } from "../shared/schemas.js";
 
 describe("Schema Validation - Edge Cases", () => {
   describe("Invalid Input (should reject)", () => {
@@ -201,5 +202,77 @@ describe("Schema Validation - Edge Cases", () => {
 
       expect(() => QuestionSchema.parse(defaultQuestion)).toThrow();
     });
+  });
+});
+
+describe("nonBlocking parameter", () => {
+  const validQuestion = {
+    options: [{ label: "Option A" }, { label: "Option B" }],
+    prompt: "Which do you prefer?",
+    title: "Preference",
+    multiSelect: false,
+  };
+
+  it("should accept nonBlocking: true", () => {
+    const result = AskUserQuestionsParametersSchema.parse({
+      questions: [validQuestion],
+      nonBlocking: true,
+    });
+    expect(result.nonBlocking).toBe(true);
+  });
+
+  it("should accept nonBlocking: false", () => {
+    const result = AskUserQuestionsParametersSchema.parse({
+      questions: [validQuestion],
+      nonBlocking: false,
+    });
+    expect(result.nonBlocking).toBe(false);
+  });
+
+  it("should default nonBlocking to false when omitted", () => {
+    const result = AskUserQuestionsParametersSchema.parse({
+      questions: [validQuestion],
+    });
+    expect(result.nonBlocking).toBe(false);
+  });
+
+  it("should reject non-boolean nonBlocking", () => {
+    expect(() =>
+      AskUserQuestionsParametersSchema.parse({
+        questions: [validQuestion],
+        nonBlocking: "yes",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("GetAnsweredQuestionsArgsSchema", () => {
+  it("should accept valid session_id", () => {
+    const result = GetAnsweredQuestionsArgsSchema.parse({
+      session_id: "a3f2e8b1-1234-4567-89ab-cdef01234567",
+    });
+    expect(result.session_id).toBe("a3f2e8b1-1234-4567-89ab-cdef01234567");
+    expect(result.blocking).toBe(false);
+  });
+
+  it("should accept session_id with blocking: true", () => {
+    const result = GetAnsweredQuestionsArgsSchema.parse({
+      session_id: "a3f2e8b1",
+      blocking: true,
+    });
+    expect(result.blocking).toBe(true);
+  });
+
+  it("should reject missing session_id", () => {
+    expect(() => GetAnsweredQuestionsArgsSchema.parse({})).toThrow();
+  });
+
+  it("should reject non-boolean blocking", () => {
+    expect(() =>
+      GetAnsweredQuestionsArgsSchema.parse({
+        session_id: "test",
+        blocking: "yes",
+      }),
+    ).toThrow();
   });
 });

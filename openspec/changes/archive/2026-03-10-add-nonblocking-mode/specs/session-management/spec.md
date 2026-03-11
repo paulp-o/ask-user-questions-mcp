@@ -1,65 +1,4 @@
-# session-management Specification
-
-## Purpose
-TBD - created by archiving change add-auq-configuration. Update Purpose after archive.
-## Requirements
-### Requirement: Session Configuration
-
-The system SHALL use configurable values for session parameters including stale detection settings.
-
-#### Scenario: Stale Threshold from Config
-
-- **WHEN** config specifies `staleThreshold: 7200000` (2 hours)
-- **THEN** the TUI SHALL use this value to determine stale sessions
-- **AND** sessions older than this threshold SHALL be flagged as stale
-
-#### Scenario: Notify On Stale from Config
-
-- **WHEN** config specifies `notifyOnStale: true` (default)
-- **THEN** the TUI SHALL display toast notifications for stale sessions
-- **AND** when `notifyOnStale: false`, no notifications SHALL be shown
-
-#### Scenario: Stale Action from Config
-
-- **WHEN** config specifies `staleAction: "warn"` (default)
-- **THEN** stale sessions SHALL show warnings but remain answerable
-- **AND** when `staleAction: "remove"`, stale sessions SHALL be hidden
-- **AND** when `staleAction: "archive"`, stale sessions SHALL be archived automatically
-
-#### Scenario: Extended Configuration Defaults
-
-- **WHEN** no config file exists or settings are unspecified
-- **THEN** the system SHALL use built-in defaults:
-  - maxOptions: 4
-  - maxQuestions: 4
-  - sessionTimeout: 0 (infinite)
-  - retentionPeriod: 604800000 (7 days)
-  - staleThreshold: 7200000 (2 hours)
-  - notifyOnStale: true
-  - staleAction: "warn"
-
-### Requirement: AbortSignal Support for Session Lifecycle
-
-The SessionManager's AbortSignal support SHALL be extended for non-blocking fetch operations.
-
-#### Scenario: Signal abort during blocking fetch
-
-- **WHEN** `get_answered_questions` is called with `blocking: true` and an AbortSignal
-- **AND** the signal is aborted during the wait
-- **THEN** the fetch SHALL stop waiting immediately
-- **AND** an error indicating cancellation SHALL be thrown
-- **AND** the session SHALL NOT be marked as read
-
-### Requirement: AI Disconnect Detection
-
-AI disconnect detection SHALL work with non-blocking sessions.
-
-#### Scenario: Non-blocking session marked abandoned on disconnect
-
-- **WHEN** a non-blocking session is created
-- **AND** the AI client disconnects before fetching answers
-- **THEN** the session SHALL be marked as "abandoned"
-- **AND** `get_answered_questions` SHALL return abandoned status
+## ADDED Requirements
 
 ### Requirement: Non-blocking Session Creation
 
@@ -187,3 +126,27 @@ Non-blocking sessions SHALL follow the same lifecycle rules as blocking sessions
 - **THEN** status SHALL be updated to "rejected"
 - **AND** `get_answered_questions` SHALL return rejection status with reason
 
+## MODIFIED Requirements
+
+### Requirement: AbortSignal Support for Session Lifecycle
+
+The SessionManager's AbortSignal support SHALL be extended for non-blocking fetch operations.
+
+#### Scenario: Signal abort during blocking fetch
+
+- **WHEN** `get_answered_questions` is called with `blocking: true` and an AbortSignal
+- **AND** the signal is aborted during the wait
+- **THEN** the fetch SHALL stop waiting immediately
+- **AND** an error indicating cancellation SHALL be thrown
+- **AND** the session SHALL NOT be marked as read
+
+### Requirement: AI Disconnect Detection
+
+AI disconnect detection SHALL work with non-blocking sessions.
+
+#### Scenario: Non-blocking session marked abandoned on disconnect
+
+- **WHEN** a non-blocking session is created
+- **AND** the AI client disconnects before fetching answers
+- **THEN** the session SHALL be marked as "abandoned"
+- **AND** `get_answered_questions` SHALL return abandoned status

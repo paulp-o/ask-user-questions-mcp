@@ -125,6 +125,9 @@ export function createAskUserQuestionsParametersSchema(
         `Each question must include: prompt (full question text), title (short label, max 12 chars), ` +
         `options (2-${maxOptions} choices with labels and descriptions), and multiSelect (boolean).`,
     ),
+    nonBlocking: z.boolean().default(false).describe(
+      "Set to true to submit questions without waiting for answers. The tool will return immediately with a session ID that can be used with get_answered_questions to fetch answers later. Default: false (blocking mode).",
+    ),
   });
 }
 
@@ -152,3 +155,20 @@ export const TOOL_DESCRIPTION =
   'Do NOT use this tool to ask "Is my plan ready?" or "Should I proceed?"';
 
 export type QuestionInput = z.infer<typeof QuestionSchema>;
+
+
+export const GetAnsweredQuestionsArgsSchema = z.object({
+  session_id: z.string().describe(
+    "The session ID returned from a non-blocking ask_user_questions call. Accepts both full UUID and short (first 8 chars) ID.",
+  ),
+  blocking: z.boolean().default(false).describe(
+    "If true, wait until the user answers before returning. If false (default), return immediately with current status.",
+  ),
+});
+
+export type GetAnsweredQuestionsArgs = z.infer<typeof GetAnsweredQuestionsArgsSchema>;
+
+export const GET_ANSWERED_QUESTIONS_DESCRIPTION =
+  "Fetch answers for a previously submitted non-blocking question set. " +
+  "Use this after calling ask_user_questions with nonBlocking: true. " +
+  "Returns the user's answers if available, or current session status if still pending.";

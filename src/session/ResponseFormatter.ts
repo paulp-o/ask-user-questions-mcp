@@ -28,6 +28,7 @@ export class ResponseFormatter {
   static formatUserResponse(
     answers: SessionAnswer,
     questions: Question[],
+    sessionId?: string,
   ): string {
     // Validate that we have matching questions and answers
     if (answers.answers.length === 0) {
@@ -39,7 +40,12 @@ export class ResponseFormatter {
     }
 
     // Start with header
-    const lines: string[] = ["Here are the user's answers:", ""];
+    const lines: string[] = [];
+    if (sessionId) {
+      const shortId = sessionId.slice(0, 8);
+      lines.push(`[Session: ${shortId} | Questions: ${questions.length}]`, "");
+    }
+    lines.push("Here are the user's answers:", "");
 
     // Format each question and its answer(s)
     // Note: A question can have multiple answers (e.g., regular answer + elaboration request)
@@ -182,6 +188,91 @@ export class ResponseFormatter {
    */
   static formatRephraseRequest(questionIndex: number, title: string): string {
     return `[REPHRASE_REQUEST] Please rephrase question '${title}' in a different way\nQuestion index: ${questionIndex}`;
+  }
+
+  /**
+   * Get the short form of a session ID (first 8 characters)
+   *
+   * @param sessionId - Full session ID
+   * @returns First 8 characters of the session ID
+   */
+  static getShortId(sessionId: string): string {
+    return sessionId.slice(0, 8);
+  }
+
+  /**
+   * Format a non-blocking submission confirmation message
+   *
+   * @param sessionId - Full session ID
+   * @param questionCount - Number of questions submitted
+   * @returns Formatted confirmation string
+   */
+  static formatNonBlockingSubmission(
+    sessionId: string,
+    questionCount: number,
+  ): string {
+    const shortId = sessionId.slice(0, 8);
+    return [
+      `[Session: ${shortId} | Questions: ${questionCount} | Status: pending]`,
+      "",
+      "Questions submitted successfully.",
+      `Use get_answered_questions(session_id="${shortId}") or \`auq fetch-answers ${shortId}\` to retrieve answers.`,
+    ].join("\n");
+  }
+
+  /**
+   * Format a pending status message for a session
+   *
+   * @param sessionId - Full session ID
+   * @param remainingTime - Optional remaining time string (e.g., "4m 45s")
+   * @returns Formatted pending status string
+   */
+  static formatPendingStatus(
+    sessionId: string,
+    remainingTime?: string,
+  ): string {
+    const shortId = sessionId.slice(0, 8);
+    const header = remainingTime
+      ? `[Session: ${shortId} | Status: pending | Remaining: ${remainingTime}]`
+      : `[Session: ${shortId} | Status: pending]`;
+    return [header, "", "No answers yet."].join("\n");
+  }
+
+  /**
+   * Format a rejected status message for a session
+   *
+   * @param sessionId - Full session ID
+   * @param reason - Optional rejection reason
+   * @returns Formatted rejected status string
+   */
+  static formatRejectedStatus(
+    sessionId: string,
+    reason?: string | null,
+  ): string {
+    const shortId = sessionId.slice(0, 8);
+    const lines = [`[Session: ${shortId} | Status: rejected]`, ""];
+    if (reason) {
+      lines.push(`User rejected this question set. Reason: "${reason}"`);
+    } else {
+      lines.push("User rejected this question set.");
+    }
+    return lines.join("\n");
+  }
+
+  /**
+   * Format a generic session status message (fallback for other statuses)
+   *
+   * @param sessionId - Full session ID
+   * @param status - Session status string (e.g., "abandoned", "timed_out")
+   * @returns Formatted status string
+   */
+  static formatSessionStatus(sessionId: string, status: string): string {
+    const shortId = sessionId.slice(0, 8);
+    return [
+      `[Session: ${shortId} | Status: ${status}]`,
+      "",
+      `Session status: ${status}`,
+    ].join("\n");
   }
 
   /**

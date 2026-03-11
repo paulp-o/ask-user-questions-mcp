@@ -23,6 +23,7 @@ export interface SessionAnswer {
   timestamp: string;
   callId?: string;
   workingDirectory?: string; // Client's working directory at time of request (if available)
+  lastReadAt?: string; // ISO 8601 timestamp of when answers were fetched by an AI agent
 }
 
 export interface SessionConfig {

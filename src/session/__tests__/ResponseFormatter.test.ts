@@ -1163,4 +1163,131 @@ describe("ResponseFormatter", () => {
       );
     });
   });
+
+  describe("metadata header", () => {
+    const validQuestions: Question[] = [
+      {
+        options: [
+          { description: "Type-safe JavaScript", label: "TypeScript" },
+          { description: "Dynamic web language", label: "JavaScript" },
+        ],
+        prompt: "Which language do you prefer?",
+        title: "Language",
+      },
+    ];
+    const validAnswers: SessionAnswer = {
+      answers: [
+        {
+          questionIndex: 0,
+          selectedOption: "TypeScript",
+          timestamp: "2025-01-01T00:00:00Z",
+        },
+      ],
+      sessionId: "a3f2e8b1-1234-4567-89ab-cdef01234567",
+      timestamp: "2025-01-01T00:00:00Z",
+    };
+
+    it("should prepend metadata header when sessionId is provided", () => {
+      const result = ResponseFormatter.formatUserResponse(
+        validAnswers,
+        validQuestions,
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+      );
+      expect(result).toMatch(/^\[Session: a3f2e8b1 \| Questions: \d+\]/);
+      expect(result).toContain("Here are the user's answers:");
+    });
+
+    it("should not include header when sessionId is omitted", () => {
+      const result = ResponseFormatter.formatUserResponse(validAnswers, validQuestions);
+      expect(result).not.toContain("[Session:");
+      expect(result.startsWith("Here are the user's answers:")).toBe(true);
+    });
+
+    it("should use short ID (first 8 chars)", () => {
+      const result = ResponseFormatter.formatUserResponse(
+        validAnswers,
+        validQuestions,
+        "abcdef12-3456-4789-abcd-ef0123456789",
+      );
+      expect(result).toContain("[Session: abcdef12");
+      expect(result).not.toContain("abcdef12-3456");
+    });
+  });
+
+  describe("formatNonBlockingSubmission", () => {
+    it("should format non-blocking submission message", () => {
+      const result = ResponseFormatter.formatNonBlockingSubmission(
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+        3,
+      );
+      expect(result).toContain("[Session: a3f2e8b1 | Questions: 3 | Status: pending]");
+      expect(result).toContain("Questions submitted successfully.");
+      expect(result).toContain("get_answered_questions");
+      expect(result).toContain("auq fetch-answers");
+    });
+  });
+
+  describe("formatPendingStatus", () => {
+    it("should format pending status without remaining time", () => {
+      const result = ResponseFormatter.formatPendingStatus(
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+      );
+      expect(result).toContain("[Session: a3f2e8b1 | Status: pending]");
+      expect(result).toContain("No answers yet.");
+    });
+
+    it("should include remaining time when provided", () => {
+      const result = ResponseFormatter.formatPendingStatus(
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+        "4m 45s",
+      );
+      expect(result).toContain("Remaining: 4m 45s");
+    });
+  });
+
+  describe("formatRejectedStatus", () => {
+    it("should format rejected with reason", () => {
+      const result = ResponseFormatter.formatRejectedStatus(
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+        "not applicable",
+      );
+      expect(result).toContain("[Session: a3f2e8b1 | Status: rejected]");
+      expect(result).toContain('Reason: "not applicable"');
+    });
+
+    it("should format rejected without reason", () => {
+      const result = ResponseFormatter.formatRejectedStatus(
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+      );
+      expect(result).toContain("[Session: a3f2e8b1 | Status: rejected]");
+      expect(result).toContain("User rejected this question set.");
+      expect(result).not.toContain("Reason:");
+    });
+
+    it("should handle null reason", () => {
+      const result = ResponseFormatter.formatRejectedStatus(
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+        null,
+      );
+      expect(result).not.toContain("Reason:");
+    });
+  });
+
+  describe("formatSessionStatus", () => {
+    it("should format generic session status", () => {
+      const result = ResponseFormatter.formatSessionStatus(
+        "a3f2e8b1-1234-4567-89ab-cdef01234567",
+        "abandoned",
+      );
+      expect(result).toContain("[Session: a3f2e8b1 | Status: abandoned]");
+    });
+  });
+
+  describe("getShortId", () => {
+    it("should return first 8 characters", () => {
+      expect(
+        ResponseFormatter.getShortId("a3f2e8b1-1234-4567-89ab-cdef01234567"),
+      ).toBe("a3f2e8b1");
+    });
+  });
 });

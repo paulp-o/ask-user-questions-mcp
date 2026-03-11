@@ -4,7 +4,7 @@ import {
   AskUserQuestionsParametersSchema,
   createAskUserQuestionsCore,
 } from "./core/ask-user-questions.js";
-import { TOOL_DESCRIPTION } from "./shared/schemas.js";
+import { GetAnsweredQuestionsArgsSchema, GET_ANSWERED_QUESTIONS_DESCRIPTION, TOOL_DESCRIPTION } from "./shared/schemas.js";
 
 const askUserQuestionsCore = createAskUserQuestionsCore();
 
@@ -73,6 +73,23 @@ server.addTool({
         .workingDirectory;
 
       try {
+        // Handle non-blocking mode
+        if (args.nonBlocking) {
+          const { sessionId, questionCount } = await askUserQuestionsCore.askNonBlocking(
+            args.questions,
+            callId,
+            workingDirectory,
+          );
+          const shortId = sessionId.slice(0, 8);
+          const responseText =
+            `[Session: ${shortId} | Questions: ${questionCount} | Status: pending]\n\n` +
+            `Questions submitted successfully.\n` +
+            `Use get_answered_questions(session_id="${shortId}") or \`auq fetch-answers ${shortId}\` to retrieve answers.`;
+          return {
+            content: [{ text: responseText, type: "text" }],
+          };
+        }
+
         const { formattedResponse, sessionId } = await askUserQuestionsCore.ask(
           args.questions,
           callId,
@@ -88,11 +105,17 @@ server.addTool({
 
         log.info("Session completed successfully", { sessionId, callId });
 
+        // Prepend metadata header to blocking responses
+        const shortId = sessionId.slice(0, 8);
+        const count = args.questions.length;
+        const header = `[Session: ${shortId} | Questions: ${count}]`;
+        const responseWithHeader = `${header}\n\n${formattedResponse}`;
+
         // Return formatted response to AI model
         return {
           content: [
             {
-              text: formattedResponse,
+              text: responseWithHeader,
               type: "text",
             },
           ],
@@ -127,6 +150,63 @@ server.addTool({
     }
   },
   parameters: AskUserQuestionsParametersSchema,
+});
+
+
+// Add the get_answered_questions tool
+server.addTool({
+  name: "get_answered_questions",
+  annotations: {
+    title: "Get Answered Questions",
+    openWorldHint: false,
+    readOnlyHint: true,
+    idempotentHint: true,
+  },
+  description: GET_ANSWERED_QUESTIONS_DESCRIPTION,
+  parameters: GetAnsweredQuestionsArgsSchema,
+  execute: async (args, ctx) => {
+    const { log } = ctx as {
+      log: {
+        info: (...args: unknown[]) => void;
+        warn: (...args: unknown[]) => void;
+        error: (...args: unknown[]) => void;
+      };
+    };
+
+    const callId = randomUUID();
+    const controller = new AbortController();
+    activeRequests.set(callId, { controller });
+
+    try {
+      await askUserQuestionsCore.ensureInitialized();
+
+      const { formattedResponse, sessionId, status } =
+        await askUserQuestionsCore.getAnsweredQuestions(
+          args.session_id,
+          args.blocking,
+          controller.signal,
+        );
+
+      log.info("Fetched answered questions", { sessionId, status, callId });
+
+      return {
+        content: [{ text: formattedResponse, type: "text" }],
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message === "ABORTED") {
+        log.warn("Fetch aborted: AI client disconnected", { callId });
+        return {
+          content: [{ text: "Fetch aborted: AI client disconnected", type: "text" }],
+        };
+      }
+      log.error("Fetch answered questions failed", { error: String(error) });
+      return {
+        content: [{ text: `Error fetching answers: ${error}`, type: "text" }],
+      };
+    } finally {
+      activeRequests.delete(callId);
+    }
+  },
 });
 
 // Handle AI client disconnections gracefully

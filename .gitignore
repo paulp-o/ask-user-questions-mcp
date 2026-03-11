@@ -49,3 +49,4 @@ oc-docs-for-references/*
 
 # opensrc - source code for packages
 opensrc/
+.mrp/

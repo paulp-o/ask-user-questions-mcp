@@ -26,6 +26,8 @@ Commands:
   sessions <sub> [flags] List/dismiss sessions
   config <sub> [flags]   Get/set configuration
   update                 Check for and install updates
+  fetch-answers [flags]    Fetch answers for non-blocking sessions
+  history [sub] [flags]    Browse session history
 
 Answer:
   auq answer <id> --answers '<json>'    Submit answers
@@ -36,6 +38,14 @@ Sessions:
   auq sessions list [--pending|--stale|--all] [--json]
   auq sessions show <id> [--json]
   auq sessions dismiss <id> [--force] [--json]
+
+Fetch Answers:
+  auq fetch-answers [session-id] [--blocking] [--json]
+  auq fetch-answers --unread [--json]
+
+History:
+  auq history [--all] [--json] [--limit N] [--unread] [--search TEXT]
+  auq history show <id> [--json]
 
 Config:
   auq config get [key] [--json]
@@ -254,6 +264,22 @@ if (command === "sessions") {
 if (command === "config") {
   const { runConfigCommand } = await import("../src/cli/commands/config.js");
   await runConfigCommand(args.slice(1));
+  await updateNotification;
+  process.exit(0);
+}
+
+// Handle 'fetch-answers' command
+if (command === "fetch-answers") {
+  const { runFetchAnswersCommand } = await import("../src/cli/commands/fetch-answers.js");
+  await runFetchAnswersCommand(args.slice(1));
+  await updateNotification;
+  process.exit(0);
+}
+
+// Handle 'history' command
+if (command === "history") {
+  const { runHistoryCommand } = await import("../src/cli/commands/history.js");
+  await runHistoryCommand(args.slice(1));
   await updateNotification;
   process.exit(0);
 }

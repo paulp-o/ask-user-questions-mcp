@@ -220,6 +220,50 @@ export class SessionManager {
   }
 
   /**
+   * Get all unread sessions (completed sessions where lastReadAt is not set)
+   */
+  async getUnreadSessions(): Promise<string[]> {
+    const sessionIds = await this.getAllSessionIds();
+    const unreadSessions: Array<{ sessionId: string; createdAt: string }> = [];
+
+    for (const sessionId of sessionIds) {
+      try {
+        const status = await this.getSessionStatus(sessionId);
+        if (!status || status.status !== "completed") continue;
+
+        const answers = await this.getSessionAnswers(sessionId);
+        if (!answers || answers.lastReadAt) continue;
+
+        unreadSessions.push({ sessionId, createdAt: status.createdAt });
+      } catch { continue; }
+    }
+
+    // Sort by createdAt descending (newest first)
+    unreadSessions.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    return unreadSessions.map((s) => s.sessionId);
+  }
+
+  /**
+   * Mark a session as read by updating lastReadAt in answers.json
+   */
+  async markSessionAsRead(sessionId: string): Promise<SessionAnswer> {
+    const answers = await this.readSessionFile<SessionAnswer>(
+      sessionId,
+      SESSION_FILES.ANSWERS,
+    );
+
+    if (!answers) {
+      throw new Error(`Session ${sessionId} has no answers to mark as read`);
+    }
+
+    answers.lastReadAt = new Date().toISOString();
+    await this.writeSessionFile(sessionId, SESSION_FILES.ANSWERS, answers);
+
+    return answers;
+  }
+
+  /**
    * Get session count
    */
   async getSessionCount(): Promise<number> {
