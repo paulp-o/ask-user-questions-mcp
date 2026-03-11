@@ -76,7 +76,7 @@ export const OptionsList = ({
   const { theme } = useTheme();
   const config = useConfig();
   const { width: termWidth } = useTerminalDimensions();
-  const rowWidth = Math.max(20, termWidth - 2);
+  const rowWidth = Math.max(20, termWidth - 6);
 
   // Use prop if provided, otherwise use config value
   const autoSelectRecommended =
@@ -149,18 +149,12 @@ export const OptionsList = ({
     if (key.name === "up") {
       const newIndex = Math.max(0, focusedIndex - 1);
       setFocusedIndex(newIndex);
-      if (!multiSelect && newIndex < options.length) {
-        onSelect(options[newIndex].label);
-      }
       return;
     }
 
     if (key.name === "down") {
       const newIndex = Math.min(maxIndex, focusedIndex + 1);
       setFocusedIndex(newIndex);
-      if (!multiSelect && newIndex < options.length) {
-        onSelect(options[newIndex].label);
-      }
       return;
     }
 
@@ -340,8 +334,13 @@ export const OptionsList = ({
                   value={customValue}
                   focused={true}
                   onInput={(val) => {
-                    onCustomChange?.(val);
-                    if (!multiSelect && val.length > 0) {
+                    // Filter SGR mouse escape sequences that leak through stdin parser
+                    const sanitized = val
+                      .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
+                      .replace(/\[?[OI]/g, '');
+                    if (sanitized !== val && sanitized.length === 0) return;
+                    onCustomChange?.(sanitized);
+                    if (!multiSelect && sanitized.length > 0) {
                       onSelect(t("input.otherCustom"));
                     }
                   }}
@@ -418,8 +417,13 @@ export const OptionsList = ({
                   value={elaborateText}
                   focused={true}
                   onInput={(val) => {
-                    onElaborateTextChange?.(val);
-                    if (!multiSelect && val.length > 0 && !isElaborateMarked) {
+                    // Filter SGR mouse escape sequences that leak through stdin parser
+                    const sanitized = val
+                      .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
+                      .replace(/\[?[OI]/g, '');
+                    if (sanitized !== val && sanitized.length === 0) return;
+                    onElaborateTextChange?.(sanitized);
+                    if (!multiSelect && sanitized.length > 0 && !isElaborateMarked) {
                       onElaborateSelect?.();
                     }
                   }}

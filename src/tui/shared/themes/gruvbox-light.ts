@@ -15,6 +15,9 @@ export const gruvboxLightTheme: Theme = {
   },
 
   colors: {
+    bg: "#FBF1C7",
+    surface: "#F2E5BC",
+    surfaceAlt: "#EBDBB2",
     primary: "#076678", // faded blue
     success: "#79740e", // faded green
     warning: "#b57614", // faded yellow
@@ -27,7 +30,7 @@ export const gruvboxLightTheme: Theme = {
     unansweredHighlight: "#cc241d", // gruvbox red
 
     text: "#3c3836", // dark1
-    textDim: "#a89984", // gray lightened
+    textDim: "#7C6F64", // gray darkened for contrast on cream
     textBold: "#282828", // dark0
   },
 
@@ -47,13 +50,13 @@ export const gruvboxLightTheme: Theme = {
       pillBg: "#ebdbb2", // light1
     },
     directory: {
-      label: "#a89984",
+      label: "#7C6F64",
       path: "#3c3836",
     },
     tabBar: {
       selected: "#3c3836",
       selectedBg: "#ebdbb2",
-      default: "#a89984",
+      default: "#7C6F64",
       answered: "#79740e",
       unanswered: "#a89984",
       divider: "#d5c4a1",

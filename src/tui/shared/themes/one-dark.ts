@@ -15,6 +15,11 @@ export const oneDarkTheme: Theme = {
   },
 
   colors: {
+    // Background layers (OpenCode-style filled surfaces)
+    bg: "#1B1D23",
+    surface: "#21252B",
+    surfaceAlt: "#2C313A",
+
     primary: "#61afef", // blue
     success: "#98c379", // green
     warning: "#d19a66", // yellow/orange
@@ -27,7 +32,7 @@ export const oneDarkTheme: Theme = {
     unansweredHighlight: "#e06c75",
 
     text: "#abb2bf", // foreground
-    textDim: "#767D8A", // comment gray brightened
+    textDim: "#838A97", // comment gray brightened
     textBold: "#d7dae0", // lighter
   },
 
@@ -91,7 +96,7 @@ export const oneDarkTheme: Theme = {
       border: "#3e4451",
       keyBg: "#3e4451",
       keyFg: "#61afef",
-      action: "#848b98",
+      action: "#949BAA",
       separator: "#3e4451",
     },
     toast: {

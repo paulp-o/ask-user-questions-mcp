@@ -14,6 +14,10 @@ export const githubLightTheme: Theme = {
   },
 
   colors: {
+    bg: "#FFFFFF",
+    surface: "#F6F8FA",
+    surfaceAlt: "#EFF2F5",
+
     primary: "#0969DA", // GitHub blue
     success: "#1A7F37", // GitHub green
     warning: "#9A6700", // GitHub orange/brown

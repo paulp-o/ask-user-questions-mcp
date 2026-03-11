@@ -40,17 +40,22 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
       style={{
         flexDirection: "column",
         alignItems: "center",
-        paddingY: 1,
+        justifyContent: "center",
+        flexGrow: 1,
       }}
     >
       <box
         style={{
-          borderColor: theme.borders.neutral,
-          borderStyle: "rounded",
           flexDirection: "column",
-          paddingX: 2,
-          paddingY: 1,
-          width: "100%",
+          paddingLeft: 4,
+          paddingRight: 4,
+          paddingTop: 2,
+          paddingBottom: 2,
+          marginLeft: 1,
+          marginRight: 1,
+          border: true,
+          borderStyle: "rounded",
+          borderColor: theme.colors.surface,
         }}
       >
         <box style={{ justifyContent: "center" }}>

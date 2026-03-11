@@ -578,11 +578,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
     ];
 
     return (
-      <box style={{ flexDirection: "column", padding: 1 }}>
+      <box style={{ flexDirection: "column", paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1 }}>
         <box
           style={{
-            borderColor: theme.borders.warning,
             borderStyle: "rounded",
+            borderColor: theme.borders.warning,
             flexDirection: "column",
             padding: 1,
           }}
@@ -621,7 +621,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   // Show rejection confirmation
   if (showRejectionConfirm) {
     return (
-      <box style={{ flexDirection: "column", padding: 1 }}>
+      <box style={{ flexDirection: "column", paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1 }}>
         <ConfirmationDialog
           message={t("confirmation.rejectMessage")}
           onCancel={() => setShowRejectionConfirm(false)}
@@ -635,49 +635,54 @@ export const StepperView: React.FC<StepperViewProps> = ({
   // Show review screen
   if (showReview) {
     return (
-      <ReviewScreen
-        isSubmitting={submitting}
-        answers={answers}
-        elapsedLabel={elapsedLabel}
-        onConfirm={handleConfirm}
-        onGoBack={handleGoBack}
-        questions={sessionRequest.questions}
-        sessionId={sessionId}
-        elaborateMarks={elaborateMarks}
-      />
+      <box style={{ flexDirection: "column", paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1 }}>
+        <ReviewScreen
+          isSubmitting={submitting}
+          answers={answers}
+          elapsedLabel={elapsedLabel}
+          onConfirm={handleConfirm}
+          onGoBack={handleGoBack}
+          questions={sessionRequest.questions}
+          sessionId={sessionId}
+          elaborateMarks={elaborateMarks}
+        />
+      </box>
     );
   }
 
   // Show question display (default)
   return (
-    <QuestionDisplay
-      currentQuestion={currentQuestion}
-      currentQuestionIndex={currentQuestionIndex}
-      customAnswer={currentAnswer?.customText}
-      elapsedLabel={elapsedLabel}
-      onAdvanceToNext={handleAdvanceToNext}
-      onChangeCustomAnswer={handleChangeCustomAnswer}
-      onSelectOption={handleSelectOption}
-      onToggleOption={handleToggleOption}
-      multiSelect={currentQuestion.multiSelect}
-      questions={sessionRequest.questions}
-      selectedOption={currentAnswer?.selectedOption}
-      answers={answers}
-      focusContext={focusContext}
-      onFocusContextChange={setFocusContext}
-      focusedOptionIndex={focusedOptionIndex}
-      onFocusedOptionIndexChange={setFocusedOptionIndex}
-      workingDirectory={sessionRequest.workingDirectory}
-      onRecommendedDetected={setHasRecommendedOptions}
-      hasRecommendedOptions={hasRecommendedOptions}
-      hasAnyRecommendedInSession={hasAnyRecommendedInSession}
-      elaborateMarks={elaborateMarks}
-      onElaborateSelect={handleElaborateSelect}
-      elaborateText={elaborateMarks.get(currentQuestionIndex) || ""}
-      onElaborateTextChange={handleElaborateTextChange}
-      showSessionSwitching={
-        hasMultipleSessions && !showReview && !showRejectionConfirm
-      }
-    />
+    <box style={{ flexDirection: "column", paddingLeft: 2, paddingRight: 2 }}>
+      <QuestionDisplay
+        currentQuestion={currentQuestion}
+        currentQuestionIndex={currentQuestionIndex}
+        customAnswer={currentAnswer?.customText}
+        elapsedLabel={elapsedLabel}
+        onAdvanceToNext={handleAdvanceToNext}
+        onChangeCustomAnswer={handleChangeCustomAnswer}
+        onSelectOption={handleSelectOption}
+        onToggleOption={handleToggleOption}
+        multiSelect={currentQuestion.multiSelect}
+        questions={sessionRequest.questions}
+        selectedOption={currentAnswer?.selectedOption}
+        answers={answers}
+        focusContext={focusContext}
+        onFocusContextChange={setFocusContext}
+        focusedOptionIndex={focusedOptionIndex}
+        onFocusedOptionIndexChange={setFocusedOptionIndex}
+        workingDirectory={sessionRequest.workingDirectory}
+        onRecommendedDetected={setHasRecommendedOptions}
+        hasRecommendedOptions={hasRecommendedOptions}
+        hasAnyRecommendedInSession={hasAnyRecommendedInSession}
+        elaborateMarks={elaborateMarks}
+        onElaborateSelect={handleElaborateSelect}
+        elaborateText={elaborateMarks.get(currentQuestionIndex) || ""}
+        onElaborateTextChange={handleElaborateTextChange}
+        onSelectIndex={(idx) => setCurrentQuestionIndex(Math.max(0, Math.min(idx, sessionRequest.questions.length - 1)))}
+        showSessionSwitching={
+          hasMultipleSessions && !showReview && !showRejectionConfirm
+        }
+      />
+    </box>
   );
 };

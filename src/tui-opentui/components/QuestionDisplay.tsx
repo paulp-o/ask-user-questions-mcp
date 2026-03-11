@@ -36,6 +36,7 @@ interface QuestionDisplayProps {
   onElaborateSelect?: () => void;
   elaborateText?: string;
   onElaborateTextChange?: (text: string) => void;
+  onSelectIndex?: (index: number) => void;
 }
 
 /**
@@ -68,6 +69,7 @@ export const QuestionDisplay = ({
   onElaborateSelect,
   elaborateText = "",
   onElaborateTextChange,
+  onSelectIndex,
 }: QuestionDisplayProps): React.ReactNode => {
   const { theme } = useTheme();
 
@@ -107,6 +109,7 @@ export const QuestionDisplay = ({
         questions={questions}
         answers={answers}
         elaborateMarks={elaborateMarks}
+        onSelectIndex={onSelectIndex}
       />
 
       {/* Question prompt and type indicator */}
@@ -149,14 +152,17 @@ export const QuestionDisplay = ({
       />
 
       {/* Footer with context-aware keybindings */}
-      <Footer
-        focusContext={focusContext}
-        multiSelect={multiSelect ?? false}
-        customInputValue={customAnswer}
-        hasRecommendedOptions={hasRecommendedOptions}
-        hasAnyRecommendedInSession={hasAnyRecommendedInSession}
-        showSessionSwitching={showSessionSwitching}
-      />
+      {/* Footer with context-aware keybindings */}
+      <box style={{ marginTop: 1 }}>
+        <Footer
+          focusContext={focusContext}
+          multiSelect={multiSelect ?? false}
+          customInputValue={customAnswer}
+          hasRecommendedOptions={hasRecommendedOptions}
+          hasAnyRecommendedInSession={hasAnyRecommendedInSession}
+          showSessionSwitching={showSessionSwitching}
+        />
+      </box>
     </box>
   );
 };

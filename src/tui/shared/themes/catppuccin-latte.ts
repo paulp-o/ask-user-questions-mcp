@@ -15,6 +15,9 @@ export const catppuccinLatteTheme: Theme = {
   },
 
   colors: {
+    bg: "#EFF1F5",
+    surface: "#E6E9EF",
+    surfaceAlt: "#CCD0DA",
     primary: "#1e66f5", // blue
     success: "#40a02b", // green
     warning: "#df8e1d", // yellow
@@ -27,7 +30,7 @@ export const catppuccinLatteTheme: Theme = {
     unansweredHighlight: "#d20f39",
 
     text: "#4c4f69", // text
-    textDim: "#acb0c0", // overlay0 lightened
+    textDim: "#8C90A0", // overlay0 darkened for visibility
     textBold: "#4c4f69",
   },
 
@@ -47,13 +50,13 @@ export const catppuccinLatteTheme: Theme = {
       pillBg: "#ccd0da",
     },
     directory: {
-      label: "#acb0c0",
+      label: "#8C90A0",
       path: "#4c4f69",
     },
     tabBar: {
       selected: "#4c4f69",
       selectedBg: "#ccd0da",
-      default: "#acb0c0",
+      default: "#8C90A0",
       answered: "#40a02b",
       unanswered: "#acb0c0",
       divider: "#ccd0da",

@@ -14,6 +14,10 @@ export const githubDarkTheme: Theme = {
   },
 
   colors: {
+    bg: "#010409",
+    surface: "#0D1117",
+    surfaceAlt: "#161B22",
+
     primary: "#58a6ff",
     success: "#3fb950",
     warning: "#d29922",
@@ -39,7 +43,7 @@ export const githubDarkTheme: Theme = {
 
   components: {
     header: {
-      border: "#30363d",
+      border: "#3D444D", // differentiated from neutral #30363d
       queueActive: "#58a6ff",
       queueEmpty: "#a0a8b4",
       queueFlash: "#79c0ff",

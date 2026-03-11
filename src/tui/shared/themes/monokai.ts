@@ -16,6 +16,11 @@ export const monokaiTheme: Theme = {
   },
 
   colors: {
+    // Background layers (OpenCode-style filled surfaces)
+    bg: "#1E1F1A",
+    surface: "#272822",
+    surfaceAlt: "#383830",
+
     primary: "#66D9EF",
     success: "#A6E22E",
     warning: "#E6DB74",
@@ -28,7 +33,7 @@ export const monokaiTheme: Theme = {
     unansweredHighlight: "#f92672",
 
     text: "#F8F8F2",
-    textDim: "#908B78", // brightened
+    textDim: "#A09B88", // brightened
     textBold: "#F8F8F2",
   },
 
@@ -41,7 +46,7 @@ export const monokaiTheme: Theme = {
 
   components: {
     header: {
-      border: "#49483E",
+      border: "#5C5B50", // was identical to neutral, now brighter
       queueActive: "#66D9EF",
       queueEmpty: "#908B78",
       queueFlash: "#F8F8F2",

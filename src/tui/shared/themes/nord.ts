@@ -15,6 +15,10 @@ export const nordTheme: Theme = {
   },
 
   colors: {
+    bg: "#2E3440",
+    surface: "#3B4252",
+    surfaceAlt: "#434C5E",
+
     primary: "#88c0d0", // nord8 - frost
     success: "#a3be8c", // nord14 - aurora green
     warning: "#ebcb8b", // nord13 - aurora yellow

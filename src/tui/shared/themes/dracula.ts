@@ -15,6 +15,11 @@ export const draculaTheme: Theme = {
   },
 
   colors: {
+    // Background layers (OpenCode-style filled surfaces)
+    bg: "#21222C",
+    surface: "#282A36",
+    surfaceAlt: "#383A4A",
+
     primary: "#bd93f9", // purple
     success: "#50fa7b", // green
     warning: "#f1fa8c", // yellow
@@ -27,7 +32,7 @@ export const draculaTheme: Theme = {
     unansweredHighlight: "#ff5555", // dracula red
 
     text: "#f8f8f2", // foreground
-    textDim: "#7C8BBE", // comment brightened
+    textDim: "#8B9BCF", // comment brightened
     textBold: "#f8f8f2",
   },
 
@@ -64,7 +69,7 @@ export const draculaTheme: Theme = {
       selected: "#bd93f9",
       selectedBg: "#44475a",
       default: "#f8f8f2",
-      description: "#bd93f9", // lighter purple for readability
+      description: "#CAA8FC", // lighter purple for readability
       hint: "#f8f8f2", // foreground for readability
     },
     input: {
@@ -91,7 +96,7 @@ export const draculaTheme: Theme = {
       border: "#44475a",
       keyBg: "#44475a",
       keyFg: "#bd93f9",
-      action: "#8294C4",
+      action: "#9AA5D4",
       separator: "#44475a",
     },
     toast: {

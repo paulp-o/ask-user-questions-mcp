@@ -16,6 +16,10 @@ export const rosePineTheme: Theme = {
   },
 
   colors: {
+    bg: "#191724",
+    surface: "#1F1D2E",
+    surfaceAlt: "#26233A",
+
     primary: "#ebbcba",
     success: "#31748f",
     warning: "#f6c177",

@@ -161,8 +161,9 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
       <box
         style={{
           flexDirection: "column",
+          border: true,
           borderStyle: "rounded",
-          borderColor: theme.components.sessionPicker.border,
+          borderColor: theme.colors.surface,
           paddingX: 2,
           paddingY: 1,
           width: Math.min(innerWidth + 6, termWidth),
@@ -230,39 +231,36 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
           const isStaleOrAbandoned = session.isStale || session.isAbandoned;
 
           return (
-            <box key={session.sessionId} style={{ flexDirection: "column" }} onMouseDown={() => { onSelectIndex(realIdx); onClose(); }}>
+            <box key={session.sessionId} style={{ flexDirection: "column", backgroundColor: isHighlighted ? theme.colors.surfaceAlt : undefined }} onMouseDown={() => { onSelectIndex(realIdx); onClose(); }}>
               <box style={{ flexDirection: "row" }}>
                 {/* Stale/abandoned warning icon */}
                 {isStaleOrAbandoned && (
                   <text
                     style={{
-                      bg: rowBg,
                       fg: theme.components.sessionPicker.staleIcon,
                     }}
                   >
-                    {"\u26a0 "}
+                    {"⚠ "}
                   </text>
                 )}
                 <text
                   style={{
-                    bg: rowBg,
                     attributes: isHighlighted ? TextAttributes.BOLD : TextAttributes.NONE,
                     fg: isStaleOrAbandoned
                       ? theme.components.sessionPicker.staleText
                       : textColor,
                   }}
                 >
-                  {`${isActive ? "\u25ba" : " "} ${realIdx + 1}. ${title}`}
+                  {`${isActive ? "►" : " "} ${realIdx + 1}. ${title}`}
                 </text>
-                <text style={{ bg: rowBg, fg: theme.components.sessionPicker.rowDim }}>
+                <text style={{ fg: theme.components.sessionPicker.rowDim }}>
                   {` — ${dir}`}
                 </text>
-                <text style={{ bg: rowBg, fg: progressColor }}>
+                <text style={{ fg: progressColor }}>
                   {`  [${answered}/${total}]`}
                 </text>
                 <text
                   style={{
-                    bg: rowBg,
                     fg: isStaleOrAbandoned
                       ? theme.components.sessionPicker.staleAge
                       : theme.components.sessionPicker.rowDim,

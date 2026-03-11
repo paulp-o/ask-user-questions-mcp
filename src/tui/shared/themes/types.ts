@@ -15,6 +15,11 @@ export interface Theme {
    * UI State Colors
    */
   colors: {
+    // Background layers (OpenCode-style filled surfaces)
+    bg: string;         // Root background — fills entire terminal
+    surface: string;    // Card/section background — Header, Footer, panels
+    surfaceAlt: string; // Elevated/focused elements — active tabs, modals
+
     // Semantic colors (keep to 4 hues)
     primary: string;
     success: string;

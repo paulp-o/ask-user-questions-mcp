@@ -15,6 +15,9 @@ export const gruvboxDarkTheme: Theme = {
   },
 
   colors: {
+    bg: "#1D2021",
+    surface: "#282828",
+    surfaceAlt: "#3C3836",
     primary: "#458588", // blue
     success: "#98971a", // green
     warning: "#d79921", // yellow

@@ -15,6 +15,10 @@ export const lightTheme: Theme = {
   },
 
   colors: {
+    bg: "#FFFFFF",
+    surface: "#F6F8FA",
+    surfaceAlt: "#EBF0F5",
+
     primary: "#007EA7", // Deep cyan
     success: "#2DA44E", // GitHub green - readable on white
     warning: "#B07D00", // Dark amber

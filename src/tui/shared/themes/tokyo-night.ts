@@ -15,6 +15,11 @@ export const tokyoNightTheme: Theme = {
   },
 
   colors: {
+    // Background layers (OpenCode-style filled surfaces)
+    bg: "#1A1B26",
+    surface: "#1F2335",
+    surfaceAlt: "#292E42",
+
     primary: "#7aa2f7", // blue
     success: "#9ece6a", // green
     warning: "#e0af68", // yellow
@@ -27,7 +32,7 @@ export const tokyoNightTheme: Theme = {
     unansweredHighlight: "#f7768e",
 
     text: "#c0caf5", // foreground
-    textDim: "#7078A3", // comment brightened
+    textDim: "#7F87B5", // comment brightened
     textBold: "#c0caf5",
   },
 
@@ -91,7 +96,7 @@ export const tokyoNightTheme: Theme = {
       border: "#24283b",
       keyBg: "#24283b",
       keyFg: "#7aa2f7",
-      action: "#7B88A1",
+      action: "#8E9AB5",
       separator: "#24283b",
     },
     toast: {

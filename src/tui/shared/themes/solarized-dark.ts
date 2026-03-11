@@ -15,6 +15,9 @@ export const solarizedDarkTheme: Theme = {
   },
 
   colors: {
+    bg: "#002B36",
+    surface: "#073642",
+    surfaceAlt: "#0A4050",
     primary: "#268bd2", // blue
     success: "#859900", // green
     warning: "#b58900", // yellow
@@ -26,9 +29,9 @@ export const solarizedDarkTheme: Theme = {
     pending: "#b58900",
     unansweredHighlight: "#dc322f",
 
-    text: "#839496", // base0
-    textDim: "#6c7c83", // base01 brightened
-    textBold: "#93a1a1", // base1
+    text: "#93A1A1", // base1 - brighter for readability
+    textDim: "#7D8E95", // base01 brightened for contrast
+    textBold: "#EEE8D5", // base2 - clearly bold
   },
 
   borders: {

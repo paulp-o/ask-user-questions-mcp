@@ -67,7 +67,7 @@ export const SessionDots: React.FC<SessionDotsProps> = ({
   if (sessions.length < 2) return null;
 
   return (
-    <box style={{ flexDirection: "row", justifyContent: "center", paddingLeft: 1, paddingRight: 1 }}>
+    <box style={{ flexDirection: "row", justifyContent: "center", paddingLeft: 2, paddingRight: 2 }}>
       {sessions.map((session, idx) => {
         const isActive = idx === activeIndex;
         const uiState = sessionUIStates[session.sessionId];

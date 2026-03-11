@@ -15,6 +15,11 @@ export const catppuccinMochaTheme: Theme = {
   },
 
   colors: {
+    // Background layers (OpenCode-style filled surfaces)
+    bg: "#181825",
+    surface: "#1E1E2E",
+    surfaceAlt: "#313244",
+
     primary: "#89b4fa", // blue
     success: "#a6e3a1", // green
     warning: "#f9e2af", // yellow
@@ -27,7 +32,7 @@ export const catppuccinMochaTheme: Theme = {
     unansweredHighlight: "#f38ba8",
 
     text: "#cdd6f4", // text
-    textDim: "#8688a0", // overlay0 brightened
+    textDim: "#9395B0", // overlay0 brightened
     textBold: "#cdd6f4",
   },
 
@@ -91,7 +96,7 @@ export const catppuccinMochaTheme: Theme = {
       border: "#313244",
       keyBg: "#313244",
       keyFg: "#89b4fa",
-      action: "#9399b2", // overlay2 - brighter for visibility
+      action: "#A5AABF", // overlay2 - brighter for visibility
       separator: "#313244",
     },
     toast: {

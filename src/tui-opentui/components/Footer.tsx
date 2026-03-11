@@ -129,10 +129,7 @@ export const Footer = ({
 
   return (
     <box
-      border
-      borderStyle="rounded"
-      borderColor={theme.components.footer.border}
-      style={{ paddingLeft: 1, paddingRight: 1, flexDirection: "row", flexWrap: "wrap" }}
+      style={{ paddingLeft: 2, paddingRight: 2, flexDirection: "row", flexWrap: "wrap", border: true, borderStyle: "rounded", borderColor: theme.colors.surface }}
     >
       {keybindings.map((binding, idx) => (
         <box key={idx} style={{ paddingRight: 2 }}>

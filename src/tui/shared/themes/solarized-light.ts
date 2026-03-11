@@ -15,6 +15,9 @@ export const solarizedLightTheme: Theme = {
   },
 
   colors: {
+    bg: "#FDF6E3",
+    surface: "#EEE8D5",
+    surfaceAlt: "#DDD6C1",
     primary: "#268bd2", // blue
     success: "#859900", // green
     warning: "#b58900", // yellow
@@ -27,7 +30,7 @@ export const solarizedLightTheme: Theme = {
     unansweredHighlight: "#dc322f",
 
     text: "#657b83", // base00
-    textDim: "#a3b1b1", // base1 lightened
+    textDim: "#8A9899", // base1 darkened for contrast on cream
     textBold: "#586e75", // base01
   },
 
@@ -47,13 +50,13 @@ export const solarizedLightTheme: Theme = {
       pillBg: "#eee8d5",
     },
     directory: {
-      label: "#a3b1b1",
+      label: "#8A9899",
       path: "#657b83",
     },
     tabBar: {
       selected: "#586e75",
       selectedBg: "#eee8d5",
-      default: "#a3b1b1",
+      default: "#8A9899",
       answered: "#859900",
       unanswered: "#a3b1b1",
       divider: "#eee8d5",

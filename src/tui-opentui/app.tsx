@@ -85,7 +85,7 @@ interface ToastData {
 
 // Inner App component that has access to ThemeProvider context
 function AppInner({ config }: { config: AUQConfig }) {
-  const { cycleTheme } = useTheme();
+  const { cycleTheme, theme } = useTheme();
   const [state, setState] = useState<AppState>({ mode: "WAITING" });
   const [sessionQueue, setSessionQueue] = useState<SessionData[]>([]);
   const [activeSessionIndex, setActiveSessionIndex] = useState(0);
@@ -596,7 +596,7 @@ function AppInner({ config }: { config: AUQConfig }) {
 
   if (!isInitialized) {
     return (
-      <box style={{ flexDirection: "column", width: "100%", height: "100%" }}>
+      <box style={{ flexDirection: "column", width: "100%", height: "100%", backgroundColor: theme.colors.bg }}>
         <text style={{ fg: "#888888" }}>Loading...</text>
       </box>
     );
@@ -630,8 +630,8 @@ function AppInner({ config }: { config: AUQConfig }) {
   }
 
   return (
-    <box style={{ flexDirection: "column", width: "100%", height: "100%" }}>
-      <box style={{ flexDirection: "column", paddingLeft: 1, paddingRight: 1 }}>
+    <box style={{ flexDirection: "column", width: "100%", height: "100%", backgroundColor: theme.colors.bg }}>
+      <box style={{ flexDirection: "column", paddingLeft: 1, paddingRight: 1, flexGrow: 1 }}>
       <Header
         pendingCount={
           state.mode === "PROCESSING"
@@ -646,6 +646,7 @@ function AppInner({ config }: { config: AUQConfig }) {
         onUpdateBadgeActivate={() => setShowUpdateOverlay(true)}
         isCheckingUpdate={isCheckingUpdate}
       />
+      <box style={{ flexGrow: 1, flexDirection: "column" }}>
       {showSessionPicker && state.mode === "PROCESSING" ? (
         <SessionPicker
           isOpen={showSessionPicker}
@@ -692,7 +693,10 @@ function AppInner({ config }: { config: AUQConfig }) {
           onRemindLater={handleRemindLater}
         />
       )}
-      <ThemeIndicator />
+      </box>
+      <box style={{ marginTop: 1 }}>
+        <ThemeIndicator />
+      </box>
       </box>
     </box>
   );

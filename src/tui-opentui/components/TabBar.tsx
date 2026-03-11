@@ -69,7 +69,7 @@ export const TabBar = ({
   const { width: columns } = useTerminalDimensions();
 
   // A little breathing room at both edges.
-  const paddingX = 1;
+  const paddingX = 2;
   const innerWidth = Math.max(0, columns - paddingX * 2);
 
   const answeredCount = questions.reduce((count, _q, index) => {
@@ -110,7 +110,7 @@ export const TabBar = ({
     <box style={{ flexDirection: "row", width: columns, paddingLeft: paddingX, paddingRight: paddingX, justifyContent: "space-between" }}>
       <box style={{ flexDirection: "row" }}>
         {tabs.map((tab, idx) => (
-          <box key={tab.index} style={{ flexDirection: "row" }} onMouseDown={() => onSelectIndex?.(tab.index)}>
+          <box key={tab.index} style={{ flexDirection: "row", backgroundColor: tab.isActive ? theme.colors.surfaceAlt : undefined, paddingLeft: tab.isActive ? 1 : 0, paddingRight: tab.isActive ? 1 : 0 }} onMouseDown={() => onSelectIndex?.(tab.index)}>
             <text
               style={{
                 fg: tab.isElaborate

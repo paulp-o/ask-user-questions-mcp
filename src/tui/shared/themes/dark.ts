@@ -16,6 +16,10 @@ export const darkTheme: Theme = {
   },
 
   colors: {
+    bg: "#0F1419",
+    surface: "#242C34",
+    surfaceAlt: "#2F3840",
+
     primary: "#46D9FF",
     success: "#5AF78E",
     warning: "#FFD36A",

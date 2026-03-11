@@ -66,10 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <box
-      border
-      borderStyle="rounded"
-      borderColor={theme.components.header.border}
-      style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 1, paddingRight: 1 }}
+      style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 2, paddingRight: 2, border: true, borderStyle: "rounded", borderColor: theme.colors.surface }}
     >
       {/* Left: logo + tagline */}
       <box style={{ flexDirection: "row", alignItems: "center" }}>
