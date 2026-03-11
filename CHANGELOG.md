@@ -1,3 +1,9 @@
+## [3.1.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.5...v3.1.0) (2026-03-11)
+
+### Features
+
+* add CLI pagination (--limit, --page) to history, sessions, fetch-answers ([be82ad8](https://github.com/paulp-o/ask-user-questions-mcp/commit/be82ad8926af5fcd4bc04e2b6d34c9b99ab3819f))
+
 ## [3.0.5](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.0.4...v3.0.5) (2026-03-11)
 
 ### Bug Fixes
