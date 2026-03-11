@@ -8,6 +8,7 @@ import chalk from "chalk";
 import { SessionManager } from "../../session/SessionManager.js";
 import { getSessionDirectory } from "../../session/utils.js";
 import { formatAge, parseFlags } from "../utils.js";
+import { formatPaginationFooter, paginateArray } from "../pagination.js";
 import type {
   SessionAnswer,
   SessionRequest,
@@ -98,6 +99,9 @@ async function listHistory(
   const limitRaw =
     typeof flags.limit === "string" ? parseInt(flags.limit, 10) : 20;
   const limit = isNaN(limitRaw) ? 20 : Math.max(1, limitRaw);
+  const pageRaw =
+    typeof flags.page === "string" ? parseInt(flags.page, 10) : 1;
+  const page = isNaN(pageRaw) ? 1 : Math.max(1, pageRaw);
 
   // Initialize SessionManager
   const sessionManager = new SessionManager({
@@ -228,19 +232,23 @@ async function listHistory(
   }
 
   // Apply limit
-  const displayed = filtered.slice(0, limit);
+  const paginated = paginateArray(filtered, { limit, page });
+  const displayed = paginated.items;
 
   // JSON output
   if (jsonMode) {
-    const result = displayed.map((e) => ({
-      sessionId: e.sessionId,
-      status: e.status,
-      createdAt: e.createdAt,
-      lastReadAt: e.lastReadAt ?? null,
-      questionCount: e.questionCount,
-      answeredCount: e.answeredCount,
-      preview: e.preview,
-    }));
+    const result = {
+      items: displayed.map((e) => ({
+        sessionId: e.sessionId,
+        status: e.status,
+        createdAt: e.createdAt,
+        lastReadAt: e.lastReadAt ?? null,
+        questionCount: e.questionCount,
+        answeredCount: e.answeredCount,
+        preview: e.preview,
+      })),
+      pagination: paginated.meta,
+    };
     console.log(JSON.stringify(result, null, 2));
     return;
   }
@@ -277,6 +285,9 @@ async function listHistory(
 
     console.log(line);
   }
+
+  // Pagination footer
+  console.log(chalk.dim(formatPaginationFooter(paginated.meta)));
 
   // Hint line when abandoned sessions are hidden
   if (!showAll && abandonedCount > 0) {

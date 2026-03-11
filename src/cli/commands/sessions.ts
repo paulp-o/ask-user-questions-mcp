@@ -15,6 +15,11 @@ import {
   parseFlags,
   resolveArchiveDirectory,
 } from "../utils.js";
+import {
+  paginateArray,
+  formatPaginationFooter,
+  type PaginationInput,
+} from "../pagination.js";
 
 // ── Sessions List ──────────────────────────────────────────────────
 
@@ -32,6 +37,8 @@ async function sessionsList(args: string[]): Promise<void> {
   const jsonMode = flags.json === true;
   const filterStale = flags.stale === true;
   const filterAll = flags.all === true;
+  const limit = flags.limit as string | number | undefined;
+  const page = flags.page as string | number | undefined;
   // --pending is same as default
 
   // Initialise SessionManager
@@ -92,23 +99,26 @@ async function sessionsList(args: string[]): Promise<void> {
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
+  const paginated = paginateArray(entries, { limit, page } as PaginationInput);
+
   // Output
   if (jsonMode) {
-    console.log(JSON.stringify(entries, null, 2));
+    console.log(JSON.stringify({ items: paginated.items, pagination: paginated.meta }, null, 2));
     return;
   }
 
-  if (entries.length === 0) {
+  if (paginated.meta.total === 0) {
     console.log("No sessions found.");
     return;
   }
 
-  for (const entry of entries) {
+  for (const entry of paginated.items) {
     const staleIndicator = entry.stale ? " ⚠" : "";
     console.log(
       `${entry.sessionId}  ${entry.status}  ${entry.age}  questions: ${entry.questionCount}${staleIndicator}`,
     );
   }
+  console.log(formatPaginationFooter(paginated.meta));
 }
 
 // ── Sessions Dismiss ───────────────────────────────────────────────

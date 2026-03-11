@@ -169,12 +169,14 @@ describe("history command", () => {
       await runHistoryCommand(["--json"]);
       const output = consoleLogSpy.mock.calls.map((c) => c[0]).join("\n");
       const parsed = JSON.parse(output);
-      expect(Array.isArray(parsed)).toBe(true);
-      expect(parsed[0]).toHaveProperty("sessionId");
-      expect(parsed[0]).toHaveProperty("status");
-      expect(parsed[0]).toHaveProperty("questionCount");
+      expect(Array.isArray(parsed.items)).toBe(true);
+      expect(parsed.items[0]).toHaveProperty("sessionId");
+      expect(parsed.items[0]).toHaveProperty("status");
+      expect(parsed.items[0]).toHaveProperty("questionCount");
+      expect(parsed).toHaveProperty("pagination");
+      expect(parsed.pagination).toHaveProperty("page");
+      expect(parsed.pagination).toHaveProperty("total");
     });
-
     it("should find session with --session", async () => {
       const id = await createCompletedSession(sessionManager);
       await runHistoryCommand(["--session", id.slice(0, 8)]);
@@ -185,6 +187,19 @@ describe("history command", () => {
     it("should error for --session with no match", async () => {
       await runHistoryCommand(["--session", "00000000"]);
       expect(process.exitCode).toBe(1);
+    });
+
+    it("should paginate with --page", async () => {
+      await createCompletedSession(sessionManager);
+      await createCompletedSession(sessionManager);
+      await createCompletedSession(sessionManager);
+      await runHistoryCommand(["--limit", "2", "--page", "2", "--json"]);
+      const output = consoleLogSpy.mock.calls.map((c) => c[0]).join("\n");
+      const parsed = JSON.parse(output);
+      expect(parsed.items).toHaveLength(1);
+      expect(parsed.pagination.page).toBe(2);
+      expect(parsed.pagination.total).toBe(3);
+      expect(parsed.pagination.totalPages).toBe(2);
     });
   });
 

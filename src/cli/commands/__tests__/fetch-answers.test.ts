@@ -285,7 +285,7 @@ describe("fetch-answers command", () => {
       expect(allOutput).toContain(sessionId.slice(0, 8));
     });
 
-    it("should output valid JSON array for unread list with --json", async () => {
+    it("should output valid JSON with items+pagination for unread list with --json", async () => {
       const id1 = await createCompletedSession(sessionManager);
       const id2 = await createCompletedSession(sessionManager);
 
@@ -302,15 +302,17 @@ describe("fetch-answers command", () => {
       });
       expect(jsonCalls.length).toBeGreaterThanOrEqual(1);
       const parsed = JSON.parse(jsonCalls[0][0] as string);
-      expect(Array.isArray(parsed)).toBe(true);
-      expect(parsed.length).toBe(2);
+      expect(Array.isArray(parsed.items)).toBe(true);
+      expect(parsed.items.length).toBe(2);
+      expect(parsed.pagination).toBeDefined();
+      expect(parsed.pagination.total).toBe(2);
       // Both session IDs appear in result
-      const ids = parsed.map((e: { sessionId: string }) => e.sessionId);
+      const ids = parsed.items.map((e: { sessionId: string }) => e.sessionId);
       expect(ids).toContain(id1);
       expect(ids).toContain(id2);
     });
 
-    it("should output empty JSON array when no unread sessions with --json", async () => {
+    it("should output empty items array when no unread sessions with --json", async () => {
       await runFetchAnswersCommand(["--json"]);
 
       const jsonCalls = consoleLogSpy.mock.calls.filter((c) => {
@@ -323,11 +325,36 @@ describe("fetch-answers command", () => {
       });
       expect(jsonCalls.length).toBeGreaterThanOrEqual(1);
       const parsed = JSON.parse(jsonCalls[0][0] as string);
-      expect(Array.isArray(parsed)).toBe(true);
-      expect(parsed.length).toBe(0);
+      expect(Array.isArray(parsed.items)).toBe(true);
+      expect(parsed.items.length).toBe(0);
+      expect(parsed.pagination.total).toBe(0);
+    });
+
+    it("should support --limit and --page flags for unread list", async () => {
+      // Create 3 sessions
+      await createCompletedSession(sessionManager);
+      await createCompletedSession(sessionManager);
+      await createCompletedSession(sessionManager);
+
+      await runFetchAnswersCommand(["--json", "--limit", "2", "--page", "1"]);
+
+      expect(process.exitCode).toBeUndefined();
+      const jsonCalls = consoleLogSpy.mock.calls.filter((c) => {
+        try {
+          JSON.parse(c[0] as string);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      expect(jsonCalls.length).toBeGreaterThanOrEqual(1);
+      const parsed = JSON.parse(jsonCalls[0][0] as string);
+      expect(parsed.items.length).toBe(2);
+      expect(parsed.pagination.total).toBe(3);
+      expect(parsed.pagination.totalPages).toBe(2);
+      expect(parsed.pagination.page).toBe(1);
     });
   });
-
   // ── --blocking with no session id ───────────────────────────────────────
 
   describe("--blocking flag validation", () => {

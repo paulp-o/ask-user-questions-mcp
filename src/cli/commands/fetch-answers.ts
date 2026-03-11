@@ -7,6 +7,7 @@ import { SessionManager } from "../../session/SessionManager.js";
 import { ResponseFormatter } from "../../session/ResponseFormatter.js";
 import { getSessionDirectory } from "../../session/utils.js";
 import { formatAge, outputResult, parseFlags } from "../utils.js";
+import { formatPaginationFooter, paginateArray } from "../pagination.js";
 
 /**
  * Run the `auq fetch-answers` command.
@@ -44,7 +45,9 @@ export async function runFetchAnswersCommand(args: string[]): Promise<void> {
       return;
     }
 
-    return listUnreadSessions(sessionManager, jsonMode);
+    const limit = typeof flags.limit === "string" ? flags.limit : undefined;
+    const page = typeof flags.page === "string" ? flags.page : undefined;
+    return listUnreadSessions(sessionManager, jsonMode, { limit, page });
   }
 
   // ── Mode A: Fetch specific session ────────────────────────────────
@@ -56,6 +59,7 @@ export async function runFetchAnswersCommand(args: string[]): Promise<void> {
 async function listUnreadSessions(
   sessionManager: SessionManager,
   jsonMode: boolean,
+  paginationInput?: { limit?: string | number; page?: string | number },
 ): Promise<void> {
   const unreadIds = await sessionManager.getUnreadSessions();
 
@@ -73,7 +77,8 @@ async function listUnreadSessions(
         };
       }),
     );
-    console.log(JSON.stringify(entries, null, 2));
+    const paginated = paginateArray(entries, paginationInput);
+    console.log(JSON.stringify({ items: paginated.items, pagination: paginated.meta }, null, 2));
     return;
   }
 
@@ -98,14 +103,17 @@ async function listUnreadSessions(
     });
   }
 
+  const paginated = paginateArray(rows, paginationInput);
   // Print header
   console.log("ID        Status     Age     Questions");
-  for (const row of rows) {
+  for (const row of paginated.items) {
     const id = row.id.padEnd(10);
     const status = row.status.padEnd(11);
     const age = row.age.padEnd(8);
     console.log(`${id}${status}${age}${row.questions}`);
   }
+  console.log("");
+  console.log(formatPaginationFooter(paginated.meta));
 }
 
 // ── Fetch Specific Session ────────────────────────────────────────────

@@ -214,7 +214,7 @@ describe("sessions command", () => {
       expect(allOutput).toContain("\u26a0");
     });
 
-    it("should output valid JSON array with --json flag", async () => {
+    it("should output paginated JSON with --json flag", async () => {
       const id = await createTestSession(sessionManager, {
         questionCount: 3,
       });
@@ -225,14 +225,57 @@ describe("sessions command", () => {
       const output = consoleLogSpy.mock.calls[0][0] as string;
       const parsed = JSON.parse(output);
 
-      expect(Array.isArray(parsed)).toBe(true);
-      expect(parsed.length).toBe(1);
-      expect(parsed[0].sessionId).toBe(id);
-      expect(parsed[0].status).toBe("pending");
-      expect(parsed[0].createdAt).toBeDefined();
-      expect(parsed[0].age).toBeDefined();
-      expect(typeof parsed[0].stale).toBe("boolean");
-      expect(parsed[0].questionCount).toBe(3);
+      expect(Array.isArray(parsed.items)).toBe(true);
+      expect(parsed.items.length).toBe(1);
+      expect(parsed.items[0].sessionId).toBe(id);
+      expect(parsed.items[0].status).toBe("pending");
+      expect(parsed.items[0].createdAt).toBeDefined();
+      expect(parsed.items[0].age).toBeDefined();
+      expect(typeof parsed.items[0].stale).toBe("boolean");
+      expect(parsed.items[0].questionCount).toBe(3);
+      expect(parsed.pagination).toBeDefined();
+      expect(parsed.pagination.total).toBe(1);
+      expect(parsed.pagination.page).toBe(1);
+    });
+
+    it("should paginate with --limit and --page flags", async () => {
+      for (let i = 0; i < 5; i++) {
+        await createTestSession(sessionManager);
+      }
+
+      await runSessionsCommand(["list", "--limit", "2", "--page", "1"]);
+
+      const allOutput = consoleLogSpy.mock.calls.map((c) => c[0]).join("\n");
+      expect(allOutput).toContain("Page 1 of 3");
+      const entryLines = consoleLogSpy.mock.calls
+        .map((c) => c[0] as string)
+        .filter((l) => l.includes("questions:"));
+      expect(entryLines.length).toBe(2);
+    });
+
+    it("should show page 2 with --limit and --page flags", async () => {
+      for (let i = 0; i < 5; i++) {
+        await createTestSession(sessionManager);
+      }
+
+      await runSessionsCommand(["list", "--limit", "2", "--page", "2"]);
+
+      const allOutput = consoleLogSpy.mock.calls.map((c) => c[0]).join("\n");
+      expect(allOutput).toContain("Page 2 of 3");
+      const entryLines = consoleLogSpy.mock.calls
+        .map((c) => c[0] as string)
+        .filter((l) => l.includes("questions:"));
+      expect(entryLines.length).toBe(2);
+    });
+
+    it("should include pagination footer in terminal output", async () => {
+      await createTestSession(sessionManager);
+
+      await runSessionsCommand(["list"]);
+
+      const allOutput = consoleLogSpy.mock.calls.map((c) => c[0]).join("\n");
+      expect(allOutput).toContain("Page 1 of 1");
+      expect(allOutput).toContain("1 total");
     });
 
     it("should include question count in output", async () => {
