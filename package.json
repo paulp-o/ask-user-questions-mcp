@@ -3,10 +3,11 @@
   "version": "3.0.0",
   "main": "dist/index.js",
   "bin": {
-    "auq": "dist/bin/auq.js"
+    "auq": "bin/auq"
   },
   "files": [
     "dist",
+    "bin/auq",
     "scripts/postinstall.cjs",
     "README.md",
     "LICENSE"

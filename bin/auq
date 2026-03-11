@@ -1,3 +1,19 @@
 #!/bin/sh
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-exec npx tsx "$SCRIPT_DIR/auq.tsx" "$@"
+# Runtime auto-detection wrapper for auq
+# Prefers bun (required for OpenTUI renderer), falls back to node (ink renderer only)
+
+# Resolve the real path of this script (handles symlinks from global installs)
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+  SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT")" && pwd)"
+  SCRIPT="$(readlink "$SCRIPT")"
+  [ "${SCRIPT#/}" = "$SCRIPT" ] && SCRIPT="$SCRIPT_DIR/$SCRIPT"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT")" && pwd)"
+ENTRY="$SCRIPT_DIR/../dist/bin/auq.js"
+
+if command -v bun >/dev/null 2>&1; then
+  exec bun "$ENTRY" "$@"
+else
+  exec node "$ENTRY" "$@"
+fi
