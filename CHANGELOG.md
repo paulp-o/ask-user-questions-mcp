@@ -1,3 +1,9 @@
+## [3.2.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.0...v3.2.1) (2026-03-11)
+
+### Bug Fixes
+
+* overhaul light theme readability — darken bg, borders, highlights, use theme-aware colors ([1893342](https://github.com/paulp-o/ask-user-questions-mcp/commit/1893342f21226688c98254a402e5ef0e00a16eff)), closes [#FFFFFF](https://github.com/paulp-o/ask-user-questions-mcp/issues/FFFFFF) [#F8F9FA](https://github.com/paulp-o/ask-user-questions-mcp/issues/F8F9FA) [#D0D7DE](https://github.com/paulp-o/ask-user-questions-mcp/issues/D0D7DE) [#B0B8C1](https://github.com/paulp-o/ask-user-questions-mcp/issues/B0B8C1) [FFFFFF/#AFAFAF](https://github.com/FFFFFF/ask-user-questions-mcp/issues/AFAFAF)
+
 ## [3.2.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.1.0...v3.2.0) (2026-03-11)
 
 ### Features
