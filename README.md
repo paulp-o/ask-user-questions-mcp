@@ -10,11 +10,36 @@ Single/multiple choice questions, custom options, multi-agent interoperability, 
 
 **Works via MCP server / OpenCode plugin / Agent Skills.**
 
+> AUQ is an **unopinionated** tool—it doesn't impose any specific workflow. It's a simple, flexible bridge between AI agents and human decision-making.
+
 [Setup](#-setup) • [Usage](#-usage) • [CLI Reference](#-cli-reference)
 
 ---
 
+## What does it do?
+
+AUQ lets your AI assistants **ask clarifying questions** consisting of multiple-choice/single-choice questions (with an "Other" option for custom input / rejection / ask for elaboration) while coding or working, and **wait for your answers** through a **separate CLI window** without messing up your workflow.
+
+This lets you inject your **intent** into long-running autonomous AI tasks—no more switching windows or babysitting AIs. Turn on the CLI **anytime**, even **remotely via SSH**!
+
+<details>
+<summary><i>A fun background story</i></summary>
+
+In AI-assisted coding, guiding LLMs to ask **clarifying questions** have been widely recognized as a powerful prompt engineering technique to overcome LLM hallucination and generate more contextually appropriate code [1].
+
+On October 18th, Claude Code 2.0.21 introduced an internal `AskUserQuestion` tool. Inspired by it, I decided to build a similar tool that is:
+
+- **Integration-flexible** - Works with MCP clients (Claude Desktop, Cursor, etc.) and has official OpenCode plugin support
+- **Non-invasive** - Doesn't heavily integrate with your coding CLI workflow or occupy UI space
+- **Multi-agent friendly** - Supports receiving questions from multiple agents simultaneously in parallel workflows
+
+</details>
+
+---
+
 ## ✨ Demo
+
+![AUQ Demo](media/demo2.png)
 
 https://github.com/user-attachments/assets/3a135a13-fcb1-4795-9a6b-f426fa079674
 
@@ -24,27 +49,53 @@ https://github.com/user-attachments/assets/3a135a13-fcb1-4795-9a6b-f426fa079674
 
 ### Install CLI
 
-**Bun (recommended)**
+**Bun (recommended — required for default OpenTUI renderer)**
 
 ```bash
 bun add -g auq-mcp-server
 ```
 
-**npm/pnpm/yarn**
+**npm**
 
 ```bash
-npx auq-mcp-server auq
-# or global install with your package manager
+npm install -g auq-mcp-server
 ```
 
-> **Note:** AUQ requires **Bun runtime** for the default OpenTUI renderer. The shell wrapper auto-detects Bun or falls back to Node.js with Ink renderer.
+**pnpm**
+
+```bash
+pnpm add -g auq-mcp-server
+```
+
+**yarn**
+
+```bash
+yarn global add auq-mcp-server
+```
+
+> **Note:** Bun is recommended for the default OpenTUI renderer. When installed via npm/pnpm/yarn, the shell wrapper auto-detects Bun at runtime. If Bun is not available, it falls back to Node.js with the legacy Ink renderer.
 
 ### Integrate with Your AI
+
+**Option A: MCP Server** (Cursor, Claude Code, Codex CLI, Claude Desktop)
 
 <details>
 <summary><strong>Cursor</strong></summary>
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=ask-user-questions&config=eyJlbnYiOnt9LCJjb21tYW5kIjoibnB4IC15IGF1cS1tY3Atc2VydmVyIHNlcnZlciJ9)
+
+Or manually add to MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "ask-user-questions": {
+      "command": "bunx",
+      "args": ["-y", "auq-mcp-server", "server"]
+    }
+  }
+}
+```
 
 </details>
 
@@ -72,6 +123,20 @@ Or add to `.mcp.json`:
 </details>
 
 <details>
+<summary><strong>Codex CLI</strong></summary>
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.ask-user-questions]
+command = "bunx"
+args = ["-y", "auq-mcp-server", "server"]
+tool_timeout_sec = 99999
+```
+
+</details>
+
+<details>
 <summary><strong>Claude Desktop</strong></summary>
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
@@ -89,22 +154,11 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 </details>
 
-<details>
-<summary><strong>Codex CLI</strong></summary>
+> **Note:** Some MCP clients have default timeouts that may interrupt AUQ if you take too long to answer. Configure longer timeouts for better experience.
 
-Add to `~/.codex/config.toml`:
+---
 
-```toml
-[mcp_servers.ask-user-questions]
-command = "bunx"
-args = ["-y", "auq-mcp-server", "server"]
-tool_timeout_sec = 99999
-```
-
-</details>
-
-<details>
-<summary><strong>OpenCode Plugin</strong></summary>
+**Option B: OpenCode Plugin**
 
 Add to `opencode.json`:
 
@@ -114,14 +168,13 @@ Add to `opencode.json`:
 }
 ```
 
-</details>
+---
 
-<details>
-<summary><strong>Agent Skills</strong></summary>
+**Option C: Agent Skills (Experimental)**
 
 Copy the `skills/ask-user-questions/` folder to your agent's skills directory.
 
-</details>
+> ⚠️ **Limitations:** Skills don't support features like status polling, fetching answers, or rejected question handling. MCP or plugin is recommended.
 
 ---
 
@@ -524,9 +577,11 @@ rm -rf ~/.local/share/auq/sessions/*                  # Linux
 
 ---
 
-## 🤔 Why AUQ vs. Built-in Tools?
+## 🤔 Why AUQ vs. Built-in Questioning Tools?
 
-You're running multiple AI agents in parallel. They ask questions simultaneously, scattered across windows. AUQ collects everything in **one inbox** and lets you respond **on your terms**.
+> **A clean decision inbox so you & AI stay in flow.**
+
+You're an AI power user, running multiple agents on multiple instances. Highly parallelized, the AIs ask questions to you simultaneously, on multiple threads—scattered across different windows. AUQ enables them to ask **anytime**, collects everything in **one inbox**, and lets you respond **on your terms**—then elegantly routes answers back to each agent.
 
 ```
    Claude Code    Cursor    OpenCode
@@ -548,15 +603,47 @@ You're running multiple AI agents in parallel. They ask questions simultaneously
    Claude Code    Cursor    OpenCode
 ```
 
-- **One Inbox** — All agents, one queue
-- **Teach the AI** — Reject bad questions with explanations
-- **Fix First** — Request elaboration on vague questions
-- **Blast Through** — `Ctrl+R` accepts all recommended
-- **Pings Matter** — Native notifications, batched
-- **Works Anywhere** — SSH into remote servers
+📥 **One Inbox for All Agents** — Multiple agents ask in one place. One queue, one source of truth.
+
+🧠 **Teach the AI** — Reject bad questions and tell it why. Turn "no" into better follow-ups.
+
+❓ **Fix the Question First** — Can't answer because it's vague? Request **elaboration** before you guess.
+
+⚡ **Blast Through the Obvious** — `Ctrl+R` accepts all **recommended** options. Focus on the hard decisions.
+
+🔔 **Pinged When It Matters** — Native notifications, **batched** so you're not spammed.
+
+🌐 **Works Where You Work** — SSH into a remote server? AUQ runs there too.
+
+<details>
+<summary><strong>Nice Extras</strong></summary>
+
+- 🎨 16 built-in themes + custom theme support
+- 🌍 i18n (English, Korean) with auto-detection
+- 📊 Dock progress bar (iTerm2, WezTerm, Ghostty)
+- 🔤 Full CJK character support
+
+#### Power Moves
+
+| Shortcut | What it does                                       |
+| -------- | -------------------------------------------------- |
+| `Space`  | Select option without advancing                    |
+| `Enter`  | Select option and advance to next question         |
+| `R`      | Select recommended option(s) for current question  |
+| `Ctrl+R` | Quick submit — auto-fill recommended, go to review |
+| `Esc`    | Reject question set — optionally explain why       |
+| `Ctrl+T` | Cycle through 16 themes                            |
+
+</details>
 
 ---
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+**References**
+
+[1] Prompt engineering techniques for LLM code generation, including clarifying questions as a method to reduce hallucination and improve contextually appropriate outputs.

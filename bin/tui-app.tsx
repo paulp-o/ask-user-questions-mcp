@@ -878,12 +878,9 @@ export const runTui = async (config?: AUQConfig): Promise<void> => {
       await runOpenTui(mergedConfig);
     } catch (err) {
       console.error(
-        `❌ OpenTUI failed to initialize: ${err instanceof Error ? err.message : String(err)}`
+        `⚠️ OpenTUI failed to initialize: ${err instanceof Error ? err.message : String(err)}. Falling back to ink renderer.`
       );
-      console.error(
-        `\n   To use the legacy ink renderer, set AUQ_RENDERER=ink or add "renderer": "ink" to your .auqrc.json\n`
-      );
-      process.exit(1);
+      await runInkTui(mergedConfig);
     }
   } else {
     await runInkTui(mergedConfig);
