@@ -158,7 +158,8 @@ export const OptionsList = ({
       return;
     }
 
-    // When custom input is focused, handle all keyboard input here
+    // When custom input is focused, only intercept navigation keys
+    // Let native <input> handle character input (IME, clipboard, etc.)
     if (isCustomInputFocused) {
       if (key.name === "escape") {
         setFocusedIndex(Math.max(0, options.length - 1));
@@ -172,22 +173,12 @@ export const OptionsList = ({
           // Enter: advance to next question
           onAdvance?.();
         }
-      } else if (key.name === "backspace" || key.name === "delete") {
-        if (customValue.length > 0) {
-          onCustomChange?.(customValue.slice(0, -1));
-        }
-      } else if (key.sequence && !key.ctrl && !key.meta && key.name !== "up" && key.name !== "down") {
-        const sanitized = key.sequence
-          .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
-          .replace(/\[?[OI]/g, '');
-        if (sanitized.length > 0) {
-          onCustomChange?.(customValue + sanitized);
-        }
       }
       return;
     }
 
-    // When elaborate input is focused, handle all keyboard input here
+    // When elaborate input is focused, only intercept navigation keys
+    // Let native <input> handle character input (IME, clipboard, etc.)
     if (isElaborateFocused) {
       if (key.name === "escape") {
         setFocusedIndex(customInputIndex);
@@ -203,17 +194,6 @@ export const OptionsList = ({
             onElaborateSelect?.();
           }
           onAdvance?.();
-        }
-      } else if (key.name === "backspace" || key.name === "delete") {
-        if (elaborateText.length > 0) {
-          onElaborateTextChange?.(elaborateText.slice(0, -1));
-        }
-      } else if (key.sequence && !key.ctrl && !key.meta && key.name !== "up" && key.name !== "down") {
-        const sanitized = key.sequence
-          .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
-          .replace(/\[?[OI]/g, '');
-        if (sanitized.length > 0) {
-          onElaborateTextChange?.(elaborateText + sanitized);
         }
       }
       return;
@@ -379,15 +359,13 @@ export const OptionsList = ({
                   paddingY: 0,
                 }}
               >
-                {customValue ? (
-                  <text style={{ fg: theme.components.options.focused }}>
-                    {customValue + "▌"}
-                  </text>
-                ) : (
-                  <text style={{ fg: theme.components.options.hint, attributes: TextAttributes.DIM }}>
-                    {t("input.placeholder") + "▌"}
-                  </text>
-                )}
+                <input
+                  value={customValue}
+                  onChange={(val: string) => onCustomChange?.(val)}
+                  onSubmit={() => {}}
+                  placeholder={t("input.placeholder")}
+                  focused={true}
+                />
               </box>
             )}
             {!isCustomInputFocused && customValue && (
@@ -454,15 +432,13 @@ export const OptionsList = ({
                   paddingY: 0,
                 }}
               >
-                {elaborateText ? (
-                  <text style={{ fg: theme.components.options.focused }}>
-                    {elaborateText + "▌"}
-                  </text>
-                ) : (
-                  <text style={{ fg: theme.components.options.hint, attributes: TextAttributes.DIM }}>
-                    {t("input.elaboratePlaceholder") + "▌"}
-                  </text>
-                )}
+                <input
+                  value={elaborateText}
+                  onChange={(val: string) => onElaborateTextChange?.(val)}
+                  onSubmit={() => {}}
+                  placeholder={t("input.elaboratePlaceholder")}
+                  focused={true}
+                />
               </box>
             )}
             {/* Preview when not focused but has text */}

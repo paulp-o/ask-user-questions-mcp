@@ -458,11 +458,23 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
   // Handle elaborate text change
   const handleElaborateTextChange = (text: string) => {
-    setElaborateMarks((prev) => {
-      const newMarks = new Map(prev);
-      newMarks.set(currentQuestionIndex, text);
-      return newMarks;
-    });
+    if (!text.trim()) {
+      // Auto-remove elaborate mark when text is cleared
+      setElaborateMarks((prev) => {
+        if (prev.has(currentQuestionIndex)) {
+          const newMarks = new Map(prev);
+          newMarks.delete(currentQuestionIndex);
+          return newMarks;
+        }
+        return prev;
+      });
+    } else {
+      setElaborateMarks((prev) => {
+        const newMarks = new Map(prev);
+        newMarks.set(currentQuestionIndex, text);
+        return newMarks;
+      });
+    }
   };
 
   // Keyboard handling for abandoned confirmation dialog
