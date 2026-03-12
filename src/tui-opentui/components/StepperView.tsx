@@ -697,9 +697,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
         elaborateText={elaborateMarks.get(currentQuestionIndex) || ""}
         onElaborateTextChange={handleElaborateTextChange}
         onSelectIndex={(idx) => setCurrentQuestionIndex(Math.max(0, Math.min(idx, sessionRequest.questions.length - 1)))}
-        showSessionSwitching={
-          hasMultipleSessions && !showReview && !showRejectionConfirm
-        }
+        showSessionSwitching={!showReview && !showRejectionConfirm}
       />
     </box>
   );

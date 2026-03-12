@@ -244,8 +244,11 @@ export const OptionsList = ({
           onAdvance();
         }
       } else {
-        // Single-select: Enter selects AND advances
-        onSelect(options[focusedIndex].label);
+        // Single-select: Enter selects (without toggle) AND advances
+        const label = options[focusedIndex].label;
+        if (selectedOption !== label) {
+          onSelect(label);
+        }
         if (onAdvance) {
           onAdvance();
         }

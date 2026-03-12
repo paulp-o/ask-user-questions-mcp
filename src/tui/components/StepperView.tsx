@@ -771,9 +771,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onElaborateSelect={handleElaborateSelect}
       elaborateText={elaborateMarks.get(currentQuestionIndex) || ""}
       onElaborateTextChange={handleElaborateTextChange}
-      showSessionSwitching={
-        hasMultipleSessions && !showReview && !showRejectionConfirm
-      }
+      showSessionSwitching={!showReview && !showRejectionConfirm}
     />
   );
 };
