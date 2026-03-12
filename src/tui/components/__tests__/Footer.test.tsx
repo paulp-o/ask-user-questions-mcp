@@ -61,8 +61,8 @@ describe("Footer keybinding labels", () => {
 
     expect(output).toContain(KEY_LABELS.NAVIGATE_OPTIONS); // "↑↓"
     expect(output).toContain(KEY_LABELS.CURSOR); // "←→"
-    expect(output).toContain(KEY_LABELS.NAVIGATE_QUESTIONS_TAB); // "Tab/S+Tab"
-    expect(output).toContain(KEY_LABELS.NEWLINE); // "Enter"
+    expect(output).toContain(KEY_LABELS.NEWLINE); // "Shift+Enter"
+    expect(output).toContain(KEY_LABELS.ADVANCE_INPUT); // "Enter"
     expect(output).toContain(KEY_LABELS.REJECT); // "Esc"
   });
 
@@ -74,7 +74,8 @@ describe("Footer keybinding labels", () => {
 
     expect(output).toContain(KEY_LABELS.NAVIGATE_OPTIONS); // "↑↓"
     expect(output).toContain(KEY_LABELS.CURSOR); // "←→"
-    expect(output).toContain("Enter/Tab");
+    expect(output).toContain(KEY_LABELS.NEWLINE); // "Shift+Enter"
+    expect(output).toContain(KEY_LABELS.ADVANCE_INPUT); // "Enter"
     expect(output).toContain(KEY_LABELS.REJECT); // "Esc"
   });
 

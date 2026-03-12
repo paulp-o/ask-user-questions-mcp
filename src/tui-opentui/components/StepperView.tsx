@@ -117,24 +117,38 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
   // Handle option selection (single-select mode)
   const handleSelectOption = (label: string) => {
+    const existing = answers.get(currentQuestionIndex) || {};
+    const isDeselecting = existing.selectedOption === label;
+
     setAnswers((prev) => {
       const newAnswers = new Map(prev);
-      const existing = newAnswers.get(currentQuestionIndex) || {};
-      newAnswers.set(currentQuestionIndex, {
-        ...existing,
-        selectedOption: label,
-      });
+      const existingAnswer = newAnswers.get(currentQuestionIndex) || {};
+      if (isDeselecting) {
+        newAnswers.set(currentQuestionIndex, {
+          ...existingAnswer,
+          selectedOption: undefined,
+        });
+      } else {
+        newAnswers.set(currentQuestionIndex, {
+          ...existingAnswer,
+          selectedOption: label,
+          customText: undefined,
+        });
+      }
       return newAnswers;
     });
-    // Clear elaborate mark when selecting a regular option (single-select behavior)
-    setElaborateMarks((prev) => {
-      if (prev.has(currentQuestionIndex)) {
-        const newMarks = new Map(prev);
-        newMarks.delete(currentQuestionIndex);
-        return newMarks;
-      }
-      return prev;
-    });
+
+    // Clear elaborate mark only when SELECTING (not deselecting) a regular option
+    if (!isDeselecting) {
+      setElaborateMarks((prev) => {
+        if (prev.has(currentQuestionIndex)) {
+          const newMarks = new Map(prev);
+          newMarks.delete(currentQuestionIndex);
+          return newMarks;
+        }
+        return prev;
+      });
+    }
   };
 
   const handleToggleOption = (label: string) => {
@@ -173,9 +187,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setAnswers((prev) => {
       const newAnswers = new Map(prev);
       const existing = newAnswers.get(currentQuestionIndex) || {};
+      const question = sessionRequest.questions[currentQuestionIndex];
       newAnswers.set(currentQuestionIndex, {
         ...existing,
         customText: text,
+        // Single-choice: clear selectedOption when typing custom text
+        ...(text.trim().length > 0 && !question?.multiSelect ? { selectedOption: undefined } : {}),
       });
       return newAnswers;
     });
@@ -409,11 +426,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
     if (isMarking && !currentQuestion.multiSelect) {
       setAnswers((prev) => {
         const existing = prev.get(currentQuestionIndex);
-        if (existing?.selectedOption) {
+        if (existing?.selectedOption || existing?.customText) {
           const newAnswers = new Map(prev);
           newAnswers.set(currentQuestionIndex, {
             ...existing,
             selectedOption: undefined,
+            customText: undefined,
           });
           return newAnswers;
         }

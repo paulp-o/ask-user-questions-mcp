@@ -158,22 +158,63 @@ export const OptionsList = ({
       return;
     }
 
-    // When custom input is focused, only handle escape and tab to exit
+    // When custom input is focused, handle all keyboard input here
     if (isCustomInputFocused) {
       if (key.name === "escape") {
         setFocusedIndex(Math.max(0, options.length - 1));
       } else if (key.name === "tab" && !key.shift) {
         onAdvance?.();
+      } else if (key.name === "return") {
+        if (key.shift) {
+          // Shift+Enter: insert newline
+          onCustomChange?.(customValue + "\n");
+        } else {
+          // Enter: advance to next question
+          onAdvance?.();
+        }
+      } else if (key.name === "backspace" || key.name === "delete") {
+        if (customValue.length > 0) {
+          onCustomChange?.(customValue.slice(0, -1));
+        }
+      } else if (key.sequence && !key.ctrl && !key.meta && key.name !== "up" && key.name !== "down") {
+        const sanitized = key.sequence
+          .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
+          .replace(/\[?[OI]/g, '');
+        if (sanitized.length > 0) {
+          onCustomChange?.(customValue + sanitized);
+        }
       }
       return;
     }
 
-    // When elaborate input is focused, only handle escape and tab to exit
+    // When elaborate input is focused, handle all keyboard input here
     if (isElaborateFocused) {
       if (key.name === "escape") {
         setFocusedIndex(customInputIndex);
       } else if (key.name === "tab" && !key.shift) {
         onAdvance?.();
+      } else if (key.name === "return") {
+        if (key.shift) {
+          // Shift+Enter: insert newline
+          onElaborateTextChange?.(elaborateText + "\n");
+        } else {
+          // Enter: advance to next question
+          if (!elaborateText.trim()) {
+            onElaborateSelect?.();
+          }
+          onAdvance?.();
+        }
+      } else if (key.name === "backspace" || key.name === "delete") {
+        if (elaborateText.length > 0) {
+          onElaborateTextChange?.(elaborateText.slice(0, -1));
+        }
+      } else if (key.sequence && !key.ctrl && !key.meta && key.name !== "up" && key.name !== "down") {
+        const sanitized = key.sequence
+          .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
+          .replace(/\[?[OI]/g, '');
+        if (sanitized.length > 0) {
+          onElaborateTextChange?.(elaborateText + sanitized);
+        }
       }
       return;
     }
@@ -184,6 +225,8 @@ export const OptionsList = ({
         if (multiSelect) {
           onToggle?.(options[focusedIndex].label);
         } else {
+          // Single-select: toggle (deselect if already selected)
+          // Parent handleSelectOption handles the toggle logic
           onSelect(options[focusedIndex].label);
         }
       }
@@ -333,20 +376,15 @@ export const OptionsList = ({
                   paddingY: 0,
                 }}
               >
-                <input
-                  placeholder={t("input.placeholder")}
-                  value={customValue}
-                  focused={true}
-                  onInput={(val) => {
-                    // Filter SGR mouse escape sequences that leak through stdin parser
-                    const sanitized = val
-                      .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
-                      .replace(/\[?[OI]/g, '');
-                    if (sanitized !== val && sanitized.length === 0) return;
-                    onCustomChange?.(sanitized);
-                  }}
-                  onSubmit={() => onAdvance?.()}
-                />
+                {customValue ? (
+                  <text style={{ fg: theme.components.options.focused }}>
+                    {customValue + "▌"}
+                  </text>
+                ) : (
+                  <text style={{ fg: theme.components.options.hint, attributes: TextAttributes.DIM }}>
+                    {t("input.placeholder") + "▌"}
+                  </text>
+                )}
               </box>
             )}
             {!isCustomInputFocused && customValue && (
@@ -413,26 +451,15 @@ export const OptionsList = ({
                   paddingY: 0,
                 }}
               >
-                <input
-                  placeholder={t("input.elaboratePlaceholder")}
-                  value={elaborateText}
-                  focused={true}
-                  onInput={(val) => {
-                    // Filter SGR mouse escape sequences that leak through stdin parser
-                    const sanitized = val
-                      .replace(/\x1b?\[<[\d;]*[Mm]/g, '')
-                      .replace(/\[?[OI]/g, '');
-                    if (sanitized !== val && sanitized.length === 0) return;
-                    onElaborateTextChange?.(sanitized);
-                  }}
-                  onSubmit={() => {
-                    // Enter submits and advance
-                    if (!elaborateText.trim()) {
-                      onElaborateSelect?.();
-                    }
-                    onAdvance?.();
-                  }}
-                />
+                {elaborateText ? (
+                  <text style={{ fg: theme.components.options.focused }}>
+                    {elaborateText + "▌"}
+                  </text>
+                ) : (
+                  <text style={{ fg: theme.components.options.hint, attributes: TextAttributes.DIM }}>
+                    {t("input.elaboratePlaceholder") + "▌"}
+                  </text>
+                )}
               </box>
             )}
             {/* Preview when not focused but has text */}

@@ -10,14 +10,14 @@ interface MultiLineTextInputProps {
   onSubmit?: () => void;
   placeholder?: string;
   value: string;
-  /** When true, Enter also triggers onSubmit (for single-line-ish inputs like elaborate) */
+  /** @deprecated Enter now always submits; kept for backward compatibility */
   enterSubmits?: boolean;
 }
 
 /**
  * Multi-line text input component for Ink with cursor positioning
  * Supports left/right arrow keys for cursor movement
- * Enter for newlines, Tab to submit (portable across terminals)
+ * Enter to submit/advance, Shift+Enter for newlines, Tab also submits
  */
 export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   isFocused = true,
@@ -25,7 +25,7 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
   onSubmit,
   placeholder = t("input.multiLinePlaceholder"),
   value,
-  enterSubmits = false,
+  enterSubmits: _enterSubmits = false,
 }) => {
   const { theme } = useTheme();
   // Initialize cursor at end of text (using character count for CJK support)
@@ -73,18 +73,20 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         return;
       }
 
-      // Enter: Submit if enterSubmits mode, otherwise add newline
+      // Enter: Submit/advance; Shift+Enter inserts newline
       if (input === "\r" || input === "\n" || key.return) {
-        if (enterSubmits) {
-          onSubmit?.();
+        if (key.shift) {
+          // Shift+Enter: Insert newline at cursor position
+          const chars = [...currentValue];
+          const before = chars.slice(0, currentCursor).join("");
+          const after = chars.slice(currentCursor).join("");
+          const newValue = before + "\n" + after;
+          onChange(newValue);
+          setCursorPosition(currentCursor + 1);
           return;
         }
-        const chars = [...currentValue];
-        const before = chars.slice(0, currentCursor).join("");
-        const after = chars.slice(currentCursor).join("");
-        const newValue = before + "\n" + after;
-        onChange(newValue);
-        setCursorPosition(currentCursor + 1);
+        // Enter (without Shift): Submit/advance
+        onSubmit?.();
         return;
       }
 
