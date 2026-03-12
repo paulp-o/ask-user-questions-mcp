@@ -60,13 +60,12 @@ export const Footer = ({
       ];
     }
 
-    // Custom input focused
+    // Custom input focused (Enter submits)
     if (focusContext === "custom-input") {
       return [
         { key: KEY_LABELS.NAVIGATE_OPTIONS, action: t("footer.options") },
         { key: KEY_LABELS.CURSOR, action: t("footer.cursor") },
-        { key: KEY_LABELS.NAVIGATE_QUESTIONS_TAB, action: t("footer.questions") },
-        { key: KEY_LABELS.NEWLINE, action: t("footer.newline") },
+        { key: "Enter/Tab", action: t("footer.next") },
         { key: KEY_LABELS.REJECT, action: t("footer.reject") },
       ];
     }
