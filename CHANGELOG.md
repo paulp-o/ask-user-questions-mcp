@@ -1,3 +1,9 @@
+## [3.2.6](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.5...v3.2.6) (2026-03-12)
+
+### Bug Fixes
+
+* single-choice toggle, Shift+Enter newline, multi-line input, and custom text preservation ([cc7b277](https://github.com/paulp-o/ask-user-questions-mcp/commit/cc7b27707bb2db5f14fddb2482637eba488f7cd7))
+
 ## [3.2.5](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.4...v3.2.5) (2026-03-12)
 
 ### Bug Fixes
