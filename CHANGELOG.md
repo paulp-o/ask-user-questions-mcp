@@ -1,3 +1,9 @@
+## [3.2.5](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.4...v3.2.5) (2026-03-12)
+
+### Bug Fixes
+
+* show Enter/Tab as submit in custom input footer, matching actual behavior ([c7bd1e3](https://github.com/paulp-o/ask-user-questions-mcp/commit/c7bd1e35f8212862b65ab463918780badde216b0))
+
 ## [3.2.4](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.3...v3.2.4) (2026-03-12)
 
 ### Bug Fixes
