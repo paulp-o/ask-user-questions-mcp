@@ -1,3 +1,9 @@
+## [3.2.7](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.6...v3.2.7) (2026-03-12)
+
+### Bug Fixes
+
+* Enter no longer deselects already-selected option, Ctrl+S always visible ([1a4c5b1](https://github.com/paulp-o/ask-user-questions-mcp/commit/1a4c5b12dfa3957597d30b14fc900d23ca49a8ec))
+
 ## [3.2.6](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.5...v3.2.6) (2026-03-12)
 
 ### Bug Fixes
