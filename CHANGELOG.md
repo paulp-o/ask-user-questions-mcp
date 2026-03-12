@@ -1,3 +1,9 @@
+## [3.2.4](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.3...v3.2.4) (2026-03-12)
+
+### Bug Fixes
+
+* move question type indicator next to timer with space padding ([a66ad31](https://github.com/paulp-o/ask-user-questions-mcp/commit/a66ad317a6afcf14303ccc3e484a0ae0c093ac07))
+
 ## [3.2.3](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.2...v3.2.3) (2026-03-11)
 
 ### Bug Fixes
