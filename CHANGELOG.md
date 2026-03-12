@@ -1,3 +1,9 @@
+## [3.2.8](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.7...v3.2.8) (2026-03-12)
+
+### Bug Fixes
+
+* restore native input for Korean IME and clipboard support, auto-clear elaborate mark ([495783c](https://github.com/paulp-o/ask-user-questions-mcp/commit/495783c2e36c1b8d25651ed4fa702667a54d1d28))
+
 ## [3.2.7](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.6...v3.2.7) (2026-03-12)
 
 ### Bug Fixes
