@@ -108,15 +108,15 @@ export const QuestionDisplay = ({
 
       {/* Question prompt and type indicator */}
       <box style={{ flexDirection: "column" }}>
-        <box style={{ flexDirection: "row" }}>
-          <MarkdownPrompt text={currentQuestion.prompt} />
-          <text style={{ fg: theme.components.questionDisplay.typeIndicator }}>
-            {` [${multiSelect ? t("question.multipleChoice") : t("question.singleChoice")}]`}
-          </text>
-        </box>
         <box>
+          <MarkdownPrompt text={currentQuestion.prompt} />
+        </box>
+        <box style={{ flexDirection: "row" }}>
           <text fg={theme.components.questionDisplay.elapsed}>
             {elapsedLabel}
+          </text>
+          <text style={{ fg: theme.components.questionDisplay.typeIndicator }}>
+            {` [${multiSelect ? t("question.multipleChoice") : t("question.singleChoice")}]`}
           </text>
         </box>
       </box>
