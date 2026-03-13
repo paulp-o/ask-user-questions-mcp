@@ -426,6 +426,12 @@ function AppInner({ config }: { config: AUQConfig }) {
       return;
     }
 
+    // Ctrl+T: cycle theme
+    if (key.ctrl && (key.name === "t" || key.sequence === "\x14")) {
+      cycleTheme();
+      return;
+    }
+
     if (!key.ctrl && !key.meta) {
       const seq = key.sequence || key.name || "";
 
@@ -450,12 +456,6 @@ function AppInner({ config }: { config: AUQConfig }) {
       // u: activate update overlay
       if (seq === KEYS.UPDATE && updateInfo && !showUpdateOverlay) {
         setShowUpdateOverlay(true);
-        return;
-      }
-
-      // t: cycle theme
-      if (seq === "t") {
-        cycleTheme();
         return;
       }
     }
