@@ -1,3 +1,9 @@
+## [3.2.10](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.9...v3.2.10) (2026-03-13)
+
+### Bug Fixes
+
+* add Ctrl+J as universal newline fallback for all terminals ([4358b48](https://github.com/paulp-o/ask-user-questions-mcp/commit/4358b48ebc0426ef93487a30d30863a531368167))
+
 ## [3.2.9](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.8...v3.2.9) (2026-03-13)
 
 ### Bug Fixes
