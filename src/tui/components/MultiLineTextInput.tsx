@@ -73,10 +73,22 @@ export const MultiLineTextInput: React.FC<MultiLineTextInputProps> = ({
         return;
       }
 
+      // Ctrl+J: universal newline fallback (0x0A, distinct from Enter which sends \r)
+      // In most terminals, Ctrl+J sends 0x0A (\n) directly without key.return set
+      if (input === "\n" && !key.return && !key.shift) {
+        const chars = [...currentValue];
+        const before = chars.slice(0, currentCursor).join("");
+        const after = chars.slice(currentCursor).join("");
+        const newValue = before + "\n" + after;
+        onChange(newValue);
+        setCursorPosition(currentCursor + 1);
+        return;
+      }
+
       // Enter: Submit/advance; Shift+Enter inserts newline
       if (input === "\r" || input === "\n" || key.return) {
         if (key.shift) {
-          // Shift+Enter: Insert newline at cursor position
+          // Shift+Enter: Insert newline at cursor position (Kitty-protocol terminals)
           const chars = [...currentValue];
           const before = chars.slice(0, currentCursor).join("");
           const after = chars.slice(currentCursor).join("");

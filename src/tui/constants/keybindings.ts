@@ -43,7 +43,7 @@ export const KEY_LABELS = {
   SELECT_NEXT: "Enter",
   NEXT: "Enter",
   CURSOR: "←→",
-  NEWLINE: "Shift+Enter",
+  NEWLINE: "S+Enter/^J",
   ADVANCE_INPUT: "Enter",
   REJECT: "Esc",
   BACK: "n",

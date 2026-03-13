@@ -168,12 +168,16 @@ export const OptionsList = ({
       } else if (key.name === "return") {
         key.preventDefault(); // prevent <input> onChange from overwriting state
         if (key.shift) {
-          // Shift+Enter: insert newline
+          // Shift+Enter: insert newline (Kitty-protocol terminals)
           onCustomChange?.(customValue + "\n");
         } else {
           // Enter: advance to next question
           onAdvance?.();
         }
+      } else if (key.ctrl && key.name === "j") {
+        // Ctrl+J: universal newline fallback (0x0A, works in ALL terminals)
+        key.preventDefault();
+        onCustomChange?.(customValue + "\n");
       }
       return;
     }
@@ -188,7 +192,7 @@ export const OptionsList = ({
       } else if (key.name === "return") {
         key.preventDefault(); // prevent <input> onChange from overwriting state
         if (key.shift) {
-          // Shift+Enter: insert newline
+          // Shift+Enter: insert newline (Kitty-protocol terminals)
           onElaborateTextChange?.(elaborateText + "\n");
         } else {
           // Enter: advance to next question
@@ -197,6 +201,10 @@ export const OptionsList = ({
           }
           onAdvance?.();
         }
+      } else if (key.ctrl && key.name === "j") {
+        // Ctrl+J: universal newline fallback (0x0A, works in ALL terminals)
+        key.preventDefault();
+        onElaborateTextChange?.(elaborateText + "\n");
       }
       return;
     }
