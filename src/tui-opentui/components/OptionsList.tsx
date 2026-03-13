@@ -166,6 +166,7 @@ export const OptionsList = ({
       } else if (key.name === "tab" && !key.shift) {
         onAdvance?.();
       } else if (key.name === "return") {
+        key.preventDefault(); // prevent <input> onChange from overwriting state
         if (key.shift) {
           // Shift+Enter: insert newline
           onCustomChange?.(customValue + "\n");
@@ -185,6 +186,7 @@ export const OptionsList = ({
       } else if (key.name === "tab" && !key.shift) {
         onAdvance?.();
       } else if (key.name === "return") {
+        key.preventDefault(); // prevent <input> onChange from overwriting state
         if (key.shift) {
           // Shift+Enter: insert newline
           onElaborateTextChange?.(elaborateText + "\n");
