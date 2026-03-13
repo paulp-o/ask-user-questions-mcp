@@ -1,3 +1,9 @@
+## [3.2.11](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.10...v3.2.11) (2026-03-13)
+
+### Bug Fixes
+
+* theme toggle requires Ctrl+T, no longer triggers on plain t ([6a654b7](https://github.com/paulp-o/ask-user-questions-mcp/commit/6a654b7cfea96e49077faeb38469d96caa7bbd58))
+
 ## [3.2.10](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.9...v3.2.10) (2026-03-13)
 
 ### Bug Fixes
