@@ -1,3 +1,9 @@
+## [3.2.9](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.8...v3.2.9) (2026-03-13)
+
+### Bug Fixes
+
+* Shift+Enter newline via key.preventDefault() to stop input overwrite ([e39229f](https://github.com/paulp-o/ask-user-questions-mcp/commit/e39229f7a67cd3743a3b1ec292e353b7b60cff50))
+
 ## [3.2.8](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.7...v3.2.8) (2026-03-12)
 
 ### Bug Fixes
