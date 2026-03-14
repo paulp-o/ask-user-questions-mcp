@@ -210,7 +210,7 @@ const App: React.FC<AppProps> = ({ config }) => {
         watcherInstance.stop();
       }
       if (notificationBatcherRef.current) {
-        notificationBatcherRef.current.cancel();
+        notificationBatcherRef.current.flush();
       }
       // Clear progress bar on unmount
       clearProgress(notificationConfig);

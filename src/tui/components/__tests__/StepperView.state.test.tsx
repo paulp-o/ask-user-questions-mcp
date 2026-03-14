@@ -135,4 +135,115 @@ describe("StepperView SessionUIState boundary", () => {
       showAbandonedConfirm: false,
     });
   });
+  it("should NOT reset answers when initialState changes for the same sessionId", async () => {
+    const onStateSnapshot = vi.fn();
+    const initialState: SessionUIState = {
+      currentQuestionIndex: 0,
+      answers: new Map([[0, { selectedOption: "TypeScript" }]]),
+      elaborateMarks: new Map(),
+      focusContext: "option",
+      focusedOptionIndex: 0,
+      showReview: false,
+    };
+
+    const refreshedInitialState: SessionUIState = {
+      currentQuestionIndex: 0,
+      answers: new Map([[0, { selectedOption: "Python" }]]),
+      elaborateMarks: new Map(),
+      focusContext: "option",
+      focusedOptionIndex: 0,
+      showReview: false,
+    };
+
+    const instance = renderStepper({ initialState, onStateSnapshot });
+
+    instance.stdin.write("\t");
+    await vi.waitFor(() => {
+      expect(onStateSnapshot).toHaveBeenCalled();
+    });
+
+    instance.rerender(
+      <ThemeContext.Provider value={mockThemeValue}>
+        <ConfigProvider>
+          <StepperView
+            sessionId={sessionRequest.sessionId}
+            sessionRequest={sessionRequest}
+            initialState={refreshedInitialState}
+            onStateSnapshot={onStateSnapshot}
+          />
+        </ConfigProvider>
+      </ThemeContext.Provider>,
+    );
+
+    instance.stdin.write("\t");
+    await vi.waitFor(() => {
+      expect(onStateSnapshot.mock.calls.length).toBeGreaterThanOrEqual(2);
+    });
+
+    const [, snapshotState] = onStateSnapshot.mock.lastCall as [string, SessionUIState];
+    expect(snapshotState.currentQuestionIndex).toBe(2);
+    expect(snapshotState.answers.get(0)?.selectedOption).toBe("TypeScript");
+    expect(snapshotState.answers.get(0)?.selectedOption).not.toBe("Python");
+  });
+
+  it("should reset answers when sessionId changes", async () => {
+    const onStateSnapshot = vi.fn();
+    const initialState: SessionUIState = {
+      currentQuestionIndex: 0,
+      answers: new Map([[0, { selectedOption: "TypeScript" }]]),
+      elaborateMarks: new Map(),
+      focusContext: "option",
+      focusedOptionIndex: 0,
+      showReview: false,
+    };
+
+    const newSessionInitialState: SessionUIState = {
+      currentQuestionIndex: 0,
+      answers: new Map([[0, { selectedOption: "Python" }]]),
+      elaborateMarks: new Map(),
+      focusContext: "option",
+      focusedOptionIndex: 0,
+      showReview: false,
+    };
+
+    const instance = renderStepper({
+      sessionId: "test-1",
+      initialState,
+      onStateSnapshot,
+    });
+
+    instance.stdin.write("\t");
+    await vi.waitFor(() => {
+      expect(onStateSnapshot).toHaveBeenCalled();
+    });
+
+    instance.rerender(
+      <ThemeContext.Provider value={mockThemeValue}>
+        <ConfigProvider>
+          <StepperView
+            sessionId="test-2"
+            sessionRequest={sessionRequest}
+            initialState={newSessionInitialState}
+            onStateSnapshot={onStateSnapshot}
+          />
+        </ConfigProvider>
+      </ThemeContext.Provider>,
+    );
+
+    instance.stdin.write("\t");
+    await vi.waitFor(() => {
+      expect(onStateSnapshot.mock.calls.length).toBeGreaterThanOrEqual(2);
+    });
+
+    const [snapshotSessionId, snapshotState] = onStateSnapshot.mock.lastCall as [
+      string,
+      SessionUIState,
+    ];
+
+    expect(snapshotSessionId).toBe("test-2");
+    expect(snapshotState.currentQuestionIndex).toBe(1);
+    expect(snapshotState.answers.get(0)?.selectedOption).toBe("Python");
+    expect(snapshotState.answers.get(0)?.selectedOption).not.toBe("TypeScript");
+  });
+
 });

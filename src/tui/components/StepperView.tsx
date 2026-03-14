@@ -221,6 +221,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   // Track mount status to avoid state updates after unmount
   const isMountedRef = useRef(true);
   const skipSnapshotRef = useRef(true);
+  const sessionIdRef = useRef<string | null>(null);
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -230,6 +231,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
   // Reset internal stepper state when the session changes (safety in case component isn't remounted)
   useEffect(() => {
+    // Only run full initialization when the session actually changes.
+    // When a snapshot is saved (cursor movement), initialState prop changes but
+    // sessionId stays the same — skip the reset to avoid resetting the timer.
+    if (sessionId === sessionIdRef.current) return;
+    sessionIdRef.current = sessionId;
+
     const maxQuestionIndex = Math.max(0, sessionRequest.questions.length - 1);
 
     if (initialState) {
