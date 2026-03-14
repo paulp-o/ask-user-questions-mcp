@@ -104,7 +104,7 @@ export const Footer = ({
 
       if (showMultiToggleHint) {
         bindings.push({
-          key: "M",
+          key: "Ctrl+M",
           action: isForceMultiActive ? "Disable Multi-select" : "Toggle Multi-select",
         });
       }

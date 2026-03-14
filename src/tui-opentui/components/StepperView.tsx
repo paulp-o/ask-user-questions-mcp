@@ -656,7 +656,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
 
     if (
       key.name?.toLowerCase() === "m" &&
-      !key.ctrl &&
+      key.ctrl &&
       !isInTextInput &&
       !currentQuestion.multiSelect
     ) {
