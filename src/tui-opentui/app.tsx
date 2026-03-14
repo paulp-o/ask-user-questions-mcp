@@ -49,6 +49,10 @@ import { SessionPicker as _SessionPicker } from "./components/SessionPicker.js";
 import { UpdateOverlay as _UpdateOverlay } from "./components/UpdateOverlay.js";
 import { Toast as _Toast } from "./components/Toast.js";
 import { ThemeIndicator as _ThemeIndicator } from "./components/ThemeIndicator.js";
+import {
+  createNotificationBatcher,
+  type NotificationBatcher,
+} from "../tui/notifications/index.js";
 
 // Cast to FC to avoid React class component type mismatch between @opentui/react
 // bundled React version and the project's @types/react (structural type incompatibility).
@@ -105,6 +109,18 @@ function AppInner({ config }: { config: AUQConfig }) {
   const [updateDismissed, setUpdateDismissed] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
 
+  // Notification configuration from config
+  const notificationConfig = useMemo(
+    () => config?.notifications ?? { enabled: true, sound: true },
+    [config?.notifications],
+  );
+
+  // Create notification batcher (memoized to persist across renders)
+  const notificationBatcherRef = useRef<NotificationBatcher | null>(null);
+  if (!notificationBatcherRef.current) {
+    notificationBatcherRef.current =
+      createNotificationBatcher(notificationConfig);
+  }
   const sessionDir = getSessionDirectory();
 
   // ── Show toast helper ────────────────────────────────────────
@@ -158,6 +174,10 @@ function AppInner({ config }: { config: AUQConfig }) {
         watcherInstance.startEnhancedWatching((event) => {
           setSessionQueue((prev) => {
             if (prev.some((s) => s.sessionId === event.sessionId)) return prev;
+            // Queue notification for new session (batched)
+            if (notificationBatcherRef.current) {
+              notificationBatcherRef.current.queue(event.sessionId);
+            }
             return [
               ...prev,
               {
@@ -178,6 +198,9 @@ function AppInner({ config }: { config: AUQConfig }) {
 
     return () => {
       if (watcherInstance) watcherInstance.stop();
+      if (notificationBatcherRef.current) {
+        notificationBatcherRef.current.flush();
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
