@@ -1,3 +1,9 @@
+## [3.3.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.3.0...v3.3.1) (2026-03-14)
+
+### Bug Fixes
+
+* add notification batcher to opentui renderer for new session alerts ([430c2d0](https://github.com/paulp-o/ask-user-questions-mcp/commit/430c2d06a7d3c0e9a89534c44e35e982357d534c))
+
 ## [3.3.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.11...v3.3.0) (2026-03-14)
 
 ### Features
