@@ -37,6 +37,8 @@ interface QuestionDisplayProps {
   elaborateText?: string;
   onElaborateTextChange?: (text: string) => void;
   onSelectIndex?: (index: number) => void;
+  showMultiToggleHint?: boolean;
+  isForceMultiActive?: boolean;
 }
 
 /**
@@ -70,6 +72,8 @@ export const QuestionDisplay = ({
   elaborateText = "",
   onElaborateTextChange,
   onSelectIndex,
+  showMultiToggleHint = false,
+  isForceMultiActive = false,
 }: QuestionDisplayProps): React.ReactNode => {
   const { theme } = useTheme();
 
@@ -155,6 +159,8 @@ export const QuestionDisplay = ({
           hasRecommendedOptions={hasRecommendedOptions}
           hasAnyRecommendedInSession={hasAnyRecommendedInSession}
           showSessionSwitching={showSessionSwitching}
+          showMultiToggleHint={showMultiToggleHint}
+          isForceMultiActive={isForceMultiActive}
         />
       </box>
     </box>

@@ -70,17 +70,24 @@ export const StepperView: React.FC<StepperViewProps> = ({
   const [elaborateMarks, setElaborateMarks] = useState<Map<number, string>>(
     new Map(),
   );
+  const [forceMultiByQuestion, setForceMultiByQuestion] = useState<Set<number>>(
+    new Set(),
+  );
 
   const safeIndex = Math.min(
     currentQuestionIndex,
     sessionRequest.questions.length - 1,
   );
   const currentQuestion = sessionRequest.questions[safeIndex];
+  const isQuestionMultiSelect = (questionIndex: number): boolean => {
+    const question = sessionRequest.questions[questionIndex];
+    return Boolean(question?.multiSelect || forceMultiByQuestion.has(questionIndex));
+  };
+  const currentQuestionMultiSelect = isQuestionMultiSelect(currentQuestionIndex);
   const sessionCreatedAt = useMemo(() => {
     const parsed = Date.parse(sessionRequest.timestamp);
     return Number.isNaN(parsed) ? Date.now() : parsed;
   }, [sessionRequest.timestamp]);
-
   const elapsedLabel = useMemo(() => {
     const hours = Math.floor(elapsedSeconds / 3600);
     const minutes = Math.floor((elapsedSeconds % 3600) / 60);
@@ -127,11 +134,13 @@ export const StepperView: React.FC<StepperViewProps> = ({
         newAnswers.set(currentQuestionIndex, {
           ...existingAnswer,
           selectedOption: undefined,
+          selectedOptions: undefined,
         });
       } else {
         newAnswers.set(currentQuestionIndex, {
           ...existingAnswer,
           selectedOption: label,
+          selectedOptions: undefined,
           customText: undefined,
         });
       }
@@ -163,6 +172,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
         : currentSelections.filter((l) => l !== label);
 
       newAnswers.set(currentQuestionIndex, {
+        ...existing,
+        selectedOption: undefined,
         selectedOptions: newSelections,
         customText: existing.customText,
       });
@@ -187,12 +198,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
     setAnswers((prev) => {
       const newAnswers = new Map(prev);
       const existing = newAnswers.get(currentQuestionIndex) || {};
-      const question = sessionRequest.questions[currentQuestionIndex];
+      const isMultiSelect = isQuestionMultiSelect(currentQuestionIndex);
       newAnswers.set(currentQuestionIndex, {
         ...existing,
         customText: text,
         // Single-choice: clear selectedOption when typing custom text
-        ...(text.trim().length > 0 && !question?.multiSelect ? { selectedOption: undefined } : {}),
+        ...(text.trim().length > 0 && !isMultiSelect ? { selectedOption: undefined } : {}),
       });
       return newAnswers;
     });
@@ -257,6 +268,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     }
 
     setSubmitting(false);
+    setForceMultiByQuestion(new Set());
     setShowRejectionConfirm(false);
     setElapsedSeconds(0);
     skipSnapshotRef.current = true;
@@ -341,8 +353,29 @@ export const StepperView: React.FC<StepperViewProps> = ({
         baseDir: getSessionDirectory(),
       });
 
-      // Add elaborate requests for marked questions
-      const allAnswers = [...userAnswers];
+      // Apply forced single/multi override before persisting answers
+      const normalizedAnswers = userAnswers.map((answer) => {
+        const isMultiSelect = isQuestionMultiSelect(answer.questionIndex);
+
+        if (isMultiSelect) {
+          const selectedOptions = answer.selectedOptions ??
+            (answer.selectedOption ? [answer.selectedOption] : undefined);
+          return {
+            ...answer,
+            selectedOption: undefined,
+            selectedOptions,
+          };
+        }
+
+        const selectedOption = answer.selectedOption ?? answer.selectedOptions?.[0];
+        return {
+          ...answer,
+          selectedOption,
+          selectedOptions: undefined,
+        };
+      });
+
+      const allAnswers = [...normalizedAnswers];
       elaborateMarks.forEach((customExplanation, questionIndex) => {
         const question = sessionRequest.questions[questionIndex];
         if (question) {
@@ -354,6 +387,8 @@ export const StepperView: React.FC<StepperViewProps> = ({
           );
           allAnswers.push({
             questionIndex,
+            selectedOption: undefined,
+            selectedOptions: undefined,
             customText: elaborateRequest,
             timestamp: new Date().toISOString(),
           });
@@ -423,7 +458,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     });
 
     // In single-select mode, clear selected option when marking elaborate
-    if (isMarking && !currentQuestion.multiSelect) {
+    if (isMarking && !currentQuestionMultiSelect) {
       setAnswers((prev) => {
         const existing = prev.get(currentQuestionIndex);
         if (existing?.selectedOption || existing?.customText) {
@@ -459,6 +494,51 @@ export const StepperView: React.FC<StepperViewProps> = ({
         return newMarks;
       });
     }
+  };
+
+  const handleToggleForceMulti = () => {
+    if (currentQuestion.multiSelect) return;
+
+    const wasForced = forceMultiByQuestion.has(currentQuestionIndex);
+
+    setForceMultiByQuestion((prev) => {
+      const next = new Set(prev);
+      if (next.has(currentQuestionIndex)) {
+        next.delete(currentQuestionIndex);
+      } else {
+        next.add(currentQuestionIndex);
+      }
+      return next;
+    });
+
+    setAnswers((prev) => {
+      const existing = prev.get(currentQuestionIndex);
+      if (!existing) return prev;
+
+      const nextAnswers = new Map(prev);
+
+      if (wasForced) {
+        const firstSelected = existing.selectedOptions?.[0] ?? existing.selectedOption;
+        nextAnswers.set(currentQuestionIndex, {
+          ...existing,
+          selectedOption: firstSelected,
+          selectedOptions: undefined,
+        });
+      } else {
+        const promotedSelections = existing.selectedOptions?.length
+          ? existing.selectedOptions
+          : existing.selectedOption
+            ? [existing.selectedOption]
+            : [];
+        nextAnswers.set(currentQuestionIndex, {
+          ...existing,
+          selectedOption: undefined,
+          selectedOptions: promotedSelections,
+        });
+      }
+
+      return nextAnswers;
+    });
   };
 
   // Keyboard handling for abandoned confirmation dialog
@@ -527,7 +607,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
         );
 
         if (recommendedOptions.length > 0) {
-          if (question.multiSelect) {
+          if (isQuestionMultiSelect(i)) {
             newAnswers.set(i, {
               selectedOptions: recommendedOptions.map((opt) => opt.label),
             });
@@ -557,11 +637,12 @@ export const StepperView: React.FC<StepperViewProps> = ({
       );
 
       if (recommendedOptions.length > 0) {
-        if (question.multiSelect) {
+        if (currentQuestionMultiSelect) {
           setAnswers((prev) => {
             const newAnswers = new Map(prev);
             newAnswers.set(currentQuestionIndex, {
               ...newAnswers.get(currentQuestionIndex),
+              selectedOption: undefined,
               selectedOptions: recommendedOptions.map((opt) => opt.label),
             });
             return newAnswers;
@@ -570,6 +651,16 @@ export const StepperView: React.FC<StepperViewProps> = ({
           handleSelectOption(recommendedOptions[0].label);
         }
       }
+      return;
+    }
+
+    if (
+      key.name?.toLowerCase() === "m" &&
+      !key.ctrl &&
+      !isInTextInput &&
+      !currentQuestion.multiSelect
+    ) {
+      handleToggleForceMulti();
       return;
     }
 
@@ -691,9 +782,11 @@ export const StepperView: React.FC<StepperViewProps> = ({
         onAdvanceToNext={handleAdvanceToNext}
         onChangeCustomAnswer={handleChangeCustomAnswer}
         onSelectOption={handleSelectOption}
-        onToggleOption={handleToggleOption}
-        multiSelect={currentQuestion.multiSelect}
         questions={sessionRequest.questions}
+        onToggleOption={handleToggleOption}
+        multiSelect={currentQuestionMultiSelect}
+        showMultiToggleHint={!currentQuestion.multiSelect}
+        isForceMultiActive={forceMultiByQuestion.has(currentQuestionIndex)}
         selectedOption={currentAnswer?.selectedOption}
         answers={answers}
         focusContext={focusContext}

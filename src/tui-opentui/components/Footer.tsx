@@ -20,6 +20,8 @@ interface FooterProps {
   isSubmitting?: boolean;
   /** True when an update is available */
   hasUpdate?: boolean;
+  showMultiToggleHint?: boolean;
+  isForceMultiActive?: boolean;
 }
 
 type Keybinding = { key: string; action: string };
@@ -38,6 +40,8 @@ export const Footer = ({
   hasAnyRecommendedInSession = false,
   isSubmitting = false,
   hasUpdate = false,
+  showMultiToggleHint = false,
+  isForceMultiActive = false,
 }: FooterProps): React.ReactNode => {
   const { theme } = useTheme();
   const [spinnerFrame, setSpinnerFrame] = useState(0);
@@ -96,6 +100,13 @@ export const Footer = ({
       } else {
         bindings.push({ key: KEY_LABELS.SELECT, action: t("footer.select") });
         bindings.push({ key: KEY_LABELS.SELECT_NEXT, action: t("footer.selectNext") });
+      }
+
+      if (showMultiToggleHint) {
+        bindings.push({
+          key: "M",
+          action: isForceMultiActive ? "Disable Multi-select" : "Toggle Multi-select",
+        });
       }
 
       if (hasRecommendedOptions) {
