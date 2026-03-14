@@ -164,6 +164,7 @@ export const OptionsList = ({
       if (key.name === "escape") {
         setFocusedIndex(Math.max(0, options.length - 1));
       } else if (key.name === "tab" && !key.shift) {
+        onCustomChange?.(customValue);
         onAdvance?.();
       } else if (key.name === "return") {
         key.preventDefault(); // prevent <input> onChange from overwriting state
@@ -172,6 +173,7 @@ export const OptionsList = ({
           onCustomChange?.(customValue + "\n");
         } else {
           // Enter: advance to next question
+          onCustomChange?.(customValue);
           onAdvance?.();
         }
       } else if (key.ctrl && key.name === "j") {
@@ -188,6 +190,10 @@ export const OptionsList = ({
       if (key.name === "escape") {
         setFocusedIndex(customInputIndex);
       } else if (key.name === "tab" && !key.shift) {
+        onElaborateTextChange?.(elaborateText);
+        if (!elaborateText.trim()) {
+          onElaborateSelect?.();
+        }
         onAdvance?.();
       } else if (key.name === "return") {
         key.preventDefault(); // prevent <input> onChange from overwriting state
@@ -196,6 +202,7 @@ export const OptionsList = ({
           onElaborateTextChange?.(elaborateText + "\n");
         } else {
           // Enter: advance to next question
+          onElaborateTextChange?.(elaborateText);
           if (!elaborateText.trim()) {
             onElaborateSelect?.();
           }

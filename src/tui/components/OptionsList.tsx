@@ -401,7 +401,10 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 <MultiLineTextInput
                   isFocused={true}
                   onChange={onCustomChange}
-                  onSubmit={onAdvance}
+                  onSubmit={() => {
+                    onCustomChange?.(customValue);
+                    onAdvance?.();
+                  }}
                   placeholder={t("input.placeholder")}
                   value={customValue}
                 />
@@ -473,6 +476,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                   isFocused={true}
                   onChange={onElaborateTextChange}
                   onSubmit={() => {
+                    onElaborateTextChange?.(elaborateText);
                     // Enter/Tab submits and advance
                     // Only call onElaborateSelect if no text (to toggle mark on)
                     // If text exists, mark is already set via onElaborateTextChange

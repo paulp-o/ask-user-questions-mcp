@@ -246,4 +246,29 @@ describe("StepperView SessionUIState boundary", () => {
     expect(snapshotState.answers.get(0)?.selectedOption).not.toBe("TypeScript");
   });
 
+  it("custom text is preserved in answers when advancing via Tab", async () => {
+    const onStateSnapshot = vi.fn();
+    const initialState: SessionUIState = {
+      currentQuestionIndex: 0,
+      answers: new Map([[0, { customText: "my custom answer" }]]),
+      elaborateMarks: new Map(),
+      focusContext: "option",
+      focusedOptionIndex: 0,
+      showReview: false,
+    };
+
+    const instance = renderStepper({ onStateSnapshot, initialState });
+
+    instance.stdin.write("\t");
+
+    await vi.waitFor(() => {
+      expect(onStateSnapshot).toHaveBeenCalled();
+      const lastCall = onStateSnapshot.mock.calls[onStateSnapshot.mock.calls.length - 1];
+      const [, snapshotState] = lastCall as [string, SessionUIState];
+
+      expect(snapshotState.answers.get(0)?.customText).toBe("my custom answer");
+      expect(snapshotState.currentQuestionIndex).toBe(1);
+    });
+  });
+
 });
