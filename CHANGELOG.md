@@ -1,3 +1,9 @@
+## [3.4.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.3.2...v3.4.0) (2026-03-14)
+
+### Features
+
+* change multi-select toggle keybinding from 'm' to Ctrl+M ([89bab14](https://github.com/paulp-o/ask-user-questions-mcp/commit/89bab146b11dd994b7146265f6469352cda8d2f1))
+
 ## [3.3.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.3.1...v3.3.2) (2026-03-14)
 
 ### Bug Fixes
