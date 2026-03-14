@@ -1,3 +1,13 @@
+## [3.3.0](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.11...v3.3.0) (2026-03-14)
+
+### Features
+
+* add M shortcut to toggle single-choice questions to multi-select mode ([b4199dd](https://github.com/paulp-o/ask-user-questions-mcp/commit/b4199dd3fc6f45550b284b3364abd92b6405d571))
+
+### Bug Fixes
+
+* flush pending notifications on unmount and prevent answer shifting between questions ([3210ea6](https://github.com/paulp-o/ask-user-questions-mcp/commit/3210ea6dfa555066135717684e16eb8dfc18b340))
+
 ## [3.2.11](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.2.10...v3.2.11) (2026-03-13)
 
 ### Bug Fixes
