@@ -1,3 +1,9 @@
+## [3.3.2](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.3.1...v3.3.2) (2026-03-14)
+
+### Bug Fixes
+
+* flush custom/elaborate text before advancing to next question ([89784c9](https://github.com/paulp-o/ask-user-questions-mcp/commit/89784c9c5d36ed5aeb717320333550d5c0314229))
+
 ## [3.3.1](https://github.com/paulp-o/ask-user-questions-mcp/compare/v3.3.0...v3.3.1) (2026-03-14)
 
 ### Bug Fixes
