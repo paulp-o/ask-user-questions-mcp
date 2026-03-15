@@ -13,10 +13,14 @@
     "LICENSE"
   ],
   "workspaces": [
-    "packages/opencode-plugin"
+    "packages/opencode-plugin",
+    "packages/shared",
+    "packages/web-adapter"
   ],
   "scripts": {
-    "build": "bun run sync-plugin-schemas && bun run generate:skill && tsc && tsc -p tsconfig.opentui.json",
+    "build": "bun run build:shared && bun run build:web-adapter && bun run sync-plugin-schemas && bun run generate:skill && tsc && tsc -p tsconfig.opentui.json",
+    "build:shared": "cd packages/shared && tsc -p tsconfig.json",
+    "build:web-adapter": "cd packages/web-adapter && tsc -p tsconfig.json",
     "prepare": "bun run build",
     "postinstall": "node scripts/postinstall.cjs",
     "release": "semantic-release",
@@ -28,7 +32,7 @@
     "sync-plugin-schemas": "bun run scripts/sync-plugin-schemas.mjs && bun run generate:skill",
     "generate:skill": "bun run scripts/generate-skill.ts",
     "validate:skill": "bunx skills-ref validate skills/ask-user-questions",
-    "test": "vitest run",
+    "test": "vitest run src packages/shared/src --exclude '**/node_modules/**'",
     "format": "prettier --write . && eslint --fix .",
     "build:opentui": "tsc -p tsconfig.opentui.json",
     "test:opentui": "bun test src/tui-opentui",
@@ -56,6 +60,7 @@
     "@inkjs/ui": "^2.0.0",
     "@opentui/core": "0.1.87",
     "@opentui/react": "0.1.87",
+    "@paulp-o/auq-shared": "workspace:*",
     "@modelcontextprotocol/sdk": "1.17.2",
     "@types/uuid": "^10.0.0",
     "chalk": "^5.6.2",

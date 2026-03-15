@@ -9,6 +9,7 @@
         "@modelcontextprotocol/sdk": "1.17.2",
         "@opentui/core": "0.1.87",
         "@opentui/react": "0.1.87",
+        "@paulp-o/auq-shared": "workspace:*",
         "@types/uuid": "^10.0.0",
         "chalk": "^5.6.2",
         "cli-highlight": "^2.1.11",
@@ -55,6 +56,26 @@
       },
       "peerDependencies": {
         "@opencode-ai/plugin": ">=1.0.0",
+      },
+    },
+    "packages/shared": {
+      "name": "@paulp-o/auq-shared",
+      "version": "1.0.0",
+      "dependencies": {
+        "zod": "^4.1.13",
+      },
+      "devDependencies": {
+        "@tsconfig/node22": "^22.0.1",
+      },
+    },
+    "packages/web-adapter": {
+      "name": "@paulp-o/auq-web-adapter",
+      "version": "1.0.0",
+      "dependencies": {
+        "@paulp-o/auq-shared": "workspace:*",
+      },
+      "devDependencies": {
+        "@tsconfig/node22": "^22.0.2",
       },
     },
   },
@@ -254,6 +275,10 @@
     "@opentui/core-win32-x64": ["@opentui/core-win32-x64@0.1.87", "", { "os": "win32", "cpu": "x64" }, "sha512-N2GErAAP8iODf2RPp86pilPaVKiD6G4pkpZL5nLGbKsl0bndrVTpSqZcn8+/nQwFZDPD/AsiRTYNOfWOblhzOw=="],
 
     "@opentui/react": ["@opentui/react@0.1.87", "", { "dependencies": { "@opentui/core": "0.1.87", "react-reconciler": "^0.32.0" }, "peerDependencies": { "react": ">=19.0.0", "react-devtools-core": "^7.0.1", "ws": "^8.18.0" } }, "sha512-FTYYs/L2AbcJbCvezlK9Klsw45AbGkwpyfjNsHP0N3BIxc3QiI5pYFpre6ZSq0feJNODmg+s9UapTCv4LtfROg=="],
+
+    "@paulp-o/auq-shared": ["@paulp-o/auq-shared@workspace:packages/shared"],
+
+    "@paulp-o/auq-web-adapter": ["@paulp-o/auq-web-adapter@workspace:packages/web-adapter"],
 
     "@paulp-o/opencode-auq": ["@paulp-o/opencode-auq@workspace:packages/opencode-plugin"],
 

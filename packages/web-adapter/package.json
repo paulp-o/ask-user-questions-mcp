@@ -1,0 +1,20 @@
+{
+  "name": "@paulp-o/auq-web-adapter",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@paulp-o/auq-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.2"
+  }
+}
