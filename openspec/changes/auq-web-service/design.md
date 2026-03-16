@@ -6,13 +6,26 @@ The AUQ Web Service implements a two-repository architecture to separate concern
 
 ### Repository Structure
 
-- **ask-user-questions-mcp** (this repo): Core MCP server, shared types, web adapter client
-- **auq-web-platform** (separate repo): SvelteKit application with API routes, frontend, and database
+#### Main Repository (ask-user-questions-mcp)
+
+- Core MCP server, shared types, web adapter client
+- Contains all open-source code for local and web modes
+- Includes `packages/shared` (`@paulp-o/auq-shared`) published to npm
+
+#### Web Platform Integration
+
+- **auq-web-platform** repository: Private GitHub repo containing SvelteKit application (API routes, frontend, PWA, database)
+- Integrated as a **git submodule** at `platforms/web/` in this main repository
+- The `platforms/web/` directory is added to `.gitignore` to keep the main repo clean for open source distribution
+- Private web platform uses `@paulp-o/auq-shared` as a regular npm dependency
 
 ### Shared Components
 
 - `@paulp-o/auq-shared`: NPM package containing schemas, session types, and response formats
+  - Published to npm registry for cross-repository type sharing
+  - Allows private web platform to access shared types without duplicating code
 - Type-safe interfaces ensure consistency between MCP server and web platform
+- This approach keeps the main repository fully open source while the hosted web platform remains private
 
 ## This Repository Changes
 

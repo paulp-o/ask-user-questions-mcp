@@ -141,3 +141,62 @@ Phase 5 + Phase 8 + Phase 10 → Phase 11 (polish & E2E)
 - Detailed session plans (001_xxx.md, 002_xxx.md...) will be created when implementation begins.
 - The separate repo (auq-web-platform) needs to be created before Phase 6 begins.
 - Total estimated time: ~98 minutes across 11 phases (Phase 4 adds ~8 minutes).
+
+---
+
+## Next Session Notes
+
+### Completion Status
+
+- **Phases 1-5 COMPLETED** ✅
+  - Phase 1: Shared Package Extraction (`@paulp-o/auq-shared`)
+  - Phase 2: Web Adapter Core (WebSessionManager, HTTP client)
+  - Phase 3: Web Adapter Resilience & Tests
+  - Phase 4: Configuration System (`.auqrc`, CLI, env vars)
+  - Phase 5: MCP Server Web Mode (auto-detection, fallback)
+  - All implemented in THIS repository
+- **Commit**: `589bc3c` on branch `webplatform`
+
+### Next Steps (For Next Session)
+
+1. **Phase 6 Preparation**: Create `auq-web-platform` as private GitHub repo
+2. **Add Git Submodule**: Add `auq-web-platform` as git submodule at `platforms/web/`
+3. **Update .gitignore**: Add `platforms/web/` to main repo's `.gitignore` to keep open source distribution clean
+4. **Phase 6+ Implementation**: Begin SvelteKit setup, database, API endpoints in the submodule
+5. **Phase 9 (Parallel)**: Can begin MCP Elicitation Adapter in THIS repo's `packages/shared` anytime after Phase 1
+
+### Key Architectural Decisions
+
+#### Web Platform Repository Structure
+
+- **Main repo** (`ask-user-questions-mcp`): Fully open source
+  - Contains all core MCP server, shared package, web adapter
+  - `@paulp-o/auq-shared` published to npm
+  - `packages/web-adapter` for HTTP client implementation
+
+- **Web platform repo** (`auq-web-platform`): Private GitHub repo
+  - Integrated via git submodule at `platforms/web/`
+  - `platforms/web/` in `.gitignore` (stays clean for open source)
+  - Installs `@paulp-o/auq-shared` as npm dependency
+  - Contains SvelteKit app, PWA, database, push notifications
+
+#### Configuration & Activation
+
+- **Web mode activation**: `api_key` presence triggers web mode (env var, `.auqrc`, or home dir config)
+- **Default hosted URL**: When `api_key` is provided without `api_url`, auto-use `https://auq.paulp.dev`
+- **Primary onboarding**: `auq config set web.api_key <key>` for users of hosted version
+- **Self-hosting**: Users set both `api_key` + custom `api_url` for self-hosted instances
+- **Fallback behavior**: Web API failures automatically fall back to local TUI mode
+
+#### Type Sharing & NPM Publishing
+
+- **Cross-repo sharing**: `@paulp-o/auq-shared` published to npm enables type-safe integration
+- **No code duplication**: Web platform imports schemas, session types from npm package
+- **CI/CD**: Semantic-release handles versioning and npm publishing
+
+### Known Issues (Pre-existing)
+
+- **Flaky tests**: `file-watcher.test.ts` and `session-watcher.test.ts` have pre-existing timing-related flakiness
+  - Root cause: File system timing in test environment
+  - Not caused by web service implementation
+  - Tests pass with retries; can be addressed in later hardening phase
