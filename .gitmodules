@@ -1,0 +1,3 @@
+[submodule "platforms/web"]
+	path = platforms/web
+	url = https://github.com/paulp-o/auq-web-platform.git

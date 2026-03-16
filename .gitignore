@@ -52,3 +52,5 @@ opensrc/
 .mrp/
 .auqrc.json
 .opencode/skills/
+
+platforms/web/

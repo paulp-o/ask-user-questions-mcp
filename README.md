@@ -49,6 +49,65 @@ On October 18th, Claude Code 2.0.21 introduced an internal `AskUserQuestion` too
 
 ---
 
+## 🏗️ Architecture
+
+AUQ follows a **three-layer architecture** that separates CLI, MCP server, and web platform concerns:
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────────┐
+│   AI Agent       │────▶│  MCP Server       │────▶│  Web Platform (PWA) │
+│ (Claude, etc.)   │     │  (this repo)      │     │  (platforms/web/)   │
+└─────────────────┘     └──────────────────┘     └─────────────────────┘
+                         │                         │
+                         ├─ packages/shared/       ├─ SvelteKit API
+                         ├─ packages/web-adapter/  ├─ SQLite + Drizzle
+                         └─ src/server.ts          └─ PWA + Push Notifs
+```
+
+### Packages & Components
+
+**`@paulp-o/auq-shared`** (`packages/shared/`)
+
+- Zod schemas for questions, sessions, and responses
+- Session types and interfaces (Question, SessionData, etc.)
+- `ResponseFormatter` class for formatting agent responses
+- MCP Elicitation adapter for bidirectional AUQ ↔ MCP format conversion
+
+**`@paulp-o/auq-web-adapter`** (`packages/web-adapter/`)
+
+- `AuqApiClient` — HTTP client with retry logic (exponential backoff, configurable timeout)
+- `WebSessionManager` — Session management via web API with polling
+- Custom error classes: `ApiUnavailableError`, `NetworkError`, `WebAdapterError`
+- Config validation and health checking
+
+**`platforms/web/`** (separate private GitHub repo as git submodule)
+
+- **Backend**: SvelteKit API routes + Drizzle ORM + SQLite (or PostgreSQL in production)
+- **Frontend**: Svelte PWA components, stores, and routing
+- **Auth**: API key management, workspace & user separation
+- **Push Notifications**: Server-sent events (SSE) for real-time updates
+- **Deployment**: Docker Compose for self-hosting, Vercel for managed hosting
+
+### Data Flow
+
+1. **AI Agent** → Calls `ask_user_questions` MCP tool with questions
+2. **MCP Server** (`src/server.ts`) → Routes to `WebSessionManager` (if API key configured) or local `SessionManager`
+3. **Web Platform** → Stores questions, sends push notifications, waits for answers via web UI
+4. **User** → Answers on web/mobile PWA at their convenience
+5. **Web Platform** → Returns answers to MCP server via polling/SSE
+6. **MCP Server** → Formats response and returns to AI agent
+
+### Configuration Priority
+
+Configuration is resolved in this order (highest to lowest):
+
+1. Environment variables (`AUQ_WEB_API_KEY`, `AUQ_WEB_API_URL`, etc.)
+2. Project `.auqrc.json` (in working directory)
+3. Global `~/.config/auq/.auqrc.json` (user home)
+4. Built-in defaults
+
+---
+
 # Setup Instructions
 
 ## 🚀 Install CLI Tool
@@ -64,16 +123,19 @@ bun add -g auq-mcp-server
 ```
 
 **npm**
+
 ```bash
 npm install -g auq-mcp-server
 ```
 
 **pnpm**
+
 ```bash
 pnpm add -g auq-mcp-server
 ```
 
 **yarn**
+
 ```bash
 yarn global add auq-mcp-server
 ```
@@ -226,7 +288,6 @@ Whenever you need clarification on what you are working on, never guess, and cal
 
 When the AI asks questions, you'll see them appear in the AUQ TUI. Answer them **at your convenience**.
 
-
 ### Web Mode
 
 > Use AUQ with the hosted web service (or your own API) for MCP, CLI, and agent-skill workflows.
@@ -256,17 +317,57 @@ You can also override by env var: `AUQ_WEB_API_URL=https://your-server.com`.
 If the web API is unreachable, AUQ automatically falls back to local TUI/session mode.
 
 Configuration priority (highest to lowest):
+
 1. Environment variables
 2. Project `.auqrc.json`
 3. Global `.auqrc.json`
+
+#### Self-Hosting
+
+To run your own AUQ web platform instance instead of using the hosted service:
+
+1. **Deploy the web platform** — See [platforms/web/README.md](platforms/web/README.md) for full setup instructions
+   - Requirements: Node.js 20+, PostgreSQL or SQLite, Bun (recommended) or npm
+   - Options: Docker Compose for local dev, Vercel for production, or any Node.js hosting
+
+2. **Point AUQ to your instance** — Set the API URL:
+
+   ```bash
+   auq config set web.api_url https://your-auq-instance.com
+   auq config set web.api_key <your-generated-api-key>
+   ```
+
+   Or via environment variables:
+
+   ```bash
+   export AUQ_WEB_API_URL=https://your-auq-instance.com
+   export AUQ_WEB_API_KEY=<your-generated-api-key>
+   ```
+
+3. **Docker quick start** (local development):
+
+   ```bash
+   cd platforms/web
+   docker-compose up -d
+   auq config set web.api_url http://localhost:5173
+   ```
+
+4. **Verify connectivity**:
+   ```bash
+   auq config get web
+   auq ask '{"questions": [{"title": "Test", "prompt": "Does web mode work?", "options": [{"label": "Yes"}, {"label": "No"}]}]}'
+   ```
+
+**API Documentation**: Each web platform instance serves OpenAPI specs at `/openapi.yaml` for integration details.
+
 ### Renderer Selection
 
 AUQ supports two terminal rendering engines:
 
-| Renderer              | Description                                         | Status              |
-| --------------------- | --------------------------------------------------- | ------------------- |
+| Renderer              | Description                                         | Status                |
+| --------------------- | --------------------------------------------------- | --------------------- |
 | **OpenTUI** (default) | Native Zig-based renderer with improved performance | Stable (requires Bun) |
-| **ink**               | React-based terminal renderer                       | Fallback (Node.js)  |
+| **ink**               | React-based terminal renderer                       | Fallback (Node.js)    |
 
 OpenTUI is the default renderer and requires **Bun** runtime. When Bun is unavailable, AUQ automatically falls back to the Ink renderer.
 
@@ -332,24 +433,23 @@ It is recommended to **disable** the built-in questioning tool in your harness (
 | Scroll            | Scroll through session picker or update overlay |
 | Click session dot | Switch to that session                          |
 
-
 <details>
 <summary><strong>⌨️ All Keyboard Shortcuts</strong></summary>
 
-| Key      | Action                                                             |
-| -------- | ------------------------------------------------------------------ |
-| `↑↓`     | Navigate options                                                   |
-| `←→/Tab` | Switch between questions                                           |
-| `Space`  | Select/toggle option without advancing                             |
-| `Enter`  | Select option and advance to next question                         |
-| `R`      | Select recommended option(s) for current question                  |
-| `Ctrl+R` | Quick submit — auto-fill recommended, go to review                 |
-| `Esc`    | Reject the whole question set and optionally explain why            |
-| `Ctrl+T` | Cycle through available color themes                               |
-| `Ctrl+S` | Open session picker                                                |
-| `1-9`    | Jump directly to session by number                                 |
-| `[/]`    | Navigate between sessions                                          |
-| `U`      | Open update overlay (when update available)                        |
+| Key      | Action                                                   |
+| -------- | -------------------------------------------------------- |
+| `↑↓`     | Navigate options                                         |
+| `←→/Tab` | Switch between questions                                 |
+| `Space`  | Select/toggle option without advancing                   |
+| `Enter`  | Select option and advance to next question               |
+| `R`      | Select recommended option(s) for current question        |
+| `Ctrl+R` | Quick submit — auto-fill recommended, go to review       |
+| `Esc`    | Reject the whole question set and optionally explain why |
+| `Ctrl+T` | Cycle through available color themes                     |
+| `Ctrl+S` | Open session picker                                      |
+| `1-9`    | Jump directly to session by number                       |
+| `[/]`    | Navigate between sessions                                |
+| `U`      | Open update overlay (when update available)              |
 
 </details>
 <details>
@@ -440,6 +540,7 @@ auq update -y     # skip confirmation
 #### Pagination
 
 List commands (`sessions list`, `history`, `fetch-answers`) support:
+
 - `--limit <N>` — Max items per page (default: 20)
 - `--page <N>` — Page number (default: 1)
 
@@ -448,15 +549,14 @@ List commands (`sessions list`, `history`, `fetch-answers`) support:
 <details>
 <summary><strong>🌍 Environment Variables</strong></summary>
 
-| Variable             | Description                                      |
-| -------------------- | ------------------------------------------------ |
-| `AUQ_RENDERER`       | Override renderer (`"ink"` or `"opentui"`)          |
-| `AUQ_SESSION_DIR`    | Custom session storage directory                 |
-| `XDG_CONFIG_HOME`    | Custom config directory (default: `~/.config`)   |
-| `NO_UPDATE_NOTIFIER` | Set to `"1"` to disable update checks             |
+| Variable             | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `AUQ_RENDERER`       | Override renderer (`"ink"` or `"opentui"`)     |
+| `AUQ_SESSION_DIR`    | Custom session storage directory               |
+| `XDG_CONFIG_HOME`    | Custom config directory (default: `~/.config`) |
+| `NO_UPDATE_NOTIFIER` | Set to `"1"` to disable update checks          |
 
 </details>
-
 
 ### Stale Session Detection
 
@@ -724,23 +824,23 @@ _Settings from local config override global config, which overrides defaults._
 <details>
 <summary><strong>Available Settings</strong></summary>
 
-| Setting                 | Type    | Default   | Range/Values                    | Description                                           |
-| ----------------------- | ------- | --------- | ------------------------------- | ----------------------------------------------------- |
+| Setting                 | Type    | Default   | Range/Values                    | Description                                               |
+| ----------------------- | ------- | --------- | ------------------------------- | --------------------------------------------------------- |
 | `renderer`              | string  | "opentui" | "ink", "opentui"                | Terminal rendering engine (OpenTUI default, ink fallback) |
-| `maxOptions`            | number  | 5         | 2-10                            | Maximum options per question                          |
-| `maxQuestions`          | number  | 5         | 1-10                            | Maximum questions per session                         |
-| `recommendedOptions`    | number  | 4         | 1-10                            | Suggested number of options (for AI guidance)         |
-| `recommendedQuestions`  | number  | 4         | 1-10                            | Suggested number of questions (for AI guidance)       |
-| `language`              | string  | "auto"    | "auto", "en", "ko"              | UI language (auto-detects from system if "auto")      |
-| `theme`                 | string  | "system"  | "system", "dark", "light", etc. | Color theme for TUI                                   |
-| `sessionTimeout`        | number  | 0         | 0+ (milliseconds)               | Session timeout (0 = no timeout)                      |
-| `retentionPeriod`       | number  | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days) |
-| `notifications.enabled` | boolean | true      | true/false                      | Enable desktop notifications for new questions        |
-| `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications                         |
-| `staleThreshold`        | number  | 7200000   | 0+ (milliseconds)               | Time before a session is considered stale (2 hours)   |
-| `notifyOnStale`         | boolean | true      | true/false                      | Show toast notification when sessions become stale    |
-| `staleAction`           | string  | "warn"    | "warn", "remove", "archive"     | Action for stale sessions                             |
-| `updateCheck`           | boolean | true      | true/false                      | Enable automatic update checks on startup             |
+| `maxOptions`            | number  | 5         | 2-10                            | Maximum options per question                              |
+| `maxQuestions`          | number  | 5         | 1-10                            | Maximum questions per session                             |
+| `recommendedOptions`    | number  | 4         | 1-10                            | Suggested number of options (for AI guidance)             |
+| `recommendedQuestions`  | number  | 4         | 1-10                            | Suggested number of questions (for AI guidance)           |
+| `language`              | string  | "auto"    | "auto", "en", "ko"              | UI language (auto-detects from system if "auto")          |
+| `theme`                 | string  | "system"  | "system", "dark", "light", etc. | Color theme for TUI                                       |
+| `sessionTimeout`        | number  | 0         | 0+ (milliseconds)               | Session timeout (0 = no timeout)                          |
+| `retentionPeriod`       | number  | 604800000 | 0+ (milliseconds)               | How long to keep completed sessions (default: 7 days)     |
+| `notifications.enabled` | boolean | true      | true/false                      | Enable desktop notifications for new questions            |
+| `notifications.sound`   | boolean | true      | true/false                      | Play sound with notifications                             |
+| `staleThreshold`        | number  | 7200000   | 0+ (milliseconds)               | Time before a session is considered stale (2 hours)       |
+| `notifyOnStale`         | boolean | true      | true/false                      | Show toast notification when sessions become stale        |
+| `staleAction`           | string  | "warn"    | "warn", "remove", "archive"     | Action for stale sessions                                 |
+| `updateCheck`           | boolean | true      | true/false                      | Enable automatic update checks on startup                 |
 
 </details>
 

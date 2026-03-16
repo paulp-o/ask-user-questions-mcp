@@ -21,6 +21,10 @@
     "./response/format": {
       "types": "./dist/response/format.d.ts",
       "import": "./dist/response/format.js"
+    },
+    "./adapters/mcp-elicitation": {
+      "types": "./dist/adapters/mcp-elicitation.d.ts",
+      "import": "./dist/adapters/mcp-elicitation.js"
     }
   },
   "files": [
