@@ -25,6 +25,9 @@ describe("ConfigLoader", () => {
     resetToDefaults();
     // Reset environment variables
     delete process.env.XDG_CONFIG_HOME;
+    delete process.env.AUQ_WEB_API_KEY;
+    delete process.env.AUQ_WEB_API_URL;
+    delete process.env.AUQ_WEB_MODE;
   });
 
   afterEach(() => {
@@ -263,6 +266,124 @@ describe("ConfigLoader", () => {
       expect(config.renderer).toBe("opentui");
       expect(config.theme).toBe("dark");
       expect(config.maxOptions).toBe(DEFAULT_CONFIG.maxOptions);
+    });
+  });
+
+  describe("web config options", () => {
+    it("should include web defaults when no config files exist", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+
+      const config = loadConfig();
+
+      expect(config.web.mode).toBe("local");
+      expect(config.web.api_key).toBeUndefined();
+      expect(config.web.api_url).toBeUndefined();
+    });
+
+    it("should load web.api_key from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ web: { api_key: "auq_sk_local_key" } }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.web.api_key).toBe("auq_sk_local_key");
+    });
+
+    it("should load web.api_url from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ web: { api_url: "https://self-hosted.example.com" } }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.web.api_url).toBe("https://self-hosted.example.com");
+    });
+
+    it("should fall back to default for invalid web.mode value", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ web: { mode: "invalid_mode" } }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.web.mode).toBe("local");
+    });
+
+    it("should default web.api_url to hosted URL when api_key is set", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ web: { api_key: "auq_sk_local_key" } }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.web.api_key).toBe("auq_sk_local_key");
+      expect(config.web.api_url).toBe("https://auq.paulp.dev");
+    });
+  });
+
+  describe("web config env var overrides", () => {
+    it("should let AUQ_WEB_API_KEY override .auqrc web.api_key", () => {
+      process.env.AUQ_WEB_API_KEY = "auq_sk_env_key";
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ web: { api_key: "auq_sk_file_key" } }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.web.api_key).toBe("auq_sk_env_key");
+    });
+
+    it("should let AUQ_WEB_API_URL override .auqrc web.api_url", () => {
+      process.env.AUQ_WEB_API_URL = "https://env-hosted.example.com";
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ web: { api_url: "https://file-hosted.example.com" } }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.web.api_url).toBe("https://env-hosted.example.com");
+    });
+
+    it("should let AUQ_WEB_MODE override .auqrc web.mode", () => {
+      process.env.AUQ_WEB_MODE = "web";
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ web: { mode: "local" } }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.web.mode).toBe("web");
+    });
+
+    it("should prioritize env vars over both global and local .auqrc", () => {
+      const cwd = process.cwd();
+      const localPath = `${cwd}/.auqrc.json`;
+      const globalPath = "/home/testuser/.config/auq/.auqrc.json";
+
+      process.env.AUQ_WEB_API_KEY = "auq_sk_env_priority";
+
+      vi.mocked(fs.existsSync).mockImplementation((path) => {
+        return String(path) === localPath || String(path) === globalPath;
+      });
+      vi.mocked(fs.readFileSync).mockImplementation((path) => {
+        if (String(path) === globalPath) {
+          return JSON.stringify({ web: { api_key: "auq_sk_global" } });
+        }
+
+        return JSON.stringify({ web: { api_key: "auq_sk_local" } });
+      });
+
+      const config = loadConfig();
+
+      expect(config.web.api_key).toBe("auq_sk_env_priority");
     });
   });
 });

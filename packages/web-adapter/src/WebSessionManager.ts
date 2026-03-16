@@ -2,29 +2,29 @@ import type { Question, SessionAnswer } from "@paulp-o/auq-shared";
 import { ResponseFormatter } from "@paulp-o/auq-shared";
 
 import { AuqApiClient, type GetSessionResponse } from "./client.js";
-
-export interface WebSessionManagerConfig {
-  apiUrl: string;
-  apiKey: string;
-  pollInterval?: number;
-  sessionTimeout?: number;
-  fetchFn?: typeof fetch;
-}
+import { validateWebAdapterConfig, type WebSessionManagerConfig } from "./config.js";
+import { ApiUnavailableError } from "./errors.js";
 
 export class WebSessionManager {
   private readonly client: AuqApiClient;
   private readonly pollInterval: number;
   private readonly sessionTimeout: number;
+  private readonly maxPollErrors: number;
   private readonly sessionStates = new Map<string, GetSessionResponse>();
 
   constructor(config: WebSessionManagerConfig) {
+    const validatedConfig = validateWebAdapterConfig(config);
+
     this.client = new AuqApiClient({
-      baseUrl: config.apiUrl,
-      apiKey: config.apiKey,
-      fetchFn: config.fetchFn,
+      baseUrl: validatedConfig.apiUrl,
+      apiKey: validatedConfig.apiKey,
+      maxRetries: validatedConfig.maxRetries,
+      retryBaseDelayMs: validatedConfig.retryBaseDelayMs,
+      fetchFn: validatedConfig.fetchFn,
     });
-    this.pollInterval = config.pollInterval ?? 3000;
-    this.sessionTimeout = config.sessionTimeout ?? 0;
+    this.pollInterval = validatedConfig.pollInterval;
+    this.sessionTimeout = validatedConfig.sessionTimeout;
+    this.maxPollErrors = validatedConfig.maxPollErrors;
   }
 
   async createSession(
@@ -43,15 +43,45 @@ export class WebSessionManager {
   ): Promise<string> {
     const startedAt = Date.now();
     const effectiveTimeout = timeoutMs ?? this.sessionTimeout;
+    let consecutiveErrors = 0;
 
     while (true) {
       if (signal?.aborted) {
         throw new Error("ABORTED");
       }
 
-      const session = await this.client.getSession(sessionId);
-      this.sessionStates.set(sessionId, session);
+      let session: GetSessionResponse;
 
+      try {
+        session = await this.client.getSession(sessionId);
+        consecutiveErrors = 0;
+      } catch (error) {
+        consecutiveErrors += 1;
+
+        if (consecutiveErrors >= this.maxPollErrors) {
+          if (error instanceof ApiUnavailableError) {
+            throw error;
+          }
+
+          if (error instanceof Error) {
+            throw new ApiUnavailableError(error.message, { cause: error });
+          }
+
+          throw new ApiUnavailableError("API unavailable");
+        }
+
+        if (
+          effectiveTimeout > 0 &&
+          Date.now() - startedAt > effectiveTimeout
+        ) {
+          throw new Error("Timeout waiting for user response");
+        }
+
+        await this.sleep(this.pollInterval, signal);
+        continue;
+      }
+
+      this.sessionStates.set(sessionId, session);
       if (expectedCallId && "callId" in session && session.callId !== expectedCallId) {
         await this.sleep(this.pollInterval, signal);
         continue;

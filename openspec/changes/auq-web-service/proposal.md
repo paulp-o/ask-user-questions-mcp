@@ -14,6 +14,9 @@ AI agents frequently require human input to proceed with tasks, but users are no
 - Implement simple API key authentication for agent-to-service communication
 - Enable real-time updates using Server-Sent Events (SSE) for browser interface
 - Provide polling fallback for push notifications when VAPID is not configured
+- Enable persistent configuration via `.auqrc` file (project-level or home directory)
+- Provide CLI command (`auq config`) for managing configuration settings
+- Support self-hosting with custom API URLs via configuration
 
 ## Non-Goals for MVP
 

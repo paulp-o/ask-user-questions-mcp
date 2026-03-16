@@ -30,26 +30,46 @@
 - [ ] Create unit tests for WebSessionManager with mocked HTTP responses
 - [ ] Add retry logic for transient network failures
 
-## Phase 3: MCP Server Web Mode (~1 session)
+## Phase 3: Configuration System (~1 session)
 
-- [ ] Update `src/server.ts` — add mode configuration option ('local' | 'web')
-- [ ] Add environment variable parsing for AUQ_WEB_API_URL and AUQ_WEB_API_KEY
-- [ ] Modify server initialization to conditionally use WebSessionManager vs SessionManager
+- [ ] Create `src/config/loader.ts` — implement config resolution logic (env vars → .auqrc → defaults)
+- [ ] Create `src/config/parser.ts` — JSON parser for .auqrc files with validation
+- [ ] Create `src/config/types.ts` — TypeScript interfaces for config (AuqConfig, ConfigSource)
+- [ ] Implement config loader with priority order: env vars > project .auqrc > home .auqrc > defaults
+- [ ] Add default hosted URL behavior: use `https://auq.paulp.dev` when api_key provided without api_url
+- [ ] Create CLI command `auq config set <key> <value>` — update project-level .auqrc
+- [ ] Create CLI command `auq config get <key>` — read single config value
+- [ ] Create CLI command `auq config list` — display all config (with masked sensitive values)
+- [ ] Create CLI command `auq config reset` — remove project-level .auqrc file
+- [ ] Add `--global` flag to config commands to modify `~/.auqrc` instead of `./.auqrc`
+- [ ] Implement config file validation with clear error messages
+- [ ] Add unit tests for config resolution order
+- [ ] Add integration tests for config CLI commands
+- [ ] Update TypeScript types in shared package to include ConfigSource type
+- [ ] Document .auqrc file format and resolution order in README
+- [ ] Add CLI help documentation for `auq config` command
+
+## Phase 4: MCP Server Web Mode (~1 session)
+
+- [ ] Update `src/server.ts` — load config and auto-detect mode: if `api_key` is present, mode='web', else mode='local'
+- [ ] Modify server initialization to conditionally use WebSessionManager vs SessionManager based on auto-detected mode
 - [ ] Add fallback logic to catch web adapter errors and retry with local mode
-- [ ] Update server configuration schema to include web mode settings
+- [ ] Update server configuration schema to include web mode settings from config loader
 - [ ] Add logging for mode switching and fallback events
-- [ ] Update server tests to cover web mode initialization
+- [ ] Update server tests to cover web mode initialization with config
 - [ ] Add health check endpoint to verify web API connectivity
-- [ ] Update README.md with web mode configuration instructions
-- [ ] Test end-to-end with mock web API server
+- [ ] Update CLI to use configuration system for web mode settings
+- [ ] Update Agent Skills integration to read from shared config
+- [ ] Ensure MCP server, CLI, and Agent Skills all use same config source
+- [ ] Test end-to-end with mock web API server and config files
 
-## Phase 4: Web Platform - API (~2 sessions, separate repo)
+## Phase 5: Web Platform - API (~2 sessions, separate repo)
 
 - [ ] Initialize SvelteKit project with TypeScript and required dependencies
 - [ ] Set up Drizzle ORM with SQLite database configuration
 - [ ] Create database schema files for workspaces, api_keys, questions, answers, push_subscriptions
 - [ ] Implement database migrations for initial schema
-- [ ] Create API key authentication middleware for /api/v1/* routes
+- [ ] Create API key authentication middleware for /api/v1/\* routes
 - [ ] Implement POST /api/v1/questions — validate API key, store questions, return requestId
 - [ ] Implement GET /api/v1/questions/:id — return status and answers if completed
 - [ ] Implement POST /api/v1/questions/:id/answer — validate session, store answers, update status
@@ -62,7 +82,7 @@
 - [ ] Create database connection pooling and transaction handling
 - [ ] Add API rate limiting for abuse prevention
 
-## Phase 5: Web Platform - Frontend (~2 sessions, separate repo)
+## Phase 6: Web Platform - Frontend (~2 sessions, separate repo)
 
 - [ ] Create SvelteKit layout with responsive design and PWA structure
 - [ ] Implement workspace selection page for first-time users
@@ -81,7 +101,7 @@
 - [ ] Add accessibility features (ARIA labels, keyboard navigation)
 - [ ] Test PWA installation and offline functionality
 
-## Phase 6: MCP Elicitation Adapter (~1 session)
+## Phase 7: MCP Elicitation Adapter (~1 session)
 
 - [ ] Create `packages/shared/src/adapters/mcp-elicitation.ts` — adapter module
 - [ ] Implement `auqToMcpElicitation()` — convert QuestionSchema[] to MCP JSON Schema
@@ -95,7 +115,7 @@
 - [ ] Update shared package exports to include adapter functions
 - [ ] Add documentation for MCP Elicitation support
 
-## Phase 7: Auth & Polish (~1 session)
+## Phase 8: Auth & Polish (~1 session)
 
 - [ ] Implement workspace creation flow in web UI
 - [ ] Add API key generation and display in workspace settings

@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { dirname } from "path";
 
 import { AUQConfigSchema } from "../../config/types.js";
@@ -160,6 +160,74 @@ function readConfigFileForWrite(filePath: string): Record<string, unknown> {
   return {};
 }
 
+function maskApiKey(value: unknown): string {
+  const key = String(value ?? "");
+  if (key.length < 10) {
+    return "********";
+  }
+  return `${key.slice(0, 6)}****${key.slice(-4)}`;
+}
+
+function formatConfigValue(key: string, value: unknown): string {
+  if (key === "web.api_key") {
+    return maskApiKey(value);
+  }
+  return typeof value === "object" ? JSON.stringify(value) : String(value);
+}
+
+function flattenConfig(config: Record<string, unknown>): Record<string, unknown> {
+  const flat: Record<string, unknown> = {};
+  const validKeys = getValidConfigKeys();
+  for (const key of validKeys) {
+    flat[key] = getNestedValue(config, key);
+  }
+  return flat;
+}
+
+function maskFlatConfig(flatConfig: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(flatConfig).map(([key, value]) => [
+      key,
+      key === "web.api_key" ? maskApiKey(value) : value,
+    ]),
+  );
+}
+
+function unsetNestedValue(obj: Record<string, unknown>, key: string): boolean {
+  const parts = key.split(".");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let current: any = obj;
+  const stack: Array<{ parent: any; key: string }> = [];
+
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    if (!current || typeof current !== "object" || !(part in current)) {
+      return false;
+    }
+    stack.push({ parent: current, key: part });
+    current = current[part];
+  }
+
+  const lastPart = parts[parts.length - 1];
+  if (!current || typeof current !== "object" || !(lastPart in current)) {
+    return false;
+  }
+
+  delete current[lastPart];
+
+  for (let i = stack.length - 1; i >= 0; i--) {
+    const { parent, key: part } = stack[i];
+    const child = parent[part];
+    if (child && typeof child === "object" && Object.keys(child).length === 0) {
+      delete parent[part];
+    } else {
+      break;
+    }
+  }
+
+  return true;
+}
+
 // ── Config Get ──────────────────────────────────────────────────────
 
 async function configGet(args: string[]): Promise<void> {
@@ -224,27 +292,35 @@ async function configGet(args: string[]): Promise<void> {
       return;
     }
 
+    if (key === "web.api_key") {
+      const masked = maskApiKey(value);
+      if (jsonMode) {
+        console.log(JSON.stringify({ success: true, key, value: masked }, null, 2));
+      } else {
+        console.log(`${key} = ${masked}`);
+      }
+      return;
+    }
+
     if (jsonMode) {
       console.log(JSON.stringify({ success: true, key, value }, null, 2));
     } else {
-      console.log(`${key} = ${typeof value === "object" ? JSON.stringify(value) : String(value)}`);
+      console.log(`${key} = ${formatConfigValue(key, value)}`);
     }
     return;
   }
 
   // Show all config values
+  const validKeys = getValidConfigKeys();
+  const flatConfig = flattenConfig(config as unknown as Record<string, unknown>);
+
   if (jsonMode) {
-    console.log(JSON.stringify({ success: true, config }, null, 2));
+    console.log(
+      JSON.stringify({ success: true, config: maskFlatConfig(flatConfig) }, null, 2),
+    );
   } else {
-    const validKeys = getValidConfigKeys();
     for (const k of validKeys) {
-      const value = getNestedValue(
-        config as unknown as Record<string, unknown>,
-        k,
-      );
-      console.log(
-        `${k} = ${typeof value === "object" ? JSON.stringify(value) : String(value)}`,
-      );
+      console.log(`${k} = ${formatConfigValue(k, flatConfig[k])}`);
     }
   }
 }
@@ -355,6 +431,92 @@ async function configSet(args: string[]): Promise<void> {
   );
 }
 
+// ── Config List / Reset / Unset ───────────────────────────────────
+
+async function configList(args: string[]): Promise<void> {
+  const { flags } = parseFlags(args);
+  const jsonMode = flags.json === true;
+  const config = loadConfig();
+  const flatConfig = flattenConfig(config as unknown as Record<string, unknown>);
+
+  if (jsonMode) {
+    console.log(
+      JSON.stringify({ success: true, config: maskFlatConfig(flatConfig) }, null, 2),
+    );
+    return;
+  }
+
+  const keys = Object.keys(flatConfig);
+  for (const key of keys) {
+    console.log(`${key} = ${formatConfigValue(key, flatConfig[key])}`);
+  }
+}
+
+async function configReset(args: string[]): Promise<void> {
+  const { flags } = parseFlags(args);
+  const isGlobal = flags.global === true;
+  const paths = getConfigPaths();
+  const targetFile = isGlobal ? paths.global : paths.local;
+
+  if (!existsSync(targetFile)) {
+    console.log("no config file to reset");
+    return;
+  }
+
+  rmSync(targetFile);
+  console.log(`reset config: ${targetFile}`);
+}
+
+async function configUnset(args: string[]): Promise<void> {
+  const { flags, positionals } = parseFlags(args);
+  const isGlobal = flags.global === true;
+  const key = positionals[0];
+
+  if (!key) {
+    outputResult(
+      {
+        success: false,
+        error: "Usage: auq config unset <key> [--global]",
+      },
+      flags.json === true,
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  const validKeys = getValidConfigKeys();
+  if (!validKeys.includes(key)) {
+    outputResult(
+      {
+        success: false,
+        error: `Unknown config key: "${key}". Valid keys: ${validKeys.join(", ")}`,
+      },
+      flags.json === true,
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  const paths = getConfigPaths();
+  const targetFile = isGlobal ? paths.global : paths.local;
+
+  if (!existsSync(targetFile)) {
+    console.log("no config file to unset");
+    return;
+  }
+
+  const existing = readConfigFileForWrite(targetFile);
+  const removed = unsetNestedValue(existing, key);
+
+  if (!removed) {
+    console.log(`key not set: ${key}`);
+    return;
+  }
+
+  writeFileSync(targetFile, JSON.stringify(existing, null, 2) + "\n");
+  console.log(`unset ${key} in ${targetFile}`);
+}
+
 // ── Config Command Dispatcher ───────────────────────────────────────
 
 export async function runConfigCommand(args: string[]): Promise<void> {
@@ -365,12 +527,25 @@ export async function runConfigCommand(args: string[]): Promise<void> {
       return configGet(args.slice(1));
     case "set":
       return configSet(args.slice(1));
+    case "list":
+      return configList(args.slice(1));
+    case "reset":
+      return configReset(args.slice(1));
+    case "unset":
+      return configUnset(args.slice(1));
     default:
       console.log(`Usage: auq config <subcommand>`, "\n");
       console.log("Subcommands:");
-      console.log("  get [key] [--json]          Show config values");
+      console.log("  get [key] [--json]                    Show config values");
       console.log(
-        "  set <key> <value> [--global] [--json]  Set a config value",
+        "  set <key> <value> [--global] [--json] Set a config value",
+      );
+      console.log("  list [--json]                         List all config values");
+      console.log(
+        "  reset [--global]                      Reset config file",
+      );
+      console.log(
+        "  unset <key> [--global]                Remove a config key",
       );
       console.log("");
       console.log("Examples:");
@@ -380,6 +555,9 @@ export async function runConfigCommand(args: string[]): Promise<void> {
       console.log("  auq config set notifyOnStale false --global");
       console.log("  auq config get renderer");
       console.log("  auq config set renderer opentui");
+      console.log("  auq config list --json");
+      console.log("  auq config unset web.api_key");
+      console.log("  auq config reset --global");
       if (subcommand !== undefined) {
         process.exitCode = 1;
       }

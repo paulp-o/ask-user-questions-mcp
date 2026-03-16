@@ -36,6 +36,7 @@ vi.mock("@paulp-o/auq-shared", async () => {
 });
 
 import { WebSessionManager } from "../WebSessionManager.js";
+import { ApiUnavailableError } from "../errors.js";
 
 describe("WebSessionManager", () => {
   const questions: Question[] = [
@@ -185,5 +186,57 @@ describe("WebSessionManager", () => {
     );
     const registeredHandler = addEventListenerSpy.mock.calls[0]?.[1];
     expect(removeEventListenerSpy).toHaveBeenCalledWith("abort", registeredHandler);
+  });
+
+  it("waitForAnswers continues polling after transient getSession failure", async () => {
+    vi.useFakeTimers();
+    mockGetSession
+      .mockRejectedValueOnce(new Error("temporary failure"))
+      .mockResolvedValueOnce({ status: "completed", answers: [] });
+
+    const manager = new WebSessionManager({ apiKey: "test-key", apiUrl: "https://api.example.com" });
+    const waitPromise = manager.waitForAnswers("session-1");
+
+    await Promise.resolve();
+    expect(mockGetSession).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(3000);
+    await expect(waitPromise).resolves.toBe("session-1");
+    expect(mockGetSession).toHaveBeenCalledTimes(2);
+  });
+
+  it("waitForAnswers throws ApiUnavailableError after consecutive poll failures exceed threshold", async () => {
+    vi.useFakeTimers();
+    mockGetSession.mockRejectedValue(new Error("network failure"));
+
+    const manager = new WebSessionManager({ apiKey: "test-key", apiUrl: "https://api.example.com" });
+    const waitPromise = manager.waitForAnswers("session-1");
+    const rejectionPromise = waitPromise.catch((error: unknown) => error);
+
+    await Promise.resolve();
+    expect(mockGetSession).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(3000);
+    await vi.advanceTimersByTimeAsync(3000);
+    const error = await rejectionPromise;
+    expect(error).toBeInstanceOf(ApiUnavailableError);
+    expect(mockGetSession).toHaveBeenCalledTimes(3);
+  });
+
+  it("createSession propagates ApiUnavailableError from client", async () => {
+    const apiError = new ApiUnavailableError("API unavailable");
+    mockCreateSession.mockRejectedValueOnce(apiError);
+
+    const manager = new WebSessionManager({ apiKey: "test-key", apiUrl: "https://api.example.com" });
+
+    await expect(manager.createSession(questions)).rejects.toBe(apiError);
+  });
+
+  it("startSession propagates ApiUnavailableError from createSession", async () => {
+    const apiError = new ApiUnavailableError("API unavailable");
+    const manager = new WebSessionManager({ apiKey: "test-key", apiUrl: "https://api.example.com" });
+    vi.spyOn(manager, "createSession").mockRejectedValueOnce(apiError);
+
+    await expect(manager.startSession(questions)).rejects.toBe(apiError);
   });
 });

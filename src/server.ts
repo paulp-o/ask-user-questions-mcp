@@ -5,8 +5,15 @@ import {
   createAskUserQuestionsCore,
 } from "./core/ask-user-questions.js";
 import { GetAnsweredQuestionsArgsSchema, GET_ANSWERED_QUESTIONS_DESCRIPTION, TOOL_DESCRIPTION } from "./shared/schemas.js";
+import { getConfig } from "./config/ConfigLoader.js";
+import { createSessionManagerForMode } from "./server/web-mode.js";
 
-const askUserQuestionsCore = createAskUserQuestionsCore();
+const config = getConfig();
+const sessionManager = createSessionManagerForMode(config);
+const askUserQuestionsCore = createAskUserQuestionsCore({ sessionManager });
+if (config.web.api_key) {
+  console.error(`[AUQ] Web mode enabled, API: ${config.web.api_url}`);
+}
 
 // Track active requests with their AbortControllers for disconnect handling
 const activeRequests = new Map<string, { controller: AbortController; sessionId?: string }>();

@@ -10,6 +10,7 @@
         "@opentui/core": "0.1.87",
         "@opentui/react": "0.1.87",
         "@paulp-o/auq-shared": "workspace:*",
+        "@paulp-o/auq-web-adapter": "workspace:*",
         "@types/uuid": "^10.0.0",
         "chalk": "^5.6.2",
         "cli-highlight": "^2.1.11",

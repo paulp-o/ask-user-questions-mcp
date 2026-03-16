@@ -19,6 +19,11 @@ export const DEFAULT_CONFIG: AUQConfig = {
     sound: true,
   },
 
+  // Web
+  web: {
+    mode: "local" as const,
+  },
+
   // Update
   updateCheck: true,
 };

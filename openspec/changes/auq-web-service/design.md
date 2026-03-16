@@ -38,11 +38,98 @@ HTTP client implementation that replaces file-based IPC with web API calls:
 
 ### MCP Server Modifications
 
-- Configuration option: `mode: 'local' | 'web'` (default: 'local')
-- When `mode: 'web'`, instantiate `WebSessionManager` instead of `SessionManager`
-- Automatic fallback to local mode if web API returns 5xx errors or timeouts
-- Environment variable configuration: `AUQ_WEB_API_URL`, `AUQ_WEB_API_KEY`
-- Graceful degradation without breaking existing local functionality
+- **Automatic mode detection**: If `api_key` is present (via env vars, project `.auqrc`, or home `~/.auqrc`), mode is automatically set to `'web'`. Otherwise, mode defaults to `'local'`.
+- **Configuration loading**: Server calls config loader on startup to read `api_key` and `api_url` using the priority order defined in the Configuration System section
+- **Web mode activation**: When `api_key` is detected, instantiate `WebSessionManager` instead of `SessionManager`
+- **Default hosted URL**: If `api_key` is provided without `api_url`, automatically use `https://auq.paulp.dev`
+- **Automatic fallback to local mode**: If web API returns 5xx errors, timeouts, or connection failures, fall back to local TUI mode with automatic retry
+- **Graceful degradation**: Existing local functionality remains unaffected; users without `api_key` continue using TUI mode by default
+
+## Configuration System
+
+### `.auqrc` File Format
+
+Configuration is stored in a `.auqrc` file that can exist at:
+
+1. **Project-level**: `./.auqrc` (highest priority)
+2. **Home directory**: `~/.auqrc` (fallback)
+
+**Format**: JSON
+
+```json
+{
+  "api_key": "auq_sk_xxxxxxxxxxxx",
+  "api_url": "https://auq.example.com",
+  "mode": "web"
+}
+```
+
+All fields are optional. When only `api_key` is provided, the default hosted URL (`https://auq.paulp.dev`) is automatically used.
+
+### Config Resolution Order
+
+Configuration is resolved in the following priority order (highest to lowest):
+
+1. **Environment Variables** (highest priority)
+   - `AUQ_WEB_MODE` → mode
+   - `AUQ_WEB_API_KEY` → api_key
+   - `AUQ_WEB_API_URL` → api_url
+
+2. **Project-level `.auqrc`** (if `./.auqrc` exists)
+   - Parsed JSON configuration
+
+3. **Home directory `.auqrc`** (if `~/.auqrc` exists)
+   - Parsed JSON configuration
+
+4. **Defaults** (lowest priority)
+   - mode: `'local'`
+   - api_url: `'https://auq.paulp.dev'` (only if api_key is provided)
+
+### CLI Configuration Management
+
+The `auq config` command provides an interface for managing configuration:
+
+```bash
+# Set configuration values
+auq config set api_key <key>          # Store API key
+auq config set api_url <url>          # Store custom API URL
+auq config set mode <local|web>       # Set operation mode
+
+# Read configuration values
+auq config get api_key                # Read current API key
+auq config get api_url                # Read current API URL
+auq config get mode                   # Read current mode
+
+# List all configuration
+auq config list                       # Show all configuration (masks sensitive values)
+
+# Reset to defaults
+auq config reset                      # Remove .auqrc file from project
+```
+
+By default, `auq config set` modifies the project-level `.auqrc`. Use `--global` flag to modify `~/.auqrc`:
+
+```bash
+auq config set --global api_key <key>
+```
+
+### Cross-Surface Configuration
+
+The same configuration source is used across all AUQ surfaces:
+
+- **MCP Server**: Reads config on startup to determine mode and API settings
+- **CLI Tool**: Uses config for web mode operations
+- **Agent Skills**: Read config when invoked to access current settings
+
+This ensures consistent behavior regardless of how AUQ is invoked.
+
+### Default Hosted URL Behavior
+
+When users provide an `api_key` without an `api_url`:
+
+- System automatically uses the default hosted instance: `https://auq.paulp.dev`
+- No additional configuration needed for hosted use
+- Self-hosters must explicitly provide `api_url` via `.auqrc` or environment variable
 
 ## Web Platform (Separate Repository)
 
@@ -167,6 +254,7 @@ CREATE TABLE push_subscriptions (
 ### API Endpoints Design
 
 #### POST /api/v1/questions
+
 - **Purpose**: Create new question set
 - **Auth**: API key in `Authorization: Bearer <key>` header
 - **Request Body**: `{ "questions": [...], "title": "optional" }`
@@ -174,28 +262,33 @@ CREATE TABLE push_subscriptions (
 - **Error Handling**: 401 (invalid API key), 400 (invalid questions)
 
 #### GET /api/v1/questions/:id
+
 - **Purpose**: Poll question status
 - **Auth**: API key required
 - **Response**: `{ "status": "pending|in_progress|completed", "answers": [...] }`
 - **Polling**: Agent polls every 2-5 seconds
 
 #### GET /api/v1/questions/:id/wait
+
 - **Purpose**: Long-poll for completion (future use)
 - **Auth**: API key required
 - **Response**: Blocks until status is completed or timeout
 
 #### POST /api/v1/questions/:id/answer
+
 - **Purpose**: Submit user answers
 - **Auth**: Session-based (web UI)
 - **Request Body**: `{ "answers": [{"questionIndex": 0, "selectedOption": "A"}] }`
 - **Response**: `{ "success": true }`
 
 #### GET /api/v1/questions/stream
+
 - **Purpose**: SSE stream for real-time browser updates
 - **Auth**: Session-based
 - **Response**: Server-Sent Events with question updates
 
 #### DELETE /api/v1/questions/:id
+
 - **Purpose**: Abandon question set
 - **Auth**: API key or session
 - **Response**: `{ "success": true }`
@@ -203,11 +296,13 @@ CREATE TABLE push_subscriptions (
 ### Authentication Flow
 
 #### Agent Authentication
+
 - API key passed in `Authorization: Bearer <api-key>` header
 - Key lookup routes to specific workspace
 - All questions for that key go to workspace inbox
 
 #### Web UI Authentication
+
 - Simple session-based auth for PWA
 - Workspace selection on first visit
 - Session stored in localStorage with workspace ID
@@ -217,11 +312,13 @@ CREATE TABLE push_subscriptions (
 Bidirectional format conversion between AUQ and MCP Elicitation:
 
 #### AUQ → MCP Elicitation
+
 - Map QuestionSchema to JSON Schema with enum options
 - Convert multiSelect to array type with items
 - Preserve option descriptions as schema descriptions
 
 #### MCP Elicitation → AUQ
+
 - Extract enum values as options
 - Convert array types to multiSelect questions
 - Generate titles from schema titles or property names

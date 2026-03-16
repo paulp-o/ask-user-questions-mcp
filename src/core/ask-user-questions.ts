@@ -3,6 +3,7 @@ import type { Question } from "../session/types.js";
 import { SessionManager } from "../session/index.js";
 import { ResponseFormatter } from "../session/ResponseFormatter.js";
 import { getSessionDirectory } from "../session/utils.js";
+import type { SessionManagerLike } from "./types.js";
 import {
   AskUserQuestionsParametersSchema,
   QuestionSchema,
@@ -37,7 +38,7 @@ export type AskUserQuestionsCore = {
 
 export type AskUserQuestionsCoreOptions = {
   baseDir?: string;
-  sessionManager?: SessionManager;
+  sessionManager?: SessionManagerLike;
 };
 
 export const createAskUserQuestionsCore = (
@@ -50,7 +51,7 @@ export const createAskUserQuestionsCore = (
 
   const ensureInitialized = async () => {
     if (initialized) return;
-    await sessionManager.initialize();
+    await sessionManager.initialize?.();
     initialized = true;
   };
 
@@ -102,10 +103,26 @@ export const createAskUserQuestionsCore = (
   ): Promise<{ formattedResponse: string; sessionId: string; status: string }> => {
     await ensureInitialized();
 
+    const getAllSessionIds = sessionManager.getAllSessionIds?.bind(sessionManager);
+    const getSessionStatus = sessionManager.getSessionStatus?.bind(sessionManager);
+    const getSessionAnswers = sessionManager.getSessionAnswers?.bind(sessionManager);
+    const getSessionRequest = sessionManager.getSessionRequest?.bind(sessionManager);
+    const markSessionAsRead = sessionManager.markSessionAsRead?.bind(sessionManager);
+
+    if (
+      !getAllSessionIds ||
+      !getSessionStatus ||
+      !getSessionAnswers ||
+      !getSessionRequest ||
+      !markSessionAsRead
+    ) {
+      throw new Error("getAnsweredQuestions is not supported in web mode");
+    }
+
     // Resolve short ID to full UUID if needed
     let resolvedSessionId = sessionId;
     if (sessionId.length < 36) {
-      const allIds = await sessionManager.getAllSessionIds();
+      const allIds = await getAllSessionIds();
       const match = allIds.find((id) => id.startsWith(sessionId));
       if (!match) {
         throw new Error(`Session not found: ${sessionId}`);
@@ -113,7 +130,7 @@ export const createAskUserQuestionsCore = (
       resolvedSessionId = match;
     }
 
-    const sessionStatus = await sessionManager.getSessionStatus(resolvedSessionId);
+    const sessionStatus = await getSessionStatus(resolvedSessionId);
     if (!sessionStatus) {
       throw new Error(`Session not found: ${sessionId}`);
     }
@@ -121,8 +138,8 @@ export const createAskUserQuestionsCore = (
     const shortId = resolvedSessionId.slice(0, 8);
 
     const handleCompleted = async () => {
-      const answers = await sessionManager.getSessionAnswers(resolvedSessionId);
-      const request = await sessionManager.getSessionRequest(resolvedSessionId);
+      const answers = await getSessionAnswers(resolvedSessionId);
+      const request = await getSessionRequest(resolvedSessionId);
       if (!answers || !request) {
         throw new Error(`Session data incomplete: ${resolvedSessionId}`);
       }
@@ -130,7 +147,7 @@ export const createAskUserQuestionsCore = (
       const count = request.questions.length;
       const header = `[Session: ${shortId} | Questions: ${count}]`;
       const formattedResponse = `${header}\n\n${formatted}`;
-      await sessionManager.markSessionAsRead(resolvedSessionId);
+      await markSessionAsRead(resolvedSessionId);
       return { formattedResponse, sessionId: resolvedSessionId, status: "completed" };
     };
 
@@ -163,9 +180,10 @@ export const createAskUserQuestionsCore = (
     ask,
     askNonBlocking,
     getAnsweredQuestions,
-    cleanupExpiredSessions: () => sessionManager.cleanupExpiredSessions(),
+    cleanupExpiredSessions: async () => sessionManager.cleanupExpiredSessions?.() ?? 0,
     ensureInitialized,
-    markAbandoned: (sessionId: string) =>
-      sessionManager.updateSessionStatus(sessionId, "abandoned"),
+    markAbandoned: async (sessionId: string) => {
+      await sessionManager.updateSessionStatus?.(sessionId, "abandoned");
+    },
   };
 };

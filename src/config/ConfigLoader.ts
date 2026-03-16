@@ -80,6 +80,55 @@ function readConfigFile(filePath: string): Partial<AUQConfig> | null {
   }
 }
 
+const HOSTED_AUQ_WEB_API_URL = "https://auq.paulp.dev";
+
+function mergeConfig(base: AUQConfig, override: Partial<AUQConfig>): AUQConfig {
+  return {
+    ...base,
+    ...override,
+    web: {
+      ...base.web,
+      ...(override.web ?? {}),
+    },
+  };
+}
+
+function applyWebEnvOverrides(config: AUQConfig): AUQConfig {
+  const overriddenConfig: AUQConfig = {
+    ...config,
+    web: { ...config.web },
+  };
+
+  if (process.env.AUQ_WEB_API_KEY) {
+    overriddenConfig.web.api_key = process.env.AUQ_WEB_API_KEY;
+  }
+
+  if (process.env.AUQ_WEB_API_URL) {
+    overriddenConfig.web.api_url = process.env.AUQ_WEB_API_URL;
+  }
+
+  const webMode = process.env.AUQ_WEB_MODE;
+  if (webMode === "local" || webMode === "web") {
+    overriddenConfig.web.mode = webMode;
+  }
+
+  return overriddenConfig;
+}
+
+export function resolveWebConfig(config: AUQConfig): AUQConfig {
+  if (config.web.api_key && !config.web.api_url) {
+    return {
+      ...config,
+      web: {
+        ...config.web,
+        api_url: HOSTED_AUQ_WEB_API_URL,
+      },
+    };
+  }
+
+  return config;
+}
+
 /**
  * Load configuration with the following priority:
  * 1. Local config (./.auqrc.json)
@@ -97,15 +146,18 @@ export function loadConfig(): AUQConfig {
   const globalPath = getGlobalConfigPath();
   const globalConfig = readConfigFile(globalPath);
   if (globalConfig) {
-    config = { ...config, ...globalConfig };
+    config = mergeConfig(config, globalConfig);
   }
 
   // Load local config (higher priority, overrides global)
   const localPath = getLocalConfigPath();
   const localConfig = readConfigFile(localPath);
   if (localConfig) {
-    config = { ...config, ...localConfig };
+    config = mergeConfig(config, localConfig);
   }
+
+  config = applyWebEnvOverrides(config);
+  config = resolveWebConfig(config);
 
   return config;
 }

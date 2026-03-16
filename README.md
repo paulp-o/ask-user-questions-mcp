@@ -226,6 +226,39 @@ Whenever you need clarification on what you are working on, never guess, and cal
 
 When the AI asks questions, you'll see them appear in the AUQ TUI. Answer them **at your convenience**.
 
+
+### Web Mode
+
+> Use AUQ with the hosted web service (or your own API) for MCP, CLI, and agent-skill workflows.
+
+Enable web mode with an API key:
+
+```bash
+auq config set web.api_key <your-key>
+```
+
+Or set it via environment variable:
+
+```bash
+AUQ_WEB_API_KEY=<your-key>
+```
+
+When only `web.api_key` is set, AUQ uses the hosted default: `https://auq.paulp.dev`.
+
+For self-hosting, set a custom API URL:
+
+```bash
+auq config set web.api_url https://your-server.com
+```
+
+You can also override by env var: `AUQ_WEB_API_URL=https://your-server.com`.
+
+If the web API is unreachable, AUQ automatically falls back to local TUI/session mode.
+
+Configuration priority (highest to lowest):
+1. Environment variables
+2. Project `.auqrc.json`
+3. Global `.auqrc.json`
 ### Renderer Selection
 
 AUQ supports two terminal rendering engines:
