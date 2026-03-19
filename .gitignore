@@ -1,5 +1,8 @@
 dist
 node_modules
+.next
+.turbo
+*.tsbuildinfo
 
 !.github/
 .env
