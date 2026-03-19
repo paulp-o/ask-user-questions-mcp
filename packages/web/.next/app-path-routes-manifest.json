@@ -1,0 +1,11 @@
+{
+  "/api/mcp/route": "/api/mcp",
+  "/api/sessions/[id]/answer/route": "/api/sessions/[id]/answer",
+  "/api/sessions/[id]/route": "/api/sessions/[id]",
+  "/api/sessions/route": "/api/sessions",
+  "/api/sse/route": "/api/sse",
+  "/_not-found/page": "/_not-found",
+  "/page": "/",
+  "/sessions/[id]/history/page": "/sessions/[id]/history",
+  "/sessions/[id]/page": "/sessions/[id]"
+}

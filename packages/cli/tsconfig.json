@@ -1,0 +1,16 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "jsxImportSource": "@opentui/react"
+  },
+  "references": [{ "path": "../core" }],
+  "include": ["src/**/*.ts", "bin/auq.tsx", "package.json"],
+  "exclude": ["src/tui/**", "src/**/*.test.ts", "src/**/*.test.tsx", "bin/tui-app.tsx"]
+}
