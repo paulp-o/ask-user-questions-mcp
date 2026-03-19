@@ -42,6 +42,10 @@ export const AUQConfigSchema = z.object({
 
   // Update
   updateCheck: z.boolean().default(true),
+
+  // Web API
+  apiKey: z.string().optional(),
+  apiUrl: z.string().url().optional(),
 });
 
 export type AUQConfig = z.infer<typeof AUQConfigSchema>;

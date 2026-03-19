@@ -9,6 +9,8 @@ import {
   QuestionsSchema,
   type QuestionInput,
 } from "../shared/schemas.js";
+import { resolveWebConfig, isWebMode } from "../config/resolve-web-config.js";
+import { WebTransport } from "../transport/index.js";
 
 // Re-export schemas for backward compatibility
 export { QuestionSchema, QuestionsSchema, AskUserQuestionsParametersSchema };
@@ -48,6 +50,12 @@ export const createAskUserQuestionsCore = (
     options.sessionManager ?? new SessionManager({ baseDir });
   let initialized = false;
 
+  const webConfig = resolveWebConfig();
+  const webModeEnabled = isWebMode();
+  const webTransport = webModeEnabled
+    ? new WebTransport({ apiKey: webConfig.apiKey!, apiUrl: webConfig.apiUrl! })
+    : null;
+
   const ensureInitialized = async () => {
     if (initialized) return;
     await sessionManager.initialize();
@@ -73,6 +81,9 @@ export const createAskUserQuestionsCore = (
   ) => {
     await ensureInitialized();
     const parsedQuestions = QuestionsSchema.parse(questions);
+    if (webTransport) {
+      return webTransport.startSession(normalizeQuestions(parsedQuestions), callId, workingDirectory, signal);
+    }
     return sessionManager.startSession(
       normalizeQuestions(parsedQuestions),
       callId,
@@ -88,6 +99,10 @@ export const createAskUserQuestionsCore = (
   ): Promise<{ sessionId: string; questionCount: number }> => {
     await ensureInitialized();
     const parsedQuestions = QuestionsSchema.parse(questions);
+    if (webTransport) {
+      const sessionId = await webTransport.createSession(normalizeQuestions(parsedQuestions), workingDirectory);
+      return { sessionId, questionCount: parsedQuestions.length };
+    }
     const sessionId = await sessionManager.createSession(
       normalizeQuestions(parsedQuestions),
       workingDirectory,
@@ -101,6 +116,9 @@ export const createAskUserQuestionsCore = (
     signal?: AbortSignal,
   ): Promise<{ formattedResponse: string; sessionId: string; status: string }> => {
     await ensureInitialized();
+    if (webTransport) {
+      return webTransport.getAnsweredQuestions(sessionId, blocking, signal);
+    }
 
     // Resolve short ID to full UUID if needed
     let resolvedSessionId = sessionId;
@@ -165,7 +183,11 @@ export const createAskUserQuestionsCore = (
     getAnsweredQuestions,
     cleanupExpiredSessions: () => sessionManager.cleanupExpiredSessions(),
     ensureInitialized,
-    markAbandoned: (sessionId: string) =>
-      sessionManager.updateSessionStatus(sessionId, "abandoned"),
+    markAbandoned: async (sessionId: string) => {
+      if (webTransport) {
+        return webTransport.markAbandoned(sessionId);
+      }
+      return sessionManager.updateSessionStatus(sessionId, "abandoned");
+    },
   };
 };

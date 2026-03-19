@@ -7,3 +7,5 @@ export {
   reloadConfig,
   resetToDefaults,
 } from "./ConfigLoader.js";
+
+export { resolveWebConfig, isWebMode } from "./resolve-web-config.js";

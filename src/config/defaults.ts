@@ -21,4 +21,8 @@ export const DEFAULT_CONFIG: AUQConfig = {
 
   // Update
   updateCheck: true,
+
+  // Web API
+  apiKey: undefined,
+  apiUrl: undefined,
 };

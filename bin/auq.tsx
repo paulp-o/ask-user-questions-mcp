@@ -117,12 +117,16 @@ CONFIG KEYS (for 'config get/set')
   renderer        \"ink\" | \"opentui\"          TUI renderer engine
   staleAction     \"warn\"|\"remove\"|\"archive\"  Action for stale sessions
   updateCheck     boolean                    Enable/disable auto-update checks
+  apiKey          string                     API key for AUQ web platform (enables web mode)
+  apiUrl          string                     AUQ web platform URL (e.g., http://localhost:5173)
 
 ENVIRONMENT VARIABLES
   AUQ_RENDERER         Override renderer (\"ink\" or \"opentui\")
   AUQ_SESSION_DIR      Custom session storage directory
   XDG_CONFIG_HOME      Custom config directory (default: ~/.config)
-  NO_UPDATE_NOTIFIER   Set to \"1\" to disable update checks
+  NO_UPDATE_NOTIFIER   Set to "1" to disable update checks
+  AUQ_API_KEY          API key for AUQ web platform (enables web mode)
+  AUQ_API_URL          AUQ web platform URL (e.g., http://localhost:5173)
 
 CONFIG FILES
   ./.auqrc.json                Local config (highest priority)
@@ -136,7 +140,15 @@ EXAMPLES
   auq history --search \"deploy\" --limit 10
   auq config set renderer opentui
   auq fetch-answers abc123 --blocking
-  auq update -y`);
+  auq update -y
+
+WEB MODE
+  When AUQ_API_KEY and AUQ_API_URL are set (via env vars or config),
+  questions are sent to the AUQ web platform instead of the local TUI.
+
+  One-time:  AUQ_API_KEY=auq_xxx AUQ_API_URL=http://localhost:5173 auq ask '...'
+  Persist:   auq config set apiKey auq_xxx --global
+             auq config set apiUrl http://localhost:5173 --global`);
   process.exit(0);
 }
 
@@ -294,6 +306,24 @@ if (command === "ask") {
     }
 
     const callId = randomUUID();
+
+    // Check for web mode
+    const { isWebMode, resolveWebConfig } = await import("../src/config/resolve-web-config.js");
+    if (isWebMode()) {
+      const { WebTransport } = await import("../src/transport/index.js");
+      const webConfig = resolveWebConfig();
+      const wt = new WebTransport({ apiKey: webConfig.apiKey!, apiUrl: webConfig.apiUrl! });
+
+      const { formattedResponse } = await wt.startSession(
+        questions,
+        callId,
+        workingDirectory,
+      );
+
+      console.log(formattedResponse);
+      await updateNotification;
+      process.exit(0);
+    }
 
     const { formattedResponse, sessionId } = await sessionManager.startSession(
       questions,
