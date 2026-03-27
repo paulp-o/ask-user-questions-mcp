@@ -17,6 +17,10 @@
     "./config": {
       "import": "./dist/config/index.js",
       "default": "./dist/config/index.js"
+    },
+    "./web": {
+      "import": "./dist/web/index.js",
+      "default": "./dist/web/index.js"
     }
   },
   "scripts": {

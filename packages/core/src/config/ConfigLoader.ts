@@ -97,17 +97,75 @@ export function loadConfig(): AUQConfig {
   const globalPath = getGlobalConfigPath();
   const globalConfig = readConfigFile(globalPath);
   if (globalConfig) {
-    config = { ...config, ...globalConfig };
+    config = {
+      ...config,
+      ...globalConfig,
+      web: globalConfig.web
+        ? {
+            ...config.web,
+            ...globalConfig.web,
+            mode: globalConfig.web.mode ?? config.web?.mode ?? "auto",
+            timeout: globalConfig.web.timeout ?? config.web?.timeout ?? 300_000,
+          }
+        : config.web,
+    };
   }
 
   // Load local config (higher priority, overrides global)
   const localPath = getLocalConfigPath();
   const localConfig = readConfigFile(localPath);
   if (localConfig) {
-    config = { ...config, ...localConfig };
+    config = {
+      ...config,
+      ...localConfig,
+      web: localConfig.web
+        ? {
+            ...config.web,
+            ...localConfig.web,
+            mode: localConfig.web.mode ?? config.web?.mode ?? "auto",
+            timeout: localConfig.web.timeout ?? config.web?.timeout ?? 300_000,
+          }
+        : config.web,
+    };
   }
 
   return config;
+}
+
+export function getWebEndpoint(config: AUQConfig): string | undefined {
+  return config.web?.endpoint ?? process.env.AUQ_DEFAULT_ENDPOINT;
+}
+
+export function getWebApiKey(config: AUQConfig): string | undefined {
+  return config.web?.apiKey;
+}
+
+export function getWebMode(config: AUQConfig): "auto" | "web" | "local" {
+  return config.web?.mode ?? "auto";
+}
+
+export function getWebTimeout(config: AUQConfig): number {
+  return config.web?.timeout ?? 300_000;
+}
+
+export function isWebForwardingEnabled(config: AUQConfig): boolean {
+  const mode = getWebMode(config);
+  const apiKey = getWebApiKey(config);
+  const endpoint = getWebEndpoint(config);
+
+  if (mode === "local") {
+    return false;
+  }
+
+  if (!apiKey) {
+    return false;
+  }
+
+  if (mode === "web") {
+    return true;
+  }
+
+  return Boolean(endpoint);
 }
 
 /**

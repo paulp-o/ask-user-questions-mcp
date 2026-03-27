@@ -21,4 +21,9 @@ export const DEFAULT_CONFIG: AUQConfig = {
 
   // Update
   updateCheck: true,
+
+  web: {
+    mode: "auto" as const,
+    timeout: 300_000,
+  },
 };

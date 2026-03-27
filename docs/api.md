@@ -190,7 +190,91 @@ Retrieve answers for a session (polls until answered or timeout).
 
 ## REST API
 
+### Authentication (REST endpoints)
+
+REST routes under `/api/sessions` require a Bearer token when `AUQ_API_KEY` is configured on the web server.
+
+- Header format: `Authorization: Bearer <apiKey>`
+- Server key source: `AUQ_API_KEY` environment variable
+- Missing or invalid token: `401 Unauthorized`
+
+Example:
+
+```bash
+curl http://localhost:3000/api/sessions \
+  -H "Authorization: Bearer sk-local-dev-key"
+```
+
 ### Sessions
+
+#### `POST /api/sessions`
+
+Create a new question session from HTTP clients (used by CLI web forwarding).
+
+**Request Body:**
+
+```json
+{
+  "request": {
+    "title": "Feedback Survey",
+    "description": "Optional description",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "How satisfied are you?",
+        "type": "single-select",
+        "options": [
+          { "id": "opt1", "label": "Very satisfied" },
+          { "id": "opt2", "label": "Satisfied" }
+        ]
+      }
+    ],
+    "timeout": 300,
+    "allowSkip": false
+  }
+}
+```
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:3000/api/sessions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-local-dev-key" \
+  -d '{
+    "request": {
+      "title": "Feedback Survey",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "How satisfied are you?",
+          "type": "single-select",
+          "options": [
+            { "id": "opt1", "label": "Very satisfied" },
+            { "id": "opt2", "label": "Satisfied" }
+          ]
+        }
+      ]
+    }
+  }'
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "sessionId": "abc-123",
+  "status": "pending"
+}
+```
+
+**Error Responses:**
+
+- `400` Invalid request payload
+- `401` Unauthorized (missing/invalid bearer token when `AUQ_API_KEY` is set)
+- `500` Failed to create session
+
+---
 
 #### `GET /api/sessions`
 
@@ -512,27 +596,22 @@ app.use("/api/", apiLimiter);
 
 ## Authentication
 
-Currently **no authentication** is implemented. The API is open to localhost by default.
+`/api/sessions` routes support API key auth using the standard Bearer token header.
 
-For production, implement one of:
+- Configure server key with `AUQ_API_KEY`
+- Send `Authorization: Bearer <apiKey>` from clients
+- Invalid/missing key returns `401`
 
-1. **JWT tokens** — Token-based authentication
-2. **API keys** — Simple key validation
-3. **OAuth 2.0** — External identity provider
-4. **Network isolation** — Firewall rules
+`/api/mcp` and `/api/sse` are not authenticated by this middleware in the current implementation.
 
-Example (simple API key):
+Example:
 
-```typescript
-// Middleware
-export async function GET(request: Request) {
-  const key = request.headers.get("x-api-key");
-  if (key !== process.env.API_KEY) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  // ...
-}
+```bash
+curl http://localhost:3000/api/sessions \
+  -H "Authorization: Bearer sk-local-dev-key"
 ```
+
+For deployment guidance, set `AUQ_API_KEY` in your runtime environment and rotate keys regularly.
 
 ---
 

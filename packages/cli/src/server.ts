@@ -2,11 +2,42 @@ import { FastMCP } from "fastmcp";
 import { randomUUID } from "crypto";
 import {
   AskUserQuestionsParametersSchema,
+  ConfigLoader,
   createAskUserQuestionsCore,
+  GetAnsweredQuestionsArgsSchema,
+  GET_ANSWERED_QUESTIONS_DESCRIPTION,
+  TOOL_DESCRIPTION,
+  WebForwardingClient,
 } from "@auq/core";
-import { GetAnsweredQuestionsArgsSchema, GET_ANSWERED_QUESTIONS_DESCRIPTION, TOOL_DESCRIPTION } from "@auq/core";
 
 const askUserQuestionsCore = createAskUserQuestionsCore();
+
+const formatWebAnswers = (sessionAnswer: { answers: unknown[] }): string => {
+  if (sessionAnswer.answers.length === 0) {
+    return "Here are the user's answers:\n\n(No answers provided)";
+  }
+
+  const lines = ["Here are the user's answers:", ""];
+
+  sessionAnswer.answers.forEach((entry, index) => {
+    const answer = entry as Record<string, unknown>;
+    const selectedOption = typeof answer.selectedOption === "string" ? answer.selectedOption : undefined;
+    const selectedOptions = Array.isArray(answer.selectedOptions)
+      ? answer.selectedOptions.filter((item): item is string => typeof item === "string")
+      : undefined;
+    const customText = typeof answer.customText === "string" ? answer.customText : undefined;
+
+    const value =
+      customText ??
+      selectedOption ??
+      (selectedOptions && selectedOptions.length > 0 ? selectedOptions.join(", ") : undefined) ??
+      JSON.stringify(answer);
+
+    lines.push(`${index + 1}. ${value}`);
+  });
+
+  return lines.join("\n");
+};
 
 // Track active requests with their AbortControllers for disconnect handling
 const activeRequests = new Map<string, { controller: AbortController; sessionId?: string }>();
@@ -73,6 +104,48 @@ server.addTool({
         .workingDirectory;
 
       try {
+        const config = ConfigLoader.getConfig();
+        const isWebForwardingEnabled = ConfigLoader.isWebForwardingEnabled(config);
+
+        if (isWebForwardingEnabled) {
+          const endpoint = ConfigLoader.getWebEndpoint(config);
+          const apiKey = ConfigLoader.getWebApiKey(config);
+
+          if (!endpoint || !apiKey) {
+            throw new Error("Web forwarding is enabled but endpoint/apiKey is missing");
+          }
+
+          const webClient = new WebForwardingClient(endpoint, apiKey);
+
+          if (args.nonBlocking) {
+            const sessionId = await webClient.createSession(args.questions);
+            const shortId = sessionId.slice(0, 8);
+            const responseText =
+              `[Session: ${shortId} | Questions: ${args.questions.length} | Status: pending]\n\n` +
+              `Questions submitted successfully.\n` +
+              `Use get_answered_questions(session_id="${shortId}") or \`auq fetch-answers ${shortId}\` to retrieve answers.`;
+
+            return {
+              content: [{ text: responseText, type: "text" }],
+            };
+          }
+
+          const sessionAnswer = await webClient.askQuestionsAndWait(args.questions, {
+            abortSignal: controller.signal,
+            timeout: ConfigLoader.getWebTimeout(config),
+          });
+
+          const formattedResponse = formatWebAnswers(sessionAnswer);
+          const shortId = sessionAnswer.sessionId.slice(0, 8);
+          const count = args.questions.length;
+          const header = `[Session: ${shortId} | Questions: ${count}]`;
+          const responseWithHeader = `${header}\n\n${formattedResponse}`;
+
+          return {
+            content: [{ text: responseWithHeader, type: "text" }],
+          };
+        }
+
         // Handle non-blocking mode
         if (args.nonBlocking) {
           const { sessionId, questionCount } = await askUserQuestionsCore.askNonBlocking(
@@ -128,6 +201,19 @@ server.addTool({
             content: [
               {
                 text: "Session aborted: AI client disconnected",
+                type: "text",
+              },
+            ],
+          };
+        }
+        if (
+          error instanceof Error &&
+          typeof (error as { getUserMessage?: unknown }).getUserMessage === "function"
+        ) {
+          return {
+            content: [
+              {
+                text: `Error in session: ${(error as unknown as { getUserMessage: () => string }).getUserMessage()}`,
                 type: "text",
               },
             ],

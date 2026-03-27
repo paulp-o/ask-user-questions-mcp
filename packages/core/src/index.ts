@@ -20,3 +20,4 @@ export type {
   AskUserQuestionsCore,
   AskUserQuestionsCoreOptions,
 } from "./core/ask-user-questions.js";
+export { WebForwardingClient, WebForwardingError } from "./web/index.js";

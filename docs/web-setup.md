@@ -240,6 +240,40 @@ eventSource.addEventListener("session-answered", (event) => {
 
 ---
 
+
+## Using from CLI
+
+You can connect the CLI to the web server so `auq ask` and STDIO MCP forwarding use the web API.
+
+1. Start the web server.
+2. Set the server API key via environment variable.
+3. Configure CLI `web.apiKey` and `web.endpoint`.
+
+### Web server environment
+
+Set `AUQ_API_KEY` on the web server process (required for authenticated forwarding):
+
+```bash
+AUQ_API_KEY=sk-local-dev-key bun run dev:web
+```
+
+Or in `packages/web/.env.local`:
+
+```env
+AUQ_API_KEY=sk-local-dev-key
+```
+
+### CLI configuration
+
+```bash
+auq config set web.apiKey sk-local-dev-key
+auq config set web.endpoint http://localhost:3000
+auq config set web.mode auto
+```
+
+With this setup, CLI commands and MCP server calls use the same forwarding config automatically.
+
+For full CLI forwarding options (`--web`, `--local`, mode behavior), see [CLI Web Forwarding Guide](./cli-web-forwarding.md).
 ## Running Both CLI and Web
 
 You can run the CLI and web server simultaneously in different terminals:

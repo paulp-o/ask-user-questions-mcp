@@ -222,16 +222,48 @@ if (
 
 // Handle 'ask' command
 if (command === "ask") {
-  const { FileStore, SessionManager, createSessionEventEmitter } = await import("@auq/core");
+  const {
+    ConfigLoader,
+    FileStore,
+    SessionManager,
+    WebForwardingClient,
+    WebForwardingError,
+    createSessionEventEmitter,
+  } = await import("@auq/core");
   const { randomUUID } = await import("crypto");
 
-  const sessionDir = getSessionDirectory();
-  const store = new FileStore({ baseDir: sessionDir });
-  const events = createSessionEventEmitter();
-  const sessionManager = new SessionManager({ storage: store, events });
-  await sessionManager.initialize();
+  const askArgs = args.slice(1);
+  const questionArgs: string[] = [];
+  let forceWeb = false;
+  let forceLocal = false;
+  let webEndpointOverride: string | undefined;
 
-  let questionsJson = args[1];
+  for (let i = 0; i < askArgs.length; i++) {
+    const arg = askArgs[i];
+    if (arg === "--local") {
+      forceLocal = true;
+      continue;
+    }
+
+    if (arg === "--web") {
+      forceWeb = true;
+      const nextArg = askArgs[i + 1];
+      if (nextArg && !nextArg.startsWith("--")) {
+        webEndpointOverride = nextArg;
+        i++;
+      }
+      continue;
+    }
+
+    questionArgs.push(arg);
+  }
+
+  if (forceWeb && forceLocal) {
+    console.error("Error: --web and --local cannot be used together.");
+    process.exit(1);
+  }
+
+  let questionsJson = questionArgs[0];
 
   if (!questionsJson) {
     const chunks: Buffer[] = [];
@@ -295,9 +327,42 @@ if (command === "ask") {
       }
     }
 
+    const config = ConfigLoader.getConfig();
+    const configuredWebEnabled = ConfigLoader.isWebForwardingEnabled(config);
+    const useWebMode = forceWeb || (!forceLocal && configuredWebEnabled);
+
+    if (useWebMode) {
+      const endpoint = webEndpointOverride ?? ConfigLoader.getWebEndpoint(config);
+      const apiKey = ConfigLoader.getWebApiKey(config);
+
+      if (!endpoint) {
+        console.error(
+          "Error: Web endpoint is required. Set web.endpoint or AUQ_DEFAULT_ENDPOINT.",
+        );
+        process.exit(1);
+      }
+
+      if (!apiKey) {
+        console.error("Error: web.apiKey is required for web forwarding.");
+        process.exit(1);
+      }
+
+      const webClient = new WebForwardingClient(endpoint, apiKey);
+      const webResponse = await webClient.askQuestionsAndWait(questions);
+      console.log(JSON.stringify(webResponse));
+      await updateNotification;
+      process.exit(0);
+    }
+
+    const sessionDir = getSessionDirectory();
+    const store = new FileStore({ baseDir: sessionDir });
+    const events = createSessionEventEmitter();
+    const sessionManager = new SessionManager({ storage: store, events });
+    await sessionManager.initialize();
+
     const callId = randomUUID();
 
-    const { formattedResponse, sessionId } = await sessionManager.startSession(
+    const { formattedResponse } = await sessionManager.startSession(
       questions,
       callId,
       workingDirectory,
@@ -308,6 +373,11 @@ if (command === "ask") {
     await updateNotification;
     process.exit(0);
   } catch (error) {
+    if (error instanceof WebForwardingError) {
+      console.error(error.getUserMessage());
+      process.exit(1);
+    }
+
     if (error instanceof SyntaxError) {
       console.error("Error: Invalid JSON input.");
       console.error(error.message);

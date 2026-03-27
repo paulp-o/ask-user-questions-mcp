@@ -5,11 +5,13 @@ import {
 } from "@auq/core";
 
 import { SQLiteStore } from "./stores/SQLiteStore";
+import { getSseEmitter, type SseEmitter } from "./sse-emitter";
 
 export type ServerState = {
   events: SessionEventEmitter;
   sessionManager: SessionManager;
   store: SQLiteStore;
+  sseEmitter: SseEmitter;
 };
 
 let serverStatePromise: null | Promise<ServerState> = null;
@@ -23,7 +25,9 @@ export const getServerState = async (): Promise<ServerState> => {
 
       await sessionManager.initialize();
 
-      return { events, sessionManager, store };
+      const sseEmitter = getSseEmitter(events);
+
+      return { events, sessionManager, store, sseEmitter };
     })();
   }
 

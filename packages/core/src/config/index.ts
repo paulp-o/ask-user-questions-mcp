@@ -6,4 +6,9 @@ export {
   loadConfig,
   reloadConfig,
   resetToDefaults,
+  getWebApiKey,
+  getWebEndpoint,
+  getWebMode,
+  getWebTimeout,
+  isWebForwardingEnabled,
 } from "./ConfigLoader.js";

@@ -12,6 +12,15 @@ export const NotificationConfigSchema = z.object({
 
 export type NotificationConfig = z.infer<typeof NotificationConfigSchema>;
 
+export const WebConfigSchema = z.object({
+  endpoint: z.string().optional(),
+  apiKey: z.string().optional(),
+  mode: z.enum(["auto", "web", "local"]).default("auto"),
+  timeout: z.number().positive().default(300_000),
+});
+
+export type WebConfig = z.infer<typeof WebConfigSchema>;
+
 export const AUQConfigSchema = z.object({
   // Limits
   maxOptions: z.number().min(2).max(10).default(5),
@@ -42,6 +51,9 @@ export const AUQConfigSchema = z.object({
 
   // Update
   updateCheck: z.boolean().default(true),
+
+  // Web forwarding
+  web: WebConfigSchema.optional(),
 });
 
 export type AUQConfig = z.infer<typeof AUQConfigSchema>;
