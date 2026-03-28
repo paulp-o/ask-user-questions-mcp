@@ -28,7 +28,7 @@ The current AUQ tool offers two terminal-based renderers (Ink and OpenTUI). Whil
 
 Add `"web"` as a third renderer option that:
 
-- Launches a local Hono HTTP server serving a bundled Svelte 5 SPA
+- Launches a local Hono HTTP server serving a bundled React 19 SPA
 - Opens the user's default browser automatically
 - Provides full feature parity with the TUI (session queue, question answering, review, rejection, themes, i18n)
 - Adds a visual config editor with Zod-powered validation
@@ -41,7 +41,7 @@ Add `"web"` as a third renderer option that:
 
 1. **CLI Integration** — `--web` flag on default command, `renderer: "web"` config option
 2. **Hono Web Server** — Local HTTP server with WebSocket, static asset serving, REST API, graceful shutdown
-3. **Svelte 5 SPA** — Complete question-answering UI with shadcn-svelte components
+3. **React 19 SPA** — Complete question-answering UI with shadcn/ui components, Jotai state, react-router v7
 4. **Config Editor** — Grouped form sections, Zod validation, import/export JSON, reset to defaults
 5. **Session History** — Table view with filters, search, pagination, expandable detail rows
 6. **Theme System** — Same 16 themes from TUI, generated as CSS custom properties
@@ -63,8 +63,8 @@ Add `"web"` as a third renderer option that:
 
 ```
 ┌─────────────────────────┐     ┌──────────────────────────┐
-│  MCP Server / AI Agent  │     │  Svelte 5 SPA (Browser)  │
-│  (creates sessions)     │     │  shadcn-svelte + TW v4   │
+│  MCP Server / AI Agent  │     │  React 19 SPA (Browser)   │
+│  (creates sessions)     │     │  shadcn/ui + Jotai + TW4  │
 └──────────┬──────────────┘     └──────────┬───────────────┘
            │ writes files                   │ WebSocket + REST
            ▼                                ▼
@@ -90,9 +90,9 @@ Add `"web"` as a third renderer option that:
 | Layer          | Technology                        | Rationale                                                       |
 | -------------- | --------------------------------- | --------------------------------------------------------------- |
 | HTTP Server    | Hono + @hono/node-server          | Lightweight, TypeScript-native, WS support, Bun+Node compatible |
-| Frontend       | Svelte 5 + Vite                   | Runes reactivity, small bundle, fast build                      |
-| UI Components  | shadcn-svelte + Tailwind CSS v4   | Copy-paste components, CSS custom properties for theming        |
-| Routing        | svelte-spa-router (hash-based)    | Works without server rewrite rules                              |
+| Frontend       | React 19 + Vite                   | Same framework as TUI, unified stack, small bundle              |
+| UI Components  | shadcn/ui + Tailwind CSS v4       | Copy-paste components, Radix primitives, CSS custom properties  |
+| Routing        | react-router v7 (hash-based)      | Industry standard, createHashRouter for SPA                     |
 | WebSocket      | @hono/node-ws + native browser WS | Integrated with Hono, auto-reconnect client                     |
 | Port Selection | get-port                          | Reliable free port detection                                    |
 | Browser Launch | open                              | Cross-platform browser opening                                  |
@@ -122,7 +122,7 @@ Add `"web"` as a third renderer option that:
 | Spec       | Description                                                   |
 | ---------- | ------------------------------------------------------------- |
 | web-server | Hono server, WS protocol, REST API, session bridge, lifecycle |
-| web-ui     | Svelte SPA, components, stores, routing, theme integration    |
+| web-ui     | React SPA, components, Jotai atoms, routing, theme integration |
 
 ### Dependencies
 
@@ -136,15 +136,17 @@ Add `"web"` as a third renderer option that:
 
 **New npm packages (dev/build):**
 
-- `svelte` ^5.37.x
-- `@sveltejs/vite-plugin-svelte` ^5.x
+- `react` ^19.x (already a dependency)
+- `react-dom` ^19.x
+- `@vitejs/plugin-react` ^4.x
 - `vite` ^6.x
 - `tailwindcss` ^4.x
 - `@tailwindcss/vite` ^4.x
-- `bits-ui` ^1.x (shadcn-svelte dependency)
+- `@radix-ui/*` (shadcn/ui dependencies)
 - `clsx` ^2.x
 - `tailwind-merge` ^2.x
-- `svelte-spa-router` ^5.x
+- `react-router-dom` ^7.x
+- `jotai` ^2.x
 - `marked` ^15.x
 - `highlight.js` ^11.x
 

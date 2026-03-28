@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Local HTTP + WebSocket server that serves the Svelte SPA and bridges filesystem-based session management to real-time browser communication. Runs on localhost only, started via `auq --web`.
+Local HTTP + WebSocket server that serves the React SPA and bridges filesystem-based session management to real-time browser communication. Runs on localhost only, started via `auq --web`.
 
 ## ADDED Requirements
 
@@ -45,7 +45,7 @@ The web server SHALL start on `auq --web` and run until Ctrl+C.
 
 ### Requirement: Static File Serving
 
-The server SHALL serve the Svelte SPA from the bundled dist directory.
+The server SHALL serve the React SPA from the bundled dist directory.
 
 #### Scenario: Serve SPA assets
 

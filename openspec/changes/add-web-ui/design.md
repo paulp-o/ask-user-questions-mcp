@@ -17,7 +17,7 @@
                                           │
                                      WebSocket
                                           │
-                                   Svelte 5 SPA
+                                   React 19 SPA
                                     [browser]
 ```
 
@@ -100,7 +100,7 @@ export async function startWebServer(opts: {
 ```typescript
 import { serveStatic } from '@hono/node-server/serve-static';
 
-// Serve Svelte SPA from packages/web-ui/dist/
+// Serve React SPA from packages/web-ui/dist/
 app.use('/*', serveStatic({
   root: resolve(__dirname, '../../packages/web-ui/dist'),
 }));
@@ -209,7 +209,7 @@ export function createSessionBridge(wss: WebSocketServer) {
 }
 ```
 
-## 5. Svelte SPA (`packages/web-ui/`)
+## 5. React SPA (`packages/web-ui/`)
 
 ### Directory Structure
 
@@ -217,105 +217,104 @@ export function createSessionBridge(wss: WebSocketServer) {
 packages/web-ui/
 ├── package.json
 ├── vite.config.ts
-├── svelte.config.js
-├── tailwind.config.ts    # (Tailwind v4 may use CSS-only config)
+├── tsconfig.json
 ├── src/
-│   ├── main.ts              # SPA entry point
-│   ├── App.svelte           # Root component + router
-│   ├── app.css              # Global styles + Tailwind imports
+│   ├── main.tsx               # SPA entry point (createRoot)
+│   ├── App.tsx                # Root component + router
+│   ├── app.css                # Global styles + Tailwind imports
 │   ├── lib/
-│   │   ├── stores/
-│   │   │   ├── sessions.svelte.ts    # Session state ($state rune)
-│   │   │   ├── config.svelte.ts      # Config state
-│   │   │   ├── theme.svelte.ts       # Theme state + system detection
-│   │   │   ├── history.svelte.ts     # History state + pagination
-│   │   │   └── connection.svelte.ts  # WebSocket connection state
+│   │   ├── atoms/
+│   │   │   ├── sessions.ts        # Jotai atoms: session list, active session, answers
+│   │   │   ├── config.ts          # Jotai atoms: config state, scope
+│   │   │   ├── theme.ts           # Jotai atoms: current theme, system detection
+│   │   │   ├── history.ts         # Jotai atoms: history list, pagination, filters
+│   │   │   └── connection.ts      # Jotai atoms: WebSocket connection status
 │   │   ├── ws/
-│   │   │   ├── client.ts             # WebSocket client with reconnect logic
-│   │   │   └── protocol.ts           # Message type definitions (mirror server)
+│   │   │   ├── client.ts           # WebSocket client with reconnect logic
+│   │   │   └── protocol.ts         # Message type definitions (mirror server)
 │   │   ├── utils/
-│   │   │   ├── notifications.ts      # Browser Notification API + audio
-│   │   │   ├── keyboard.ts           # Global keyboard shortcut handler
-│   │   │   └── favicon.ts            # Dynamic favicon badge
+│   │   │   ├── notifications.ts    # Browser Notification API + audio
+│   │   │   ├── keyboard.ts         # Global keyboard shortcut handler
+│   │   │   └── favicon.ts          # Dynamic favicon badge
 │   │   └── components/
-│   │       ├── ui/                   # shadcn-svelte components
+│   │       ├── ui/                 # shadcn/ui components
 │   │       ├── layout/
-│   │       │   ├── Sidebar.svelte        # Session list sidebar
-│   │       │   ├── Header.svelte         # Top bar: logo, mode toggle, theme
-│   │       │   └── ConnectionBanner.svelte # Reconnecting banner
+│   │       │   ├── Sidebar.tsx          # Session list sidebar
+│   │       │   ├── Header.tsx           # Top bar: logo, mode toggle, theme
+│   │       │   └── ConnectionBanner.tsx # Reconnecting banner
 │   │       ├── questions/
-│   │       │   ├── StepperView.svelte    # One-at-a-time stepper
-│   │       │   ├── FormView.svelte       # All-at-once form
-│   │       │   ├── QuestionCard.svelte   # Single question display
-│   │       │   ├── OptionsList.svelte    # Option selection
-│   │       │   ├── CustomInput.svelte    # Auto-growing textarea
-│   │       │   ├── ElaborateButton.svelte
-│   │       │   └── QuickSubmitButton.svelte
+│   │       │   ├── StepperView.tsx      # One-at-a-time stepper
+│   │       │   ├── FormView.tsx         # All-at-once form
+│   │       │   ├── QuestionCard.tsx     # Single question display
+│   │       │   ├── OptionsList.tsx      # Option selection
+│   │       │   ├── CustomInput.tsx      # Auto-growing textarea
+│   │       │   ├── ElaborateButton.tsx
+│   │       │   └── QuickSubmitButton.tsx
 │   │       ├── review/
-│   │       │   ├── ReviewCard.svelte     # Full-page summary card
-│   │       │   └── RejectionModal.svelte # 2-step rejection dialog
+│   │       │   ├── ReviewCard.tsx       # Full-page summary card
+│   │       │   └── RejectionModal.tsx   # 2-step rejection dialog
 │   │       ├── config/
-│   │       │   ├── ConfigEditor.svelte   # Main config page
-│   │       │   ├── ConfigSection.svelte  # Grouped form section
-│   │       │   ├── ConfigField.svelte    # Individual field renderer
-│   │       │   └── ImportExport.svelte   # Import/export controls
+│   │       │   ├── ConfigEditor.tsx     # Main config page
+│   │       │   ├── ConfigSection.tsx    # Grouped form section
+│   │       │   ├── ConfigField.tsx      # Individual field renderer
+│   │       │   └── ImportExport.tsx     # Import/export controls
 │   │       ├── history/
-│   │       │   ├── HistoryTable.svelte   # Sortable table with filters
-│   │       │   ├── HistoryRow.svelte     # Expandable row with Q&A detail
-│   │       │   └── HistoryFilters.svelte # Status filter + search
+│   │       │   ├── HistoryTable.tsx     # Sortable table with filters
+│   │       │   ├── HistoryRow.tsx       # Expandable row with Q&A detail
+│   │       │   └── HistoryFilters.tsx   # Status filter + search
 │   │       └── waiting/
-│   │           └── WaitingScreen.svelte  # No sessions state
+│   │           └── WaitingScreen.tsx    # No sessions state
 │   ├── routes/
-│   │   ├── Questions.svelte      # /#/questions (default)
-│   │   ├── Config.svelte         # /#/config
-│   │   └── History.svelte        # /#/history
+│   │   ├── Questions.tsx        # /#/questions (default)
+│   │   ├── Config.tsx           # /#/config
+│   │   └── History.tsx          # /#/history
 │   └── themes/
 │       └── generated.css         # Auto-generated CSS custom properties
-└── dist/                     # Vite build output (committed for npm)
+└── dist/                         # Vite build output (committed for npm)
 ```
 
 ### Routing (Hash-Based)
 
-Using `svelte-spa-router`:
+Using `react-router` v7 with `createHashRouter`:
 
-```svelte
-<!-- App.svelte -->
-<script>
-  import Router from 'svelte-spa-router';
-  import Questions from './routes/Questions.svelte';
-  import Config from './routes/Config.svelte';
-  import History from './routes/History.svelte';
+```tsx
+// App.tsx
+import { createHashRouter, RouterProvider } from 'react-router-dom';
+import Questions from './routes/Questions';
+import Config from './routes/Config';
+import History from './routes/History';
 
-  const routes = {
-    '/': Questions,
-    '/config': Config,
-    '/history': History,
-  };
-</script>
+const router = createHashRouter([
+  { path: '/', element: <Questions /> },
+  { path: '/config', element: <Config /> },
+  { path: '/history', element: <History /> },
+]);
 
-<Router {routes} />
+export default function App() {
+  return <RouterProvider router={router} />;
+}
 ```
 
-### Svelte 5 State Management
+### Jotai State Management
 
-Using Svelte 5 runes for reactive state:
+Using Jotai atoms for reactive state:
 
 ```typescript
-// lib/stores/sessions.svelte.ts
-class SessionStore {
-  sessions = $state<SessionRequest[]>([]);
-  activeSessionId = $state<string | null>(null);
-  viewMode = $state<'stepper' | 'form'>('stepper');
+// lib/atoms/sessions.ts
+import { atom } from 'jotai';
+import type { SessionRequest } from '@auq/shared';
 
-  get activeSession() {
-    return $derived(this.sessions.find(s => s.sessionId === this.activeSessionId));
-  }
+export const sessionsAtom = atom<SessionRequest[]>([]);
+export const activeSessionIdAtom = atom<string | null>(null);
+export const viewModeAtom = atom<'stepper' | 'form'>('stepper');
 
-  get pendingCount() {
-    return $derived(this.sessions.length);
-  }
-}
-export const sessionStore = new SessionStore();
+export const activeSessionAtom = atom((get) => {
+  const sessions = get(sessionsAtom);
+  const id = get(activeSessionIdAtom);
+  return sessions.find(s => s.sessionId === id) ?? null;
+});
+
+export const pendingCountAtom = atom((get) => get(sessionsAtom).length);
 ```
 
 ### WebSocket Client
@@ -433,7 +432,7 @@ packages/shared/
 1. Move type definitions from `src/session/types.ts` → `packages/shared/src/session-types.ts`
 2. Move config schema from `src/config/types.ts` → `packages/shared/src/config-types.ts`
 3. Update all imports in `src/` to reference `@auq/shared`
-4. Svelte SPA imports from `@auq/shared` directly
+4. React SPA imports from `@auq/shared` directly
 
 ## 7. Theme Generation
 
@@ -536,7 +535,7 @@ Add to `files` array:
 
 ### Size Budget
 
-Target: <1MB gzipped total for web UI assets. Svelte 5 + shadcn-svelte + Tailwind should produce ~200-400KB gzipped.
+Target: <1MB gzipped total for web UI assets. React 19 + shadcn/ui + Jotai + Tailwind should produce ~200-400KB gzipped.
 
 ## 11. Concurrent Access (TUI + Web UI Coexistence)
 

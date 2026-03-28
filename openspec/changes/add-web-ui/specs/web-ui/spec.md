@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Browser-based UI for AUQ with 100% feature parity with the TUI. Built with Svelte 5 + shadcn-svelte, served as a static SPA from the local Hono web server. Communicates exclusively via WebSocket.
+Browser-based UI for AUQ with 100% feature parity with the TUI. Built with React 19 + shadcn/ui + Jotai + react-router v7, served as a static SPA from the local Hono web server. Communicates exclusively via WebSocket.
 
 ## ADDED Requirements
 
