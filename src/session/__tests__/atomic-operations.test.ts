@@ -65,13 +65,13 @@ describe("Atomic File Operations", () => {
       const invalidFile = join(invalidDir, "test.txt");
 
       try {
-        await atomicWriteFile(invalidFile, testContent);
+        await atomicWriteFile(invalidFile, testContent, { tmpDir: "/tmp" });
         expect.fail("Should have thrown an error");
       } catch (error) {
         expect(error).toBeInstanceOf(AtomicWriteError);
       }
 
-      // Verify no temporary files were left in the default temp directory
+      // Verify no temporary files were left in the configured temp directory
       const tempFiles = await fs
         .readdir("/tmp")
         .then((files) => files.filter((file) => file.includes(".tmp")));
