@@ -5,8 +5,7 @@
 
 import { constants, copyFile, rename } from "fs";
 import { promises as fs } from "fs";
-import { tmpdir } from "os";
-import { join } from "path";
+import { dirname, join } from "path";
 
 import { fileExists } from "./utils.js";
 
@@ -71,7 +70,7 @@ const DEFAULT_WRITE_OPTIONS: Required<AtomicWriteOptions> = {
   maxRetries: 3,
   mode: 0o600,
   retryDelay: 100,
-  tmpDir: tmpdir(),
+  tmpDir: "",
 };
 
 const DEFAULT_READ_OPTIONS: Required<AtomicReadOptions> = {
@@ -206,7 +205,8 @@ export async function atomicWriteFile(
   options: AtomicWriteOptions = {},
 ): Promise<void> {
   const opts = { ...DEFAULT_WRITE_OPTIONS, ...options };
-  const tempPath = generateTempPath(filePath, opts.tmpDir);
+  // Keep temp and destination on the same filesystem to preserve atomic rename().
+  const tempPath = generateTempPath(filePath, opts.tmpDir || dirname(filePath));
 
   try {
     // Acquire file lock
