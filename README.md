@@ -419,10 +419,28 @@ List commands (`sessions list`, `history`, `fetch-answers`) support:
 | -------------------- | ------------------------------------------------ |
 | `AUQ_RENDERER`       | Override renderer (`"ink"` or `"opentui"`)          |
 | `AUQ_SESSION_DIR`    | Custom session storage directory                 |
+| `AUQ_TELEGRAM_BOT_TOKEN` | Bot token read via `telegram.tokenEnvKey`      |
+| `AUQ_TELEGRAM_WEBHOOK_SECRET` | Optional webhook secret token header check |
 | `XDG_CONFIG_HOME`    | Custom config directory (default: `~/.config`)   |
 | `NO_UPDATE_NOTIFIER` | Set to `"1"` to disable update checks             |
 
 </details>
+
+### Telegram Sync (Experimental)
+
+You can enable Telegram question delivery + button-based answer submission:
+
+```bash
+export AUQ_TELEGRAM_BOT_TOKEN="<your-bot-token>"
+auq config telegram init --webhook-url "https://<your-funnel-domain>/webhook"
+```
+
+The init flow prints:
+- a bot link (`https://t.me/<bot>?start=pair_<id>`)
+- a one-time PIN
+
+Open the bot and send the PIN to bind `allowedChatId`.  
+If a chat is already bound, AUQ rejects overwrite by default; use `auq config telegram rebind`.
 
 
 ### Stale Session Detection

@@ -73,6 +73,8 @@ SUBCOMMANDS
   config set <key> <value>     Set a config value
     --global                   Write to global config (~/.config/auq/.auqrc.json)
     --json                     Output as JSON
+  config telegram init         Initialize Telegram pairing flow
+  config telegram rebind       Rebind Telegram chat (explicit overwrite)
 
 COMMAND FLAGS
 
@@ -115,6 +117,12 @@ CONFIG KEYS (for 'config get/set')
   theme           string                     UI theme name
   language        string                     UI language
   renderer        \"ink\" | \"opentui\"          TUI renderer engine
+  telegram.enabled boolean                    Enable Telegram integration
+  telegram.tokenEnvKey string                Env key containing bot token
+  telegram.allowedChatId string              Whitelisted Telegram chat ID
+  telegram.webhookUrl string                 HTTPS webhook URL
+  telegram.bindHost \"0.0.0.0\"               Webhook bind host
+  telegram.bindPort number                   Webhook bind port
   staleAction     \"warn\"|\"remove\"|\"archive\"  Action for stale sessions
   updateCheck     boolean                    Enable/disable auto-update checks
 
