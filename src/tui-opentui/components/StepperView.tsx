@@ -42,6 +42,7 @@ interface StepperViewProps {
   sessionRequest: SessionRequest;
   isAbandoned?: boolean;
   onAbandonedCancel?: () => void;
+  onTelegramConfigChanged?: () => void;
 }
 
 export type TelegramShortcutOutcome = "ignore" | "setup" | "toggle";
@@ -141,6 +142,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   sessionRequest,
   isAbandoned,
   onAbandonedCancel,
+  onTelegramConfigChanged,
 }) => {
   const { theme } = useTheme();
   const config = useConfig();
@@ -355,6 +357,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       webhookUrl: refreshed.telegram.webhookUrl,
       allowedChatId: refreshed.telegram.allowedChatId,
     });
+    onTelegramConfigChanged?.();
   };
 
   const handleTelegramInit = async (

@@ -5,6 +5,7 @@ import { promises as fs } from "fs";
 
 import type { AUQConfig } from "../config/types.js";
 import { DEFAULT_CONFIG } from "../config/defaults.js";
+import { getConfig } from "../config/index.js";
 import { ConfigProvider } from "./ConfigContext.js";
 import { ErrorBoundary } from "./components/ErrorBoundary.js";
 import { ThemeProvider, useTheme } from "./ThemeProvider.js";
@@ -40,6 +41,10 @@ import {
 } from "../update/index.js";
 import type { UpdateInfo } from "../update/types.js";
 import { KEYS } from "../tui/constants/keybindings.js";
+import {
+  startTelegramClientRuntime,
+  stopTelegramClientRuntime,
+} from "../telegram/runtime.js";
 
 import { Header as _Header } from "./components/Header.js";
 import { WaitingScreen as _WaitingScreen } from "./components/WaitingScreen.js";
@@ -131,6 +136,23 @@ function AppInner({ config }: { config: AUQConfig }) {
     [],
   );
 
+  const syncTelegramRuntime = useCallback(async () => {
+    const latestConfig = getConfig();
+    if (!latestConfig.telegram.enabled) {
+      await stopTelegramClientRuntime();
+      return;
+    }
+
+    const result = await startTelegramClientRuntime(latestConfig.telegram);
+    if (result.status === "conflict") {
+      showToast(
+        `Telegram runtime 已由另一個 AUQ 實例承載 (PID ${result.ownerPid})`,
+        "info",
+        "Telegram",
+      );
+    }
+  }, [showToast]);
+
   // ── Initialize: load existing sessions + start persistent watcher ───
   useEffect(() => {
     let watcherInstance: ReturnType<typeof createTUIWatcher> | null = null;
@@ -204,6 +226,13 @@ function AppInner({ config }: { config: AUQConfig }) {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    void syncTelegramRuntime();
+    return () => {
+      void stopTelegramClientRuntime();
+    };
+  }, [syncTelegramRuntime]);
 
   // ── Auto-update checker ─────────────────────────────────────
   useEffect(() => {
@@ -637,6 +666,9 @@ function AppInner({ config }: { config: AUQConfig }) {
           sessionId={session.sessionId}
           sessionRequest={session.sessionRequest}
           isAbandoned={isSessionAbandoned(sessionMeta.get(session.sessionId)?.status ?? "")}
+          onTelegramConfigChanged={() => {
+            void syncTelegramRuntime();
+          }}
         />
       );
     }
