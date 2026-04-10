@@ -58,6 +58,23 @@ Add an opt-in Telegram channel to AUQ so question sets can be delivered to Teleg
    - remove inline keyboard (`editMessageReplyMarkup` empty)
    - edit message body to summary-only format (question + submitted option)
 
+## TUI Quick Toggle Flow
+- Add `[T] Telegram` to TUI footer quick actions.
+- Press `T` behavior:
+  - If Telegram is not fully configured, open Telegram setup flow and auto-enable on success.
+  - If Telegram is configured, toggle `telegram.enabled` and show status toast.
+- When enabling Telegram from TUI, immediately run active-session reconciliation.
+
+## Active Session Reconciliation on Telegram Enable
+- Scope of `active quz`: not completed and not expired (`waiting` / `partial`).
+- Trigger points:
+  - TUI `T` enables Telegram
+  - `auq config telegram init|rebind` completes and enables Telegram
+- Reconciliation actions:
+  - Add: active session without Telegram message mapping -> create Telegram messages
+  - Update: active session with existing mapping -> edit Telegram messages to latest prompt/options/progress
+  - Remove: mapped message for non-active session -> keep message, remove buttons, convert to summary-only content
+
 ## Data Model
 `telegram` config fields:
 - `enabled: boolean`
@@ -66,6 +83,14 @@ Add an opt-in Telegram channel to AUQ so question sets can be delivered to Teleg
 - `webhookUrl: string`
 - `bindHost: "0.0.0.0"`
 - `bindPort: number`
+
+Persistent Telegram message mapping store (new file):
+- `sessionId`
+- `questionIndex`
+- `chatId`
+- `messageId`
+- `lastSyncedHash`
+- `state` (`active` | `completed` | `stale`)
 
 ## Error Handling
 - Invalid token / `getMe` failure: setup aborts with actionable hint.
