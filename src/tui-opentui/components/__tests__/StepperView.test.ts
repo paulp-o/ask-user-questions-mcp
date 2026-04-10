@@ -14,6 +14,12 @@ import {
   makeSessionUIState,
 } from "../../__tests__/fixtures.js";
 import { isRecommendedOption } from "../../../tui/shared/utils/recommended.js";
+import {
+  buildTelegramInitCommandArgs,
+  buildTelegramToggleCommandArgs,
+  getTelegramShortcutOutcome,
+  isTelegramConfigured,
+} from "../StepperView.js";
 
 // ─── Elapsed label formatting (pure helper copied from StepperView) ──────────────
 
@@ -177,6 +183,116 @@ describe("session recommended detection", () => {
       { options: [{ label: "Gamma" }, { label: "Delta" }] },
     ];
     expect(anyHasRecommended(questions)).toBe(false);
+  });
+});
+
+// ─── Telegram shortcut behavior ───────────────────────────────────────────────
+
+describe("telegram shortcut behavior", () => {
+  test("detects configured telegram by enabled flag or webhook presence", () => {
+    expect(isTelegramConfigured({ enabled: true, webhookUrl: "" })).toBe(true);
+    expect(isTelegramConfigured({ enabled: false, webhookUrl: "" })).toBe(false);
+    expect(
+      isTelegramConfigured({ enabled: false, webhookUrl: "https://example.com/webhook" }),
+    ).toBe(true);
+    expect(
+      isTelegramConfigured({ enabled: false, webhookUrl: "", allowedChatId: "12345" }),
+    ).toBe(true);
+  });
+
+  test("returns setup in main option context when webhook is missing", () => {
+    expect(
+      getTelegramShortcutOutcome(
+        { enabled: false, webhookUrl: "" },
+        "option",
+        0,
+        3,
+      ),
+    ).toBe("setup");
+  });
+
+  test("returns toggle in main option context when enabled is true even without webhook", () => {
+    expect(
+      getTelegramShortcutOutcome(
+        { enabled: true, webhookUrl: "" },
+        "option",
+        0,
+        3,
+      ),
+    ).toBe("toggle");
+  });
+
+  test("returns toggle in main option context when webhook exists", () => {
+    expect(
+      getTelegramShortcutOutcome(
+        { enabled: false, webhookUrl: "https://example.com/webhook" },
+        "option",
+        0,
+        3,
+      ),
+    ).toBe("toggle");
+  });
+
+  test("ignores telegram shortcut in text input contexts", () => {
+    expect(
+      getTelegramShortcutOutcome(
+        { enabled: true, webhookUrl: "https://example.com/webhook" },
+        "custom-input",
+        0,
+        3,
+      ),
+    ).toBe("ignore");
+    expect(
+      getTelegramShortcutOutcome(
+        { enabled: true, webhookUrl: "https://example.com/webhook" },
+        "elaborate-input",
+        0,
+        3,
+      ),
+    ).toBe("ignore");
+  });
+});
+
+describe("telegram command args", () => {
+  test("builds init args for auto funnel without webhook", () => {
+    expect(
+      buildTelegramInitCommandArgs({
+        token: "abc123",
+        funnelMode: "auto",
+      }),
+    ).toEqual(["telegram", "init", "--token", "abc123", "--funnel", "auto"]);
+  });
+
+  test("builds init args for off funnel with webhook", () => {
+    expect(
+      buildTelegramInitCommandArgs({
+        token: "abc123",
+        funnelMode: "off",
+        webhookUrl: "https://example.com/webhook",
+      }),
+    ).toEqual([
+      "telegram",
+      "init",
+      "--token",
+      "abc123",
+      "--funnel",
+      "off",
+      "--webhook-url",
+      "https://example.com/webhook",
+    ]);
+  });
+
+  test("builds persistent toggle args for telegram.enabled", () => {
+    expect(buildTelegramToggleCommandArgs(true)).toEqual([
+      "set",
+      "telegram.enabled",
+      "true",
+    ]);
+    expect(buildTelegramToggleCommandArgs(false)).toEqual([
+      "set",
+      "telegram.enabled",
+      "false",
+    ]);
   });
 });
 
