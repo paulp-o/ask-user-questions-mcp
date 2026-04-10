@@ -7,13 +7,17 @@ import { AnimatedGradient } from "./AnimatedGradient.js";
 
 interface WaitingScreenProps {
   queueCount: number;
+  showTelegramShortcutHint?: boolean;
 }
 
 /**
  * WaitingScreen displays when no question sets are being processed.
  * Shows "Waiting for AI..." message with animated gradient effect and elapsed time.
  */
-export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
+export const WaitingScreen: React.FC<WaitingScreenProps> = ({
+  queueCount,
+  showTelegramShortcutHint = false,
+}) => {
   const { theme } = useTheme();
 
   const [startTime] = useState(new Date());
@@ -63,7 +67,7 @@ export const WaitingScreen: React.FC<WaitingScreenProps> = ({ queueCount }) => {
         </box>
         <box style={{ justifyContent: "center", marginTop: 1 }}>
           <text style={{ attributes: TextAttributes.DIM }}>
-            {`${t("waiting.hint")} • ${elapsedSeconds}s`}
+            {`${t("waiting.hint")}${showTelegramShortcutHint ? " • T Telegram" : ""} • ${elapsedSeconds}s`}
           </text>
         </box>
       </box>
