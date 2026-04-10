@@ -18,6 +18,14 @@ export const DEFAULT_CONFIG: AUQConfig = {
     enabled: true,
     sound: true,
   },
+  telegram: {
+    enabled: false,
+    tokenEnvKey: "AUQ_TELEGRAM_BOT_TOKEN",
+    allowedChatId: "",
+    webhookUrl: "",
+    bindHost: "0.0.0.0",
+    bindPort: 8080,
+  },
 
   // Update
   updateCheck: true,

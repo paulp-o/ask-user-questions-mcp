@@ -173,6 +173,7 @@ describe("Footer keybinding logic (derived from component spec)", () => {
       bindings.push({ key: KEY_LABELS.SESSION_LIST, action: "list" });
     }
     bindings.push({ key: KEY_LABELS.THEME, action: "theme" });
+    bindings.push({ key: "T", action: "Telegram" });
     if (hasUpdate) {
       bindings.push({ key: KEY_LABELS.UPDATE, action: "Update" });
     }
@@ -249,7 +250,10 @@ describe("Footer keybinding logic (derived from component spec)", () => {
   test("always shows THEME and REJECT in option mode", () => {
     const bindings = getKeybindings({ focusContext: "option", multiSelect: false });
     const keys = bindings.map((b) => b.key);
+    const telegram = bindings.find((b) => b.key === "T");
     expect(keys).toContain(KEY_LABELS.THEME);
+    expect(keys).toContain("T");
+    expect(telegram?.action).toBe("Telegram");
     expect(keys).toContain(KEY_LABELS.REJECT);
   });
 

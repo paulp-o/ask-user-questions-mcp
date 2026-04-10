@@ -4,6 +4,7 @@ import { dirname } from "path";
 import { AUQConfigSchema } from "../../config/types.js";
 import { getConfigPaths, loadConfig } from "../../config/ConfigLoader.js";
 import { outputResult, parseFlags } from "../utils.js";
+import { runTelegramConfigCommand } from "./telegram-config.js";
 
 /**
  * Get all valid config key paths, including dot-notated nested keys.
@@ -148,13 +149,21 @@ function buildPartialConfig(
 /**
  * Read an existing config file or return empty object.
  */
-function readConfigFileForWrite(filePath: string): Record<string, unknown> {
+function readConfigFileForWrite(
+  filePath: string,
+  strict = false,
+): Record<string, unknown> {
   try {
     if (existsSync(filePath)) {
       const content = readFileSync(filePath, "utf-8");
       return JSON.parse(content) as Record<string, unknown>;
     }
-  } catch {
+  } catch (error) {
+    if (strict) {
+      const message =
+        error instanceof Error ? error.message : String(error);
+      throw new Error(`Invalid JSON in config file at ${filePath}: ${message}`);
+    }
     // File doesn't exist or invalid — start fresh
   }
   return {};
@@ -339,7 +348,24 @@ async function configSet(args: string[]): Promise<void> {
   }
 
   // Read existing config, merge, and write
-  const existing = readConfigFileForWrite(targetFile);
+  let existing: Record<string, unknown>;
+  try {
+    existing = readConfigFileForWrite(targetFile, true);
+  } catch (error) {
+    outputResult(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : `Invalid JSON in config file at ${targetFile}`,
+      },
+      jsonMode,
+    );
+    process.exitCode = 1;
+    return;
+  }
+
   setNestedValue(existing, key, coerced);
 
   writeFileSync(targetFile, JSON.stringify(existing, null, 2) + "\n");
@@ -365,12 +391,17 @@ export async function runConfigCommand(args: string[]): Promise<void> {
       return configGet(args.slice(1));
     case "set":
       return configSet(args.slice(1));
+    case "telegram":
+      return runTelegramConfigCommand(args.slice(1));
     default:
       console.log(`Usage: auq config <subcommand>`, "\n");
       console.log("Subcommands:");
       console.log("  get [key] [--json]          Show config values");
       console.log(
         "  set <key> <value> [--global] [--json]  Set a config value",
+      );
+      console.log(
+        "  telegram <init|rebind> [--global] [--funnel auto|off] [--token TOKEN] [--token-env-key KEY] [--webhook-url URL]",
       );
       console.log("");
       console.log("Examples:");

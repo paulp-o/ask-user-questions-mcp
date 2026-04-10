@@ -73,6 +73,8 @@ SUBCOMMANDS
   config set <key> <value>     Set a config value
     --global                   Write to global config (~/.config/auq/.auqrc.json)
     --json                     Output as JSON
+  config telegram init         Initialize Telegram pairing flow
+  config telegram rebind       Rebind Telegram chat (explicit overwrite)
 
 COMMAND FLAGS
 
@@ -115,6 +117,12 @@ CONFIG KEYS (for 'config get/set')
   theme           string                     UI theme name
   language        string                     UI language
   renderer        \"ink\" | \"opentui\"          TUI renderer engine
+  telegram.enabled boolean                    Enable Telegram integration
+  telegram.tokenEnvKey string                Env key containing bot token
+  telegram.allowedChatId string              Whitelisted Telegram chat ID
+  telegram.webhookUrl string                 HTTPS webhook URL
+  telegram.bindHost \"0.0.0.0\"               Webhook bind host
+  telegram.bindPort number                   Webhook bind port
   staleAction     \"warn\"|\"remove\"|\"archive\"  Action for stale sessions
   updateCheck     boolean                    Enable/disable auto-update checks
 
@@ -174,9 +182,17 @@ if (command === "server") {
   // Import and start the MCP server directly
   // This avoids spawning a subprocess and outputting non-JSON to stdout
   await import("../src/server.js");
-  // The server will start and handle stdio communication
-  // Keep process alive
-  await new Promise(() => {});
+  // Bun can busy-loop at 100% CPU on unresolved top-level await promises.
+  // Keep the process alive with a low-frequency timer and shut down on signals.
+  await new Promise<void>((resolve) => {
+    const keepAlive = setInterval(() => {}, 60_000);
+    const stop = () => {
+      clearInterval(keepAlive);
+      resolve();
+    };
+    process.once("SIGINT", stop);
+    process.once("SIGTERM", stop);
+  });
 }
 
 // Handle 'update' command

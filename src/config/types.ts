@@ -12,6 +12,17 @@ export const NotificationConfigSchema = z.object({
 
 export type NotificationConfig = z.infer<typeof NotificationConfigSchema>;
 
+export const TelegramConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  tokenEnvKey: z.string().default("AUQ_TELEGRAM_BOT_TOKEN"),
+  allowedChatId: z.string().default(""),
+  webhookUrl: z.string().default(""),
+  bindHost: z.literal("0.0.0.0").default("0.0.0.0"),
+  bindPort: z.number().int().min(1).max(65535).default(8080),
+});
+
+export type TelegramConfig = z.infer<typeof TelegramConfigSchema>;
+
 export const AUQConfigSchema = z.object({
   // Limits
   maxOptions: z.number().min(2).max(10).default(5),
@@ -38,6 +49,16 @@ export const AUQConfigSchema = z.object({
   notifications: NotificationConfigSchema.default({
     enabled: true,
     sound: true,
+  }),
+
+  // Telegram
+  telegram: TelegramConfigSchema.default({
+    enabled: false,
+    tokenEnvKey: "AUQ_TELEGRAM_BOT_TOKEN",
+    allowedChatId: "",
+    webhookUrl: "",
+    bindHost: "0.0.0.0",
+    bindPort: 8080,
   }),
 
   // Update

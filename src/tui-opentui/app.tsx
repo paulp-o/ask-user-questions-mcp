@@ -5,6 +5,7 @@ import { promises as fs } from "fs";
 
 import type { AUQConfig } from "../config/types.js";
 import { DEFAULT_CONFIG } from "../config/defaults.js";
+import { getConfig } from "../config/index.js";
 import { ConfigProvider } from "./ConfigContext.js";
 import { ErrorBoundary } from "./components/ErrorBoundary.js";
 import { ThemeProvider, useTheme } from "./ThemeProvider.js";
@@ -40,6 +41,11 @@ import {
 } from "../update/index.js";
 import type { UpdateInfo } from "../update/types.js";
 import { KEYS } from "../tui/constants/keybindings.js";
+import { runConfigCommand } from "../cli/commands/config.js";
+import {
+  startTelegramClientRuntime,
+  stopTelegramClientRuntime,
+} from "../telegram/runtime.js";
 
 import { Header as _Header } from "./components/Header.js";
 import { WaitingScreen as _WaitingScreen } from "./components/WaitingScreen.js";
@@ -49,6 +55,7 @@ import { SessionPicker as _SessionPicker } from "./components/SessionPicker.js";
 import { UpdateOverlay as _UpdateOverlay } from "./components/UpdateOverlay.js";
 import { Toast as _Toast } from "./components/Toast.js";
 import { ThemeIndicator as _ThemeIndicator } from "./components/ThemeIndicator.js";
+import { TelegramSetupWizard as _TelegramSetupWizard } from "./components/TelegramSetupWizard.js";
 import {
   createNotificationBatcher,
   type NotificationBatcher,
@@ -72,6 +79,9 @@ const SessionPicker = _SessionPicker as unknown as AnyFC<React.ComponentProps<ty
 const UpdateOverlay = _UpdateOverlay as unknown as AnyFC<React.ComponentProps<typeof _UpdateOverlay>>;
 const Toast = _Toast as unknown as AnyFC<React.ComponentProps<typeof _Toast>>;
 const ThemeIndicator = _ThemeIndicator as unknown as AnyFC<Record<string, never>>;
+const TelegramSetupWizard = _TelegramSetupWizard as unknown as AnyFC<
+  React.ComponentProps<typeof _TelegramSetupWizard>
+>;
 
 type AppState = { mode: "PROCESSING" } | { mode: "WAITING" };
 
@@ -85,6 +95,53 @@ interface ToastData {
   message: string;
   type: "success" | "error" | "info";
   title?: string;
+}
+
+function isTelegramConfigured(telegram: {
+  enabled?: boolean;
+  webhookUrl?: string;
+  allowedChatId?: string;
+}): boolean {
+  return (
+    telegram.enabled === true ||
+    (telegram.webhookUrl?.trim().length ?? 0) > 0 ||
+    (telegram.allowedChatId?.trim().length ?? 0) > 0
+  );
+}
+
+function buildTelegramInitCommandArgs(values: {
+  token: string;
+  funnelMode: "auto" | "off";
+  webhookUrl?: string;
+}): string[] {
+  const args = ["telegram", "init", "--token", values.token, "--funnel", values.funnelMode];
+  if (values.funnelMode === "off" && values.webhookUrl) {
+    args.push("--webhook-url", values.webhookUrl);
+  }
+  return args;
+}
+
+function buildTelegramToggleCommandArgs(nextEnabled: boolean): string[] {
+  return ["set", "telegram.enabled", String(nextEnabled)];
+}
+
+async function runConfigCommandExpectSuccess(args: string[]): Promise<void> {
+  const previousExitCode = process.exitCode;
+  process.exitCode = undefined;
+
+  try {
+    await runConfigCommand(args);
+  } catch (error) {
+    process.exitCode = previousExitCode;
+    throw error;
+  }
+
+  const failed = process.exitCode !== undefined;
+  process.exitCode = previousExitCode;
+
+  if (failed) {
+    throw new Error(`Config command failed: ${args.join(" ")}`);
+  }
 }
 
 // Inner App component that has access to ThemeProvider context
@@ -108,6 +165,7 @@ function AppInner({ config }: { config: AUQConfig }) {
   const [changelogContent, setChangelogContent] = useState<string | null>(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [showTelegramWizard, setShowTelegramWizard] = useState(false);
 
   // Notification configuration from config
   const notificationConfig = useMemo(
@@ -130,6 +188,52 @@ function AppInner({ config }: { config: AUQConfig }) {
     },
     [],
   );
+
+  const syncTelegramRuntime = useCallback(async () => {
+    const latestConfig = getConfig();
+    if (!latestConfig.telegram.enabled) {
+      await stopTelegramClientRuntime();
+      return;
+    }
+
+    const result = await startTelegramClientRuntime(latestConfig.telegram);
+    if (result.status === "conflict") {
+      showToast(
+        `Telegram runtime 已由另一個 AUQ 實例承載 (PID ${result.ownerPid})`,
+        "info",
+        "Telegram",
+      );
+    }
+  }, [showToast]);
+
+  const handleWaitingTelegramInit = useCallback(
+    async (values: { token: string; funnelMode: "auto" | "off"; webhookUrl?: string }) => {
+      try {
+        await runConfigCommandExpectSuccess(buildTelegramInitCommandArgs(values));
+        await syncTelegramRuntime();
+        setShowTelegramWizard(false);
+        showToast("Telegram 已完成設定", "success", "Telegram");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Telegram 初始化失敗";
+        showToast(message, "error", "Telegram");
+        throw error;
+      }
+    },
+    [showToast, syncTelegramRuntime],
+  );
+
+  const handleWaitingTelegramToggle = useCallback(async () => {
+    const latest = getConfig();
+    const nextEnabled = !latest.telegram.enabled;
+    try {
+      await runConfigCommandExpectSuccess(buildTelegramToggleCommandArgs(nextEnabled));
+      await syncTelegramRuntime();
+      showToast(nextEnabled ? "Telegram 已啟用" : "Telegram 已停用", "success", "Telegram");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Telegram 狀態切換失敗";
+      showToast(message, "error", "Telegram");
+    }
+  }, [showToast, syncTelegramRuntime]);
 
   // ── Initialize: load existing sessions + start persistent watcher ───
   useEffect(() => {
@@ -204,6 +308,13 @@ function AppInner({ config }: { config: AUQConfig }) {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    void syncTelegramRuntime();
+    return () => {
+      void stopTelegramClientRuntime();
+    };
+  }, [syncTelegramRuntime]);
 
   // ── Auto-update checker ─────────────────────────────────────
   useEffect(() => {
@@ -493,6 +604,20 @@ function AppInner({ config }: { config: AUQConfig }) {
     }
   });
 
+  useKeyboard((key) => {
+    if (state.mode !== "WAITING") return;
+    if (showUpdateOverlay || showTelegramWizard) return;
+    if (key.ctrl || key.meta) return;
+
+    if (key.name?.toLowerCase() !== "t") return;
+    const telegram = getConfig().telegram;
+    if (!isTelegramConfigured(telegram)) {
+      setShowTelegramWizard(true);
+      return;
+    }
+    void handleWaitingTelegramToggle();
+  });
+
   // ── Update overlay handlers ────────────────────────────────────
   const handleUpdateInstall = async () => {
     try {
@@ -619,7 +744,22 @@ function AppInner({ config }: { config: AUQConfig }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mainContent: any;
   if (state.mode === "WAITING") {
-    mainContent = <WaitingScreen queueCount={sessionQueue.length} />;
+    if (showTelegramWizard) {
+      mainContent = (
+        <TelegramSetupWizard
+          onCancel={() => setShowTelegramWizard(false)}
+          onError={(message) => showToast(message, "error", "Telegram")}
+          onSubmit={handleWaitingTelegramInit}
+        />
+      );
+    } else {
+      mainContent = (
+        <WaitingScreen
+          queueCount={sessionQueue.length}
+          showTelegramShortcutHint={true}
+        />
+      );
+    }
   } else {
     const session = sessionQueue[activeSessionIndex];
     if (!session) {
@@ -637,6 +777,9 @@ function AppInner({ config }: { config: AUQConfig }) {
           sessionId={session.sessionId}
           sessionRequest={session.sessionRequest}
           isAbandoned={isSessionAbandoned(sessionMeta.get(session.sessionId)?.status ?? "")}
+          onTelegramConfigChanged={() => {
+            void syncTelegramRuntime();
+          }}
         />
       );
     }

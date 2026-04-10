@@ -125,6 +125,7 @@ export const Footer = ({
       }
 
       bindings.push({ key: KEY_LABELS.THEME, action: t("footer.theme") });
+      bindings.push({ key: "T", action: "Telegram" });
 
       if (hasUpdate) {
         bindings.push({ key: KEY_LABELS.UPDATE, action: "Update" });

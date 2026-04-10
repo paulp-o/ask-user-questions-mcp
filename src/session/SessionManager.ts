@@ -12,6 +12,7 @@ import type {
   SessionConfig,
   SessionRequest,
   SessionStatus,
+  UserAnswer,
 } from "./types.js";
 
 import {
@@ -35,6 +36,8 @@ import {
   sanitizeSessionId,
   validateSessionDirectory,
 } from "./utils.js";
+
+const TELEGRAM_PROGRESS_FILE = "telegram-progress.json";
 
 export class SessionManager {
   private baseDir: string;
@@ -220,6 +223,26 @@ export class SessionManager {
   }
 
   /**
+   * Get active sessions that are still within retention, excluding abandoned/completed.
+   */
+  async getActiveSessionIds(): Promise<string[]> {
+    const pendingSessions = await this.getPendingSessions();
+    const activeSessions: string[] = [];
+
+    for (const sessionId of pendingSessions) {
+      try {
+        const status = await this.getSessionStatus(sessionId);
+        if (!status || this.isSessionRetentionExpired(status)) continue;
+        activeSessions.push(sessionId);
+      } catch {
+        continue;
+      }
+    }
+
+    return activeSessions;
+  }
+
+  /**
    * Get all unread sessions (completed sessions where lastReadAt is not set)
    */
   async getUnreadSessions(): Promise<string[]> {
@@ -340,6 +363,103 @@ export class SessionManager {
 
     // Update session status to completed
     await this.updateSessionStatus(sessionId, "completed");
+  }
+
+  /**
+   * Save intermediate answers without completing the session.
+   * This is used by integrations that collect answers incrementally.
+   */
+  async saveIntermediateAnswers(
+    sessionId: string,
+    answers: SessionAnswer,
+  ): Promise<void> {
+    const exists = await this.sessionExists(sessionId);
+    if (!exists) {
+      throw new Error(`Session not found: ${sessionId}`);
+    }
+
+    const status = await this.getSessionStatus(sessionId);
+    if (!status) {
+      throw new Error(`Session not found: ${sessionId}`);
+    }
+
+    if (status.status === "completed") {
+      throw new Error("SESSION_ALREADY_COMPLETED");
+    }
+
+    await this.writeSessionFile(sessionId, SESSION_FILES.ANSWERS, answers);
+    await this.updateSessionStatus(sessionId, "in-progress");
+  }
+
+  async getQuestionCount(sessionId: string): Promise<number> {
+    const request = await this.getSessionRequest(sessionId);
+    if (!request) {
+      throw new Error(`Session not found: ${sessionId}`);
+    }
+    return request.questions.length;
+  }
+
+  async getQuestionByIndex(sessionId: string, questionIndex: number): Promise<Question> {
+    const request = await this.getSessionRequest(sessionId);
+    if (!request) {
+      throw new Error(`Session not found: ${sessionId}`);
+    }
+    const question = request.questions[questionIndex];
+    if (!question) {
+      throw new Error(`Invalid question index: ${questionIndex}`);
+    }
+    return question;
+  }
+
+  async upsertAnswer(
+    sessionId: string,
+    answer: UserAnswer,
+  ): Promise<SessionAnswer> {
+    const exists = await this.sessionExists(sessionId);
+    if (!exists) {
+      throw new Error(`Session not found: ${sessionId}`);
+    }
+
+    const status = await this.getSessionStatus(sessionId);
+    if (!status) {
+      throw new Error(`Session not found: ${sessionId}`);
+    }
+    if (status.status === "completed") {
+      throw new Error("SESSION_ALREADY_COMPLETED");
+    }
+
+    let progress: SessionAnswer | null = null;
+    try {
+      progress = await this.readSessionFile<SessionAnswer>(
+        sessionId,
+        TELEGRAM_PROGRESS_FILE,
+        null,
+      );
+    } catch {
+      progress = null;
+    }
+    const nextAnswers = progress?.answers ? [...progress.answers] : [];
+    const idx = nextAnswers.findIndex(
+      (item) => item.questionIndex === answer.questionIndex,
+    );
+    if (idx >= 0) {
+      nextAnswers[idx] = answer;
+    } else {
+      nextAnswers.push(answer);
+    }
+
+    const merged: SessionAnswer = {
+      answers: nextAnswers,
+      sessionId,
+      timestamp: new Date().toISOString(),
+      callId: progress?.callId,
+      workingDirectory: progress?.workingDirectory,
+      lastReadAt: progress?.lastReadAt,
+    };
+
+    await this.writeSessionFile(sessionId, TELEGRAM_PROGRESS_FILE, merged);
+    await this.updateSessionStatus(sessionId, "in-progress");
+    return merged;
   }
 
   /**

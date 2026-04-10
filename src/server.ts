@@ -5,8 +5,13 @@ import {
   createAskUserQuestionsCore,
 } from "./core/ask-user-questions.js";
 import { GetAnsweredQuestionsArgsSchema, GET_ANSWERED_QUESTIONS_DESCRIPTION, TOOL_DESCRIPTION } from "./shared/schemas.js";
+import { getConfig } from "./config/ConfigLoader.js";
+import {
+  dispatchSessionToTelegram,
+} from "./telegram/notifier.js";
 
 const askUserQuestionsCore = createAskUserQuestionsCore();
+const runtimeConfig = getConfig();
 
 // Track active requests with their AbortControllers for disconnect handling
 const activeRequests = new Map<string, { controller: AbortController; sessionId?: string }>();
@@ -80,6 +85,16 @@ server.addTool({
             callId,
             workingDirectory,
           );
+          await dispatchSessionToTelegram(
+            args.questions.map((q) => ({
+              options: q.options.map((o) => ({ label: o.label, description: o.description })),
+              prompt: q.prompt,
+              title: q.title,
+              multiSelect: q.multiSelect,
+            })),
+            sessionId,
+            runtimeConfig.telegram,
+          ).catch(() => {});
           const shortId = sessionId.slice(0, 8);
           const responseText =
             `[Session: ${shortId} | Questions: ${questionCount} | Status: pending]\n\n` +
