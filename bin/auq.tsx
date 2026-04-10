@@ -182,9 +182,17 @@ if (command === "server") {
   // Import and start the MCP server directly
   // This avoids spawning a subprocess and outputting non-JSON to stdout
   await import("../src/server.js");
-  // The server will start and handle stdio communication
-  // Keep process alive
-  await new Promise(() => {});
+  // Bun can busy-loop at 100% CPU on unresolved top-level await promises.
+  // Keep the process alive with a low-frequency timer and shut down on signals.
+  await new Promise<void>((resolve) => {
+    const keepAlive = setInterval(() => {}, 60_000);
+    const stop = () => {
+      clearInterval(keepAlive);
+      resolve();
+    };
+    process.once("SIGINT", stop);
+    process.once("SIGTERM", stop);
+  });
 }
 
 // Handle 'update' command
