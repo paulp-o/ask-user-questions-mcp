@@ -258,6 +258,48 @@ describe("SessionManager", () => {
     });
   });
 
+  describe("getActiveSessionIds", () => {
+    it("should include pending and in-progress sessions but exclude completed, abandoned, and expired sessions", async () => {
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
+
+      const pendingId = await sessionManager.createSession(questions);
+      const inProgressId = await sessionManager.createSession(questions);
+      await sessionManager.updateSessionStatus(inProgressId, "in-progress");
+      const completedId = await sessionManager.createSession(questions);
+      await sessionManager.updateSessionStatus(completedId, "completed");
+      const abandonedId = await sessionManager.createSession(questions);
+      await sessionManager.updateSessionStatus(abandonedId, "abandoned");
+
+      const active = await sessionManager.getActiveSessionIds();
+
+      expect(active).toContain(pendingId);
+      expect(active).toContain(inProgressId);
+      expect(active).not.toContain(completedId);
+      expect(active).not.toContain(abandonedId);
+    });
+
+    it("should exclude sessions older than retention period", async () => {
+      const shortRetentionManager = new SessionManager({
+        baseDir: testBaseDir,
+        retentionPeriod: 500,
+      } as SessionConfig);
+
+      await shortRetentionManager.initialize();
+
+      const questions = [
+        { options: [{ label: "Opt" }], prompt: "Test", title: "Test" },
+      ];
+      const sessionId = await shortRetentionManager.createSession(questions);
+
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      const active = await shortRetentionManager.getActiveSessionIds();
+      expect(active).not.toContain(sessionId);
+    });
+  });
+
   describe("isSessionLimitReached", () => {
     it("should return false when under limit", async () => {
       const questions = [
@@ -737,6 +779,33 @@ describe("SessionManager", () => {
       expect(result1.formattedResponse).toContain("Option 1");
       expect(result2.sessionId).toBe(sessionId2);
       expect(result2.formattedResponse).toContain("Option 2");
+    });
+  });
+
+  describe("incremental telegram-style answers", () => {
+    it("should keep session in-progress until all answers are present", async () => {
+      const questions: Question[] = [
+        {
+          options: [{ label: "A" }, { label: "B" }],
+          prompt: "Q1?",
+          title: "Q1",
+        },
+        {
+          options: [{ label: "C" }, { label: "D" }],
+          prompt: "Q2?",
+          title: "Q2",
+        },
+      ];
+      const sessionId = await sessionManager.createSession(questions);
+
+      await sessionManager.upsertAnswer(sessionId, {
+        questionIndex: 0,
+        selectedOption: "A",
+        timestamp: getCurrentTimestamp(),
+      });
+
+      const status = await sessionManager.getSessionStatus(sessionId);
+      expect(status?.status).toBe("in-progress");
     });
   });
 
