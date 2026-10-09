@@ -30,8 +30,8 @@ The system SHALL use configurable values for session parameters including stale 
 
 - **WHEN** no config file exists or settings are unspecified
 - **THEN** the system SHALL use built-in defaults:
-  - maxOptions: 4
-  - maxQuestions: 4
+  - maxOptions: 5
+  - maxQuestions: 5
   - sessionTimeout: 0 (infinite)
   - retentionPeriod: 604800000 (7 days)
   - staleThreshold: 7200000 (2 hours)
