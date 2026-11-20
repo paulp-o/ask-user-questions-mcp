@@ -107,6 +107,9 @@ GLOBAL FLAGS
   -h, --help                   Show this help
   -v, --version                Show version number
   --json                       Output as machine-readable JSON (supported by most commands)
+  --web, -w                    Start the web UI (Hono server + React SPA) instead of TUI
+    --no-open                  Do not open browser automatically when using --web
+    --port <number>            Port for the web server (default: 3000, auto-increments if taken)
 
 CONFIG KEYS (for 'config get/set')
   maxOptions      number (2-10)              Max options per question
@@ -114,12 +117,12 @@ CONFIG KEYS (for 'config get/set')
   sessionTimeout  number (ms)                Session timeout in milliseconds
   theme           string                     UI theme name
   language        string                     UI language
-  renderer        \"ink\" | \"opentui\"          TUI renderer engine
+  renderer        "ink" | "opentui" | "web"   TUI/web renderer engine
   staleAction     \"warn\"|\"remove\"|\"archive\"  Action for stale sessions
   updateCheck     boolean                    Enable/disable auto-update checks
 
 ENVIRONMENT VARIABLES
-  AUQ_RENDERER         Override renderer (\"ink\" or \"opentui\")
+  AUQ_RENDERER         Override renderer ("ink", "opentui", or "web")
   AUQ_SESSION_DIR      Custom session storage directory
   XDG_CONFIG_HOME      Custom config directory (default: ~/.config)
   NO_UPDATE_NOTIFIER   Set to \"1\" to disable update checks
@@ -356,6 +359,29 @@ if (command === "history") {
   const { runHistoryCommand } = await import("../src/cli/commands/history.js");
   await runHistoryCommand(args.slice(1));
   await updateNotification;
+  process.exit(0);
+}
+
+// Handle --web / -w flag
+const isWebMode = args.includes("--web") || args.includes("-w");
+if (isWebMode) {
+  const noOpen = args.includes("--no-open");
+  const portFlagIndex = args.findIndex((a) => a === "--port");
+  const port = portFlagIndex !== -1 ? Number(args[portFlagIndex + 1]) || undefined : undefined;
+
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = "production";
+  }
+
+  const { getConfig } = await import("../src/config/index.js");
+  const { initI18n } = await import("../src/i18n/index.js");
+  const webConfig = getConfig();
+  initI18n(webConfig.language);
+
+  const { startWebServer } = (await import("../src/web-server/index.js")) as {
+    startWebServer: (opts: { open?: boolean; port?: number; config: typeof webConfig }) => Promise<void>;
+  };
+  await startWebServer({ open: !noOpen, port, config: webConfig });
   process.exit(0);
 }
 

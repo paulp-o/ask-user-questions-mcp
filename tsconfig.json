@@ -3,7 +3,12 @@
   "compilerOptions": {
     "outDir": "dist",
     "jsx": "react",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@auq/shared": ["./packages/shared/src/index.ts"],
+      "@auq/shared/*": ["./packages/shared/src/*"]
+    }
   },
   "include": [
     "src",

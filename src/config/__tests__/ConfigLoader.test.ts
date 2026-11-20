@@ -252,6 +252,29 @@ describe("ConfigLoader", () => {
       expect(config.renderer).toBe("opentui");
     });
 
+    it("should load renderer: 'web' from config file", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ renderer: "web" }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.renderer).toBe("web");
+    });
+
+    it("should fall back to 'opentui' for renderer: 'invalid'", () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify({ renderer: "invalid" }),
+      );
+
+      const config = loadConfig();
+
+      expect(config.renderer).toBe(DEFAULT_CONFIG.renderer);
+      expect(config.renderer).toBe("opentui");
+    });
+
     it("should preserve other config values alongside renderer setting", () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue(

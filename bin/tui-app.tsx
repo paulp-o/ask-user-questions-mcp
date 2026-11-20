@@ -871,6 +871,14 @@ export const runTui = async (config?: AUQConfig): Promise<void> => {
   const mergedConfig: AUQConfig = { ...DEFAULT_CONFIG, ...config };
   const rendererType = process.env.AUQ_RENDERER || mergedConfig.renderer || "opentui";
 
+  if (rendererType === "web") {
+    const { startWebServer } = (await import("../src/web-server/index.js")) as {
+      startWebServer: (opts: { open?: boolean; port?: number; config: AUQConfig }) => Promise<void>;
+    };
+    await startWebServer({ config: mergedConfig });
+    return;
+  }
+
   if (rendererType === "opentui") {
     try {
       const opentuiPath = "../src/tui-opentui/app.js";

@@ -1,0 +1,31 @@
+{
+  "name": "@auq/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./session-types": {
+      "import": "./dist/session-types.js",
+      "types": "./dist/session-types.d.ts"
+    },
+    "./config-types": {
+      "import": "./dist/config-types.js",
+      "types": "./dist/config-types.d.ts"
+    },
+    "./ws-protocol": {
+      "import": "./dist/ws-protocol.js",
+      "types": "./dist/ws-protocol.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "zod": "^4.1.13"
+  }
+}
