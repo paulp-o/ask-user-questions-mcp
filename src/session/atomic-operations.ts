@@ -89,10 +89,12 @@ export async function atomicCopyFile(
   options: AtomicWriteOptions = {},
 ): Promise<void> {
   const opts = { ...DEFAULT_WRITE_OPTIONS, ...options };
+  let lockAcquired = false;
 
   try {
     // Acquire destination lock
     await acquireLock(destPath);
+    lockAcquired = true;
 
     // Perform atomic copy
     await new Promise<void>((resolve, reject) => {
@@ -115,7 +117,7 @@ export async function atomicCopyFile(
       error as Error,
     );
   } finally {
-    await releaseLock(destPath);
+    if (lockAcquired) await releaseLock(destPath);
   }
 }
 
@@ -123,8 +125,10 @@ export async function atomicCopyFile(
  * Atomic file delete operation
  */
 export async function atomicDeleteFile(filePath: string): Promise<void> {
+  let lockAcquired = false;
   try {
     await acquireLock(filePath);
+    lockAcquired = true;
     await fs.unlink(filePath);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -138,7 +142,7 @@ export async function atomicDeleteFile(filePath: string): Promise<void> {
       error as Error,
     );
   } finally {
-    await releaseLock(filePath);
+    if (lockAcquired) await releaseLock(filePath);
   }
 }
 
@@ -207,10 +211,12 @@ export async function atomicWriteFile(
   const opts = { ...DEFAULT_WRITE_OPTIONS, ...options };
   // Keep temp and destination on the same filesystem to preserve atomic rename().
   const tempPath = generateTempPath(filePath, opts.tmpDir || dirname(filePath));
+  let lockAcquired = false;
 
   try {
     // Acquire file lock
     await acquireLock(filePath);
+    lockAcquired = true;
 
     // Write to temporary file first
     await fs.writeFile(tempPath, data, {
@@ -262,8 +268,8 @@ export async function atomicWriteFile(
     }
     throw new AtomicWriteError(filePath, error as Error);
   } finally {
-    // Always release the lock
-    await releaseLock(filePath);
+    // A timed-out contender must not release the active owner's lock.
+    if (lockAcquired) await releaseLock(filePath);
   }
 }
 
