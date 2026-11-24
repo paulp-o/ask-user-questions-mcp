@@ -3,8 +3,10 @@
  */
 
 import { promises as fs } from "fs";
-import { join } from "path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { tmpdir } from "os";
+import { dirname, join } from "path";
+import { setTimeout as delay } from "timers/promises";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   atomicCopyFile,
@@ -19,8 +21,9 @@ import {
   waitForFileUnlock,
 } from "../atomic-operations.js";
 
+const testDir = await fs.mkdtemp(join(tmpdir(), "auq-atomic-test-"));
+
 describe("Atomic File Operations", () => {
-  const testDir = "/tmp/auq-atomic-test";
   const testFile = join(testDir, "test.txt");
   const testContent = "Hello, Atomic World!";
 
@@ -31,11 +34,36 @@ describe("Atomic File Operations", () => {
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     // Clean up test directory after each test
     await fs.rm(testDir, { force: true, recursive: true }).catch(() => {});
   });
 
   describe("atomicWriteFile", () => {
+    it("creates default temporary files beside the destination", async () => {
+      const writeSpy = vi.spyOn(fs, "writeFile");
+      await atomicWriteFile(testFile, testContent);
+
+      const tempWrite = writeSpy.mock.calls.find(([path]) =>
+        String(path).endsWith(".tmp"),
+      );
+      expect(tempWrite).toBeDefined();
+      expect(dirname(String(tempWrite![0]))).toBe(testDir);
+    });
+
+    it("honors an explicitly configured temporary directory", async () => {
+      const customTmpDir = join(testDir, "custom-tmp");
+      await fs.mkdir(customTmpDir);
+      const writeSpy = vi.spyOn(fs, "writeFile");
+      await atomicWriteFile(testFile, testContent, { tmpDir: customTmpDir });
+
+      const tempWrite = writeSpy.mock.calls.find(([path]) =>
+        String(path).endsWith(".tmp"),
+      );
+      expect(tempWrite).toBeDefined();
+      expect(dirname(String(tempWrite![0]))).toBe(customTmpDir);
+    });
+
     it("should write file atomically with correct content", async () => {
       await atomicWriteFile(testFile, testContent);
 
@@ -60,25 +88,24 @@ describe("Atomic File Operations", () => {
       expect(content).toBe(testContent);
     });
 
-    it("should clean up temporary files on failure", async () => {
-      const invalidDir = "/invalid/directory/path";
-      const invalidFile = join(invalidDir, "test.txt");
+    it("cleans up temporary files and locks after rename failure", async () => {
+      const destinationDirectory = join(testDir, "destination");
+      await fs.mkdir(destinationDirectory);
 
-      try {
-        await atomicWriteFile(invalidFile, testContent, { tmpDir: "/tmp" });
-        expect.fail("Should have thrown an error");
-      } catch (error) {
-        expect(error).toBeInstanceOf(AtomicWriteError);
-      }
-
-      // Verify no temporary files were left in the configured temp directory
-      const tempFiles = await fs
-        .readdir("/tmp")
-        .then((files) => files.filter((file) => file.includes(".tmp")));
-      const testTempFiles = tempFiles.filter((file) =>
-        file.includes("test.txt"),
+      const error = await atomicWriteFile(
+        destinationDirectory,
+        testContent,
+      ).then(
+        () => undefined,
+        (error: unknown) => error,
       );
-      expect(testTempFiles).toHaveLength(0);
+      expect(error).toBeInstanceOf(AtomicWriteError);
+      expect((error as AtomicWriteError).cause).toMatchObject({
+        syscall: "rename",
+      });
+
+      expect(await fs.readdir(testDir)).toEqual(["destination"]);
+      expect(await isFileLocked(destinationDirectory)).toBe(false);
     });
 
     it("should verify data integrity after write", async () => {
@@ -252,46 +279,27 @@ describe("Atomic File Operations", () => {
 
     it("should wait for file unlock", async () => {
       const lockFile = `${testFile}.lock`;
+      await fs.writeFile(lockFile, process.pid.toString(), { mode: 0o600 });
 
-      // Create a lock file
-      await fs.writeFile(lockFile, "999999", { mode: 0o600 });
+      const unlockPromise = waitForFileUnlock(testFile, 5000);
+      const initialState = await Promise.race([
+        unlockPromise.then(() => "unlocked"),
+        delay(150).then(() => "locked"),
+      ]);
+      expect(initialState).toBe("locked");
 
-      // Start unlock wait in background
-      const unlockPromise = waitForFileUnlock(testFile, 1000);
-
-      // Remove the lock file after a short delay
-      setTimeout(async () => {
-        await fs.unlink(lockFile);
-      }, 100);
-
-      // Should complete once lock is released
+      await fs.unlink(lockFile);
       await expect(unlockPromise).resolves.toBeUndefined();
     });
 
     it("should timeout waiting for file unlock", async () => {
       const lockFile = `${testFile}.lock`;
-
-      // Create the target file first
       await fs.writeFile(testFile, testContent);
+      await fs.writeFile(lockFile, process.pid.toString(), { mode: 0o600 });
 
-      // Create a lock file with a fake PID that won't be killed
-      await fs.writeFile(lockFile, "999999", { mode: 0o600 });
-
-      try {
-        await waitForFileUnlock(testFile, 100); // Short timeout
-        expect.fail("Should have timed out");
-      } catch (error) {
-        expect(error).toBeInstanceOf(FileLockError);
-        // Log the actual error to understand what's happening
-        console.log("Timeout test error:", (error as Error).message);
-
-        // Accept any FileLockError as the timeout behavior
-        expect(error).toBeInstanceOf(FileLockError);
-      } finally {
-        // Clean up lock file and test file
-        await fs.unlink(lockFile).catch(() => {});
-        await fs.unlink(testFile).catch(() => {});
-      }
+      await expect(waitForFileUnlock(testFile, 100)).rejects.toBeInstanceOf(
+        FileLockError,
+      );
     });
   });
 
@@ -333,9 +341,10 @@ describe("Atomic File Operations", () => {
     });
 
     it("should provide specific error types", async () => {
+      const nonExistentFile = join(testDir, "missing", "file.txt");
       // Test AtomicReadError
       try {
-        await atomicReadFile("/non/existent/file.txt");
+        await atomicReadFile(nonExistentFile);
         expect.fail("Should have thrown AtomicReadError");
       } catch (error) {
         expect(error).toBeInstanceOf(AtomicReadError);
@@ -343,7 +352,7 @@ describe("Atomic File Operations", () => {
 
       // Test AtomicWriteError
       try {
-        await atomicWriteFile("/invalid/path/file.txt", "content");
+        await atomicWriteFile(nonExistentFile, "content");
         expect.fail("Should have thrown AtomicWriteError");
       } catch (error) {
         expect(error).toBeInstanceOf(AtomicWriteError);
