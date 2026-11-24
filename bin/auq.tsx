@@ -18,8 +18,16 @@ if (command === "--help" || command === "-h") {
   const __filenameH = fileURLToPath(import.meta.url);
   const __dirnameH = dirname(__filenameH);
   let _helpVersion = "unknown";
-  for (const _p of [join(__dirnameH, "..", "package.json"), join(__dirnameH, "..", "..", "package.json")]) {
-    try { _helpVersion = JSON.parse(readFileSync(_p, "utf-8")).version; break; } catch { /* try next */ }
+  for (const _p of [
+    join(__dirnameH, "..", "package.json"),
+    join(__dirnameH, "..", "..", "package.json"),
+  ]) {
+    try {
+      _helpVersion = JSON.parse(readFileSync(_p, "utf-8")).version;
+      break;
+    } catch {
+      /* try next */
+    }
   }
   console.log(`auq - Ask User Questions (MCP Server + Interactive TUI)
 Version: ${_helpVersion}
@@ -171,12 +179,10 @@ if (command === "--version" || command === "-v") {
 
 // Handle 'server' command
 if (command === "server") {
-  // Import and start the MCP server directly
-  // This avoids spawning a subprocess and outputting non-JSON to stdout
+  // Import and start the MCP server directly.
+  // The stdio transport owns the process lifetime; do not keep a pending
+  // top-level promise here, which can spin the Bun event loop when orphaned.
   await import("../src/server.js");
-  // The server will start and handle stdio communication
-  // Keep process alive
-  await new Promise(() => {});
 }
 
 // Handle 'update' command
@@ -329,7 +335,8 @@ if (command === "answer") {
 
 // Handle 'sessions' command
 if (command === "sessions") {
-  const { runSessionsCommand } = await import("../src/cli/commands/sessions.js");
+  const { runSessionsCommand } =
+    await import("../src/cli/commands/sessions.js");
   await runSessionsCommand(args.slice(1));
   await updateNotification;
   process.exit(0);
@@ -345,7 +352,8 @@ if (command === "config") {
 
 // Handle 'fetch-answers' command
 if (command === "fetch-answers") {
-  const { runFetchAnswersCommand } = await import("../src/cli/commands/fetch-answers.js");
+  const { runFetchAnswersCommand } =
+    await import("../src/cli/commands/fetch-answers.js");
   await runFetchAnswersCommand(args.slice(1));
   await updateNotification;
   process.exit(0);
@@ -359,20 +367,23 @@ if (command === "history") {
   process.exit(0);
 }
 
-// Default: Start TUI
-// Important: Lazy-load Ink/React so non-interactive commands (ask/server) don't pull them in.
-// Also force production mode before importing React/Ink to avoid perf_hooks measure accumulation warnings.
-if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = "production";
+// Default: Start TUI. The server command stays alive through its stdio
+// listeners instead of blocking here, so it must not fall through to the TUI.
+if (command !== "server") {
+  // Important: Lazy-load Ink/React so non-interactive commands (ask/server) don't pull them in.
+  // Also force production mode before importing React/Ink to avoid perf_hooks measure accumulation warnings.
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = "production";
+  }
+
+  // Load configuration before starting TUI
+  const { getConfig } = await import("../src/config/index.js");
+  const { initI18n } = await import("../src/i18n/index.js");
+
+  // Initialize config and i18n
+  const config = getConfig();
+  initI18n(config.language);
+
+  const { runTui } = await import("./tui-app.js");
+  runTui(config);
 }
-
-// Load configuration before starting TUI
-const { getConfig } = await import("../src/config/index.js");
-const { initI18n } = await import("../src/i18n/index.js");
-
-// Initialize config and i18n
-const config = getConfig();
-initI18n(config.language);
-
-const { runTui } = await import("./tui-app.js");
-runTui(config);
