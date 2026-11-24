@@ -6,6 +6,7 @@ import type { SessionRequest } from "../../session/types.js";
 import { useTheme } from "../ThemeProvider.js";
 import type { Answer, SessionUIState } from "../../tui/shared/types.js";
 import { formatRelativeTime } from "../../tui/shared/utils/relativeTime.js";
+import { getVimNavigationDirection } from "../../tui/shared/utils/vimNavigation.js";
 import { KEYS } from "../../tui/constants/keybindings.js";
 import { useTerminalDimensions } from "../hooks/useTerminalDimensions.js";
 
@@ -96,9 +97,10 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
   useKeyboard((key) => {
     if (!isOpen) return;
 
-    if (key.name === "up") {
+    const vimDirection = getVimNavigationDirection(key.name, key, false);
+    if (key.name === "up" || vimDirection === "up") {
       setHighlightIndex((prev) => Math.max(0, prev - 1));
-    } else if (key.name === "down") {
+    } else if (key.name === "down" || vimDirection === "down") {
       setHighlightIndex((prev) => Math.min(sessions.length - 1, prev + 1));
     } else if (key.name === "return") {
       onSelectIndex(highlightIndex);

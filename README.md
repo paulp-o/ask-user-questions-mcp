@@ -307,7 +307,8 @@ It is recommended to **disable** the built-in questioning tool in your harness (
 
 | Key      | Action                                                             |
 | -------- | ------------------------------------------------------------------ |
-| `↑↓`     | Navigate options                                                   |
+| `↑↓`     | Navigate options or session picker rows                         |
+| `j` / `k` | Navigate down/up outside text input                             |
 | `←→/Tab` | Switch between questions                                           |
 | `Space`  | Select/toggle option without advancing                             |
 | `Enter`  | Select option and advance to next question                         |

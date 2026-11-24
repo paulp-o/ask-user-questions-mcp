@@ -30,6 +30,8 @@ interface StepperViewProps {
   }) => void;
   sessionId: string;
   sessionRequest: SessionRequest;
+  /** Disable all question input while a modal session/update overlay is open. */
+  isInputActive?: boolean;
   /** Whether this session is abandoned (AI disconnected) */
   isAbandoned?: boolean;
   /** Called when user cancels an abandoned session */
@@ -49,6 +51,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   onFlowStateChange,
   sessionId,
   sessionRequest,
+  isInputActive = true,
   isAbandoned,
   onAbandonedCancel,
 }) => {
@@ -507,7 +510,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     if (key.escape) {
       onAbandonedCancel?.();
     }
-  });
+  }, { isActive: isInputActive && showAbandonedConfirm });
 
   // Global keyboard shortcuts and navigation
   useInput((input, key) => {
@@ -629,7 +632,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     ) {
       setCurrentQuestionIndex((prev) => prev + 1);
     }
-  });
+  }, { isActive: isInputActive });
 
   const currentAnswer = answers.get(currentQuestionIndex);
 
@@ -738,6 +741,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
     return (
       <Box flexDirection="column" padding={1}>
         <ConfirmationDialog
+          isInputActive={isInputActive}
           message={t("confirmation.rejectMessage")}
           onCancel={() => setShowRejectionConfirm(false)}
           onQuit={() => exit()}
@@ -751,6 +755,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
   if (showReview) {
     return (
       <ReviewScreen
+        isInputActive={isInputActive}
         isSubmitting={submitting}
         answers={answers}
         elapsedLabel={elapsedLabel}
@@ -782,6 +787,7 @@ export const StepperView: React.FC<StepperViewProps> = ({
       onFocusContextChange={setFocusContext}
       focusedOptionIndex={focusedOptionIndex}
       onFocusedOptionIndexChange={setFocusedOptionIndex}
+      isInputActive={isInputActive}
       workingDirectory={sessionRequest.workingDirectory}
       onRecommendedDetected={setHasRecommendedOptions}
       hasRecommendedOptions={hasRecommendedOptions}

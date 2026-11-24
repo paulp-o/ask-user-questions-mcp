@@ -748,6 +748,7 @@ const App: React.FC<AppProps> = ({ config }) => {
           hasMultipleSessions={sessionQueue.length >= 2}
           sessionId={session.sessionId}
           sessionRequest={session.sessionRequest}
+          isInputActive={!showSessionPicker && !showUpdateOverlay}
           isAbandoned={isSessionAbandoned(sessionMeta.get(session.sessionId)?.status ?? "")}
         />
       );

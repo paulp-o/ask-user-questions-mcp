@@ -5,6 +5,7 @@ import type { SessionRequest } from "../../session/types.js";
 import { useTheme } from "../ThemeContext.js";
 import type { Answer, SessionUIState } from "../shared/types.js";
 import { formatRelativeTime } from "../shared/utils/relativeTime.js";
+import { getVimNavigationDirection } from "../shared/utils/vimNavigation.js";
 import { KEYS } from "../constants/keybindings.js";
 
 /* ------------------------------------------------------------------ */
@@ -95,9 +96,10 @@ export const SessionPicker: React.FC<SessionPickerProps> = ({
   // ── Keyboard handling (only active when overlay is open) ────────
   useInput(
     (input, key) => {
-      if (key.upArrow) {
+      const vimDirection = getVimNavigationDirection(input, key, false);
+      if (key.upArrow || vimDirection === "up") {
         setHighlightIndex((prev) => Math.max(0, prev - 1));
-      } else if (key.downArrow) {
+      } else if (key.downArrow || vimDirection === "down") {
         setHighlightIndex((prev) => Math.min(sessions.length - 1, prev + 1));
       } else if (key.return) {
         onSelectIndex(highlightIndex);
