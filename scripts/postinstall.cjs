@@ -5,11 +5,23 @@
  * Provides instructions for setting up shell aliases
  */
 
+const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
 // Check if this is a global installation
 const isGlobal = process.env.npm_config_global === "true";
+
+// POSIX keeps the checked-in Bun-first shell launcher, which also works when
+// Bun skips install hooks. Windows npm shims need the Node launcher. Avoid
+// rewriting a contributor's checkout when this is the root project's install.
+const isRootProjectInstall =
+  path.resolve(process.env.INIT_CWD ?? process.cwd()) === process.cwd();
+if (process.platform === "win32" && !isRootProjectInstall) {
+  const launcher = path.join(__dirname, "../bin/auq");
+  fs.copyFileSync(path.join(__dirname, "auq-node.mjs"), launcher);
+  fs.chmodSync(launcher, 0o755);
+}
 
 if (!isGlobal) {
   // Local install - no setup needed
@@ -18,7 +30,7 @@ if (!isGlobal) {
 
 // Detect if installed via Bun
 const isBun = process.env.BUN_INSTALL || typeof Bun !== "undefined";
-const runCmd = isBun ? "bunx" : "npx";
+const runCmd = isBun ? "bunx --bun" : "npx";
 
 console.log("\n✅ AUQ MCP Server installed successfully!\n");
 console.log("📝 Optional: Set up shell aliases for convenience\n");

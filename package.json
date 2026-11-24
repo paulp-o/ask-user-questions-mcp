@@ -8,6 +8,7 @@
   "files": [
     "dist",
     "bin/auq",
+    "scripts/auq-node.mjs",
     "scripts/postinstall.cjs",
     "README.md",
     "LICENSE"

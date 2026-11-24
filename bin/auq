@@ -1,8 +1,6 @@
 #!/bin/sh
-# Runtime auto-detection wrapper for auq
-# Prefers bun (required for OpenTUI renderer), falls back to node (ink renderer only)
-
-# Resolve the real path of this script (handles symlinks from global installs)
+# Default POSIX launcher. It works without Node or install hooks when Bun is
+# available; Windows installation replaces this with scripts/auq-node.mjs.
 SCRIPT="$0"
 while [ -L "$SCRIPT" ]; do
   SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT")" && pwd)"
