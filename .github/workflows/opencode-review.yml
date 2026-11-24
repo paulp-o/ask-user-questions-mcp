@@ -34,30 +34,12 @@ jobs:
             ## Project Context Files (READ THESE FIRST)
             Before reviewing, read these files:
             - `AGENTS.md` - AI assistant instructions and project rules
-            - `openspec/AGENTS.md` - OpenSpec workflow and spec-driven development guidelines
-            - `openspec/project.md` - Project conventions, tech stack, and domain context
+            - `README.md` - Installation, configuration, and project usage
             - `docs/design-system.md` - Design rules, UI constraints, and component usage
-
-            ## OpenSpec Directory Structure
-            The `openspec/` folder at the repository root contains:
-            - `specs/` - Current specifications for each capability:
-              - authentication, base-layout, contribution-management, history-log
-              - notification-system, project-invitation, project-management
-              - project-setup, task-management, team-member-management, timeline-feature
-            - `changes/` - Pending change proposals
-            - `project.md` - Project conventions and tech stack
 
             ## FIRST: Add Labels
             Analyze the issue/PR and add appropriate labels using `gh` CLI.
             You should add labels AFTER performing some ANALYSIS on the codebase. Do NOT add labels right after you read the issue/PR description.
-
-            ### Required Labels (OpenSpec Requirement - Must Choose One)
-            You MUST choose exactly ONE of: `spec needed` or `non-spec`
-
-            | Label | When to use |
-            |-------|-------------|
-            | `spec needed` | Work that requires OpenSpec proposal (new features, breaking changes, architecture changes, etc.) |
-            | `non-spec` | Work that doesn't require OpenSpec proposal (bug fixes, typos, documentation, config changes, etc.) |
 
             ### Required Type Labels (Choose AT LEAST ONE from this group)
             | Label | When to use |
@@ -83,26 +65,23 @@ jobs:
             - For issues: `gh issue edit <number> --add-label "label1,label2"`
             - For PRs: `gh pr edit <number> --add-label "label1,label2"`
 
-            **IMPORTANT**: You MUST choose exactly one of `spec needed` or `non-spec` labels.
-
             ## Review Tasks
 
-            ### 1. Identify Related Specs
-            - Check which specs in `openspec/specs/` relate to this issue/PR
-            - For PRs, read commit messages to identify affected features
+            ### 1. Identify Related Code
+            - Inspect relevant source files, tests, and existing documentation
+            - For PRs, read commit messages to identify affected capabilities
 
-            ### 2. Classify & Check Proposal
-            - Bug fix / Typo / Config → Can proceed directly
-            - New feature / Breaking change → Needs OpenSpec proposal in `openspec/changes/`
-            - Check for conflicts with pending proposals
+            ### 2. Classify the Change
+            - Identify the change type and whether it contains breaking behavior
+            - Check that the implementation and tests cover the stated change
 
             ## Response Format (in English)
 
-            ### Related Specs
-            - List of openspec documents reviewed
+            ### Related Code
+            - List the source files, tests, and documentation reviewed
 
             ### Classification
-            - Issue/PR type and whether an OpenSpec proposal is needed (required!)
+            - Issue/PR type and any breaking changes
 
             ### Review Results (if PR)
             - Checklist violations

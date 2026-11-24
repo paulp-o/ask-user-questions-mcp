@@ -46,8 +46,7 @@ jobs:
             ## Project Context
             Read as needed:
             - `AGENTS.md` - Project rules
-            - `openspec/project.md` - Tech stack, conventions
-            - `openspec/specs/` - Feature specifications
+            - `README.md` - Installation, configuration, and project usage
             - `docs/design-system.md` - UI constraints
 
             ## Labels (when asked to add/manage labels)
@@ -58,8 +57,7 @@ jobs:
             - `gh pr edit <number> --add-label "label1,label2"`
 
             ## When User EXPLICITLY Asks for Implementation
-            - Check specs in `openspec/specs/<capability>/spec.md`
-            - New features need OpenSpec proposal in `openspec/changes/`
+            - Inspect the existing implementation and tests for affected capabilities
 
             ## When User EXPLICITLY Asks for PR/Commit
             - Use conventional commits (feat:, fix:, docs:) for commit messages
