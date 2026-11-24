@@ -57,11 +57,13 @@ First, install the **AUQ CLI**:
 
 ### Global Installation (Recommended)
 
-**Bun (recommended — required for default OpenTUI renderer)**
+**Bun (recommended on macOS/Linux — required for default OpenTUI renderer)**
 
 ```bash
 bun add -g auq-mcp-server
 ```
+
+On Windows, use the npm global installation below or run without a global install via `bunx --bun auq-mcp-server`.
 
 **npm**
 ```bash
@@ -78,7 +80,7 @@ pnpm add -g auq-mcp-server
 yarn global add auq-mcp-server
 ```
 
-> **Note:** Bun is recommended for the default OpenTUI renderer. When installed via npm/pnpm/yarn, the shell wrapper auto-detects Bun at runtime. If Bun is not available, it falls back to Node.js with the legacy Ink renderer.
+> **Note:** macOS/Linux global installations use a Bun-first shell launcher without requiring install hooks. On Windows, npm installation selects a Node-based launcher before creating shims. Both auto-detect Bun at runtime; if Bun is unavailable, they fall back to Node.js with the legacy Ink renderer. For a Node-free `bunx` setup, use `bunx --bun`.
 
 <details><summary>Local (Project-specific) Installation</summary>
 
@@ -114,7 +116,7 @@ AUQ supports multiple AI environments. Choose between **OpenCode plugin** and **
 **Method 1: Using CLI** (Recommended)
 
 ```bash
-claude mcp add --transport stdio ask-user-questions -- bunx -y auq-mcp-server server
+claude mcp add --transport stdio ask-user-questions -- bunx --bun -y auq-mcp-server server
 ```
 
 > **Note:** `npx` also works if you prefer npm.
@@ -129,7 +131,7 @@ Add to `.mcp.json` in your project root (for team-wide sharing):
     "ask-user-questions": {
       "type": "stdio",
       "command": "bunx",
-      "args": ["-y", "auq-mcp-server", "server"]
+      "args": ["--bun", "-y", "auq-mcp-server", "server"]
     }
   }
 }
@@ -151,7 +153,7 @@ Add to `~/.codex/config.toml`:
 ```toml
 [mcp_servers.ask-user-questions]
 command = "bunx"
-args = ["-y", "auq-mcp-server", "server"]
+args = ["--bun", "-y", "auq-mcp-server", "server"]
 tool_timeout_sec = 99999  // Extend timeout for long sessions
 ```
 
@@ -167,7 +169,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
   "mcpServers": {
     "ask-user-questions": {
       "command": "bunx",
-      "args": ["-y", "auq-mcp-server", "server"]
+      "args": ["--bun", "-y", "auq-mcp-server", "server"]
     }
   }
 }
@@ -259,7 +261,7 @@ OpenTUI is the default renderer and requires **Bun** runtime. When Bun is unavai
    auq config set renderer ink
    ```
 
-> **Note:** OpenTUI provides native CJK character support, built-in markdown rendering with syntax highlighting, and mouse support. The shell wrapper (`bin/auq`) auto-detects Bun at runtime.
+> **Note:** OpenTUI provides native CJK character support, built-in markdown rendering with syntax highlighting, and mouse support. The platform-specific launcher (`bin/auq`) auto-detects Bun at runtime and uses a Node-based entry point for Windows npm shims.
 
 ### Markdown rendering in question prompts
 

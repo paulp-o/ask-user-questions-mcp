@@ -1,4 +1,6 @@
 import { spawn } from "child_process";
+import { statSync } from "fs";
+import { isAbsolute, join } from "path";
 
 import { type Plugin } from "@opencode-ai/plugin";
 import { tool } from "@opencode-ai/plugin/tool";
@@ -43,10 +45,37 @@ function safeSummaryFromArgs(args: unknown): string | null {
   return `Questions: ${labels}`;
 }
 
+function resolveWindowsAuq(): string {
+  const pathValue = process.env.PATH ?? process.env.Path ?? "";
+  for (const rawDirectory of pathValue.split(";")) {
+    const directory = rawDirectory.trim().replace(/^"(.*)"$/, "$1");
+    if (!directory || !isAbsolute(directory)) continue;
+
+    for (const extension of [".cmd", ".exe", ".bat"]) {
+      const candidate = join(directory, `auq${extension}`);
+      try {
+        if (statSync(candidate).isFile()) return candidate;
+      } catch {
+        // Try the next executable or absolute PATH entry.
+      }
+    }
+  }
+  throw new Error(
+    'Could not find "auq" in an absolute PATH directory. Is the auq CLI installed globally?',
+  );
+}
+
 const runAuqAsk = async (payload: unknown): Promise<string> =>
   new Promise((resolve, reject) => {
-    const child = spawn("auq", ["ask"], {
+    const isWindows = process.platform === "win32";
+    // cmd.exe prefers the current directory. Resolve only absolute PATH
+    // entries and quote the resulting path before invoking the npm shim.
+    const command = isWindows ? `"${resolveWindowsAuq()}"` : "auq";
+    const child = spawn(command, ["ask"], {
       stdio: ["pipe", "pipe", "pipe"],
+      // npm exposes `auq` as a .cmd shim on Windows. Node cannot spawn that
+      // shim directly, while POSIX should retain the direct, no-shell path.
+      shell: isWindows,
     });
 
     let stdout = "";
@@ -77,6 +106,10 @@ const runAuqAsk = async (payload: unknown): Promise<string> =>
       }
       const detail = stderr.trim() || stdout.trim();
       reject(new Error(detail || `auq ask exited with code ${code}`));
+    });
+
+    child.stdin.on("error", (error) => {
+      reject(new Error(`Failed to write to "auq ask": ${error.message}`));
     });
 
     try {
