@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SessionRequest } from "../../../session/types.js";
 import { ConfigProvider } from "../../ConfigContext.js";
 import { ThemeContext } from "../../ThemeContext.js";
+import type { SessionUIState } from "../../shared/types.js";
 import { darkTheme } from "../../shared/themes/dark.js";
 import { StepperView } from "../StepperView.js";
 
@@ -41,10 +42,10 @@ const sessionRequest: SessionRequest = {
   ],
 };
 
-function renderStepper(
+function stepperElement(
   props: Partial<React.ComponentProps<typeof StepperView>> = {},
 ) {
-  return render(
+  return (
     <ThemeContext.Provider value={mockThemeValue}>
       <ConfigProvider>
         <StepperView
@@ -53,12 +54,31 @@ function renderStepper(
           {...props}
         />
       </ConfigProvider>
-    </ThemeContext.Provider>,
+    </ThemeContext.Provider>
   );
 }
 
+function renderStepper(
+  props: Partial<React.ComponentProps<typeof StepperView>> = {},
+) {
+  return render(stepperElement(props));
+}
+
 function getOutput(frame: string | undefined): string {
+  // eslint-disable-next-line no-control-regex -- Terminal frames contain ANSI escapes.
   return (frame ?? "").replace(/\x1b\[[0-9;]*m/g, "").replace(/\r/g, "");
+}
+
+async function expectFocusedOption(
+  onStateSnapshot: ReturnType<typeof vi.fn>,
+  focusedOptionIndex: number,
+) {
+  await vi.waitFor(() => {
+    const state = onStateSnapshot.mock.lastCall?.[1] as
+      | SessionUIState
+      | undefined;
+    expect(state?.focusedOptionIndex).toBe(focusedOptionIndex);
+  });
 }
 
 afterEach(() => {
@@ -71,7 +91,7 @@ describe("StepperView keyboard shortcuts", () => {
     const instance = renderStepper();
 
     // Verify we start on question 1
-    let output = getOutput(instance.lastFrame());
+    const output = getOutput(instance.lastFrame());
     expect(output).toContain("First question?");
 
     // Press Escape
@@ -83,11 +103,40 @@ describe("StepperView keyboard shortcuts", () => {
     });
   });
 
+  it("blocks rejection reason input and submission while inactive", async () => {
+    const onComplete = vi.fn();
+    const instance = renderStepper({ onComplete });
+
+    instance.stdin.write("\x1b");
+    await vi.waitFor(() => {
+      expect(getOutput(instance.lastFrame())).toContain(
+        "Are you sure you want to reject this question set?",
+      );
+    });
+
+    instance.stdin.write("y");
+    await vi.waitFor(() => {
+      expect(getOutput(instance.lastFrame())).toContain(
+        "Type your reason here...",
+      );
+    });
+
+    instance.rerender(stepperElement({ isInputActive: false, onComplete }));
+    instance.stdin.write("\x1b");
+    instance.stdin.write("\r");
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(getOutput(instance.lastFrame())).toContain(
+      "Type your reason here...",
+    );
+  });
+
   it("Tab navigates to next question", async () => {
     const instance = renderStepper();
 
     // Verify starting on question 1
-    let output = getOutput(instance.lastFrame());
+    const output = getOutput(instance.lastFrame());
     expect(output).toContain("First question?");
 
     // Press Tab to advance to Q2
@@ -148,7 +197,7 @@ describe("StepperView keyboard shortcuts", () => {
     const instance = renderStepper();
 
     // Verify on Q1
-    let output = getOutput(instance.lastFrame());
+    const output = getOutput(instance.lastFrame());
     expect(output).toContain("First question?");
 
     // Press Shift+Tab at Q1 — should remain on Q1
@@ -171,6 +220,72 @@ describe("StepperView keyboard shortcuts", () => {
     await vi.waitFor(() => {
       // onProgress should be called with (answered=1, total=3)
       expect(onProgress).toHaveBeenCalledWith(1, 3);
+    });
+  });
+
+  it("navigates options with bare j/k", async () => {
+    const onStateSnapshot = vi.fn();
+    const instance = renderStepper({ onStateSnapshot });
+
+    instance.stdin.write("j");
+    await expectFocusedOption(onStateSnapshot, 1);
+
+    instance.stdin.write("k");
+    await expectFocusedOption(onStateSnapshot, 0);
+  });
+
+  it("preserves custom input and blocks keys while inactive", async () => {
+    const onStateSnapshot = vi.fn();
+    const onAbandonedCancel = vi.fn();
+    const instance = renderStepper({ onStateSnapshot, onAbandonedCancel });
+
+    instance.stdin.write("j");
+    await expectFocusedOption(onStateSnapshot, 1);
+    instance.stdin.write("j");
+    await expectFocusedOption(onStateSnapshot, 2);
+
+    instance.stdin.write("j");
+    await vi.waitFor(() => {
+      const state = onStateSnapshot.mock.lastCall?.[1] as
+        | SessionUIState
+        | undefined;
+      expect(state?.answers.get(0)?.customText).toBe("j");
+      expect(state?.focusedOptionIndex).toBe(2);
+    });
+
+    instance.rerender(
+      stepperElement({
+        isInputActive: false,
+        onStateSnapshot,
+        onAbandonedCancel,
+      }),
+    );
+    instance.stdin.write("k");
+    instance.stdin.write("\x1b");
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const inactiveState = onStateSnapshot.mock.lastCall?.[1] as
+      | SessionUIState
+      | undefined;
+    expect(inactiveState?.answers.get(0)?.customText).toBe("j");
+    expect(inactiveState?.focusedOptionIndex).toBe(2);
+    expect(getOutput(instance.lastFrame())).not.toContain("Reject Questions?");
+    expect(onAbandonedCancel).not.toHaveBeenCalled();
+
+    instance.rerender(
+      stepperElement({
+        isInputActive: true,
+        onStateSnapshot,
+        onAbandonedCancel,
+      }),
+    );
+    instance.stdin.write("k");
+    await vi.waitFor(() => {
+      const state = onStateSnapshot.mock.lastCall?.[1] as
+        | SessionUIState
+        | undefined;
+      expect(state?.answers.get(0)?.customText).toBe("jk");
+      expect(state?.focusedOptionIndex).toBe(2);
     });
   });
 });

@@ -20,6 +20,7 @@ interface ReviewScreenProps {
   sessionId: string;
   elaborateMarks?: Map<number, string>;
   isSubmitting?: boolean;
+  isInputActive?: boolean;
 }
 
 /**
@@ -34,10 +35,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   questions,
   elaborateMarks,
   isSubmitting = false,
+  isInputActive = true,
 }) => {
   const { theme } = useTheme();
 
-  useInput((input, key) => {
+  useInput(
+    (input, key) => {
     // Disable input while submitting
     if (isSubmitting) return;
 
@@ -64,7 +67,9 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
     if (KEYS.GO_BACK.test(input)) {
       onGoBack();
     }
-  });
+    },
+    { isActive: isInputActive && !isSubmitting },
+  );
 
   return (
     <Box flexDirection="column">
@@ -97,9 +102,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                   <Text color={theme.components.review.questionId}>
                     [{questionId}]{" "}
                   </Text>
-                  <Text bold>
-                    {questionTitle}.{" "}
-                  </Text>
+                  <Text bold>{questionTitle}. </Text>
                 </Box>
                 <MarkdownPrompt text={question.prompt} />
               </Box>

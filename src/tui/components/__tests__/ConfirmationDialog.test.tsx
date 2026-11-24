@@ -16,7 +16,7 @@ vi.mock("ink", async () => {
       handler: (input: string, key: Record<string, boolean>) => void,
       options?: { isActive?: boolean },
     ) => {
-      // ConfirmationDialog calls useInput without options, so always capture
+      // Capture only active handlers; overlay-hidden screens must stay inert.
       if (!options || options.isActive !== false) {
         inputState.handler = handler;
       }
@@ -173,5 +173,10 @@ describe("ConfirmationDialog keyboard handling", () => {
     await Promise.resolve();
 
     expect(onQuit).toHaveBeenCalled();
+  });
+
+  it("does not register keyboard input while an overlay is active", () => {
+    renderDialog({ isInputActive: false });
+    expect(inputState.handler).toBeNull();
   });
 });

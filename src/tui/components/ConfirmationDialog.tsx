@@ -10,6 +10,7 @@ interface ConfirmationDialogProps {
   onReject: (reason: string | null) => void;
   onCancel: () => void;
   onQuit: () => void;
+  isInputActive?: boolean;
 }
 
 /**
@@ -22,6 +23,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onReject,
   onCancel,
   onQuit,
+  isInputActive = true,
 }) => {
   const { theme } = useTheme();
 
@@ -46,7 +48,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     { key: "n", label: t("confirmation.rejectNo"), action: onCancel },
   ];
 
-  useInput((input, key) => {
+  useInput(
+    (input, key) => {
     // If in reason input mode, handle Esc to skip
     if (showReasonInput) {
       if (key.escape) {
@@ -80,7 +83,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     if (key.escape) {
       onQuit();
     }
-  });
+    },
+    { isActive: isInputActive },
+  );
 
   // Step 2: Reason input screen
   if (showReasonInput) {
@@ -101,7 +106,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         </Box>
         <Box marginBottom={1}>
           <SingleLineTextInput
-            isFocused={true}
+            isFocused={isInputActive}
             onChange={setRejectionReason}
             onSubmit={handleReasonSubmit}
             placeholder="Type your reason here..."

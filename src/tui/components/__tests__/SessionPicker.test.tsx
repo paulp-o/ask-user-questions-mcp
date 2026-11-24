@@ -1,6 +1,10 @@
-import React from "react";
+import React, { act } from "react";
 import { cleanup, render } from "ink-testing-library";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+(
+  globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 const inputState = vi.hoisted(() => ({
   handler: null as
@@ -47,7 +51,10 @@ function getOutput(frame: string | undefined): string {
   return (frame ?? "").replace(/\x1b\[[0-9;]*m/g, "").replace(/\r/g, "");
 }
 
-function createSession(id: number, overrides?: { isStale?: boolean; isAbandoned?: boolean }): SessionPickerSessionData {
+function createSession(
+  id: number,
+  overrides?: { isStale?: boolean; isAbandoned?: boolean },
+): SessionPickerSessionData {
   return {
     sessionId: `picker-id-${id}`,
     sessionRequest: {
@@ -145,6 +152,52 @@ describe("SessionPicker", () => {
 
     expect(onSelectIndex).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("navigates to the next row with j and selects it on Enter", async () => {
+    const onSelectIndex = vi.fn();
+    renderWithTheme(
+      <SessionPicker
+        isOpen
+        sessions={[createSession(1), createSession(2), createSession(3)]}
+        activeIndex={0}
+        sessionUIStates={{}}
+        onSelectIndex={onSelectIndex}
+        onClose={vi.fn()}
+      />,
+    );
+
+    await act(async () => {
+      inputState.handler!("j", {});
+    });
+    await act(async () => {
+      inputState.handler!("", { return: true });
+    });
+
+    expect(onSelectIndex).toHaveBeenCalledWith(1);
+  });
+
+  it("navigates to the previous row with k and selects it on Enter", async () => {
+    const onSelectIndex = vi.fn();
+    renderWithTheme(
+      <SessionPicker
+        isOpen
+        sessions={[createSession(1), createSession(2), createSession(3)]}
+        activeIndex={1}
+        sessionUIStates={{}}
+        onSelectIndex={onSelectIndex}
+        onClose={vi.fn()}
+      />,
+    );
+
+    await act(async () => {
+      inputState.handler!("k", {});
+    });
+    await act(async () => {
+      inputState.handler!("", { return: true });
+    });
+
+    expect(onSelectIndex).toHaveBeenCalledWith(0);
   });
 
   it("selects the currently highlighted session on Enter", async () => {

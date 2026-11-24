@@ -1,5 +1,5 @@
-import { TextAttributes } from "@opentui/core";
-import React, { useEffect, useState } from "react";
+import { TextAttributes, type TextareaRenderable } from "@opentui/core";
+import React, { useEffect, useRef, useState } from "react";
 import { useKeyboard } from "@opentui/react";
 
 import type { Option } from "../../session/types.js";
@@ -8,6 +8,7 @@ import { useConfig } from "../ConfigContext.js";
 import { useTheme } from "../ThemeProvider.js";
 import type { FocusContext } from "../../tui/shared/types.js";
 import { isRecommendedOption } from "../../tui/shared/utils/recommended.js";
+import { getVimNavigationDirection } from "../../tui/shared/utils/vimNavigation.js";
 import { useTerminalDimensions } from "../hooks/useTerminalDimensions.js";
 
 interface OptionsListProps {
@@ -106,6 +107,25 @@ export const OptionsList = ({
   const isElaborateFocused = showCustomInput && focusedIndex === elaborateIndex;
   const customLines = customValue.replace(/\r\n?/g, "\n").split("\n");
   const elaborateLines = elaborateText.replace(/\r\n?/g, "\n").split("\n");
+  const customInputRef = useRef<TextareaRenderable>(null);
+  const elaborateInputRef = useRef<TextareaRenderable>(null);
+
+  // Textarea is uncontrolled so native editing and newlines are not sanitized.
+  // onContentChange mirrors text into the answer state for submissions/previews.
+  // External changes (for example, clearing a mark) must update the native buffer.
+  useEffect(() => {
+    const customInput = customInputRef.current;
+    if (customInput && customInput.plainText !== customValue) {
+      customInput.setText(customValue);
+      customInput.gotoBufferEnd();
+    }
+
+    const elaborateInput = elaborateInputRef.current;
+    if (elaborateInput && elaborateInput.plainText !== elaborateText) {
+      elaborateInput.setText(elaborateText);
+      elaborateInput.gotoBufferEnd();
+    }
+  }, [customValue, elaborateText]);
 
   // Track and emit focus context changes
   useEffect(() => {
@@ -145,14 +165,20 @@ export const OptionsList = ({
   useKeyboard((key) => {
     if (!isFocused) return;
 
-    // Handle up/down navigation even when custom input is focused
-    if (key.name === "up") {
+    const vimDirection = getVimNavigationDirection(
+      key.name,
+      key,
+      isCustomInputFocused || isElaborateFocused,
+    );
+
+    // Arrow keys always navigate; bare j/k navigate only outside text input.
+    if (key.name === "up" || vimDirection === "up") {
       const newIndex = Math.max(0, focusedIndex - 1);
       setFocusedIndex(newIndex);
       return;
     }
 
-    if (key.name === "down") {
+    if (key.name === "down" || vimDirection === "down") {
       const newIndex = Math.min(maxIndex, focusedIndex + 1);
       setFocusedIndex(newIndex);
       return;
@@ -170,7 +196,7 @@ export const OptionsList = ({
         key.preventDefault(); // prevent <input> onChange from overwriting state
         if (key.shift) {
           // Shift+Enter: insert newline (Kitty-protocol terminals)
-          onCustomChange?.(customValue + "\n");
+          customInputRef.current?.newLine();
         } else {
           // Enter: advance to next question
           onCustomChange?.(customValue);
@@ -179,7 +205,7 @@ export const OptionsList = ({
       } else if (key.ctrl && key.name === "j") {
         // Ctrl+J: universal newline fallback (0x0A, works in ALL terminals)
         key.preventDefault();
-        onCustomChange?.(customValue + "\n");
+        customInputRef.current?.newLine();
       }
       return;
     }
@@ -199,7 +225,7 @@ export const OptionsList = ({
         key.preventDefault(); // prevent <input> onChange from overwriting state
         if (key.shift) {
           // Shift+Enter: insert newline (Kitty-protocol terminals)
-          onElaborateTextChange?.(elaborateText + "\n");
+          elaborateInputRef.current?.newLine();
         } else {
           // Enter: advance to next question
           onElaborateTextChange?.(elaborateText);
@@ -211,7 +237,7 @@ export const OptionsList = ({
       } else if (key.ctrl && key.name === "j") {
         // Ctrl+J: universal newline fallback (0x0A, works in ALL terminals)
         key.preventDefault();
-        onElaborateTextChange?.(elaborateText + "\n");
+        elaborateInputRef.current?.newLine();
       }
       return;
     }
@@ -376,12 +402,17 @@ export const OptionsList = ({
                   paddingY: 0,
                 }}
               >
-                <input
-                  value={customValue}
-                  onChange={(val: string) => onCustomChange?.(val)}
+                <textarea
+                  ref={customInputRef}
+                  initialValue={customValue}
+                  onContentChange={() =>
+                    onCustomChange?.(customInputRef.current?.plainText ?? "")
+                  }
                   onSubmit={() => {}}
                   placeholder={t("input.placeholder")}
                   focused={true}
+                  style={{ height: 1 }}
+                  wrapMode="none"
                 />
               </box>
             )}
@@ -449,12 +480,19 @@ export const OptionsList = ({
                   paddingY: 0,
                 }}
               >
-                <input
-                  value={elaborateText}
-                  onChange={(val: string) => onElaborateTextChange?.(val)}
+                <textarea
+                  ref={elaborateInputRef}
+                  initialValue={elaborateText}
+                  onContentChange={() =>
+                    onElaborateTextChange?.(
+                      elaborateInputRef.current?.plainText ?? "",
+                    )
+                  }
                   onSubmit={() => {}}
                   placeholder={t("input.elaboratePlaceholder")}
                   focused={true}
+                  style={{ height: 1 }}
+                  wrapMode="none"
                 />
               </box>
             )}

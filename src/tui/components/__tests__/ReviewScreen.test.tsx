@@ -16,7 +16,7 @@ vi.mock("ink", async () => {
       handler: (input: string, key: Record<string, boolean>) => void,
       options?: { isActive?: boolean },
     ) => {
-      // ReviewScreen calls useInput without options, so always capture
+      // Capture only active handlers; overlay-hidden screens must stay inert.
       if (!options || options.isActive !== false) {
         inputState.handler = handler;
       }
@@ -57,9 +57,7 @@ describe("ReviewScreen keyboard handling", () => {
     },
   ];
 
-  const sampleAnswers = new Map([
-    [0, { selectedOption: "Option A" }],
-  ]);
+  const sampleAnswers = new Map([[0, { selectedOption: "Option A" }]]);
 
   function renderReview(overrides: Record<string, unknown> = {}) {
     const props = {
@@ -106,13 +104,14 @@ describe("ReviewScreen keyboard handling", () => {
     expect(onGoBack).toHaveBeenCalledTimes(1);
   });
 
-  it("Enter does not fire while submitting", async () => {
+  it("does not register Enter while submitting", () => {
     const { onConfirm } = renderReview({ isSubmitting: true });
-    expect(inputState.handler).not.toBeNull();
-
-    inputState.handler!("", { return: true });
-    await Promise.resolve();
-
+    expect(inputState.handler).toBeNull();
     expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it("does not register keyboard input while an overlay is active", () => {
+    renderReview({ isInputActive: false });
+    expect(inputState.handler).toBeNull();
   });
 });

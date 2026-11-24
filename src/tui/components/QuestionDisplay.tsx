@@ -29,6 +29,7 @@ interface QuestionDisplayProps {
   onFocusContextChange?: (context: FocusContext) => void;
   focusedOptionIndex: number;
   onFocusedOptionIndexChange?: (index: number) => void;
+  isInputActive?: boolean;
   workingDirectory?: string;
   // Recommended option detection
   onRecommendedDetected?: (hasRecommended: boolean) => void;
@@ -66,6 +67,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   onFocusContextChange,
   focusedOptionIndex,
   onFocusedOptionIndexChange,
+  isInputActive = true,
   workingDirectory,
   onRecommendedDetected,
   hasRecommendedOptions,
@@ -141,7 +143,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       {/* Options list with integrated custom input and elaborate option */}
       <OptionsList
         customValue={customAnswer}
-        isFocused={true}
+        isFocused={isInputActive}
         onAdvance={onAdvanceToNext}
         onCustomChange={handleCustomAnswerChange}
         onSelect={handleSelectOption}

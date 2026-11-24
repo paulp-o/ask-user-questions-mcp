@@ -8,6 +8,7 @@ import { useConfig } from "../ConfigContext.js";
 import { useTheme } from "../ThemeContext.js";
 import type { FocusContext } from "../shared/types.js";
 import { isRecommendedOption } from "../shared/utils/recommended.js";
+import { getVimNavigationDirection } from "../shared/utils/vimNavigation.js";
 import {
   fitToVisualWidth,
   getVisualWidth,
@@ -183,13 +184,19 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     (input, key) => {
       if (!isFocused) return;
 
-      // Handle up/down navigation even when custom input is focused
-      if (key.upArrow) {
+      const vimDirection = getVimNavigationDirection(
+        input,
+        key,
+        isCustomInputFocused || isElaborateFocused,
+      );
+
+      // Arrow keys always navigate; bare j/k navigate only outside text input.
+      if (key.upArrow || vimDirection === "up") {
         setFocusedIndex((prev) => Math.max(0, prev - 1));
         return;
       }
 
-      if (key.downArrow) {
+      if (key.downArrow || vimDirection === "down") {
         setFocusedIndex((prev) => Math.min(maxIndex, prev + 1));
         return;
       }
@@ -399,7 +406,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
                 paddingY={0}
               >
                 <MultiLineTextInput
-                  isFocused={true}
+                  isFocused={isFocused}
                   onChange={onCustomChange}
                   onSubmit={() => {
                     onCustomChange?.(customValue);
@@ -473,7 +480,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
               >
                 <MultiLineTextInput
                   enterSubmits={true}
-                  isFocused={true}
+                  isFocused={isFocused}
                   onChange={onElaborateTextChange}
                   onSubmit={() => {
                     onElaborateTextChange?.(elaborateText);
