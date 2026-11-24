@@ -181,6 +181,32 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 </details>
 
+<details>
+<summary><strong>Google Antigravity</strong></summary>
+
+AUQ works as a local stdio MCP server in Antigravity.
+
+For **Antigravity IDE**, open the agent side panel menu (`…`), select **MCP Servers → Manage MCP Servers → View raw config**, and add the following entry. The global configuration file is `~/.gemini/config/mcp_config.json`; for workspace-only access, use `<workspace>/.agents/mcp_config.json` instead.
+
+```json
+{
+  "mcpServers": {
+    "ask-user-questions": {
+      "command": "bunx",
+      "args": ["--bun", "-y", "auq-mcp-server", "server"]
+    }
+  }
+}
+```
+
+> _If you use npm instead of Bun, replace `bunx` with `npx` and remove `--bun` from `args`._
+
+For the **Antigravity CLI**, the same global/workspace files apply. Use `/mcp` to reload the configuration or inspect the server connection. If the server does not appear in the IDE immediately, restart its MCP connection after saving.
+
+See the [Antigravity MCP documentation](https://antigravity.google/docs/mcp) for configuration details.
+
+</details>
+
 ### Option B: OpenCode Plugin
 
 **Direct integration** for OpenCode users. Adds working directory viewability feature exclusively.
