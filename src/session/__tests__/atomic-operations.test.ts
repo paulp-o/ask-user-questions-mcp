@@ -263,6 +263,30 @@ describe("Atomic File Operations", () => {
   });
 
   describe("File Locking", () => {
+    it.each([
+      ["write", (path: string) => atomicWriteFile(path, "replacement")],
+      ["copy", (path: string) => atomicCopyFile(join(testDir, "source"), path)],
+      ["delete", atomicDeleteFile],
+    ] as const)(
+      "preserves another owner's lock after a %s timeout",
+      async (_, operation) => {
+        const lockFile = `${testFile}.lock`;
+        const owner = process.pid.toString();
+        await fs.writeFile(testFile, testContent);
+        await fs.writeFile(join(testDir, "source"), "replacement");
+        await fs.writeFile(lockFile, owner, { flag: "wx" });
+
+        await expect(operation(testFile)).rejects.toMatchObject({
+          cause: expect.any(FileLockError),
+        });
+
+        expect(await isFileLocked(testFile)).toBe(true);
+        expect(await fs.readFile(lockFile, "utf8")).toBe(owner);
+        expect(await fs.readFile(testFile, "utf8")).toBe(testContent);
+      },
+      10_000,
+    );
+
     it("should detect when file is locked", async () => {
       // Manually create a lock file
       const lockFile = `${testFile}.lock`;
